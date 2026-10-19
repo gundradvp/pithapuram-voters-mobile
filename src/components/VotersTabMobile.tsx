@@ -1,11 +1,13 @@
 import React, { useState, useMemo } from 'react';
 import { Search, Phone, PhoneCall, MessageSquare, Send, Printer, CheckCircle2, Flag, UserX, AlertCircle, Sparkles, Home, UserCheck, Sliders, Plus, Clock } from 'lucide-react';
 import { MobileVoter, BoothInfo, VoterSurveyStatus, VoterCampaignProfile } from '../types';
+import { Language, translations } from '../utils/i18n';
 
 interface VotersTabMobileProps {
   voters: MobileVoter[];
   boothInfo: BoothInfo;
   profiles: Record<number, VoterCampaignProfile>;
+  language?: Language;
   onOpenPhoneEditor: (voter: MobileVoter) => void;
   onOpenSupportPicker: (title: string, currentPct: number, currentNotes?: string, voterSno?: number) => void;
   onOpenLogVisit: (voter: MobileVoter) => void;
@@ -18,6 +20,7 @@ export const VotersTabMobile: React.FC<VotersTabMobileProps> = ({
   voters,
   boothInfo,
   profiles,
+  language = 'te',
   onOpenPhoneEditor,
   onOpenSupportPicker,
   onOpenLogVisit,
@@ -31,6 +34,8 @@ export const VotersTabMobile: React.FC<VotersTabMobileProps> = ({
   >('all');
   const [visibleCount, setVisibleCount] = useState(30);
   const [activeMenuSno, setActiveMenuSno] = useState<number | null>(null);
+
+  const t = translations[language];
 
   // Filter Voters
   const filteredVoters = useMemo(() => {
@@ -112,41 +117,41 @@ export const VotersTabMobile: React.FC<VotersTabMobileProps> = ({
     if (p === 100) {
       return (
         <span className="px-1.5 py-0.2 bg-red-600/30 text-red-300 border border-red-500/50 rounded-md text-[9px] font-black flex items-center gap-0.5">
-          🚩 100% Support
+          🚩 {language === 'te' ? '100% మనవాళ్లే' : '100% Support'}
         </span>
       );
     }
     if (p >= 75) {
       return (
         <span className="px-1.5 py-0.2 bg-emerald-600/30 text-emerald-300 border border-emerald-500/50 rounded-md text-[9px] font-black flex items-center gap-0.5">
-          🟢 {p}% Strong
+          🟢 {p}% {language === 'te' ? 'అనుకూలం' : 'Strong'}
         </span>
       );
     }
     if (p === 40) {
       return (
         <span className="px-1.5 py-0.2 bg-amber-600/30 text-amber-300 border border-amber-500/50 rounded-md text-[9px] font-black flex items-center gap-0.5">
-          🟡 40% Positive
+          🟡 {p}% {language === 'te' ? 'సానుకూలం' : 'Positive'}
         </span>
       );
     }
     if (p === 0) {
       return (
         <span className="px-1.5 py-0.2 bg-rose-950/80 text-rose-400 border border-rose-500/50 rounded-md text-[9px] font-black flex items-center gap-0.5">
-          🔴 100% Opponent
+          🔴 0% {language === 'te' ? 'ప్రత్యర్థి' : 'Opponent'}
         </span>
       );
     }
     if (p <= 25) {
       return (
         <span className="px-1.5 py-0.2 bg-orange-600/30 text-orange-300 border border-orange-500/50 rounded-md text-[9px] font-bold flex items-center gap-0.5">
-          🟠 {p}% Doubtful
+          🟠 {p}% {language === 'te' ? 'అనుమానం' : 'Doubtful'}
         </span>
       );
     }
     return (
       <span className="px-1.5 py-0.2 bg-slate-800 text-slate-400 border border-slate-700 rounded-md text-[9px] font-medium flex items-center gap-0.5">
-        ⚪ 50% Neutral
+        ⚪ 50% {language === 'te' ? 'తేల్చుకోలేదు' : 'Neutral'}
       </span>
     );
   };
@@ -154,17 +159,15 @@ export const VotersTabMobile: React.FC<VotersTabMobileProps> = ({
   const getStatusBadge = (status?: VoterSurveyStatus | null) => {
     switch (status) {
       case 'voted':
-        return <span className="px-1.5 py-0.5 bg-emerald-600/30 text-emerald-300 border border-emerald-500/40 rounded text-[9px] font-bold flex items-center gap-0.5">✅ Voted</span>;
+        return <span className="px-1.5 py-0.5 bg-emerald-600/30 text-emerald-300 border border-emerald-500/40 rounded text-[9px] font-bold flex items-center gap-0.5">✅ {t.markVoted}</span>;
       case 'supporter':
-        return <span className="px-1.5 py-0.5 bg-red-600/30 text-red-300 border border-red-500/40 rounded text-[9px] font-bold flex items-center gap-0.5">🚩 Supporter</span>;
+        return <span className="px-1.5 py-0.5 bg-red-600/30 text-red-300 border border-red-500/40 rounded text-[9px] font-bold flex items-center gap-0.5">🚩 {language === 'te' ? 'మద్దతుదారు' : 'Supporter'}</span>;
       case 'visited':
-        return <span className="px-1.5 py-0.5 bg-blue-600/30 text-blue-300 border border-blue-500/40 rounded text-[9px] font-bold flex items-center gap-0.5">📋 Visited</span>;
+        return <span className="px-1.5 py-0.5 bg-blue-600/30 text-blue-300 border border-blue-500/40 rounded text-[9px] font-bold flex items-center gap-0.5">📋 {language === 'te' ? 'వెళ్లాము' : 'Visited'}</span>;
       case 'opponent':
-        return <span className="px-1.5 py-0.5 bg-slate-700/60 text-slate-300 border border-slate-600 rounded text-[9px] font-bold flex items-center gap-0.5">🔴 Opponent</span>;
+        return <span className="px-1.5 py-0.5 bg-slate-700/60 text-slate-300 border border-slate-600 rounded text-[9px] font-bold flex items-center gap-0.5">🔴 {language === 'te' ? 'ప్రత్యర్థి' : 'Opponent'}</span>;
       case 'doubtful':
-        return <span className="px-1.5 py-0.5 bg-amber-600/30 text-amber-300 border border-amber-500/40 rounded text-[9px] font-bold flex items-center gap-0.5">⚠️ Doubtful</span>;
-      case 'shifted':
-        return <span className="px-1.5 py-0.5 bg-purple-600/30 text-purple-300 border border-purple-500/40 rounded text-[9px] font-bold flex items-center gap-0.5">✈️ Shifted</span>;
+        return <span className="px-1.5 py-0.5 bg-amber-600/30 text-amber-300 border border-amber-500/40 rounded text-[9px] font-bold flex items-center gap-0.5">⚠️ {language === 'te' ? 'అనుమానం' : 'Doubtful'}</span>;
       default:
         return null;
     }
@@ -173,7 +176,7 @@ export const VotersTabMobile: React.FC<VotersTabMobileProps> = ({
   return (
     <div className="space-y-3 pb-24 text-xs">
       {/* Search Input */}
-      <div className="sticky top-[53px] z-30 bg-slate-950/95 backdrop-blur-md pt-2 pb-1 space-y-2">
+      <div className="sticky top-[51px] z-30 bg-slate-950/95 backdrop-blur-md pt-2 pb-1 space-y-2">
         <div className="relative">
           <Search className="w-4 h-4 absolute left-3 top-3 text-slate-400" />
           <input
@@ -183,7 +186,7 @@ export const VotersTabMobile: React.FC<VotersTabMobileProps> = ({
               setSearchQuery(e.target.value);
               setVisibleCount(30);
             }}
-            placeholder="Search Name, Phone, Door No, EPIC, Relative, Influencer..."
+            placeholder={t.searchPlaceholder}
             className="w-full bg-slate-900 border border-slate-800 rounded-xl pl-9 pr-3 py-2 text-xs text-white placeholder-slate-500 focus:outline-none focus:border-amber-400 shadow-md"
           />
         </div>
@@ -198,7 +201,7 @@ export const VotersTabMobile: React.FC<VotersTabMobileProps> = ({
                 : 'bg-slate-900 text-slate-400 border border-slate-800'
             }`}
           >
-            All ({counts.all})
+            {t.filterAll} ({counts.all})
           </button>
 
           <button
@@ -209,7 +212,7 @@ export const VotersTabMobile: React.FC<VotersTabMobileProps> = ({
                 : 'bg-slate-900 text-red-300 border border-red-500/30'
             }`}
           >
-            <span>🚩 100% Full ({counts.full})</span>
+            <span>{t.filterFull} ({counts.full})</span>
           </button>
 
           <button
@@ -220,7 +223,7 @@ export const VotersTabMobile: React.FC<VotersTabMobileProps> = ({
                 : 'bg-slate-900 text-amber-300 border border-amber-500/30'
             }`}
           >
-            <span>🟡 40% Positive ({counts.soft})</span>
+            <span>{t.filterSoft} ({counts.soft})</span>
           </button>
 
           <button
@@ -231,7 +234,7 @@ export const VotersTabMobile: React.FC<VotersTabMobileProps> = ({
                 : 'bg-slate-900 text-emerald-300 border border-emerald-500/30'
             }`}
           >
-            <span>🟢 75% Strong ({counts.strong})</span>
+            <span>{t.filterStrong} ({counts.strong})</span>
           </button>
 
           <button
@@ -242,7 +245,7 @@ export const VotersTabMobile: React.FC<VotersTabMobileProps> = ({
                 : 'bg-slate-900 text-blue-300 border border-blue-500/30'
             }`}
           >
-            <span>📱 Has Phone ({counts.hasPhone})</span>
+            <span>{t.filterPhone} ({counts.hasPhone})</span>
           </button>
 
           <button
@@ -253,7 +256,7 @@ export const VotersTabMobile: React.FC<VotersTabMobileProps> = ({
                 : 'bg-slate-900 text-amber-300 border border-amber-500/30'
             }`}
           >
-            <span>⭐ Kriya Exact ({counts.exact})</span>
+            <span>{t.filterKriya} ({counts.exact})</span>
           </button>
 
           <button
@@ -264,7 +267,7 @@ export const VotersTabMobile: React.FC<VotersTabMobileProps> = ({
                 : 'bg-slate-900 text-emerald-400 border border-emerald-500/30'
             }`}
           >
-            <span>✅ Voted ({counts.voted})</span>
+            <span>{t.filterVoted} ({counts.voted})</span>
           </button>
 
           <button
@@ -275,7 +278,7 @@ export const VotersTabMobile: React.FC<VotersTabMobileProps> = ({
                 : 'bg-slate-900 text-rose-400 border border-rose-500/30'
             }`}
           >
-            <span>🔴 Opponent ({counts.opponent})</span>
+            <span>{t.filterOpponent} ({counts.opponent})</span>
           </button>
         </div>
       </div>
@@ -283,14 +286,22 @@ export const VotersTabMobile: React.FC<VotersTabMobileProps> = ({
       {/* Showing Count */}
       <div className="flex items-center justify-between text-[11px] text-slate-400 px-1">
         <span>
-          Showing <strong className="text-white">{displayedVoters.length}</strong> of <strong className="text-amber-400">{filteredVoters.length}</strong> electors
+          {language === 'te' ? (
+            <>
+              <strong className="text-white">{displayedVoters.length}</strong> మంది ఓటర్లు కనిపిస్తున్నారు (మొత్తం: <strong className="text-amber-400 font-mono font-bold">{filteredVoters.length}</strong>)
+            </>
+          ) : (
+            <>
+              Showing <strong className="text-white">{displayedVoters.length}</strong> of <strong className="text-amber-400">{filteredVoters.length}</strong> electors
+            </>
+          )}
         </span>
         {searchQuery && (
           <button 
             onClick={() => setSearchQuery('')}
             className="text-amber-400 font-bold hover:underline"
           >
-            Clear Search
+            {t.clearSearch}
           </button>
         )}
       </div>
@@ -333,7 +344,7 @@ export const VotersTabMobile: React.FC<VotersTabMobileProps> = ({
                   <button
                     onClick={() => onOpenSupportPicker(v.n, pct, prof.notes, v.s)}
                     className="hover:scale-105 transition-transform"
-                    title="Tap to change political leaning %"
+                    title={language === 'te' ? 'మద్దతు శాతాన్ని మార్చడానికి ట్యాప్ చేయండి' : 'Tap to change political leaning %'}
                   >
                     {getLeaningBadge(pct)}
                   </button>
@@ -352,19 +363,19 @@ export const VotersTabMobile: React.FC<VotersTabMobileProps> = ({
                           : 'bg-gradient-to-r from-amber-500 to-yellow-500 text-slate-950'
                       }`}
                     >
-                      {v.k_type === 'exact' ? '⭐ Kriya Exact' : '⚡ Kriya Similar'}
+                      {v.k_type === 'exact' ? (language === 'te' ? '⭐ పక్కా క్రియా' : '⭐ Kriya Exact') : (language === 'te' ? '⚡ క్రియా మ్యాచింగ్' : '⚡ Kriya Similar')}
                     </span>
                   )}
                 </div>
 
                 <div className="text-[11px] text-slate-400 mt-0.5 flex items-center gap-2 flex-wrap">
-                  <span>Rel: <strong className="text-slate-300 font-medium">{v.r || '-'}</strong></span>
+                  <span>{t.relation}: <strong className="text-slate-300 font-medium">{v.r || '-'}</strong></span>
                   <span>•</span>
-                  <span>Age: <strong className="text-slate-300 font-medium">{v.a}Y ({v.g === 'M' ? 'M' : 'F'})</strong></span>
+                  <span>{t.age}: <strong className="text-slate-300 font-medium">{v.a}Y ({v.g === 'M' ? (language === 'te' ? 'పురుషుడు' : 'M') : (language === 'te' ? 'మహిళ' : 'F')})</strong></span>
                   <span>•</span>
                   <span className="flex items-center gap-1">
                     <Home className="w-3 h-3 text-amber-400" />
-                    H.No: <strong className="text-amber-300 font-mono">{v.hn || '-'}</strong>
+                    {t.houseNo}: <strong className="text-amber-300 font-mono">{v.hn || '-'}</strong>
                   </span>
                 </div>
 
@@ -384,7 +395,7 @@ export const VotersTabMobile: React.FC<VotersTabMobileProps> = ({
                     )}
 
                     {!phone && (
-                      <span className="text-slate-500 text-[10px] italic">No phone added</span>
+                      <span className="text-slate-500 text-[10px] italic">{t.noPhoneAdded}</span>
                     )}
                   </div>
 
@@ -392,7 +403,7 @@ export const VotersTabMobile: React.FC<VotersTabMobileProps> = ({
                     onClick={() => onOpenPhoneEditor(v)}
                     className="text-amber-400 hover:text-amber-300 font-bold text-[10px] underline flex items-center gap-0.5"
                   >
-                    {phone ? 'Edit Phone' : '+ Add Phone'}
+                    {phone ? t.editPhone : t.addPhone}
                   </button>
                 </div>
 
@@ -400,15 +411,15 @@ export const VotersTabMobile: React.FC<VotersTabMobileProps> = ({
                 <div className="mt-1 flex items-center justify-between text-[10px] text-slate-400">
                   <div className="flex items-center gap-1">
                     <UserCheck className="w-3 h-3 text-amber-400" />
-                    <span>Influencer:</span>
-                    <strong className="text-white">{prof.influencerName || 'None Assigned'}</strong>
+                    <span>{t.influencer}:</span>
+                    <strong className="text-white">{prof.influencerName || t.noneAssigned}</strong>
                   </div>
 
                   <button
                     onClick={() => onOpenInfluencerAssign(v.n, prof.influencerId, v.s)}
                     className="text-amber-400 hover:underline font-bold"
                   >
-                    {prof.influencerName ? 'Change' : '+ Assign'}
+                    {prof.influencerName ? t.changeLead : t.assignLead}
                   </button>
                 </div>
 
@@ -423,7 +434,7 @@ export const VotersTabMobile: React.FC<VotersTabMobileProps> = ({
                 <div className="mt-1.5 flex items-center justify-between text-[10px] bg-slate-950/80 p-1.5 rounded-xl border border-slate-800">
                   <div className="flex items-center gap-1.5 text-slate-300">
                     <Clock className="w-3.5 h-3.5 text-amber-400 flex-shrink-0" />
-                    <span>Visits: <strong className="text-white font-mono font-bold">{prof.visits?.length || 0}</strong></span>
+                    <span>{t.visitsLogged}: <strong className="text-white font-mono font-bold">{prof.visits?.length || 0}</strong></span>
                     {prof.visits && prof.visits.length > 0 && (
                       <span className="text-amber-400/90 truncate max-w-[120px] text-[9px] italic">
                         • {prof.visits[0].keyIssue}
@@ -434,7 +445,7 @@ export const VotersTabMobile: React.FC<VotersTabMobileProps> = ({
                     onClick={() => onOpenLogVisit(v)}
                     className="text-amber-400 hover:text-amber-300 font-black text-[10px] flex items-center gap-0.5 bg-amber-500/10 hover:bg-amber-500/20 px-2 py-0.5 rounded-lg border border-amber-500/30 transition-all"
                   >
-                    <span>{prof.visits && prof.visits.length > 0 ? '+ Add Visit' : '+ Log Visit'}</span>
+                    <span>{prof.visits && prof.visits.length > 0 ? t.addVisit : t.logVisit}</span>
                   </button>
                 </div>
               </div>
@@ -450,7 +461,7 @@ export const VotersTabMobile: React.FC<VotersTabMobileProps> = ({
                       title="Call Voter"
                     >
                       <PhoneCall className="w-3 h-3 text-emerald-400" />
-                      <span>Call</span>
+                      <span>{t.call}</span>
                     </a>
                   ) : (
                     <button
@@ -473,7 +484,7 @@ export const VotersTabMobile: React.FC<VotersTabMobileProps> = ({
                       title="Send WhatsApp message"
                     >
                       <MessageSquare className="w-3 h-3" />
-                      <span>WA</span>
+                      <span>{t.whatsapp}</span>
                     </a>
                   ) : null}
 
@@ -485,7 +496,7 @@ export const VotersTabMobile: React.FC<VotersTabMobileProps> = ({
                       title="Send SMS"
                     >
                       <Send className="w-3 h-3" />
-                      <span>SMS</span>
+                      <span>{t.sms}</span>
                     </a>
                   ) : null}
 
@@ -496,7 +507,7 @@ export const VotersTabMobile: React.FC<VotersTabMobileProps> = ({
                     title="View & Share Voter Slip"
                   >
                     <Printer className="w-3 h-3 text-amber-400" />
-                    <span>Slip</span>
+                    <span>{t.slip}</span>
                   </button>
                 </div>
 
@@ -510,48 +521,48 @@ export const VotersTabMobile: React.FC<VotersTabMobileProps> = ({
                         : 'bg-slate-800 hover:bg-slate-700 text-slate-400 border-slate-700'
                     }`}
                   >
-                    <span>{prof.survey_status ? prof.survey_status.toUpperCase() : '+ Poll Status'}</span>
+                    <span>{prof.survey_status ? prof.survey_status.toUpperCase() : t.pollStatus}</span>
                   </button>
 
                   {/* Status Dropdown */}
                   {activeMenuSno === v.s && (
-                    <div className="absolute right-0 bottom-8 z-30 bg-slate-900 border border-amber-500/40 rounded-xl p-1.5 shadow-2xl w-40 space-y-1 animate-in fade-in duration-100">
+                    <div className="absolute right-0 bottom-8 z-30 bg-slate-900 border border-amber-500/40 rounded-xl p-1.5 shadow-2xl w-44 space-y-1 animate-in fade-in duration-100">
                       <button
                         onClick={() => { onUpdateSurveyMark(v.s, 'voted'); setActiveMenuSno(null); }}
                         className="w-full text-left px-2 py-1.5 rounded-lg text-[11px] font-bold text-emerald-300 hover:bg-emerald-950/40 flex items-center gap-1.5"
                       >
-                        <CheckCircle2 className="w-3.5 h-3.5 text-emerald-400" /> Mark Voted
+                        <CheckCircle2 className="w-3.5 h-3.5 text-emerald-400" /> {t.markVoted}
                       </button>
                       <button
                         onClick={() => { onUpdateSurveyMark(v.s, 'supporter'); setActiveMenuSno(null); }}
                         className="w-full text-left px-2 py-1.5 rounded-lg text-[11px] font-bold text-red-300 hover:bg-red-950/40 flex items-center gap-1.5"
                       >
-                        <Flag className="w-3.5 h-3.5 text-red-400" /> Mark Supporter
+                        <Flag className="w-3.5 h-3.5 text-red-400" /> {t.markSupporter}
                       </button>
                       <button
                         onClick={() => { onUpdateSurveyMark(v.s, 'visited'); setActiveMenuSno(null); }}
                         className="w-full text-left px-2 py-1.5 rounded-lg text-[11px] font-bold text-blue-300 hover:bg-blue-950/40 flex items-center gap-1.5"
                       >
-                        <Sparkles className="w-3.5 h-3.5 text-blue-400" /> Door Visited
+                        <Sparkles className="w-3.5 h-3.5 text-blue-400" /> {t.doorVisited}
                       </button>
                       <button
                         onClick={() => { onUpdateSurveyMark(v.s, 'doubtful'); setActiveMenuSno(null); }}
                         className="w-full text-left px-2 py-1.5 rounded-lg text-[11px] font-bold text-amber-300 hover:bg-amber-950/40 flex items-center gap-1.5"
                       >
-                        <AlertCircle className="w-3.5 h-3.5 text-amber-400" /> Doubtful
+                        <AlertCircle className="w-3.5 h-3.5 text-amber-400" /> {t.markDoubtful}
                       </button>
                       <button
                         onClick={() => { onUpdateSurveyMark(v.s, 'opponent'); setActiveMenuSno(null); }}
                         className="w-full text-left px-2 py-1.5 rounded-lg text-[11px] font-bold text-slate-300 hover:bg-slate-800 flex items-center gap-1.5"
                       >
-                        <UserX className="w-3.5 h-3.5 text-slate-400" /> Opponent
+                        <UserX className="w-3.5 h-3.5 text-slate-400" /> {t.markOpponent}
                       </button>
                       {prof.survey_status && (
                         <button
                           onClick={() => { onUpdateSurveyMark(v.s, null); setActiveMenuSno(null); }}
                           className="w-full text-left px-2 py-1 rounded-lg text-[10px] text-slate-400 hover:text-white hover:bg-slate-800 border-t border-slate-800 mt-1"
                         >
-                          Clear Status
+                          {t.clearStatus}
                         </button>
                       )}
                     </div>
@@ -569,14 +580,16 @@ export const VotersTabMobile: React.FC<VotersTabMobileProps> = ({
           onClick={() => setVisibleCount(prev => prev + 30)}
           className="w-full py-3 bg-slate-900 hover:bg-slate-800 text-amber-400 font-black rounded-2xl border border-slate-800 text-xs shadow-md transition-all flex items-center justify-center gap-1"
         >
-          Load More Electors ({filteredVoters.length - displayedVoters.length} remaining) ↓
+          {language === 'te' 
+            ? `ఇంకా ఓటర్లను చూడండి (${filteredVoters.length - displayedVoters.length} మిగిలి ఉన్నారు) ↓` 
+            : `Load More Electors (${filteredVoters.length - displayedVoters.length} remaining) ↓`}
         </button>
       )}
 
       {filteredVoters.length === 0 && (
         <div className="py-12 text-center text-slate-500 text-xs space-y-1">
-          <p className="font-bold text-slate-300 text-sm">No voters match this filter</p>
-          <p>Try searching for a different name, house number, or clearing filter chips.</p>
+          <p className="font-bold text-slate-300 text-sm">{t.noVotersMatch}</p>
+          <p>{t.tryAnotherSearch}</p>
         </div>
       )}
     </div>

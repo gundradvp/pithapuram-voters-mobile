@@ -1,44 +1,47 @@
 import React from 'react';
 import { Users, Home, UserCheck, Trophy, DownloadCloud } from 'lucide-react';
 import { TabType } from '../types';
+import { Language } from '../utils/i18n';
 
 interface BottomNavMobileProps {
   activeTab: TabType;
   onTabChange: (tab: TabType) => void;
   votersCount: number;
   kriyaCount: number;
+  language?: Language;
 }
 
 export const BottomNavMobile: React.FC<BottomNavMobileProps> = ({
   activeTab,
   onTabChange,
-  votersCount
+  votersCount,
+  language = 'te'
 }) => {
   const tabs = [
     {
       id: 'voters' as TabType,
-      label: 'Voters',
+      label: language === 'te' ? 'ఓటర్లు' : 'Voters',
       icon: Users,
       badge: votersCount > 0 ? votersCount : null
     },
     {
       id: 'families' as TabType,
-      label: 'Families',
+      label: language === 'te' ? 'కుటుంబాలు' : 'Families',
       icon: Home
     },
     {
       id: 'influencers' as TabType,
-      label: 'Influencers',
+      label: language === 'te' ? 'నాయకులు' : 'Leaders',
       icon: UserCheck
     },
     {
       id: 'warroom' as TabType,
-      label: 'War Room',
+      label: language === 'te' ? 'వార్ రూమ్' : 'War Room',
       icon: Trophy
     },
     {
       id: 'offline' as TabType,
-      label: 'Offline & Tools',
+      label: language === 'te' ? 'ఆఫ్‌లైన్' : 'Offline',
       icon: DownloadCloud
     }
   ];

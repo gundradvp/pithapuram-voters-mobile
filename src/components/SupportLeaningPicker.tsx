@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import { X, Check, Flag, Sparkles, AlertCircle, ThumbsUp, ThumbsDown, Sliders } from 'lucide-react';
+import { Language, translations } from '../utils/i18n';
 
 interface SupportLeaningPickerProps {
   title: string;
@@ -7,6 +8,7 @@ interface SupportLeaningPickerProps {
   currentPct?: number;
   currentNotes?: string;
   hasFamily?: boolean;
+  language?: Language;
   onSave: (pct: number, notes?: string, applyToFamily?: boolean) => void;
   onClose: () => void;
 }
@@ -17,14 +19,59 @@ export const SupportLeaningPicker: React.FC<SupportLeaningPickerProps> = ({
   currentPct = 50,
   currentNotes = '',
   hasFamily = false,
+  language = 'te',
   onSave,
   onClose
 }) => {
   const [pct, setPct] = useState<number>(currentPct);
   const [notes, setNotes] = useState<string>(currentNotes);
   const [applyToFamily, setApplyToFamily] = useState<boolean>(false);
+  const t = translations[language];
 
-  const presets = [
+  const presets = language === 'te' ? [
+    {
+      pct: 100,
+      label: '100% మనవాళ్లే (పక్కా మద్దతు)',
+      desc: 'పవన్ కళ్యాణ్ గారికి, జనసేనకు కట్టుబడిన కార్యకర్తలు & పక్కా ఓటర్లు',
+      badgeClass: 'bg-red-600/30 text-red-300 border-red-500/50',
+      icon: Flag
+    },
+    {
+      pct: 75,
+      label: '75% మనకే అనుకూలం',
+      desc: 'కూటమికి, పార్టీ సిద్ధాంతానికి చాలా అనుకూలం, దాదాపు మనకే వేస్తారు',
+      badgeClass: 'bg-emerald-600/30 text-emerald-300 border-emerald-500/50',
+      icon: ThumbsUp
+    },
+    {
+      pct: 50,
+      label: '50% ఎటూ తేల్చుకోలేదు (స్వింగ్)',
+      desc: 'అభ్యర్థుల పనులను బట్టి చూస్తున్నారు, సరైన హామీ ఇస్తే మారుతారు',
+      badgeClass: 'bg-slate-700/60 text-slate-300 border-slate-600',
+      icon: Sparkles
+    },
+    {
+      pct: 40,
+      label: '40% సానుకూలం (ప్రయత్నిస్తే పడతారు)',
+      desc: 'మనపై సానుకూలత ఉంది, 1-2 సార్లు వెళ్లి మాట్లాడితే ఓటు వేస్తారు',
+      badgeClass: 'bg-amber-600/30 text-amber-300 border-amber-500/50',
+      icon: ThumbsUp
+    },
+    {
+      pct: 25,
+      label: '25% అనుమానం (వ్యతిరేకత ఉండొచ్చు)',
+      desc: 'సంకోచిస్తున్నారు, ప్రత్యర్థి పార్టీ లేదా కుల ఒత్తిడిలో ఉన్నారు',
+      badgeClass: 'bg-orange-600/30 text-orange-300 border-orange-500/50',
+      icon: AlertCircle
+    },
+    {
+      pct: 0,
+      label: '0% ప్రత్యర్థులు (మారరు)',
+      desc: 'పక్కా ప్రత్యర్థి పార్టీ మద్దతుదారులు, సమయం వృధా చేయవద్దు',
+      badgeClass: 'bg-rose-950/80 text-rose-400 border-rose-500/50',
+      icon: ThumbsDown
+    }
+  ] : [
     {
       pct: 100,
       label: '100% Full Support',
@@ -62,7 +109,7 @@ export const SupportLeaningPicker: React.FC<SupportLeaningPickerProps> = ({
     },
     {
       pct: 0,
-      label: '100% Opponent',
+      label: '0% Opponent',
       desc: 'Committed opposition / anti-JSP voters',
       badgeClass: 'bg-rose-950/80 text-rose-400 border-rose-500/50',
       icon: ThumbsDown
@@ -83,7 +130,7 @@ export const SupportLeaningPicker: React.FC<SupportLeaningPickerProps> = ({
         <div className="border-b border-slate-800 pb-3">
           <div className="flex items-center gap-1.5 text-xs text-amber-400 font-bold uppercase tracking-wider">
             <Sliders className="w-3.5 h-3.5 text-amber-400" />
-            Political Leaning & Sentiment
+            {language === 'te' ? 'ఓటరు మొగ్గు & మద్దతు శాతం' : 'Political Leaning & Sentiment'}
           </div>
           <h3 className="text-base font-black text-white mt-0.5">{title}</h3>
           {subtitle && <p className="text-[11px] text-slate-400 mt-0.5">{subtitle}</p>}
@@ -92,7 +139,7 @@ export const SupportLeaningPicker: React.FC<SupportLeaningPickerProps> = ({
         {/* Current Leaning Meter */}
         <div className="bg-slate-950 border border-slate-800 rounded-2xl p-3.5 text-center space-y-2">
           <div className="flex items-center justify-between text-xs font-bold">
-            <span className="text-slate-400">Support Percentage:</span>
+            <span className="text-slate-400">{language === 'te' ? 'మద్దతు శాతం:' : 'Support Percentage:'}</span>
             <span className={`text-xl font-black font-mono ${
               pct === 100 ? 'text-red-400' : pct >= 75 ? 'text-emerald-400' : pct === 40 ? 'text-amber-400' : pct === 0 ? 'text-rose-400' : 'text-slate-300'
             }`}>
@@ -124,7 +171,7 @@ export const SupportLeaningPicker: React.FC<SupportLeaningPickerProps> = ({
         {/* Preset Percentage Options */}
         <div className="space-y-1.5">
           <label className="text-[10px] uppercase font-bold text-slate-400 block">
-            Quick Sentiment Presets
+            {language === 'te' ? 'త్వరిత ఎంపికలు (Presets)' : 'Quick Sentiment Presets'}
           </label>
           <div className="space-y-1">
             {presets.map(p => {
@@ -157,12 +204,12 @@ export const SupportLeaningPicker: React.FC<SupportLeaningPickerProps> = ({
         {/* Campaign Notes */}
         <div>
           <label className="text-[10px] uppercase font-bold text-slate-400 block mb-1">
-            Campaign Ground Notes (Optional)
+            {language === 'te' ? 'గ్రౌండ్ నోట్స్ (గమనికలు)' : 'Campaign Ground Notes (Optional)'}
           </label>
           <textarea
             value={notes}
             onChange={e => setNotes(e.target.value)}
-            placeholder="e.g., Demands pension sanction, local youth leader family, nephew working in Hyderabad..."
+            placeholder={language === 'te' ? 'ఉదా: పింఛన్ రాలేదని అడిగారు, ఇంటి పెద్దను ఒప్పించాలి, హైదరాబాద్‌లో ఉద్యోగం...' : 'e.g., Demands pension sanction, local youth leader family...'}
             rows={2}
             className="w-full bg-slate-950 border border-slate-800 rounded-xl px-3 py-2 text-white text-xs placeholder-slate-600 focus:outline-none focus:border-amber-400"
           />
@@ -172,7 +219,7 @@ export const SupportLeaningPicker: React.FC<SupportLeaningPickerProps> = ({
         {hasFamily && (
           <div className="bg-slate-950 border border-slate-800 p-2.5 rounded-xl flex items-center justify-between">
             <span className="text-xs text-slate-300 font-medium">
-              Apply {pct}% support to all members in this family
+              {language === 'te' ? `కుటుంబ సభ్యులందరికీ ఈ ${pct}% వర్తింపజేయండి` : `Apply ${pct}% support to all members in this family`}
             </span>
             <input
               type="checkbox"
@@ -192,7 +239,7 @@ export const SupportLeaningPicker: React.FC<SupportLeaningPickerProps> = ({
           className="w-full py-2.5 bg-gradient-to-r from-amber-500 to-amber-600 hover:from-amber-400 hover:to-amber-500 text-slate-950 font-black rounded-xl text-xs flex items-center justify-center gap-1.5 shadow-md shadow-amber-950/40"
         >
           <Check className="w-4 h-4" />
-          <span>Save Support Leaning ({pct}%)</span>
+          <span>{language === 'te' ? `మద్దతు శాతం సేవ్ చేయండి (${pct}%)` : `Save Support Leaning (${pct}%)`}</span>
         </button>
       </div>
     </div>

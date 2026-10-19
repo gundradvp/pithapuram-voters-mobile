@@ -1,17 +1,21 @@
 import React, { useState } from 'react';
 import { Trophy, TrendingUp, TrendingDown, Target, AlertTriangle, ShieldCheck, ChevronDown, ChevronUp, Flame, ArrowRight } from 'lucide-react';
 import { WinningScoreCalculation } from '../types';
+import { Language, translations } from '../utils/i18n';
 
 interface WinningScoreBannerProps {
   calc: WinningScoreCalculation;
+  language?: Language;
   onOpenWarRoom?: () => void;
 }
 
 export const WinningScoreBanner: React.FC<WinningScoreBannerProps> = ({
   calc,
+  language = 'te',
   onOpenWarRoom
 }) => {
   const [isExpanded, setIsExpanded] = useState<boolean>(false);
+  const t = translations[language];
 
   const getStatusBadge = () => {
     switch (calc.status) {
@@ -19,28 +23,28 @@ export const WinningScoreBanner: React.FC<WinningScoreBannerProps> = ({
         return (
           <span className="px-2 py-0.5 bg-emerald-500/20 text-emerald-300 border border-emerald-500/40 rounded-full text-[10px] font-black flex items-center gap-1 animate-pulse">
             <ShieldCheck className="w-3 h-3 text-emerald-400" />
-            SAFE WIN ZONE
+            {t.safeWinZone}
           </span>
         );
       case 'likely_win':
         return (
           <span className="px-2 py-0.5 bg-blue-500/20 text-blue-300 border border-blue-500/40 rounded-full text-[10px] font-black flex items-center gap-1">
             <TrendingUp className="w-3 h-3 text-blue-400" />
-            LIKELY WIN
+            {t.likelyWin}
           </span>
         );
       case 'battleground':
         return (
           <span className="px-2 py-0.5 bg-amber-500/20 text-amber-300 border border-amber-500/40 rounded-full text-[10px] font-black flex items-center gap-1">
             <Flame className="w-3 h-3 text-amber-400" />
-            BATTLEGROUND
+            {t.battleground}
           </span>
         );
       case 'deficit_danger':
         return (
           <span className="px-2 py-0.5 bg-rose-500/20 text-rose-300 border border-rose-500/40 rounded-full text-[10px] font-black flex items-center gap-1 animate-pulse">
             <AlertTriangle className="w-3 h-3 text-rose-400" />
-            DEFICIT ALERT
+            {t.deficitAlert}
           </span>
         );
     }
@@ -64,14 +68,14 @@ export const WinningScoreBanner: React.FC<WinningScoreBannerProps> = ({
             <Trophy className="w-4 h-4 text-amber-400" />
           </div>
           <div>
-            <div className="flex items-center gap-1.5">
+            <div className="flex items-center gap-1.5 flex-wrap">
               <span className="text-[11px] font-black uppercase tracking-wider text-slate-200">
-                Booth Victory Predictor
+                {t.victoryPredictor}
               </span>
               {getStatusBadge()}
             </div>
             <p className="text-[10px] text-slate-400 font-medium">
-              Target: <strong className="text-amber-400">{calc.targetVotesToWin} votes</strong> to win (at {calc.expectedTurnoutPct}% turnout)
+              {t.targetToWin}: <strong className="text-amber-400 font-mono font-bold">{calc.targetVotesToWin}</strong> ({t.atTurnout} {calc.expectedTurnoutPct}%)
             </p>
           </div>
         </div>
@@ -88,19 +92,19 @@ export const WinningScoreBanner: React.FC<WinningScoreBannerProps> = ({
             {calc.projectedLead > 0 ? (
               <>
                 <TrendingUp className="w-4 h-4 text-emerald-400" />
-                +{calc.projectedLead} Lead
+                +{calc.projectedLead} {language === 'te' ? 'ఆధిక్యం' : 'Lead'}
               </>
             ) : calc.projectedLead === 0 ? (
-              'Tied (0)'
+              language === 'te' ? 'సమానం (0)' : 'Tied (0)'
             ) : (
               <>
                 <TrendingDown className="w-4 h-4 text-rose-400" />
-                {calc.projectedLead} Deficit
+                {calc.projectedLead} {language === 'te' ? 'లోటు' : 'Deficit'}
               </>
             )}
           </div>
           <span className="text-[9px] text-slate-400 block font-mono">
-            {calc.projectedJspVotes} vs {calc.projectedOpponentVotes} Opp
+            {calc.projectedJspVotes} vs {calc.projectedOpponentVotes} {language === 'te' ? 'ప్రత్యర్థి' : 'Opp'}
           </span>
         </div>
       </div>
@@ -109,13 +113,13 @@ export const WinningScoreBanner: React.FC<WinningScoreBannerProps> = ({
       <div className="space-y-1">
         <div className="flex items-center justify-between text-[10px] font-mono">
           <span className="text-slate-400">
-            Projected JSP: <strong className="text-red-400 font-bold">{calc.projectedJspVotes}</strong>
+            {t.projectedJsp}: <strong className="text-red-400 font-bold">{calc.projectedJspVotes}</strong>
           </span>
           <span className="text-amber-400 font-bold">
-            {progressPct}% of Victory Goal
+            {progressPct}% {t.victoryGoal}
           </span>
           <span className="text-slate-400">
-            Opponents: <strong className="text-slate-300 font-bold">{calc.projectedOpponentVotes}</strong>
+            {t.projectedOpp}: <strong className="text-slate-300 font-bold">{calc.projectedOpponentVotes}</strong>
           </span>
         </div>
 
@@ -147,19 +151,19 @@ export const WinningScoreBanner: React.FC<WinningScoreBannerProps> = ({
         <div className="pt-2 border-t border-slate-800/80 space-y-2 text-[11px] animate-in fade-in duration-100">
           <div className="grid grid-cols-4 gap-1.5 text-center">
             <div className="bg-slate-950/80 p-2 rounded-xl border border-slate-800">
-              <span className="text-[9px] text-slate-400 block">Total Electors</span>
+              <span className="text-[9px] text-slate-400 block">{language === 'te' ? 'మొత్తం ఓటర్లు' : 'Total Electors'}</span>
               <strong className="text-white text-xs font-mono">{calc.totalElectors}</strong>
             </div>
             <div className="bg-slate-950/80 p-2 rounded-xl border border-slate-800">
-              <span className="text-[9px] text-slate-400 block">Poll Votes</span>
+              <span className="text-[9px] text-slate-400 block">{language === 'te' ? 'పోల్ ఓట్లు' : 'Poll Votes'}</span>
               <strong className="text-amber-400 text-xs font-mono">{calc.expectedPollVotes}</strong>
             </div>
             <div className="bg-slate-950/80 p-2 rounded-xl border border-red-500/30">
-              <span className="text-[9px] text-red-300 block">JSP Votes</span>
+              <span className="text-[9px] text-red-300 block">{language === 'te' ? 'జనసేన ఓట్లు' : 'JSP Votes'}</span>
               <strong className="text-red-400 text-xs font-mono font-black">{calc.projectedJspVotes}</strong>
             </div>
             <div className="bg-slate-950/80 p-2 rounded-xl border border-rose-500/30">
-              <span className="text-[9px] text-rose-300 block">Opponent</span>
+              <span className="text-[9px] text-rose-300 block">{language === 'te' ? 'ప్రత్యర్థి' : 'Opponent'}</span>
               <strong className="text-rose-400 text-xs font-mono font-black">{calc.projectedOpponentVotes}</strong>
             </div>
           </div>
@@ -170,12 +174,20 @@ export const WinningScoreBanner: React.FC<WinningScoreBannerProps> = ({
             <div className="flex-1">
               {calc.neededToGuarantee > 0 ? (
                 <p className="text-slate-300 text-[10px] leading-tight">
-                  <strong className="text-amber-400 font-bold">Action Needed:</strong> Convert{' '}
-                  <strong className="text-white font-mono underline font-bold">{calc.neededToGuarantee}</strong> more swing voters (40% Positive or 50% Neutral) into committed supporters to guarantee booth victory.
+                  <strong className="text-amber-400 font-bold">{t.actionNeeded}:</strong>{' '}
+                  {language === 'te' ? (
+                    <>
+                      గెలుపు ఖాయం కావడానికి ఇంకా <strong className="text-white font-mono underline font-bold">{calc.neededToGuarantee}</strong> మంది స్వింగ్ ఓటర్లను (40% లేదా 50%) మన వైపు తిప్పుకోవాలి.
+                    </>
+                  ) : (
+                    <>
+                      Convert <strong className="text-white font-mono underline font-bold">{calc.neededToGuarantee}</strong> more swing voters into committed supporters to guarantee booth victory.
+                    </>
+                  )}
                 </p>
               ) : (
                 <p className="text-emerald-300 text-[10px] leading-tight">
-                  <strong className="font-bold">Victory Threshold Reached!</strong> You have surpassed the 50%+ mark. Focus on 100% booth turnout mobilization on polling day to lock in this margin.
+                  {t.thresholdReached}
                 </p>
               )}
             </div>
@@ -185,7 +197,7 @@ export const WinningScoreBanner: React.FC<WinningScoreBannerProps> = ({
                 onClick={onOpenWarRoom}
                 className="px-2 py-1 bg-amber-500 hover:bg-amber-400 text-slate-950 rounded-lg text-[10px] font-black flex items-center gap-1 shadow-sm flex-shrink-0"
               >
-                <span>War Room</span>
+                <span>{language === 'te' ? 'వార్ రూమ్' : 'War Room'}</span>
                 <ArrowRight className="w-3 h-3" />
               </button>
             )}
@@ -198,7 +210,7 @@ export const WinningScoreBanner: React.FC<WinningScoreBannerProps> = ({
         onClick={() => setIsExpanded(!isExpanded)}
         className="w-full py-0.5 text-slate-400 hover:text-slate-200 text-[10px] font-bold flex items-center justify-center gap-1"
       >
-        <span>{isExpanded ? 'Hide Details' : 'View Winning Score Breakdown'}</span>
+        <span>{isExpanded ? t.hideDetails : t.viewBreakdown}</span>
         {isExpanded ? <ChevronUp className="w-3 h-3" /> : <ChevronDown className="w-3 h-3" />}
       </button>
     </div>

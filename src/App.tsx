@@ -43,9 +43,12 @@ import {
   saveInfluencer,
   calculateWinningScore
 } from './utils/storage';
+import { useI18n } from './utils/i18n';
 import { Loader2, AlertCircle, Sparkles, Trophy } from 'lucide-react';
 
 export function App() {
+  const { lang, toggleLanguage, t } = useI18n();
+
   const [boothsIndex, setBoothsIndex] = useState<BoothIndexItem[]>([]);
   const [currentPartNo, setCurrentPartNo] = useState<number>(() => {
     return getAssignedBooth() || 1;
@@ -192,7 +195,7 @@ export function App() {
         altPhone
       }
     }));
-    triggerScoreNotice(`📱 Phone updated for ${voter.n}`);
+    triggerScoreNotice(lang === 'te' ? `📱 ${voter.n} గారి ఫోన్ నంబర్ సేవ్ అయ్యింది` : `📱 Phone updated for ${voter.n}`);
   };
 
   // Handle Support Leaning Save
@@ -221,11 +224,17 @@ export function App() {
       setProfiles(getVoterProfiles(currentPartNo));
 
       // Notification based on support category
-      if (pct === 100) triggerScoreNotice(`🚩 100% Supporter Added! +1 Projected JSP Vote`);
-      else if (pct >= 75) triggerScoreNotice(`🟢 Strong Supporter Added! +0.75 Projected Vote`);
-      else if (pct === 40) triggerScoreNotice(`🟡 40% Positive Added! +0.40 Projected Vote`);
-      else if (pct === 0) triggerScoreNotice(`🔴 Opponent Marked! Opposition vote added, margin reduced.`);
-      else triggerScoreNotice(`⚪ Neutral leaning updated (${pct}%)`);
+      if (pct === 100) {
+        triggerScoreNotice(lang === 'te' ? `🚩 100% మనవాళ్లే చేరారు! +1 మన ఓటు పెరిగింది` : `🚩 100% Supporter Added! +1 Projected JSP Vote`);
+      } else if (pct >= 75) {
+        triggerScoreNotice(lang === 'te' ? `🟢 మన మద్దతుదారుడు చేరారు! +0.75 ఓటు పెరిగింది` : `🟢 Strong Supporter Added! +0.75 Projected Vote`);
+      } else if (pct === 40) {
+        triggerScoreNotice(lang === 'te' ? `🟡 40% సానుకూల ఓటరు జతయ్యారు! +0.40 ఓటు పెరిగింది` : `🟡 40% Positive Added! +0.40 Projected Vote`);
+      } else if (pct === 0) {
+        triggerScoreNotice(lang === 'te' ? `🔴 ప్రత్యర్థిగా మార్చారు! ప్రత్యర్థి ఓట్ల సంఖ్య పెరిగి, లీడ్ తగ్గింది` : `🔴 Opponent Marked! Opposition vote added, margin reduced.`);
+      } else {
+        triggerScoreNotice(lang === 'te' ? `⚪ ఓటరు అభిప్రాయం అప్‌డేట్ అయ్యింది (${pct}%)` : `⚪ Neutral leaning updated (${pct}%)`);
+      }
     } else if (familyId) {
       const fam = families[familyId];
       if (fam) {
@@ -240,7 +249,7 @@ export function App() {
         setFamilies(getFamilyGroups(currentPartNo));
         setProfiles(getVoterProfiles(currentPartNo));
 
-        triggerScoreNotice(`🏠 Family sentiment updated to ${pct}% (${fam.memberSnos.length} members)`);
+        triggerScoreNotice(lang === 'te' ? `🏠 కుటుంబ సభ్యులందరి మద్దతు ${pct}% గా మారింది` : `🏠 Family sentiment updated to ${pct}%`);
       }
     }
   };
@@ -249,7 +258,7 @@ export function App() {
   const handleSaveVisit = (voter: MobileVoter, visit: VoterVisit) => {
     addVoterVisit(currentPartNo, voter.s, visit);
     setProfiles(getVoterProfiles(currentPartNo));
-    triggerScoreNotice(`📋 Field visit logged for ${voter.n}! Winning score refreshed.`);
+    triggerScoreNotice(lang === 'te' ? `📋 ${voter.n} గారి విజిట్ సేవ్ అయ్యింది! గెలుపు స్కోర్ అప్‌డేట్ అయ్యింది` : `📋 Field visit logged for ${voter.n}! Winning score refreshed.`);
   };
 
   // Handle Influencer Assignment
@@ -263,7 +272,7 @@ export function App() {
         influencerMobile: influencer?.mobile || ''
       });
       setProfiles(getVoterProfiles(currentPartNo));
-      triggerScoreNotice(`🤝 Influencer assigned to voter`);
+      triggerScoreNotice(lang === 'te' ? `🤝 నాయకుడికి ఓటరును కేటాయించారు` : `🤝 Influencer assigned to voter`);
     } else if (familyId) {
       const fam = families[familyId];
       if (fam) {
@@ -281,7 +290,7 @@ export function App() {
         });
         setFamilies(getFamilyGroups(currentPartNo));
         setProfiles(getVoterProfiles(currentPartNo));
-        triggerScoreNotice(`🤝 Influencer assigned to family (${fam.name})`);
+        triggerScoreNotice(lang === 'te' ? `🤝 కుటుంబానికి నాయకుడిని కేటాయించారు` : `🤝 Influencer assigned to family`);
       }
     }
   };
@@ -290,29 +299,29 @@ export function App() {
   const handleSaveFamily = (family: FamilyGroup) => {
     saveFamilyGroup(currentPartNo, family);
     setFamilies(getFamilyGroups(currentPartNo));
-    triggerScoreNotice(`🏠 Family group "${family.name}" saved`);
+    triggerScoreNotice(lang === 'te' ? `🏠 కుటుంబ గ్రూప్ సేవ్ అయ్యింది` : `🏠 Family group saved`);
   };
 
   const handleDeleteFamily = (familyId: string) => {
     deleteFamilyGroup(currentPartNo, familyId);
     setFamilies(getFamilyGroups(currentPartNo));
-    triggerScoreNotice(`🗑️ Family group removed`);
+    triggerScoreNotice(lang === 'te' ? `🗑️ కుటుంబం తీసివేయబడింది` : `🗑️ Family group removed`);
   };
 
   // Handle New Influencer Creation
   const handleAddNewInfluencer = (newInf: Influencer) => {
     saveInfluencer(currentPartNo, newInf);
     setInfluencers(getInfluencers(currentPartNo));
-    triggerScoreNotice(`⭐ New Influencer "${newInf.name}" registered`);
+    triggerScoreNotice(lang === 'te' ? `⭐ కొత్త నాయకుడు "${newInf.name}" నమోదయ్యారు` : `⭐ New Influencer registered`);
   };
 
   // Handle Field Survey Quick Status Mark
   const handleUpdateSurveyMark = (serialNo: number, status: VoterSurveyStatus | null) => {
     saveVoterProfile(currentPartNo, serialNo, { survey_status: status });
     setProfiles(getVoterProfiles(currentPartNo));
-    if (status === 'voted') triggerScoreNotice(`✅ Marked Voted for S.No #${serialNo}`);
-    else if (status === 'supporter') triggerScoreNotice(`🚩 Marked Supporter for S.No #${serialNo}`);
-    else if (status === 'opponent') triggerScoreNotice(`🔴 Marked Opponent for S.No #${serialNo}`);
+    if (status === 'voted') triggerScoreNotice(lang === 'te' ? `✅ ఓటు వేశారు అని మార్క్ చేశారు` : `✅ Marked Voted for S.No #${serialNo}`);
+    else if (status === 'supporter') triggerScoreNotice(lang === 'te' ? `🚩 మన మద్దతుదారుడిగా మార్క్ చేశారు` : `🚩 Marked Supporter for S.No #${serialNo}`);
+    else if (status === 'opponent') triggerScoreNotice(lang === 'te' ? `🔴 ప్రత్యర్థిగా మార్క్ చేశారు` : `🔴 Marked Opponent for S.No #${serialNo}`);
   };
 
   // Handle Custom JSON file import
@@ -329,11 +338,13 @@ export function App() {
 
   return (
     <div className="min-h-screen bg-slate-950 text-slate-100 flex flex-col font-sans select-none antialiased">
-      {/* Sticky Mobile Header */}
+      {/* Sticky Mobile Header with Language Toggle */}
       <HeaderMobile
         boothInfo={boothData?.booth_info || null}
         isLocked={isLocked}
         isCached={isCached}
+        language={lang}
+        onToggleLanguage={toggleLanguage}
         onOpenBoothSelector={() => setIsBoothSelectorOpen(true)}
       />
 
@@ -350,7 +361,7 @@ export function App() {
         {isLoading && !boothData && (
           <div className="py-24 flex flex-col items-center justify-center space-y-3">
             <Loader2 className="w-8 h-8 text-amber-400 animate-spin" />
-            <p className="text-xs text-slate-400 font-bold">Loading Booth #{currentPartNo} Electors...</p>
+            <p className="text-xs text-slate-400 font-bold">{lang === 'te' ? `బూత్ #${currentPartNo} ఓటర్ల డేటా లోడ్ అవుతోంది...` : `Loading Booth #${currentPartNo} Electors...`}</p>
           </div>
         )}
 
@@ -362,7 +373,7 @@ export function App() {
               onClick={() => setIsBoothSelectorOpen(true)}
               className="px-4 py-2 bg-amber-500 text-slate-950 font-black rounded-xl text-xs"
             >
-              Select Another Booth
+              {lang === 'te' ? 'వేరే బూత్ ఎంచుకోండి' : 'Select Another Booth'}
             </button>
           </div>
         )}
@@ -373,6 +384,7 @@ export function App() {
             {activeTab === 'voters' && winningScore && (
               <WinningScoreBanner
                 calc={winningScore}
+                language={lang}
                 onOpenWarRoom={() => setActiveTab('warroom')}
               />
             )}
@@ -383,6 +395,7 @@ export function App() {
                 voters={boothData.voters}
                 boothInfo={boothData.booth_info}
                 profiles={profiles}
+                language={lang}
                 onOpenPhoneEditor={v => setSelectedVoterForPhone(v)}
                 onOpenSupportPicker={(title, currentPct, currentNotes, voterSno) => {
                   setSupportPickerState({
@@ -471,6 +484,7 @@ export function App() {
                 profiles={profiles}
                 influencers={influencers}
                 families={families}
+                language={lang}
                 onOpenPhoneEditor={v => setSelectedVoterForPhone(v)}
                 onOpenSupportPicker={(title, currentPct, currentNotes, voterSno) => {
                   setSupportPickerState({
@@ -509,12 +523,13 @@ export function App() {
         )}
       </main>
 
-      {/* Fixed Bottom Navigation */}
+      {/* Fixed Bottom Navigation with Bilingual labels */}
       <BottomNavMobile
         activeTab={activeTab}
         onTabChange={setActiveTab}
         votersCount={boothData?.voters.length || 0}
         kriyaCount={boothData?.booth_info.total_kriya_count || 0}
+        language={lang}
       />
 
       {/* Booth Assignment Modal */}
@@ -555,6 +570,7 @@ export function App() {
           currentPct={supportPickerState.currentPct}
           currentNotes={supportPickerState.currentNotes}
           hasFamily={supportPickerState.hasFamily}
+          language={lang}
           onSave={handleSaveSupport}
           onClose={() => setSupportPickerState(prev => ({ ...prev, open: false }))}
         />
@@ -589,6 +605,7 @@ export function App() {
         <LogVisitModal
           voter={selectedVoterForVisit}
           profile={profiles[selectedVoterForVisit.s]}
+          language={lang}
           onSaveVisit={visit => handleSaveVisit(selectedVoterForVisit, visit)}
           onClose={() => setSelectedVoterForVisit(null)}
         />
