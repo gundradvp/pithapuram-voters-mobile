@@ -1,0 +1,600 @@
+import React, { useState, useEffect, useCallback, useMemo } from 'react';
+import { HeaderMobile } from './components/HeaderMobile';
+import { BottomNavMobile } from './components/BottomNavMobile';
+import { VotersTabMobile } from './components/VotersTabMobile';
+import { FamiliesTabMobile } from './components/FamiliesTabMobile';
+import { InfluencersTabMobile } from './components/InfluencersTabMobile';
+import { WarRoomTabMobile } from './components/WarRoomTabMobile';
+import { OfflineTabMobile } from './components/OfflineTabMobile';
+import { WinningScoreBanner } from './components/WinningScoreBanner';
+import { BoothAssignmentModal } from './components/BoothAssignmentModal';
+import { VoterSlipModal } from './components/VoterSlipModal';
+import { PhoneEditorModal } from './components/PhoneEditorModal';
+import { SupportLeaningPicker } from './components/SupportLeaningPicker';
+import { InfluencerAssignModal } from './components/InfluencerAssignModal';
+import { CreateFamilyModal } from './components/CreateFamilyModal';
+import { LogVisitModal } from './components/LogVisitModal';
+import {
+  BoothData,
+  BoothIndexItem,
+  MobileVoter,
+  TabType,
+  VoterSurveyStatus,
+  FamilyGroup,
+  Influencer,
+  VoterCampaignProfile,
+  VoterVisit,
+  WinningScoreCalculation
+} from './types';
+import {
+  getAssignedBooth,
+  setAssignedBooth,
+  isBoothLocked,
+  getCachedBoothData,
+  saveCachedBoothData,
+  isBoothCached,
+  getVoterProfiles,
+  saveVoterProfile,
+  addVoterVisit,
+  getFamilyGroups,
+  saveFamilyGroup,
+  deleteFamilyGroup,
+  getInfluencers,
+  saveInfluencer,
+  calculateWinningScore
+} from './utils/storage';
+import { Loader2, AlertCircle, Sparkles, Trophy } from 'lucide-react';
+
+export function App() {
+  const [boothsIndex, setBoothsIndex] = useState<BoothIndexItem[]>([]);
+  const [currentPartNo, setCurrentPartNo] = useState<number>(() => {
+    return getAssignedBooth() || 1;
+  });
+  const [boothData, setBoothData] = useState<BoothData | null>(null);
+  const [activeTab, setActiveTab] = useState<TabType>('voters');
+  const [isLocked, setIsLocked] = useState<boolean>(() => isBoothLocked());
+  const [isCached, setIsCached] = useState<boolean>(false);
+  const [isLoading, setIsLoading] = useState<boolean>(true);
+  const [errorMsg, setErrorMsg] = useState<string | null>(null);
+
+  // Campaign State
+  const [profiles, setProfiles] = useState<Record<number, VoterCampaignProfile>>({});
+  const [families, setFamilies] = useState<Record<string, FamilyGroup>>({});
+  const [influencers, setInfluencers] = useState<Record<string, Influencer>>({});
+  const [scoreNotification, setScoreNotification] = useState<string | null>(null);
+
+  // Modals State
+  const [isBoothSelectorOpen, setIsBoothSelectorOpen] = useState<boolean>(false);
+  const [selectedVoterForSlip, setSelectedVoterForSlip] = useState<MobileVoter | null>(null);
+  const [selectedVoterForPhone, setSelectedVoterForPhone] = useState<MobileVoter | null>(null);
+  const [selectedVoterForVisit, setSelectedVoterForVisit] = useState<MobileVoter | null>(null);
+
+  const [supportPickerState, setSupportPickerState] = useState<{
+    open: boolean;
+    title: string;
+    subtitle?: string;
+    currentPct: number;
+    currentNotes?: string;
+    voterSno?: number;
+    familyId?: string;
+    hasFamily?: boolean;
+  }>({
+    open: false,
+    title: '',
+    currentPct: 50
+  });
+
+  const [influencerAssignState, setInfluencerAssignState] = useState<{
+    open: boolean;
+    targetName: string;
+    currentInfId?: string;
+    voterSno?: number;
+    familyId?: string;
+  }>({
+    open: false,
+    targetName: ''
+  });
+
+  const [createFamilyState, setCreateFamilyState] = useState<{
+    open: boolean;
+    initialFamily?: FamilyGroup | null;
+  }>({
+    open: false,
+    initialFamily: null
+  });
+
+  // 1. Load Booths Index
+  useEffect(() => {
+    fetch('/booths_index.json')
+      .then(res => res.json())
+      .then(data => {
+        setBoothsIndex(data);
+      })
+      .catch(err => {
+        console.warn('Could not load booths index online:', err);
+      });
+  }, []);
+
+  // 2. Load Selected Booth Data (Offline First Pattern)
+  const loadBooth = useCallback(async (partNo: number) => {
+    setIsLoading(true);
+    setErrorMsg(null);
+
+    // Step A: Load profiles, families, influencers immediately from localStorage
+    const localProfiles = getVoterProfiles(partNo);
+    setProfiles(localProfiles);
+    setInfluencers(getInfluencers(partNo));
+
+    // Step B: Check local cache first (Instant load)
+    const cached = getCachedBoothData(partNo);
+    if (cached) {
+      setBoothData(cached);
+      setFamilies(getFamilyGroups(partNo, cached.voters));
+      setIsCached(true);
+      setIsLoading(false);
+    }
+
+    // Step C: Fetch latest over network
+    try {
+      const res = await fetch(`/booths/booth_${partNo}.json`);
+      if (!res.ok) throw new Error(`HTTP error ${res.status}`);
+      const onlineData: BoothData = await res.json();
+      setBoothData(onlineData);
+      saveCachedBoothData(partNo, onlineData);
+      setFamilies(getFamilyGroups(partNo, onlineData.voters));
+      setIsCached(true);
+      setIsLoading(false);
+    } catch (err) {
+      console.warn('Network fetch failed, relying on cache:', err);
+      if (!cached) {
+        setErrorMsg(`Booth #${partNo} data is not available offline. Please connect to internet to download it.`);
+      }
+      setIsLoading(false);
+    }
+  }, []);
+
+  useEffect(() => {
+    loadBooth(currentPartNo);
+    setIsLocked(isBoothLocked());
+    setIsCached(isBoothCached(currentPartNo));
+  }, [currentPartNo, loadBooth]);
+
+  // Compute Winning Score dynamically
+  const winningScore: WinningScoreCalculation | null = useMemo(() => {
+    if (!boothData) return null;
+    return calculateWinningScore(boothData, profiles);
+  }, [boothData, profiles]);
+
+  // Show score bump toast notification
+  const triggerScoreNotice = (msg: string) => {
+    setScoreNotification(msg);
+    setTimeout(() => {
+      setScoreNotification(null);
+    }, 3500);
+  };
+
+  // Handle Booth Assignment
+  const handleSelectBooth = (partNo: number, lock: boolean) => {
+    setCurrentPartNo(partNo);
+    setAssignedBooth(partNo, lock);
+    setIsLocked(lock);
+    loadBooth(partNo);
+  };
+
+  // Handle Phone Number Save
+  const handleSavePhone = (voter: MobileVoter, phone: string, altPhone?: string) => {
+    saveVoterProfile(currentPartNo, voter.s, { customPhone: phone, altPhone });
+    setProfiles(prev => ({
+      ...prev,
+      [voter.s]: {
+        ...prev[voter.s],
+        customPhone: phone,
+        altPhone
+      }
+    }));
+    triggerScoreNotice(`📱 Phone updated for ${voter.n}`);
+  };
+
+  // Handle Support Leaning Save
+  const handleSaveSupport = (pct: number, notes?: string, applyToFamily?: boolean) => {
+    const { voterSno, familyId } = supportPickerState;
+
+    if (voterSno) {
+      const voter = boothData?.voters.find(v => v.s === voterSno);
+      saveVoterProfile(currentPartNo, voterSno, { supportPct: pct, notes });
+
+      // Apply to all family members if requested
+      if (applyToFamily && voter) {
+        const famKey = Object.values(families).find(f => f.memberSnos.includes(voterSno));
+        if (famKey) {
+          famKey.supportPct = pct;
+          famKey.supportCategory = pct === 100 ? 'full_support' : pct >= 75 ? 'strong_lean' : pct === 0 ? 'opponent' : 'neutral_swing';
+          saveFamilyGroup(currentPartNo, famKey);
+
+          famKey.memberSnos.forEach(sno => {
+            saveVoterProfile(currentPartNo, sno, { supportPct: pct });
+          });
+          setFamilies(getFamilyGroups(currentPartNo));
+        }
+      }
+
+      setProfiles(getVoterProfiles(currentPartNo));
+
+      // Notification based on support category
+      if (pct === 100) triggerScoreNotice(`🚩 100% Supporter Added! +1 Projected JSP Vote`);
+      else if (pct >= 75) triggerScoreNotice(`🟢 Strong Supporter Added! +0.75 Projected Vote`);
+      else if (pct === 40) triggerScoreNotice(`🟡 40% Positive Added! +0.40 Projected Vote`);
+      else if (pct === 0) triggerScoreNotice(`🔴 Opponent Marked! Opposition vote added, margin reduced.`);
+      else triggerScoreNotice(`⚪ Neutral leaning updated (${pct}%)`);
+    } else if (familyId) {
+      const fam = families[familyId];
+      if (fam) {
+        fam.supportPct = pct;
+        fam.campaignNotes = notes;
+        fam.supportCategory = pct === 100 ? 'full_support' : pct >= 75 ? 'strong_lean' : pct === 0 ? 'opponent' : 'neutral_swing';
+        saveFamilyGroup(currentPartNo, fam);
+
+        fam.memberSnos.forEach(sno => {
+          saveVoterProfile(currentPartNo, sno, { supportPct: pct });
+        });
+        setFamilies(getFamilyGroups(currentPartNo));
+        setProfiles(getVoterProfiles(currentPartNo));
+
+        triggerScoreNotice(`🏠 Family sentiment updated to ${pct}% (${fam.memberSnos.length} members)`);
+      }
+    }
+  };
+
+  // Handle Field Visit Log
+  const handleSaveVisit = (voter: MobileVoter, visit: VoterVisit) => {
+    addVoterVisit(currentPartNo, voter.s, visit);
+    setProfiles(getVoterProfiles(currentPartNo));
+    triggerScoreNotice(`📋 Field visit logged for ${voter.n}! Winning score refreshed.`);
+  };
+
+  // Handle Influencer Assignment
+  const handleAssignInfluencer = (influencer: Influencer | null) => {
+    const { voterSno, familyId } = influencerAssignState;
+
+    if (voterSno) {
+      saveVoterProfile(currentPartNo, voterSno, {
+        influencerId: influencer?.id || '',
+        influencerName: influencer?.name || '',
+        influencerMobile: influencer?.mobile || ''
+      });
+      setProfiles(getVoterProfiles(currentPartNo));
+      triggerScoreNotice(`🤝 Influencer assigned to voter`);
+    } else if (familyId) {
+      const fam = families[familyId];
+      if (fam) {
+        fam.influencerId = influencer?.id || '';
+        fam.influencerName = influencer?.name || '';
+        fam.influencerMobile = influencer?.mobile || '';
+        saveFamilyGroup(currentPartNo, fam);
+
+        fam.memberSnos.forEach(sno => {
+          saveVoterProfile(currentPartNo, sno, {
+            influencerId: influencer?.id || '',
+            influencerName: influencer?.name || '',
+            influencerMobile: influencer?.mobile || ''
+          });
+        });
+        setFamilies(getFamilyGroups(currentPartNo));
+        setProfiles(getVoterProfiles(currentPartNo));
+        triggerScoreNotice(`🤝 Influencer assigned to family (${fam.name})`);
+      }
+    }
+  };
+
+  // Handle Family Create/Edit
+  const handleSaveFamily = (family: FamilyGroup) => {
+    saveFamilyGroup(currentPartNo, family);
+    setFamilies(getFamilyGroups(currentPartNo));
+    triggerScoreNotice(`🏠 Family group "${family.name}" saved`);
+  };
+
+  const handleDeleteFamily = (familyId: string) => {
+    deleteFamilyGroup(currentPartNo, familyId);
+    setFamilies(getFamilyGroups(currentPartNo));
+    triggerScoreNotice(`🗑️ Family group removed`);
+  };
+
+  // Handle New Influencer Creation
+  const handleAddNewInfluencer = (newInf: Influencer) => {
+    saveInfluencer(currentPartNo, newInf);
+    setInfluencers(getInfluencers(currentPartNo));
+    triggerScoreNotice(`⭐ New Influencer "${newInf.name}" registered`);
+  };
+
+  // Handle Field Survey Quick Status Mark
+  const handleUpdateSurveyMark = (serialNo: number, status: VoterSurveyStatus | null) => {
+    saveVoterProfile(currentPartNo, serialNo, { survey_status: status });
+    setProfiles(getVoterProfiles(currentPartNo));
+    if (status === 'voted') triggerScoreNotice(`✅ Marked Voted for S.No #${serialNo}`);
+    else if (status === 'supporter') triggerScoreNotice(`🚩 Marked Supporter for S.No #${serialNo}`);
+    else if (status === 'opponent') triggerScoreNotice(`🔴 Marked Opponent for S.No #${serialNo}`);
+  };
+
+  // Handle Custom JSON file import
+  const handleImportCustomJson = (customData: BoothData) => {
+    setBoothData(customData);
+    const pNo = customData.booth_info.part_no;
+    setCurrentPartNo(pNo);
+    saveCachedBoothData(pNo, customData);
+    setIsCached(true);
+    setProfiles(getVoterProfiles(pNo));
+    setFamilies(getFamilyGroups(pNo, customData.voters));
+    setInfluencers(getInfluencers(pNo));
+  };
+
+  return (
+    <div className="min-h-screen bg-slate-950 text-slate-100 flex flex-col font-sans select-none antialiased">
+      {/* Sticky Mobile Header */}
+      <HeaderMobile
+        boothInfo={boothData?.booth_info || null}
+        isLocked={isLocked}
+        isCached={isCached}
+        onOpenBoothSelector={() => setIsBoothSelectorOpen(true)}
+      />
+
+      {/* Floating Dynamic Score Notification Toast */}
+      {scoreNotification && (
+        <div className="fixed top-14 left-1/2 transform -translate-x-1/2 z-50 bg-amber-500 text-slate-950 px-4 py-2 rounded-2xl shadow-2xl font-black text-xs flex items-center gap-2 border border-amber-300 animate-in fade-in slide-in-from-top-2 duration-200">
+          <Sparkles className="w-4 h-4 text-slate-950 flex-shrink-0" />
+          <span>{scoreNotification}</span>
+        </div>
+      )}
+
+      {/* Main Content Area */}
+      <main className="flex-1 max-w-lg w-full mx-auto p-3">
+        {isLoading && !boothData && (
+          <div className="py-24 flex flex-col items-center justify-center space-y-3">
+            <Loader2 className="w-8 h-8 text-amber-400 animate-spin" />
+            <p className="text-xs text-slate-400 font-bold">Loading Booth #{currentPartNo} Electors...</p>
+          </div>
+        )}
+
+        {errorMsg && !boothData && (
+          <div className="bg-red-950/30 border border-red-500/40 rounded-2xl p-5 text-center space-y-3 my-8">
+            <AlertCircle className="w-8 h-8 text-red-400 mx-auto" />
+            <p className="text-xs text-red-300 font-bold">{errorMsg}</p>
+            <button
+              onClick={() => setIsBoothSelectorOpen(true)}
+              className="px-4 py-2 bg-amber-500 text-slate-950 font-black rounded-xl text-xs"
+            >
+              Select Another Booth
+            </button>
+          </div>
+        )}
+
+        {boothData && (
+          <>
+            {/* Top Winning Score Banner (Shown on Voters tab) */}
+            {activeTab === 'voters' && winningScore && (
+              <WinningScoreBanner
+                calc={winningScore}
+                onOpenWarRoom={() => setActiveTab('warroom')}
+              />
+            )}
+
+            {/* TAB 1: Voters Tab */}
+            {activeTab === 'voters' && (
+              <VotersTabMobile
+                voters={boothData.voters}
+                boothInfo={boothData.booth_info}
+                profiles={profiles}
+                onOpenPhoneEditor={v => setSelectedVoterForPhone(v)}
+                onOpenSupportPicker={(title, currentPct, currentNotes, voterSno) => {
+                  setSupportPickerState({
+                    open: true,
+                    title,
+                    currentPct,
+                    currentNotes,
+                    voterSno
+                  });
+                }}
+                onOpenLogVisit={v => setSelectedVoterForVisit(v)}
+                onOpenInfluencerAssign={(targetName, currentInfId, voterSno) => {
+                  setInfluencerAssignState({
+                    open: true,
+                    targetName,
+                    currentInfId,
+                    voterSno
+                  });
+                }}
+                onUpdateSurveyMark={handleUpdateSurveyMark}
+                onOpenSlip={v => setSelectedVoterForSlip(v)}
+              />
+            )}
+
+            {/* TAB 2: Families Tab */}
+            {activeTab === 'families' && (
+              <FamiliesTabMobile
+                families={families}
+                voters={boothData.voters}
+                influencers={influencers}
+                profiles={profiles}
+                boothInfo={boothData.booth_info}
+                onCreateFamily={() => setCreateFamilyState({ open: true, initialFamily: null })}
+                onEditFamily={fam => setCreateFamilyState({ open: true, initialFamily: fam })}
+                onOpenPhoneEditor={v => setSelectedVoterForPhone(v)}
+                onOpenSupportPicker={(title, currentPct, currentNotes, familyId) => {
+                  setSupportPickerState({
+                    open: true,
+                    title,
+                    currentPct,
+                    currentNotes,
+                    familyId,
+                    hasFamily: true
+                  });
+                }}
+                onOpenInfluencerAssign={(targetName, currentInfId, familyId) => {
+                  setInfluencerAssignState({
+                    open: true,
+                    targetName,
+                    currentInfId,
+                    familyId
+                  });
+                }}
+                onOpenSlip={v => setSelectedVoterForSlip(v)}
+              />
+            )}
+
+            {/* TAB 3: Influencers Command Tab */}
+            {activeTab === 'influencers' && (
+              <InfluencersTabMobile
+                influencers={influencers}
+                voters={boothData.voters}
+                families={families}
+                profiles={profiles}
+                boothInfo={boothData.booth_info}
+                onAddNewInfluencer={() => {
+                  setInfluencerAssignState({
+                    open: true,
+                    targetName: 'New Influencer'
+                  });
+                }}
+                onOpenInfluencerAssign={(targetName, currentInfId) => {
+                  setInfluencerAssignState({
+                    open: true,
+                    targetName,
+                    currentInfId
+                  });
+                }}
+              />
+            )}
+
+            {/* TAB 4: Candidate War Room (Winning Weapon) */}
+            {activeTab === 'warroom' && (
+              <WarRoomTabMobile
+                boothData={boothData}
+                profiles={profiles}
+                influencers={influencers}
+                families={families}
+                onOpenPhoneEditor={v => setSelectedVoterForPhone(v)}
+                onOpenSupportPicker={(title, currentPct, currentNotes, voterSno) => {
+                  setSupportPickerState({
+                    open: true,
+                    title,
+                    currentPct,
+                    currentNotes,
+                    voterSno
+                  });
+                }}
+                onOpenLogVisit={v => setSelectedVoterForVisit(v)}
+                onOpenInfluencerAssign={(targetName, currentInfId, voterSno) => {
+                  setInfluencerAssignState({
+                    open: true,
+                    targetName,
+                    currentInfId,
+                    voterSno
+                  });
+                }}
+                onOpenSlip={v => setSelectedVoterForSlip(v)}
+              />
+            )}
+
+            {/* TAB 5: Offline & Tools Tab */}
+            {activeTab === 'offline' && (
+              <OfflineTabMobile
+                boothData={boothData}
+                isCached={isCached}
+                isLocked={isLocked}
+                onRefreshCache={() => setIsCached(isBoothCached(currentPartNo))}
+                onOpenBoothSelector={() => setIsBoothSelectorOpen(true)}
+                onImportCustomJson={handleImportCustomJson}
+              />
+            )}
+          </>
+        )}
+      </main>
+
+      {/* Fixed Bottom Navigation */}
+      <BottomNavMobile
+        activeTab={activeTab}
+        onTabChange={setActiveTab}
+        votersCount={boothData?.voters.length || 0}
+        kriyaCount={boothData?.booth_info.total_kriya_count || 0}
+      />
+
+      {/* Booth Assignment Modal */}
+      {isBoothSelectorOpen && (
+        <BoothAssignmentModal
+          boothsIndex={boothsIndex}
+          currentPartNo={currentPartNo}
+          isLocked={isLocked}
+          onSelectBooth={handleSelectBooth}
+          onClose={() => setIsBoothSelectorOpen(false)}
+        />
+      )}
+
+      {/* Voter Slip Preview & WhatsApp Share Modal */}
+      {selectedVoterForSlip && boothData && (
+        <VoterSlipModal
+          voter={selectedVoterForSlip}
+          boothInfo={boothData.booth_info}
+          onClose={() => setSelectedVoterForSlip(null)}
+        />
+      )}
+
+      {/* Phone Number Add/Edit Modal */}
+      {selectedVoterForPhone && (
+        <PhoneEditorModal
+          voter={selectedVoterForPhone}
+          profile={profiles[selectedVoterForPhone.s]}
+          onSavePhone={(phone, altPhone) => handleSavePhone(selectedVoterForPhone, phone, altPhone)}
+          onClose={() => setSelectedVoterForPhone(null)}
+        />
+      )}
+
+      {/* Political Support Leaning & Percentage Selector Modal */}
+      {supportPickerState.open && (
+        <SupportLeaningPicker
+          title={supportPickerState.title}
+          subtitle={supportPickerState.subtitle}
+          currentPct={supportPickerState.currentPct}
+          currentNotes={supportPickerState.currentNotes}
+          hasFamily={supportPickerState.hasFamily}
+          onSave={handleSaveSupport}
+          onClose={() => setSupportPickerState(prev => ({ ...prev, open: false }))}
+        />
+      )}
+
+      {/* Key Influencer Assign & Management Modal */}
+      {influencerAssignState.open && (
+        <InfluencerAssignModal
+          targetName={influencerAssignState.targetName}
+          currentInfluencerId={influencerAssignState.currentInfId}
+          influencers={influencers}
+          onAssignInfluencer={handleAssignInfluencer}
+          onAddNewInfluencer={handleAddNewInfluencer}
+          onClose={() => setInfluencerAssignState(prev => ({ ...prev, open: false }))}
+        />
+      )}
+
+      {/* Create / Edit Custom Family Group Modal */}
+      {createFamilyState.open && boothData && (
+        <CreateFamilyModal
+          initialFamily={createFamilyState.initialFamily}
+          voters={boothData.voters}
+          influencers={influencers}
+          onSaveFamily={handleSaveFamily}
+          onDeleteFamily={handleDeleteFamily}
+          onClose={() => setCreateFamilyState({ open: false, initialFamily: null })}
+        />
+      )}
+
+      {/* Field Visit & Touchpoint Logger Modal */}
+      {selectedVoterForVisit && (
+        <LogVisitModal
+          voter={selectedVoterForVisit}
+          profile={profiles[selectedVoterForVisit.s]}
+          onSaveVisit={visit => handleSaveVisit(selectedVoterForVisit, visit)}
+          onClose={() => setSelectedVoterForVisit(null)}
+        />
+      )}
+    </div>
+  );
+}
+export { App as MobileBoothApp };
+export default App;

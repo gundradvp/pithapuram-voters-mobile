@@ -1,0 +1,16 @@
+{
+  "short_name": "JSP Booth",
+  "name": "JSP Booth Field Voter App — Pithapuram",
+  "icons": [
+    {
+      "src": "data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🚩</text></svg>",
+      "sizes": "192x192 512x512",
+      "type": "image/svg+xml"
+    }
+  ],
+  "start_url": "/",
+  "background_color": "#0b1120",
+  "theme_color": "#0b1120",
+  "display": "standalone",
+  "orientation": "portrait"
+}
