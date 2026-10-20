@@ -14,6 +14,7 @@ import { SupportLeaningPicker } from './components/SupportLeaningPicker';
 import { InfluencerAssignModal } from './components/InfluencerAssignModal';
 import { CreateFamilyModal } from './components/CreateFamilyModal';
 import { LogVisitModal } from './components/LogVisitModal';
+import { ThemeSelectorModal } from './components/ThemeSelectorModal';
 import {
   BoothData,
   BoothIndexItem,
@@ -44,10 +45,24 @@ import {
   calculateWinningScore
 } from './utils/storage';
 import { useI18n } from './utils/i18n';
+import { ThemeId, getSavedTheme, setSavedTheme, applyThemeToDom } from './utils/theme';
 import { Loader2, AlertCircle, Sparkles, Trophy } from 'lucide-react';
 
 export function App() {
   const { lang, toggleLanguage, t } = useI18n();
+
+  // App Theme State
+  const [theme, setTheme] = useState<ThemeId>(() => getSavedTheme());
+  const [isThemeModalOpen, setIsThemeModalOpen] = useState<boolean>(false);
+
+  useEffect(() => {
+    applyThemeToDom(theme);
+  }, [theme]);
+
+  const handleSelectTheme = (newTheme: ThemeId) => {
+    setTheme(newTheme);
+    setSavedTheme(newTheme);
+  };
 
   const [boothsIndex, setBoothsIndex] = useState<BoothIndexItem[]>([]);
   const [currentPartNo, setCurrentPartNo] = useState<number>(() => {
@@ -338,13 +353,15 @@ export function App() {
 
   return (
     <div className="min-h-screen bg-slate-950 text-slate-100 flex flex-col font-sans select-none antialiased">
-      {/* Sticky Mobile Header with Language Toggle */}
+      {/* Sticky Mobile Header with Language & Theme Toggle */}
       <HeaderMobile
         boothInfo={boothData?.booth_info || null}
         isLocked={isLocked}
         isCached={isCached}
         language={lang}
+        theme={theme}
         onToggleLanguage={toggleLanguage}
+        onOpenThemeSelector={() => setIsThemeModalOpen(true)}
         onOpenBoothSelector={() => setIsBoothSelectorOpen(true)}
       />
 
@@ -514,6 +531,9 @@ export function App() {
                 boothData={boothData}
                 isCached={isCached}
                 isLocked={isLocked}
+                language={lang}
+                theme={theme}
+                onSelectTheme={handleSelectTheme}
                 onRefreshCache={() => setIsCached(isBoothCached(currentPartNo))}
                 onOpenBoothSelector={() => setIsBoothSelectorOpen(true)}
                 onImportCustomJson={handleImportCustomJson}
@@ -608,6 +628,16 @@ export function App() {
           language={lang}
           onSaveVisit={visit => handleSaveVisit(selectedVoterForVisit, visit)}
           onClose={() => setSelectedVoterForVisit(null)}
+        />
+      )}
+
+      {/* Theme Selector Modal */}
+      {isThemeModalOpen && (
+        <ThemeSelectorModal
+          currentTheme={theme}
+          language={lang}
+          onSelectTheme={handleSelectTheme}
+          onClose={() => setIsThemeModalOpen(false)}
         />
       )}
     </div>

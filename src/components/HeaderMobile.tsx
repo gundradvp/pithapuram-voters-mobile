@@ -1,14 +1,17 @@
 import React from 'react';
-import { Lock, Unlock, Wifi, WifiOff, Languages } from 'lucide-react';
+import { Lock, Unlock, Wifi, WifiOff, Languages, Palette } from 'lucide-react';
 import { BoothInfo } from '../types';
 import { Language } from '../utils/i18n';
+import { ThemeId, THEMES } from '../utils/theme';
 
 interface HeaderMobileProps {
   boothInfo: BoothInfo | null;
   isLocked: boolean;
   isCached: boolean;
   language: Language;
+  theme: ThemeId;
   onToggleLanguage: () => void;
+  onOpenThemeSelector: () => void;
   onOpenBoothSelector: () => void;
 }
 
@@ -17,9 +20,13 @@ export const HeaderMobile: React.FC<HeaderMobileProps> = ({
   isLocked,
   isCached,
   language,
+  theme,
   onToggleLanguage,
+  onOpenThemeSelector,
   onOpenBoothSelector
 }) => {
+  const currentThemeConfig = THEMES.find(t => t.id === theme) || THEMES[0];
+
   return (
     <header className="sticky top-0 z-40 bg-slate-900/95 backdrop-blur-md border-b border-slate-800 px-3 py-2 shadow-lg flex items-center justify-between">
       {/* Left: Emblem, Title & Part # */}
@@ -42,8 +49,18 @@ export const HeaderMobile: React.FC<HeaderMobileProps> = ({
         </div>
       </div>
 
-      {/* Right: Language Switcher, Offline Badge & Booth Lock */}
+      {/* Right: Theme Switcher, Language Switcher, Offline Badge & Booth Lock */}
       <div className="flex items-center gap-1.5 flex-shrink-0">
+        {/* Theme Switcher Button */}
+        <button
+          onClick={onOpenThemeSelector}
+          className="flex items-center gap-1 px-2 py-1 rounded-lg text-[10px] font-black border transition-all bg-slate-800/80 text-amber-300 border-slate-700 hover:border-amber-400/60 active:scale-95 shadow-sm"
+          title={language === 'te' ? 'యాప్ థీమ్ మార్చండి (ఎండలో స్పష్టత / రాత్రి మోడ్)' : 'Change Theme (Daylight / OLED Black / Alliance)'}
+        >
+          <Palette className="w-3.5 h-3.5 text-amber-400" />
+          <span className="text-[10px]">{currentThemeConfig.icon}</span>
+        </button>
+
         {/* Language Switcher Pill */}
         <button
           onClick={onToggleLanguage}
