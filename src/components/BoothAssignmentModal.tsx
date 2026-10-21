@@ -196,7 +196,7 @@ export const BoothAssignmentModal: React.FC<BoothAssignmentModalProps> = ({
                 >
                   <Building2 className="w-3 h-3" />
                   <span>{language === 'te' ? 'మున్సిపల్ వార్డులు' : 'Municipal Wards'}</span>
-                  <span className="bg-emerald-500 text-slate-950 text-[9px] px-1 rounded-full font-black">14 Ready</span>
+                  <span className="bg-emerald-500 text-slate-950 text-[9px] px-1 rounded-full font-black">2 Ready</span>
                 </button>
                 <button
                   onClick={() => setLocalSubCategory('panchayat')}
@@ -320,7 +320,6 @@ export const BoothAssignmentModal: React.FC<BoothAssignmentModalProps> = ({
               {electionCategoryTab === 'local' && (
                 filteredLocalUnits.map(u => {
                   const isSelected = u.id === currentPartNo || u.part_no === currentPartNo;
-                  const isWard14 = u.id === 'ward_14';
 
                   return (
                     <div
@@ -334,11 +333,9 @@ export const BoothAssignmentModal: React.FC<BoothAssignmentModalProps> = ({
                       className={`p-2.5 rounded-xl transition-all border ${
                         isSelected
                           ? 'bg-blue-950/40 border-blue-500 text-white'
-                          : isWard14
+                          : u.is_loaded
                             ? 'bg-gradient-to-r from-blue-950/40 via-amber-950/30 to-slate-900 border-amber-500/60 shadow-lg cursor-pointer hover:border-amber-400'
-                            : u.is_loaded
-                              ? 'bg-slate-950/40 border-slate-800 hover:border-slate-700 cursor-pointer text-slate-300'
-                              : 'bg-slate-950/20 border-slate-900/60 opacity-60 cursor-not-allowed'
+                            : 'bg-slate-950/20 border-slate-900/60 opacity-60 cursor-not-allowed'
                       }`}
                     >
                       <div className="flex items-start justify-between gap-2">
@@ -355,10 +352,10 @@ export const BoothAssignmentModal: React.FC<BoothAssignmentModalProps> = ({
                               {u.category_label.split(' ')[0]}
                             </span>
 
-                            {isWard14 && (
+                            {u.is_loaded && (
                               <span className="px-2 py-0.2 bg-emerald-500/20 text-emerald-300 border border-emerald-500/40 rounded-full text-[9.5px] font-black flex items-center gap-1 animate-pulse">
                                 <Sparkles className="w-3 h-3 text-emerald-400" />
-                                1,256 ఓటర్లు లోడ్ అయ్యాయి (Active)
+                                {u.total_voters.toLocaleString()} ఓటర్లు లోడ్ అయ్యాయి (Active)
                               </span>
                             )}
                           </div>
@@ -378,11 +375,11 @@ export const BoothAssignmentModal: React.FC<BoothAssignmentModalProps> = ({
                             </div>
                           )}
 
-                          {isWard14 && (
+                          {u.is_loaded && (
                             <div className="flex items-center gap-3 text-[10px] pt-1 text-slate-300 font-mono">
-                              <span>పురుషులు: <strong className="text-white">604</strong></span>
-                              <span>మహిళలు: <strong className="text-white">652</strong></span>
-                              <span>క్రియా: <strong className="text-amber-400">239</strong></span>
+                              <span>పురుషులు: <strong className="text-white">{u.male_count}</strong></span>
+                              <span>మహిళలు: <strong className="text-white">{u.female_count}</strong></span>
+                              <span>క్రియా: <strong className="text-amber-400">{u.exact_kriya_count}</strong></span>
                             </div>
                           )}
                         </div>

@@ -18,7 +18,7 @@ export const VoterSlipModal: React.FC<VoterSlipModalProps> = ({
   const handleShareWhatsApp = () => {
     const isMunicipal = boothInfo.election_type === 'municipal';
     const text = isMunicipal
-      ? `*🚩 జనసేన పార్టీ — పిఠాపురం పురపాలక సంఘం (వార్డు #14)*
+      ? `*🚩 జనసేన పార్టీ — ${boothInfo.local_body || 'పురపాలక సంఘం'} (${boothInfo.ward_no ? `${boothInfo.ward_no}వ వార్డు` : ''})*
 *ఓటరు సమాచార స్లిప్పు (VOTER SLIP)*
 
 *ఓటరు పేరు:* ${voter.n}
@@ -27,7 +27,7 @@ export const VoterSlipModal: React.FC<VoterSlipModalProps> = ({
 *వార్డు క్రమ సంఖ్య:* #${voter.s}
 *శాసనసభ బూత్:* Part #${voter.ac_part || ''} (క్రమం #${voter.ac_sno || ''})
 *ఇంటి నెంబర్:* ${voter.hn}
-*వీధి / ప్రాంతం:* ${voter.sec || '14వ వార్డు'}
+*వీధి / ప్రాంతం:* ${voter.sec || ''}
 *వయస్సు / లింగం:* ${voter.a} Yrs / ${voter.g === 'M' ? 'Male' : 'Female'}
 *పోలింగ్ కేంద్రం:* ${boothInfo.ps_address}
 
