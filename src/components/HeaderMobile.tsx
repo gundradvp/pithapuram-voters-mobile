@@ -1,8 +1,9 @@
 import React from 'react';
-import { Lock, Unlock, Wifi, WifiOff, Languages, Palette } from 'lucide-react';
+import { Lock, Unlock, Wifi, WifiOff, Languages, Palette, LogOut, Crown, UserCheck } from 'lucide-react';
 import { BoothInfo } from '../types';
 import { Language } from '../utils/i18n';
 import { ThemeId, THEMES } from '../utils/theme';
+import { UserSession } from '../utils/auth';
 
 interface HeaderMobileProps {
   boothInfo: BoothInfo | null;
@@ -10,9 +11,12 @@ interface HeaderMobileProps {
   isCached: boolean;
   language: Language;
   theme: ThemeId;
+  session: UserSession | null;
   onToggleLanguage: () => void;
   onOpenThemeSelector: () => void;
   onOpenBoothSelector: () => void;
+  onOpenAdminHub?: () => void;
+  onLogout: () => void;
 }
 
 export const HeaderMobile: React.FC<HeaderMobileProps> = ({
@@ -21,9 +25,12 @@ export const HeaderMobile: React.FC<HeaderMobileProps> = ({
   isCached,
   language,
   theme,
+  session,
   onToggleLanguage,
   onOpenThemeSelector,
-  onOpenBoothSelector
+  onOpenBoothSelector,
+  onOpenAdminHub,
+  onLogout
 }) => {
   const currentThemeConfig = THEMES.find(t => t.id === theme) || THEMES[0];
 
@@ -35,7 +42,7 @@ export const HeaderMobile: React.FC<HeaderMobileProps> = ({
           🚩
         </div>
         <div className="min-w-0">
-          <div className="flex items-center gap-1.5">
+          <div className="flex items-center gap-1.5 flex-wrap">
             <span className="text-[10px] uppercase font-bold text-amber-400 tracking-wider">
               {language === 'te' ? 'జనసేన పిఠాపురం' : 'JSP Pithapuram'}
             </span>
@@ -50,12 +57,13 @@ export const HeaderMobile: React.FC<HeaderMobileProps> = ({
                 ? (language === 'te' ? '🏛️ మునిసిపల్ వార్డు' : '🏛️ Municipal Ward')
                 : boothInfo?.election_type === 'panchayat'
                   ? (language === 'te' ? '🏡 పంచాయతీ వార్డు' : '🏡 GP Ward')
-                  : boothInfo?.election_type === 'mptc'
-                    ? '🚩 MPTC'
-                    : boothInfo?.election_type === 'zptc'
-                      ? '🏛️ ZPTC'
-                      : 'AC #37'}
+                  : 'AC #37'}
             </span>
+            {session?.role === 'admin' && (
+              <span className="px-1.5 py-0.2 rounded bg-red-600 text-white text-[9px] font-black uppercase tracking-wider animate-pulse flex items-center gap-0.5">
+                <Crown className="w-2.5 h-2.5" /> ADMIN
+              </span>
+            )}
           </div>
           <h1 className="text-xs font-black text-white truncate leading-tight">
             {boothInfo ? (
@@ -67,13 +75,25 @@ export const HeaderMobile: React.FC<HeaderMobileProps> = ({
         </div>
       </div>
 
-      {/* Right: Theme Switcher, Language Switcher, Offline Badge & Booth Lock */}
-      <div className="flex items-center gap-1.5 flex-shrink-0">
+      {/* Right: Actions */}
+      <div className="flex items-center gap-1 flex-shrink-0">
+        {/* Admin Hub Shortcut (Only visible to Admin) */}
+        {session?.role === 'admin' && onOpenAdminHub && (
+          <button
+            onClick={onOpenAdminHub}
+            className="flex items-center gap-1 px-2 py-1 rounded-lg text-[10px] font-black bg-gradient-to-r from-red-600 to-amber-600 hover:from-red-500 hover:to-amber-500 text-white shadow-sm active:scale-95 transition-all"
+            title="Admin Assignment & WhatsApp Messaging Portal"
+          >
+            <Crown className="w-3 h-3" />
+            <span className="hidden xs:inline">కేటాయింపులు</span>
+          </button>
+        )}
+
         {/* Theme Switcher Button */}
         <button
           onClick={onOpenThemeSelector}
-          className="flex items-center gap-1 px-2 py-1 rounded-lg text-[10px] font-black border transition-all bg-slate-800/80 text-amber-300 border-slate-700 hover:border-amber-400/60 active:scale-95 shadow-sm"
-          title={language === 'te' ? 'యాప్ థీమ్ మార్చండి (ఎండలో స్పష్టత / రాత్రి మోడ్)' : 'Change Theme (Daylight / OLED Black / Alliance)'}
+          className="flex items-center gap-0.5 px-1.5 py-1 rounded-lg text-[10px] font-black border transition-all bg-slate-800/80 text-amber-300 border-slate-700 hover:border-amber-400/60 active:scale-95 shadow-sm"
+          title={language === 'te' ? 'యాప్ థీమ్ మార్చండి (తేజో సోలార్ CRM / లైట్ / డార్క్)' : 'Change Theme (Tejo Solar CRM / Light / Dark)'}
         >
           <Palette className="w-3.5 h-3.5 text-amber-400" />
           <span className="text-[10px]">{currentThemeConfig.icon}</span>
@@ -82,24 +102,12 @@ export const HeaderMobile: React.FC<HeaderMobileProps> = ({
         {/* Language Switcher Pill */}
         <button
           onClick={onToggleLanguage}
-          className="flex items-center gap-1 px-2 py-1 rounded-lg text-[10px] font-black border transition-all bg-gradient-to-r from-red-950/60 to-amber-950/60 text-amber-300 border-amber-500/50 hover:bg-amber-500/20 active:scale-95 shadow-sm"
+          className="flex items-center gap-1 px-1.5 py-1 rounded-lg text-[10px] font-black border transition-all bg-gradient-to-r from-red-950/60 to-amber-950/60 text-amber-300 border-amber-500/50 hover:bg-amber-500/20 active:scale-95 shadow-sm"
           title={language === 'te' ? 'Switch to English' : 'తెలుగులోకి మార్చండి'}
         >
           <Languages className="w-3.5 h-3.5 text-amber-400" />
-          <span className="tracking-tight">{language === 'te' ? 'తెలుగు' : 'English'}</span>
+          <span className="tracking-tight hidden xs:inline">{language === 'te' ? 'తెలుగు' : 'En'}</span>
         </button>
-
-        {/* Offline Badge */}
-        <div 
-          className={`hidden sm:flex items-center gap-1 px-1.5 py-0.5 rounded-full text-[9px] font-bold border ${
-            isCached 
-              ? 'bg-emerald-950/60 text-emerald-400 border-emerald-500/30' 
-              : 'bg-slate-800 text-slate-400 border-slate-700'
-          }`}
-        >
-          {isCached ? <Wifi className="w-2.5 h-2.5" /> : <WifiOff className="w-2.5 h-2.5" />}
-          <span>{isCached ? (language === 'te' ? 'ఆఫ్‌లైన్' : 'Offline') : (language === 'te' ? 'ఆన్‌లైన్' : 'Online')}</span>
-        </div>
 
         {/* Booth Lock / Unlock Button */}
         <button
@@ -109,10 +117,25 @@ export const HeaderMobile: React.FC<HeaderMobileProps> = ({
               ? 'bg-slate-800 hover:bg-slate-700 text-amber-300 border border-amber-500/40'
               : 'bg-amber-500 hover:bg-amber-400 text-slate-950 font-black'
           }`}
-          title={isLocked ? 'Assigned Booth Locked. Tap to unlock with Admin PIN.' : 'Tap to assign/switch booth'}
+          title={isLocked ? 'Tap to switch booth/ward' : 'Tap to assign/switch booth'}
         >
           {isLocked ? <Lock className="w-3 h-3 text-amber-400" /> : <Unlock className="w-3 h-3" />}
-          <span>{isLocked ? (boothInfo?.part_no === 'ward_14' ? (language === 'te' ? 'వార్డు 14' : 'Ward 14') : `#${boothInfo?.part_no || ''}`) : (language === 'te' ? 'మార్చండి' : 'Change')}</span>
+          <span>
+            {boothInfo?.part_no === 'ward_14'
+              ? (language === 'te' ? 'వార్డు 14' : 'W-14')
+              : boothInfo?.part_no === 'gollaprolu_ward_11'
+                ? (language === 'te' ? 'వార్డు 11' : 'W-11')
+                : `#${boothInfo?.part_no || ''}`}
+          </span>
+        </button>
+
+        {/* Logout Button */}
+        <button
+          onClick={onLogout}
+          className="p-1 rounded-lg text-slate-400 hover:text-red-400 hover:bg-slate-800/80 transition-all"
+          title={language === 'te' ? `లాగౌట్ (${session?.phone || ''})` : `Logout (${session?.phone || ''})`}
+        >
+          <LogOut className="w-3.5 h-3.5" />
         </button>
       </div>
     </header>

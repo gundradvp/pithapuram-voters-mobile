@@ -15,6 +15,8 @@ import { InfluencerAssignModal } from './components/InfluencerAssignModal';
 import { CreateFamilyModal } from './components/CreateFamilyModal';
 import { LogVisitModal } from './components/LogVisitModal';
 import { ThemeSelectorModal } from './components/ThemeSelectorModal';
+import { LoginModal } from './components/LoginModal';
+import { AdminAssignmentModal } from './components/AdminAssignmentModal';
 import {
   BoothData,
   BoothIndexItem,
@@ -45,9 +47,16 @@ import {
   saveInfluencer,
   calculateWinningScore
 } from './utils/storage';
+import {
+  UserSession,
+  getUserSession,
+  logoutUser,
+  getVolunteerAssignment,
+  getWhatsAppShareUrl
+} from './utils/auth';
 import { useI18n } from './utils/i18n';
 import { ThemeId, getSavedTheme, setSavedTheme, applyThemeToDom } from './utils/theme';
-import { Loader2, AlertCircle, Sparkles, Trophy } from 'lucide-react';
+import { Loader2, AlertCircle, Sparkles, Trophy, MessageSquare } from 'lucide-react';
 
 export function App() {
   const { lang, toggleLanguage, t } = useI18n();
@@ -55,6 +64,11 @@ export function App() {
   // App Theme State
   const [theme, setTheme] = useState<ThemeId>(() => getSavedTheme());
   const [isThemeModalOpen, setIsThemeModalOpen] = useState<boolean>(false);
+
+  // User Auth & Role Session State
+  const [session, setSession] = useState<UserSession | null>(() => getUserSession());
+  const [isLoginModalOpen, setIsLoginModalOpen] = useState<boolean>(() => !getUserSession());
+  const [isAdminModalOpen, setIsAdminModalOpen] = useState<boolean>(false);
 
   useEffect(() => {
     applyThemeToDom(theme);
@@ -67,9 +81,44 @@ export function App() {
 
   const [boothsIndex, setBoothsIndex] = useState<BoothIndexItem[]>([]);
   const [localUnits, setLocalUnits] = useState<LocalElectionUnit[]>([]);
+
+  // Volunteer assigned units lookup
+  const currentAssignment = useMemo(() => {
+    if (!session || session.role === 'admin') return null;
+    return getVolunteerAssignment(session.phone);
+  }, [session]);
+
+  const assignedAssemblyBooths = useMemo(() => {
+    if (session?.role === 'admin') return boothsIndex.map(b => Number(b.part_no));
+    return currentAssignment?.assemblyBooths || [];
+  }, [session, currentAssignment, boothsIndex]);
+
+  const assignedMunicipalWards = useMemo(() => {
+    if (session?.role === 'admin') return localUnits.map(u => u.id);
+    return currentAssignment?.municipalWards || [];
+  }, [session, currentAssignment, localUnits]);
+
   const [currentPartNo, setCurrentPartNo] = useState<number | string>(() => {
     return getAssignedBooth() || 'ward_14';
   });
+
+  // Auto-switch to assigned unit on volunteer login if currentPartNo is not in their assigned list
+  useEffect(() => {
+    if (!session || session.role === 'admin') return;
+    if (!currentAssignment) return;
+
+    const isCurrentValid =
+      (typeof currentPartNo === 'number' && assignedAssemblyBooths.includes(currentPartNo)) ||
+      (typeof currentPartNo === 'string' && assignedMunicipalWards.includes(currentPartNo));
+
+    if (!isCurrentValid) {
+      if (assignedMunicipalWards.length > 0) {
+        setCurrentPartNo(assignedMunicipalWards[0]);
+      } else if (assignedAssemblyBooths.length > 0) {
+        setCurrentPartNo(assignedAssemblyBooths[0]);
+      }
+    }
+  }, [session, currentAssignment, assignedAssemblyBooths, assignedMunicipalWards, currentPartNo]);
   const [boothData, setBoothData] = useState<BoothData | null>(null);
   const [activeTab, setActiveTab] = useState<TabType>('voters');
   const [isLocked, setIsLocked] = useState<boolean>(() => isBoothLocked());
@@ -379,9 +428,16 @@ export function App() {
         isCached={isCached}
         language={lang}
         theme={theme}
+        session={session}
         onToggleLanguage={toggleLanguage}
         onOpenThemeSelector={() => setIsThemeModalOpen(true)}
         onOpenBoothSelector={() => setIsBoothSelectorOpen(true)}
+        onOpenAdminHub={() => setIsAdminModalOpen(true)}
+        onLogout={() => {
+          logoutUser();
+          setSession(null);
+          setIsLoginModalOpen(true);
+        }}
       />
 
       {/* Floating Dynamic Score Notification Toast */}
@@ -394,6 +450,28 @@ export function App() {
 
       {/* Main Content Area */}
       <main className="flex-1 max-w-lg w-full mx-auto p-3">
+        {/* Unassigned Volunteer Notice Banner */}
+        {session && session.role === 'volunteer' && assignedAssemblyBooths.length === 0 && assignedMunicipalWards.length === 0 && (
+          <div className="bg-amber-950/40 border border-amber-500/50 rounded-2xl p-4 text-center space-y-2 mb-4 animate-in fade-in">
+            <div className="text-amber-400 font-bold text-xs">
+              {lang === 'te' ? '⚠️ బూతులు ఇంకా కేటాయించబడలేదు' : '⚠️ No Booths Assigned Yet'}
+            </div>
+            <p className="text-[11px] text-slate-300">
+              {lang === 'te' 
+                ? `మీ మొబైల్ నంబర్ (+91 ${session.phone}) కు ఇంకా అసెంబ్లీ లేదా మున్సిపల్ బూతులు కేటాయించబడలేదు.`
+                : `Your mobile number (+91 ${session.phone}) has not been assigned any booths or wards yet.`}
+            </p>
+            <a
+              href={getWhatsAppShareUrl('9000273028', `నమస్తే అడ్మిన్ గారు, నా మొబైల్ నంబర్ ${session.phone} తో పిఠాపురం ఎలక్షన్ యాప్‌లో లాగిన్ అయ్యాను. దయచేసి నాకు బూత్/వార్డు బాధ్యతలు కేటాయించండి.`)}
+              target="_blank"
+              rel="noreferrer"
+              className="inline-flex items-center gap-1.5 px-3 py-1.5 bg-emerald-600 hover:bg-emerald-500 text-white rounded-xl text-xs font-bold shadow-md shadow-emerald-950/40"
+            >
+              <MessageSquare className="w-3.5 h-3.5" />
+              <span>{lang === 'te' ? 'అడ్మిన్‌ను వాట్సాప్‌లో కోరండి (9000273028)' : 'Request Admin on WhatsApp'}</span>
+            </a>
+          </div>
+        )}
         {isLoading && !boothData && (
           <div className="py-24 flex flex-col items-center justify-center space-y-3">
             <Loader2 className="w-8 h-8 text-amber-400 animate-spin" />
@@ -581,6 +659,34 @@ export function App() {
           onSelectBooth={handleSelectBooth}
           onClose={() => setIsBoothSelectorOpen(false)}
           language={lang}
+          userRole={session?.role || 'volunteer'}
+          assignedAssemblyBooths={assignedAssemblyBooths}
+          assignedMunicipalWards={assignedMunicipalWards}
+          onOpenAdminHub={() => setIsAdminModalOpen(true)}
+        />
+      )}
+
+      {/* Admin Assignment & WhatsApp Dispatch Hub Modal */}
+      {isAdminModalOpen && session?.role === 'admin' && (
+        <AdminAssignmentModal
+          isOpen={isAdminModalOpen}
+          onClose={() => setIsAdminModalOpen(false)}
+          boothsIndex={boothsIndex}
+          localUnits={localUnits}
+          language={lang}
+        />
+      )}
+
+      {/* Volunteer & Admin Login Modal */}
+      {(!session || isLoginModalOpen) && (
+        <LoginModal
+          isOpen={!session || isLoginModalOpen}
+          language={lang}
+          onLoginSuccess={(newSession) => {
+            setSession(newSession);
+            setIsLoginModalOpen(false);
+          }}
+          onClose={session ? () => setIsLoginModalOpen(false) : undefined}
         />
       )}
 

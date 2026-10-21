@@ -18,7 +18,7 @@ export const ThemeSelectorModal: React.FC<ThemeSelectorModalProps> = ({
 }) => {
   return (
     <div className="fixed inset-0 z-50 bg-black/80 backdrop-blur-sm flex items-end sm:items-center justify-center p-3 animate-in fade-in duration-150">
-      <div className="bg-slate-900 border border-amber-500/40 rounded-3xl max-w-sm w-full p-5 space-y-4 shadow-2xl relative max-h-[90vh] overflow-y-auto">
+      <div className="bg-slate-900 border border-amber-500/40 rounded-3xl max-w-md w-full p-5 space-y-4 shadow-2xl relative max-h-[90vh] overflow-y-auto">
         {/* Close Button */}
         <button
           onClick={onClose}
@@ -31,15 +31,15 @@ export const ThemeSelectorModal: React.FC<ThemeSelectorModalProps> = ({
         <div className="border-b border-slate-800 pb-3">
           <div className="flex items-center gap-1.5 text-xs text-amber-400 font-bold uppercase tracking-wider">
             <Palette className="w-3.5 h-3.5 text-amber-400" />
-            {language === 'te' ? 'ఫీల్డ్ క్యాంపెయిన్ థీమ్స్' : 'Field Campaign Themes'}
+            {language === 'te' ? 'ఫీల్డ్ & CRM థీమ్స్' : 'Field & CRM Themes'}
           </div>
           <h3 className="text-base font-black text-white mt-0.5">
             {language === 'te' ? 'యాప్ థీమ్ ఎంచుకోండి' : 'Choose App Theme'}
           </h3>
           <p className="text-[11px] text-slate-400 mt-0.5">
             {language === 'te' 
-              ? 'పగటిపూట ఎండలో స్పష్టత కోసం, రాత్రి బ్యాటరీ ఆదా కోసం లేదా పార్టీ రంగులను ఎంచుకోండి.' 
-              : 'Switch for outdoor sun visibility, night survey battery savings, or party colors.'}
+              ? 'తేజో సోలార్ CRM తరహా క్లీన్ వైట్, పగటిపూట ఎండలో స్పష్టత, లేదా పార్టీ రంగులను ఎంచుకోండి.' 
+              : 'Choose Tejo Solar CRM clean light, high-contrast sunlight mode, or party colors.'}
           </p>
         </div>
 
@@ -53,7 +53,7 @@ export const ThemeSelectorModal: React.FC<ThemeSelectorModalProps> = ({
                 onClick={() => onSelectTheme(theme.id)}
                 className={`p-3 rounded-2xl border transition-all cursor-pointer relative overflow-hidden flex items-center justify-between ${
                   isSelected
-                    ? 'border-amber-400 bg-amber-500/10 ring-2 ring-amber-400/50 shadow-lg'
+                    ? 'border-amber-400 bg-amber-500/10 ring-2 ring-amber-400/50 shadow-md'
                     : 'bg-slate-950/70 border-slate-800 hover:border-slate-700'
                 }`}
               >
@@ -78,6 +78,11 @@ export const ThemeSelectorModal: React.FC<ThemeSelectorModalProps> = ({
                       {isSelected && (
                         <span className="px-1.5 py-0.2 bg-amber-500 text-slate-950 rounded text-[9px] font-black uppercase">
                           {language === 'te' ? 'యాక్టివ్' : 'Active'}
+                        </span>
+                      )}
+                      {!theme.isDark && (
+                        <span className="px-1 py-0.2 bg-teal-500/20 text-teal-300 border border-teal-500/30 rounded text-[8px] font-bold">
+                          LIGHT
                         </span>
                       )}
                     </div>
