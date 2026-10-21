@@ -29,6 +29,7 @@ export const VotersTabMobile: React.FC<VotersTabMobileProps> = ({
   onOpenSlip
 }) => {
   const [searchQuery, setSearchQuery] = useState('');
+  const [selectedStreet, setSelectedStreet] = useState<string>('all');
   const [filterMode, setFilterMode] = useState<
     'all' | 'full' | 'soft' | 'strong' | 'neutral' | 'opponent' | 'exact' | 'similar' | 'kriya_all' | 'voted' | 'has_phone'
   >('all');
@@ -36,6 +37,21 @@ export const VotersTabMobile: React.FC<VotersTabMobileProps> = ({
   const [activeMenuSno, setActiveMenuSno] = useState<number | null>(null);
 
   const t = translations[language];
+
+  // Unique streets list for chips
+  const streetsList = useMemo(() => {
+    const sMap = new Map<string, number>();
+    voters.forEach(v => {
+      let s = v.sec || '';
+      if (s.includes(' - ')) {
+        s = s.split(' - ').slice(1).join(' - ');
+      }
+      if (s) {
+        sMap.set(s, (sMap.get(s) || 0) + 1);
+      }
+    });
+    return Array.from(sMap.entries()).sort((a, b) => b[1] - a[1]);
+  }, [voters]);
 
   // Filter Voters
   const filteredVoters = useMemo(() => {
@@ -54,7 +70,13 @@ export const VotersTabMobile: React.FC<VotersTabMobileProps> = ({
         const hnMatch = v.hn.toLowerCase().includes(q);
         const pMatch = phone && phone.includes(q);
         const infMatch = prof.influencerName?.toLowerCase().includes(q);
-        if (!nMatch && !rMatch && !idMatch && !hnMatch && !pMatch && !infMatch) return false;
+        const secMatch = v.sec?.toLowerCase().includes(q);
+        if (!nMatch && !rMatch && !idMatch && !hnMatch && !pMatch && !infMatch && !secMatch) return false;
+      }
+
+      // Street Filter
+      if (selectedStreet !== 'all') {
+        if (!v.sec || !v.sec.includes(selectedStreet)) return false;
       }
 
       // 2. Leaning / Filter Mode
@@ -71,7 +93,7 @@ export const VotersTabMobile: React.FC<VotersTabMobileProps> = ({
 
       return true;
     });
-  }, [voters, searchQuery, filterMode, profiles]);
+  }, [voters, searchQuery, selectedStreet, filterMode, profiles]);
 
   // Counts for pills
   const counts = useMemo(() => {
@@ -190,6 +212,39 @@ export const VotersTabMobile: React.FC<VotersTabMobileProps> = ({
             className="w-full bg-slate-900 border border-slate-800 rounded-xl pl-9 pr-3 py-2 text-xs text-white placeholder-slate-500 focus:outline-none focus:border-amber-400 shadow-md"
           />
         </div>
+
+        {/* Street / Locality Quick Filter Chips */}
+        {streetsList.length > 1 && (
+          <div className="flex items-center gap-1.5 overflow-x-auto py-0.5 scrollbar-none text-[10.5px]">
+            <span className="text-slate-500 font-bold flex-shrink-0 flex items-center gap-1">
+              📍 {language === 'te' ? 'వీధి:' : 'Street:'}
+            </span>
+            <button
+              onClick={() => { setSelectedStreet('all'); setVisibleCount(30); }}
+              className={`px-2 py-0.5 rounded-md font-bold whitespace-nowrap transition-all ${
+                selectedStreet === 'all'
+                  ? 'bg-blue-600 text-white font-black'
+                  : 'bg-slate-900 text-slate-400 hover:text-white border border-slate-800'
+              }`}
+            >
+              {language === 'te' ? 'అన్ని వీధులు' : 'All Streets'}
+            </button>
+            {streetsList.map(([stName, cnt]) => (
+              <button
+                key={stName}
+                onClick={() => { setSelectedStreet(stName); setVisibleCount(30); }}
+                className={`px-2 py-0.5 rounded-md font-bold whitespace-nowrap transition-all flex items-center gap-1 ${
+                  selectedStreet === stName
+                    ? 'bg-blue-500 text-slate-950 font-black'
+                    : 'bg-slate-900 text-blue-300 hover:text-white border border-blue-500/30'
+                }`}
+              >
+                <span>{stName}</span>
+                <span className="font-mono text-[9.5px] opacity-80">({cnt})</span>
+              </button>
+            ))}
+          </div>
+        )}
 
         {/* Filter Pills */}
         <div className="flex items-center gap-1.5 overflow-x-auto py-1 scrollbar-none text-[11px]">
@@ -379,6 +434,27 @@ export const VotersTabMobile: React.FC<VotersTabMobileProps> = ({
                   </span>
                 </div>
 
+                {/* Local Election & Street Information */}
+                {(v.ward_no || v.ac_part || v.sec) && (
+                  <div className="flex items-center gap-1.5 flex-wrap text-[10px] text-slate-400 mt-1">
+                    {v.ward_no && (
+                      <span className="bg-blue-950/60 text-blue-300 border border-blue-500/30 px-1.5 py-0.2 rounded font-bold font-mono">
+                        🏛️ వార్డు #{v.ward_no}
+                      </span>
+                    )}
+                    {v.ac_part && (
+                      <span className="bg-slate-950 text-slate-300 border border-slate-800 px-1.5 py-0.2 rounded font-mono text-[9.5px]">
+                        శాసనసభ: AC 37 - బూత్ #{v.ac_part} (క్రమం #{v.ac_sno})
+                      </span>
+                    )}
+                    {v.sec && (
+                      <span className="text-amber-300/90 text-[10px] truncate max-w-[260px]">
+                        📍 {v.sec.includes(' - ') ? v.sec.split(' - ').slice(1).join(' - ') : v.sec}
+                      </span>
+                    )}
+                  </div>
+                )}
+
                 {/* Contact Phone Row (Kriya Phone + Custom Phone) */}
                 <div className="mt-2 pt-1.5 border-t border-slate-800/80 flex items-center justify-between text-[11px] flex-wrap gap-1">
                   <div className="flex items-center gap-2">
@@ -477,7 +553,11 @@ export const VotersTabMobile: React.FC<VotersTabMobileProps> = ({
                   {/* WhatsApp */}
                   {phone ? (
                     <a
-                      href={`https://wa.me/91${phone}?text=${encodeURIComponent(`నమస్కారం ${v.n} గారు, జనసేన పార్టీ పిఠాపురం బూత్ #${boothInfo.part_no} నుండి సంప్రదిస్తున్నాము. మీ ఓటరు క్రమ సంఖ్య: #${v.s}, పోలింగ్ బూత్: ${boothInfo.clean_village}. మన గాజు గ్లాసు గుర్తుపై ఓటు వేసి పవన్ కళ్యాణ్ గారిని గెలిపించండి! 🚩`)}`}
+                      href={`https://wa.me/91${phone}?text=${encodeURIComponent(
+                        boothInfo.election_type === 'municipal'
+                          ? `నమస్కారం ${v.n} గారు, జనసేన పార్టీ పిఠాపురం పురపాలక సంఘం 14వ వార్డు ఎన్నికల ప్రచారం కొరకు సంప్రదిస్తున్నాము. మీ వార్డు ఓటరు క్రమ సంఖ్య: #${v.s}, శాసనసభ బూత్: Part #${v.ac_part || ''}. మన గాజు గ్లాసు గుర్తుపై ఓటు వేసి వార్డును అభివృద్ధి చేసుకుందాం! 🚩`
+                          : `నమస్కారం ${v.n} గారు, జనసేన పార్టీ పిఠాపురం బూత్ #${boothInfo.part_no} నుండి సంప్రదిస్తున్నాము. మీ ఓటరు క్రమ సంఖ్య: #${v.s}, పోలింగ్ బూత్: ${boothInfo.clean_village}. మన గాజు గ్లాసు గుర్తుపై ఓటు వేసి పవన్ కళ్యాణ్ గారిని గెలిపించండి! 🚩`
+                      )}`}
                       target="_blank"
                       rel="noreferrer"
                       className="p-1.5 bg-emerald-600/20 hover:bg-emerald-600 text-emerald-400 hover:text-white rounded-lg border border-emerald-500/30 transition-all text-xs flex items-center gap-1 font-bold"

@@ -39,12 +39,30 @@ export const HeaderMobile: React.FC<HeaderMobileProps> = ({
             <span className="text-[10px] uppercase font-bold text-amber-400 tracking-wider">
               {language === 'te' ? 'జనసేన పిఠాపురం' : 'JSP Pithapuram'}
             </span>
-            <span className="text-[9px] bg-slate-800 text-slate-400 px-1 py-0.2 rounded font-mono">
-              AC #37
+            <span className={`text-[9px] px-1.5 py-0.2 rounded font-mono font-bold ${
+              boothInfo?.election_type === 'municipal'
+                ? 'bg-blue-900/60 text-blue-300 border border-blue-500/40'
+                : boothInfo?.election_type === 'panchayat'
+                  ? 'bg-emerald-900/60 text-emerald-300 border border-emerald-500/40'
+                  : 'bg-slate-800 text-slate-400'
+            }`}>
+              {boothInfo?.election_type === 'municipal' 
+                ? (language === 'te' ? '🏛️ మునిసిపల్ వార్డు' : '🏛️ Municipal Ward')
+                : boothInfo?.election_type === 'panchayat'
+                  ? (language === 'te' ? '🏡 పంచాయతీ వార్డు' : '🏡 GP Ward')
+                  : boothInfo?.election_type === 'mptc'
+                    ? '🚩 MPTC'
+                    : boothInfo?.election_type === 'zptc'
+                      ? '🏛️ ZPTC'
+                      : 'AC #37'}
             </span>
           </div>
           <h1 className="text-xs font-black text-white truncate leading-tight">
-            {boothInfo ? `${language === 'te' ? 'బూత్' : 'Booth'} #${boothInfo.part_no}: ${boothInfo.clean_village}` : (language === 'te' ? 'బూత్ ఎంచుకోండి' : 'Select Assigned Booth')}
+            {boothInfo ? (
+              boothInfo.election_type === 'municipal'
+                ? `${language === 'te' ? 'వార్డు' : 'Ward'} #${boothInfo.ward_no || 14}: ${boothInfo.clean_village}`
+                : `${language === 'te' ? 'బూత్' : 'Booth'} #${boothInfo.part_no}: ${boothInfo.clean_village}`
+            ) : (language === 'te' ? 'బూత్ / వార్డు ఎంచుకోండి' : 'Select Assigned Unit')}
           </h1>
         </div>
       </div>
@@ -94,7 +112,7 @@ export const HeaderMobile: React.FC<HeaderMobileProps> = ({
           title={isLocked ? 'Assigned Booth Locked. Tap to unlock with Admin PIN.' : 'Tap to assign/switch booth'}
         >
           {isLocked ? <Lock className="w-3 h-3 text-amber-400" /> : <Unlock className="w-3 h-3" />}
-          <span>{isLocked ? `#${boothInfo?.part_no || ''}` : (language === 'te' ? 'మార్చండి' : 'Change')}</span>
+          <span>{isLocked ? (boothInfo?.part_no === 'ward_14' ? (language === 'te' ? 'వార్డు 14' : 'Ward 14') : `#${boothInfo?.part_no || ''}`) : (language === 'te' ? 'మార్చండి' : 'Change')}</span>
         </button>
       </div>
     </header>

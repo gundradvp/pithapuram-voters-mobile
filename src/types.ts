@@ -1,5 +1,30 @@
+export type ElectionCategory = 'assembly' | 'municipal' | 'panchayat' | 'mptc' | 'zptc';
+
+export interface LocalElectionUnit {
+  id: string; // e.g. "ward_14", "gp_chendurthi_w1"
+  part_no: string | number;
+  ward_no?: number;
+  election_type: ElectionCategory;
+  category_label: string;
+  local_body: string;
+  mandal?: string;
+  village: string;
+  clean_village: string;
+  ps_address: string;
+  sections?: string;
+  total_voters: number;
+  male_count?: number;
+  female_count?: number;
+  exact_kriya_count?: number;
+  similar_kriya_count?: number;
+  total_kriya_count?: number;
+  kriya_percentage?: number;
+  volunteers_count?: number;
+  is_loaded: boolean;
+}
+
 export interface BoothIndexItem {
-  part_no: number;
+  part_no: number | string;
   village: string;
   clean_village: string;
   mandal: string;
@@ -10,10 +35,14 @@ export interface BoothIndexItem {
   total_kriya_count: number;
   kriya_percentage: number;
   volunteers_count: number;
+  election_type?: ElectionCategory;
+  ward_no?: number;
+  local_body?: string;
+  is_loaded?: boolean;
 }
 
 export interface BoothInfo {
-  part_no: number;
+  part_no: number | string;
   village: string;
   clean_village: string;
   mandal: string;
@@ -26,6 +55,10 @@ export interface BoothInfo {
   similar_kriya_count: number;
   total_kriya_count: number;
   kriya_percentage: number;
+  election_type?: ElectionCategory;
+  ward_no?: number;
+  local_body?: string;
+  is_loaded?: boolean;
 }
 
 export interface BoothVolunteer {
@@ -101,6 +134,9 @@ export interface MobileVoter {
   v_name?: string;
   v_mob?: string;
   k_photo?: string;
+  ward_no?: number;
+  ac_part?: number;
+  ac_sno?: number;
 }
 
 export interface BoothData {

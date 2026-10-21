@@ -18,6 +18,7 @@ import { ThemeSelectorModal } from './components/ThemeSelectorModal';
 import {
   BoothData,
   BoothIndexItem,
+  LocalElectionUnit,
   MobileVoter,
   TabType,
   VoterSurveyStatus,
@@ -65,8 +66,9 @@ export function App() {
   };
 
   const [boothsIndex, setBoothsIndex] = useState<BoothIndexItem[]>([]);
-  const [currentPartNo, setCurrentPartNo] = useState<number>(() => {
-    return getAssignedBooth() || 1;
+  const [localUnits, setLocalUnits] = useState<LocalElectionUnit[]>([]);
+  const [currentPartNo, setCurrentPartNo] = useState<number | string>(() => {
+    return getAssignedBooth() || 'ward_14';
   });
   const [boothData, setBoothData] = useState<BoothData | null>(null);
   const [activeTab, setActiveTab] = useState<TabType>('voters');
@@ -121,7 +123,7 @@ export function App() {
     initialFamily: null
   });
 
-  // 1. Load Booths Index
+  // 1. Load Booths Index and Local Elections Index
   useEffect(() => {
     fetch('/booths_index.json')
       .then(res => res.json())
@@ -131,10 +133,19 @@ export function App() {
       .catch(err => {
         console.warn('Could not load booths index online:', err);
       });
+
+    fetch('/local_elections_index.json')
+      .then(res => res.json())
+      .then(data => {
+        setLocalUnits(data);
+      })
+      .catch(err => {
+        console.warn('Could not load local elections index online:', err);
+      });
   }, []);
 
-  // 2. Load Selected Booth Data (Offline First Pattern)
-  const loadBooth = useCallback(async (partNo: number) => {
+  // 2. Load Selected Unit Data (Offline First Pattern)
+  const loadBooth = useCallback(async (partNo: number | string) => {
     setIsLoading(true);
     setErrorMsg(null);
 
@@ -154,7 +165,10 @@ export function App() {
 
     // Step C: Fetch latest over network
     try {
-      const res = await fetch(`/booths/booth_${partNo}.json`);
+      let res = await fetch(`/booths/booth_${partNo}.json`);
+      if (!res.ok) {
+        res = await fetch(`/booths/${partNo}.json`);
+      }
       if (!res.ok) throw new Error(`HTTP error ${res.status}`);
       const onlineData: BoothData = await res.json();
       setBoothData(onlineData);
@@ -165,7 +179,12 @@ export function App() {
     } catch (err) {
       console.warn('Network fetch failed, relying on cache:', err);
       if (!cached) {
-        setErrorMsg(`Booth #${partNo} data is not available offline. Please connect to internet to download it.`);
+        const isWard = typeof partNo === 'string' && partNo.startsWith('ward_');
+        setErrorMsg(
+          isWard 
+            ? `పురపాలక వార్డు #${partNo.replace('ward_', '')} డేటా ఆఫ్‌లైన్‌లో అందుబాటులో లేదు. దయచేసి నెట్‌వర్క్ కనెక్ట్ చేయండి.`
+            : `Booth #${partNo} data is not available offline. Please connect to internet to download it.`
+        );
       }
       setIsLoading(false);
     }
@@ -191,8 +210,8 @@ export function App() {
     }, 3500);
   };
 
-  // Handle Booth Assignment
-  const handleSelectBooth = (partNo: number, lock: boolean) => {
+  // Handle Booth / Ward Assignment
+  const handleSelectBooth = (partNo: number | string, lock: boolean) => {
     setCurrentPartNo(partNo);
     setAssignedBooth(partNo, lock);
     setIsLocked(lock);
@@ -556,10 +575,12 @@ export function App() {
       {isBoothSelectorOpen && (
         <BoothAssignmentModal
           boothsIndex={boothsIndex}
+          localUnits={localUnits}
           currentPartNo={currentPartNo}
           isLocked={isLocked}
           onSelectBooth={handleSelectBooth}
           onClose={() => setIsBoothSelectorOpen(false)}
+          language={lang}
         />
       )}
 

@@ -5,12 +5,14 @@ const BOOTH_LOCKED_KEY = 'jsp_mobile_booth_locked';
 const ADMIN_PIN_KEY = 'jsp_mobile_admin_pin';
 const DEFAULT_ADMIN_PIN = '1982';
 
-export function getAssignedBooth(): number | null {
+export function getAssignedBooth(): number | string | null {
   const val = localStorage.getItem(ASSIGNED_BOOTH_KEY);
-  return val ? parseInt(val, 10) : null;
+  if (!val) return null;
+  const num = parseInt(val, 10);
+  return isNaN(num) || val.includes('_') ? val : num;
 }
 
-export function setAssignedBooth(partNo: number, lock: boolean = true): void {
+export function setAssignedBooth(partNo: number | string, lock: boolean = true): void {
   localStorage.setItem(ASSIGNED_BOOTH_KEY, partNo.toString());
   localStorage.setItem(BOOTH_LOCKED_KEY, lock ? 'true' : 'false');
 }
@@ -35,11 +37,11 @@ export function setAdminPin(newPin: string): void {
 // -------------------------------------------------------------
 // Offline Booth Caching (Full Offline Field Work Support)
 // -------------------------------------------------------------
-function getBoothStorageKey(partNo: number): string {
+function getBoothStorageKey(partNo: number | string): string {
   return `jsp_offline_booth_${partNo}`;
 }
 
-export function getCachedBoothData(partNo: number): BoothData | null {
+export function getCachedBoothData(partNo: number | string): BoothData | null {
   try {
     const raw = localStorage.getItem(getBoothStorageKey(partNo));
     if (!raw) return null;
@@ -50,7 +52,7 @@ export function getCachedBoothData(partNo: number): BoothData | null {
   }
 }
 
-export function saveCachedBoothData(partNo: number, data: BoothData): boolean {
+export function saveCachedBoothData(partNo: number | string, data: BoothData): boolean {
   try {
     localStorage.setItem(getBoothStorageKey(partNo), JSON.stringify(data));
     return true;
@@ -60,18 +62,18 @@ export function saveCachedBoothData(partNo: number, data: BoothData): boolean {
   }
 }
 
-export function isBoothCached(partNo: number): boolean {
+export function isBoothCached(partNo: number | string): boolean {
   return !!localStorage.getItem(getBoothStorageKey(partNo));
 }
 
 // -------------------------------------------------------------
 // Voter Campaign Profiles (Custom Phone, Leaning %, Influencer, Visits)
 // -------------------------------------------------------------
-function getVoterProfilesKey(partNo: number): string {
+function getVoterProfilesKey(partNo: number | string): string {
   return `jsp_voter_profiles_booth_${partNo}`;
 }
 
-export function getVoterProfiles(partNo: number): Record<number, VoterCampaignProfile> {
+export function getVoterProfiles(partNo: number | string): Record<number, VoterCampaignProfile> {
   try {
     const raw = localStorage.getItem(getVoterProfilesKey(partNo));
     return raw ? JSON.parse(raw) : {};
@@ -80,7 +82,7 @@ export function getVoterProfiles(partNo: number): Record<number, VoterCampaignPr
   }
 }
 
-export function saveVoterProfile(partNo: number, sno: number, updates: Partial<VoterCampaignProfile>): void {
+export function saveVoterProfile(partNo: number | string, sno: number, updates: Partial<VoterCampaignProfile>): void {
   const profiles = getVoterProfiles(partNo);
   profiles[sno] = { ...profiles[sno], ...updates };
   try {
@@ -90,7 +92,7 @@ export function saveVoterProfile(partNo: number, sno: number, updates: Partial<V
   }
 }
 
-export function addVoterVisit(partNo: number, sno: number, visit: VoterVisit): void {
+export function addVoterVisit(partNo: number | string, sno: number, visit: VoterVisit): void {
   const profiles = getVoterProfiles(partNo);
   const current = profiles[sno] || {};
   const currentVisits = current.visits || [];
@@ -192,11 +194,11 @@ export function calculateWinningScore(
 // -------------------------------------------------------------
 // Family Groups Management
 // -------------------------------------------------------------
-function getFamiliesKey(partNo: number): string {
+function getFamiliesKey(partNo: number | string): string {
   return `jsp_families_booth_${partNo}`;
 }
 
-export function getFamilyGroups(partNo: number, voters?: MobileVoter[]): Record<string, FamilyGroup> {
+export function getFamilyGroups(partNo: number | string, voters?: MobileVoter[]): Record<string, FamilyGroup> {
   try {
     const raw = localStorage.getItem(getFamiliesKey(partNo));
     if (raw) return JSON.parse(raw);
@@ -212,7 +214,7 @@ export function getFamilyGroups(partNo: number, voters?: MobileVoter[]): Record<
   }
 }
 
-export function autoGenerateHouseFamilies(partNo: number, voters: MobileVoter[]): Record<string, FamilyGroup> {
+export function autoGenerateHouseFamilies(partNo: number | string, voters: MobileVoter[]): Record<string, FamilyGroup> {
   const map: Record<string, FamilyGroup> = {};
   const houseMap = new Map<string, MobileVoter[]>();
 
@@ -245,7 +247,7 @@ export function autoGenerateHouseFamilies(partNo: number, voters: MobileVoter[])
   return map;
 }
 
-export function saveFamilyGroup(partNo: number, family: FamilyGroup): void {
+export function saveFamilyGroup(partNo: number | string, family: FamilyGroup): void {
   const families = getFamilyGroups(partNo);
   families[family.id] = family;
   try {
@@ -255,7 +257,7 @@ export function saveFamilyGroup(partNo: number, family: FamilyGroup): void {
   }
 }
 
-export function deleteFamilyGroup(partNo: number, familyId: string): void {
+export function deleteFamilyGroup(partNo: number | string, familyId: string): void {
   const families = getFamilyGroups(partNo);
   delete families[familyId];
   try {
@@ -268,11 +270,11 @@ export function deleteFamilyGroup(partNo: number, familyId: string): void {
 // -------------------------------------------------------------
 // Key Influencers Hub
 // -------------------------------------------------------------
-function getInfluencersKey(partNo: number): string {
+function getInfluencersKey(partNo: number | string): string {
   return `jsp_influencers_booth_${partNo}`;
 }
 
-export function getInfluencers(partNo: number): Record<string, Influencer> {
+export function getInfluencers(partNo: number | string): Record<string, Influencer> {
   try {
     const raw = localStorage.getItem(getInfluencersKey(partNo));
     if (raw) return JSON.parse(raw);
@@ -300,7 +302,7 @@ export function getInfluencers(partNo: number): Record<string, Influencer> {
   }
 }
 
-export function saveInfluencer(partNo: number, influencer: Influencer): void {
+export function saveInfluencer(partNo: number | string, influencer: Influencer): void {
   const list = getInfluencers(partNo);
   list[influencer.id] = influencer;
   try {
@@ -310,7 +312,7 @@ export function saveInfluencer(partNo: number, influencer: Influencer): void {
   }
 }
 
-export function deleteInfluencer(partNo: number, influencerId: string): void {
+export function deleteInfluencer(partNo: number | string, influencerId: string): void {
   const list = getInfluencers(partNo);
   delete list[influencerId];
   try {
@@ -325,7 +327,7 @@ export function deleteInfluencer(partNo: number, influencerId: string): void {
 // -------------------------------------------------------------
 export function generateInfluencerWhatsAppMessage(
   influencer: Influencer,
-  boothPartNo: number,
+  boothPartNo: number | string,
   village: string,
   assignedVoters: MobileVoter[],
   profiles: Record<number, VoterCampaignProfile>

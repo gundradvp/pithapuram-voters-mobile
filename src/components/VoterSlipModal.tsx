@@ -16,7 +16,23 @@ export const VoterSlipModal: React.FC<VoterSlipModalProps> = ({
   if (!voter || !boothInfo) return null;
 
   const handleShareWhatsApp = () => {
-    const text = `*🚩 జనసేన పార్టీ — పిఠాపురం నియోజకవర్గం (AC #37)*
+    const isMunicipal = boothInfo.election_type === 'municipal';
+    const text = isMunicipal
+      ? `*🚩 జనసేన పార్టీ — పిఠాపురం పురపాలక సంఘం (వార్డు #14)*
+*ఓటరు సమాచార స్లిప్పు (VOTER SLIP)*
+
+*ఓటరు పేరు:* ${voter.n}
+*సంబంధీకుడు:* ${voter.r}
+*EPIC ID:* ${voter.id}
+*వార్డు క్రమ సంఖ్య:* #${voter.s}
+*శాసనసభ బూత్:* Part #${voter.ac_part || ''} (క్రమం #${voter.ac_sno || ''})
+*ఇంటి నెంబర్:* ${voter.hn}
+*వీధి / ప్రాంతం:* ${voter.sec || '14వ వార్డు'}
+*వయస్సు / లింగం:* ${voter.a} Yrs / ${voter.g === 'M' ? 'Male' : 'Female'}
+*పోలింగ్ కేంద్రం:* ${boothInfo.ps_address}
+
+_మీ అమూల్యమైన ఓటును గాజు గ్లాసు గుర్తుపై వేసి జనసేన పార్టీ వార్డు అభ్యర్థిని భారీ మెజారిటీతో గెలిపించండి!_ 🚩`
+      : `*🚩 జనసేన పార్టీ — పిఠాపురం నియోజకవర్గం (AC #37)*
 *ఓటరు సమాచార స్లిప్పు (VOTER SLIP)*
 
 *ఓటరు పేరు:* ${voter.n}
