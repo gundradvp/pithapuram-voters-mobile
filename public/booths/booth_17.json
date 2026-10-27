@@ -1196,7 +1196,9 @@
       "k_m": "6303547740",
       "v_name": "Yerramsetti Sivananda Swamy",
       "v_mob": "9154502585",
-      "k_photo": "https://janasenabackup.blob.core.windows.net/kriyamembers/YFBOL8VLZ6IL777AVEE1LHX74Q46NXO4.jpg"
+      "k_photo": "https://janasenabackup.blob.core.windows.net/kriyamembers/YFBOL8VLZ6IL777AVEE1LHX74Q46NXO4.jpg",
+      "photo_url": "/photos/durgada/photo_YOU2330223.jpg",
+      "photo": "/photos/durgada/photo_YOU2330223.jpg"
     },
     {
       "s": 8,
@@ -4891,7 +4893,9 @@
       "a": "35",
       "g": "M",
       "sec": "1-KOTHA PETA RAMALAYAM",
-      "kriya": false
+      "kriya": false,
+      "photo_url": "/photos/durgada/photo_YOU0820184.jpg",
+      "photo": "/photos/durgada/photo_YOU0820184.jpg"
     },
     {
       "s": 340,
@@ -4902,7 +4906,9 @@
       "a": "32",
       "g": "M",
       "sec": "1-KOTHA PETA RAMALAYAM",
-      "kriya": false
+      "kriya": false,
+      "photo_url": "/photos/durgada/photo_YOU0857799.jpg",
+      "photo": "/photos/durgada/photo_YOU0857799.jpg"
     },
     {
       "s": 341,
@@ -4935,7 +4941,9 @@
       "a": "42",
       "g": "F",
       "sec": "1-KOTHA PETA RAMALAYAM",
-      "kriya": false
+      "kriya": false,
+      "photo_url": "/photos/durgada/photo_YOU0860206.jpg",
+      "photo": "/photos/durgada/photo_YOU0860206.jpg"
     },
     {
       "s": 346,
@@ -4946,7 +4954,9 @@
       "a": "33",
       "g": "F",
       "sec": "1-KOTHA PETA RAMALAYAM",
-      "kriya": false
+      "kriya": false,
+      "photo_url": "/photos/durgada/photo_UYO0646646.jpg",
+      "photo": "/photos/durgada/photo_UYO0646646.jpg"
     },
     {
       "s": 348,

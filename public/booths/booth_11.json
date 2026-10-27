@@ -332,7 +332,9 @@
       "k_m": "7569797119",
       "v_name": "Kaparapu.Venkataramana",
       "v_mob": "9177084343",
-      "k_photo": "https://janasenabackup.blob.core.windows.net/kriyamembers/DHWDF7G6JK5HEK24NU0UUQI7Y9RTSO2O.jpg"
+      "k_photo": "https://janasenabackup.blob.core.windows.net/kriyamembers/DHWDF7G6JK5HEK24NU0UUQI7Y9RTSO2O.jpg",
+      "photo_url": "/photos/vannepudi/photo_YOU2383784.jpg",
+      "photo": "/photos/vannepudi/photo_YOU2383784.jpg"
     },
     {
       "s": 20,
@@ -3934,7 +3936,9 @@
       "a": "44",
       "g": "F",
       "sec": "1-BC COLONY",
-      "kriya": false
+      "kriya": false,
+      "photo_url": "/photos/vannepudi/photo_BCK0773879.jpg",
+      "photo": "/photos/vannepudi/photo_BCK0773879.jpg"
     },
     {
       "s": 126,
@@ -5375,7 +5379,9 @@
       "a": "48",
       "g": "F",
       "sec": "1-BC COLONY",
-      "kriya": false
+      "kriya": false,
+      "photo_url": "/photos/durgada/photo_YOU1361708.jpg",
+      "photo": "/photos/durgada/photo_YOU1361708.jpg"
     },
     {
       "s": 293,
@@ -8369,7 +8375,9 @@
       "a": "51",
       "g": "F",
       "sec": "2-SIVALAYAM VEEDHI",
-      "kriya": false
+      "kriya": false,
+      "photo_url": "/photos/durgada/photo_YOU0848962.jpg",
+      "photo": "/photos/durgada/photo_YOU0848962.jpg"
     },
     {
       "s": 632,
