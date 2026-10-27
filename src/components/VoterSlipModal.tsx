@@ -1,6 +1,7 @@
 import React from 'react';
 import { X, Share2, Printer, MapPin, Home, User } from 'lucide-react';
 import { MobileVoter, BoothInfo } from '../types';
+import { resolvePhotoUrl } from '../utils/photoResolver';
 
 interface VoterSlipModalProps {
   voter: MobileVoter | null;
@@ -68,6 +69,20 @@ _మీ అమూల్యమైన ఓటును గాజు గ్లాస
           <h3 className="text-base font-black text-white">Voter Information Slip</h3>
           <p className="text-[11px] text-amber-400 font-bold">2026 SIR Draft Electoral Roll</p>
         </div>
+
+        {/* Photo if available */}
+        {(voter.photo_url || voter.photo) && (
+          <div className="flex justify-center -mb-1">
+            <img
+              src={resolvePhotoUrl(voter.photo_url || voter.photo)}
+              alt={voter.n}
+              className="w-16 h-20 object-cover rounded-2xl border-2 border-amber-500/60 shadow-lg bg-slate-950"
+              onError={(e) => {
+                (e.currentTarget as HTMLElement).style.display = 'none';
+              }}
+            />
+          </div>
+        )}
 
         {/* Big Serial & Booth Number */}
         <div className="grid grid-cols-2 gap-2 text-center">

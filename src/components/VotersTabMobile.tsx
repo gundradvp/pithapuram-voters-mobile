@@ -1,7 +1,8 @@
 import React, { useState, useMemo } from 'react';
-import { Search, Phone, PhoneCall, MessageSquare, Send, Printer, CheckCircle2, Flag, UserX, AlertCircle, Sparkles, Home, UserCheck, Sliders, Plus, Clock } from 'lucide-react';
+import { Search, Phone, PhoneCall, MessageSquare, Send, Printer, CheckCircle2, Flag, UserX, AlertCircle, Sparkles, Home, UserCheck, Sliders, Plus, Clock, User } from 'lucide-react';
 import { MobileVoter, BoothInfo, VoterSurveyStatus, VoterCampaignProfile } from '../types';
 import { Language, translations } from '../utils/i18n';
+import { resolvePhotoUrl } from '../utils/photoResolver';
 
 interface VotersTabMobileProps {
   voters: MobileVoter[];
@@ -406,33 +407,60 @@ export const VotersTabMobile: React.FC<VotersTabMobileProps> = ({
                 </div>
               </div>
 
-              {/* Name, Kriya Badge & Details */}
-              <div>
-                <div className="flex items-center gap-1.5 flex-wrap">
-                  <h3 className="text-sm font-black text-white">{v.n}</h3>
-                  {v.kriya && (
-                    <span 
-                      className={`px-1.5 py-0.2 rounded text-[8px] font-extrabold uppercase tracking-wide flex items-center gap-0.5 ${
-                        v.k_type === 'exact'
-                          ? 'bg-gradient-to-r from-red-600 to-amber-600 text-white'
-                          : 'bg-gradient-to-r from-amber-500 to-yellow-500 text-slate-950'
-                      }`}
-                    >
-                      {v.k_type === 'exact' ? (language === 'te' ? '⭐ పక్కా క్రియా' : '⭐ Kriya Exact') : (language === 'te' ? '⚡ క్రియా మ్యాచింగ్' : '⚡ Kriya Similar')}
-                    </span>
-                  )}
+              {/* Name, Photo, Kriya Badge & Details */}
+              <div className="flex items-start gap-3 mt-1">
+                {/* Photo or Default Avatar */}
+                <div className="relative shrink-0">
+                  {v.photo_url || v.photo ? (
+                    <img
+                      src={resolvePhotoUrl(v.photo_url || v.photo)}
+                      alt={v.n}
+                      loading="lazy"
+                      className="w-12 h-14 object-cover rounded-xl border border-slate-700 bg-slate-950 shadow-sm"
+                      onError={(e) => {
+                        (e.currentTarget as HTMLElement).style.display = 'none';
+                        const fallback = (e.currentTarget.nextElementSibling as HTMLElement);
+                        if (fallback) fallback.style.display = 'flex';
+                      }}
+                    />
+                  ) : null}
+                  <div
+                    className="w-12 h-14 rounded-xl bg-slate-800/90 border border-slate-700/60 flex flex-col items-center justify-center text-slate-500 shadow-inner"
+                    style={{ display: (v.photo_url || v.photo) ? 'none' : 'flex' }}
+                  >
+                    <User className="w-5 h-5 text-slate-400" />
+                    <span className="text-[9px] font-black text-slate-400 mt-0.5">{v.g === 'M' ? 'M' : 'F'}</span>
+                  </div>
                 </div>
 
-                <div className="text-[11px] text-slate-400 mt-0.5 flex items-center gap-2 flex-wrap">
-                  <span>{t.relation}: <strong className="text-slate-300 font-medium">{v.r || '-'}</strong></span>
-                  <span>•</span>
-                  <span>{t.age}: <strong className="text-slate-300 font-medium">{v.a}Y ({v.g === 'M' ? (language === 'te' ? 'పురుషుడు' : 'M') : (language === 'te' ? 'మహిళ' : 'F')})</strong></span>
-                  <span>•</span>
-                  <span className="flex items-center gap-1">
-                    <Home className="w-3 h-3 text-amber-400" />
-                    {t.houseNo}: <strong className="text-amber-300 font-mono">{v.hn || '-'}</strong>
-                  </span>
+                <div className="flex-1 min-w-0">
+                  <div className="flex items-center gap-1.5 flex-wrap">
+                    <h3 className="text-sm font-black text-white">{v.n}</h3>
+                    {v.kriya && (
+                      <span 
+                        className={`px-1.5 py-0.2 rounded text-[8px] font-extrabold uppercase tracking-wide flex items-center gap-0.5 ${
+                          v.k_type === 'exact'
+                            ? 'bg-gradient-to-r from-red-600 to-amber-600 text-white'
+                            : 'bg-gradient-to-r from-amber-500 to-yellow-500 text-slate-950'
+                        }`}
+                      >
+                        {v.k_type === 'exact' ? (language === 'te' ? '⭐ పక్కా క్రియా' : '⭐ Kriya Exact') : (language === 'te' ? '⚡ క్రియా మ్యాచింగ్' : '⚡ Kriya Similar')}
+                      </span>
+                    )}
+                  </div>
+
+                  <div className="text-[11px] text-slate-400 mt-0.5 flex items-center gap-2 flex-wrap">
+                    <span>{t.relation}: <strong className="text-slate-300 font-medium">{v.r || '-'}</strong></span>
+                    <span>•</span>
+                    <span>{t.age}: <strong className="text-slate-300 font-medium">{v.a}Y ({v.g === 'M' ? (language === 'te' ? 'పురుషుడు' : 'M') : (language === 'te' ? 'మహిళ' : 'F')})</strong></span>
+                    <span>•</span>
+                    <span className="flex items-center gap-1">
+                      <Home className="w-3 h-3 text-amber-400" />
+                      {t.houseNo}: <strong className="text-amber-300 font-mono">{v.hn || '-'}</strong>
+                    </span>
+                  </div>
                 </div>
+              </div>
 
                 {/* Local Election & Street Information */}
                 {(v.ward_no || v.ac_part || v.sec) && (
@@ -524,7 +552,6 @@ export const VotersTabMobile: React.FC<VotersTabMobileProps> = ({
                     <span>{prof.visits && prof.visits.length > 0 ? t.addVisit : t.logVisit}</span>
                   </button>
                 </div>
-              </div>
 
               {/* Action Buttons Bar: Call, WhatsApp, SMS, Slip, Mark */}
               <div className="flex items-center justify-between pt-1 border-t border-slate-800/60 gap-1.5">

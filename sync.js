@@ -11,6 +11,7 @@ const filesToSync = [
   'src/utils/auth.ts',
   'src/utils/theme.ts',
   'src/utils/storage.ts',
+  'src/utils/photoResolver.ts',
   'src/index.css',
   'src/App.tsx',
   'src/components/LoginModal.tsx',
@@ -24,7 +25,24 @@ const filesToSync = [
   'public/booths/booth_ward_14.json',
   'public/booths/ward_14.json',
   'public/booths/booth_gollaprolu_ward_11.json',
-  'public/booths/gollaprolu_ward_11.json'
+  'public/booths/gollaprolu_ward_11.json',
+  'public/booths/gp_vannepudi.json',
+  'public/booths/booth_gp_vannepudi.json',
+  'public/booths/gp_durgada.json',
+  'public/booths/booth_gp_durgada.json',
+  'public/booths/booth_9.json',
+  'public/booths/booth_11.json',
+  'public/booths/booth_12.json',
+  'public/booths/booth_13.json',
+  'public/booths/booth_14.json',
+  'public/booths/booth_15.json',
+  'public/booths/booth_16.json',
+  'public/booths/booth_17.json',
+  'public/booths/booth_18.json',
+  'public/booths/booth_19.json',
+  'public/booths/booth_23.json',
+  'public/booths/booth_24.json',
+  'public/booths/booth_25.json'
 ];
 
 function fetchWithHttps(url, maxRedirects = 5) {

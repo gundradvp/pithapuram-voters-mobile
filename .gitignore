@@ -22,3 +22,7 @@ dist-ssr
 *.njsproj
 *.sln
 *.sw?
+
+# Voter Photos (hosted externally on Google Drive / CDN)
+public/photos/
+
