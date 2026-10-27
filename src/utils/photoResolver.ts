@@ -37,3 +37,7 @@ export function resolvePhotoUrl(rawUrl?: string): string | undefined {
 
   return rawUrl;
 }
+
+export const resolveCardUrl = resolvePhotoUrl;
+export const resolveMediaUrl = resolvePhotoUrl;
+

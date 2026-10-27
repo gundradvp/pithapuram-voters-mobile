@@ -136,6 +136,8 @@ export interface MobileVoter {
   k_photo?: string;
   photo?: string;
   photo_url?: string;
+  card?: string;
+  card_url?: string;
   ward_no?: number;
   ac_part?: number;
   ac_sno?: number;

@@ -70,8 +70,26 @@ _మీ అమూల్యమైన ఓటును గాజు గ్లాస
           <p className="text-[11px] text-amber-400 font-bold">2026 SIR Draft Electoral Roll</p>
         </div>
 
-        {/* Photo if available */}
-        {(voter.photo_url || voter.photo) && (
+        {/* Complete Official Voter Card Image (High-Priority Ground Truth) */}
+        {(voter.card_url || voter.card) ? (
+          <div className="space-y-1.5">
+            <div className="flex items-center justify-between px-1 text-[11px] font-bold text-amber-400">
+              <span className="flex items-center gap-1.5">
+                📄 అధికారిక ఓటర్ జాబితా కార్డు (Official Card)
+              </span>
+              <span className="font-mono text-emerald-400 bg-emerald-950/60 px-2 py-0.5 rounded border border-emerald-500/30 text-[10px]">
+                GP #{voter.s}
+              </span>
+            </div>
+            <div className="rounded-2xl overflow-hidden border-2 border-amber-500/70 bg-slate-950 shadow-2xl p-1 relative">
+              <img
+                src={resolvePhotoUrl(voter.card_url || voter.card)}
+                alt={`Official Voter Card ${voter.s}`}
+                className="w-full h-auto rounded-xl object-contain shadow-inner"
+              />
+            </div>
+          </div>
+        ) : (voter.photo_url || voter.photo) ? (
           <div className="flex justify-center -mb-1">
             <img
               src={resolvePhotoUrl(voter.photo_url || voter.photo)}
@@ -82,7 +100,7 @@ _మీ అమూల్యమైన ఓటును గాజు గ్లాస
               }}
             />
           </div>
-        )}
+        ) : null}
 
         {/* Big Serial & Booth Number */}
         <div className="grid grid-cols-2 gap-2 text-center">

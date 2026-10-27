@@ -214,9 +214,9 @@ export function App() {
 
     // Step C: Fetch latest over network
     try {
-      let res = await fetch(`/booths/booth_${partNo}.json`);
+      let res = await fetch(`/booths/booth_${partNo}.json?v=${Date.now()}`);
       if (!res.ok) {
-        res = await fetch(`/booths/${partNo}.json`);
+        res = await fetch(`/booths/${partNo}.json?v=${Date.now()}`);
       }
       if (!res.ok) throw new Error(`HTTP error ${res.status}`);
       const onlineData: BoothData = await res.json();

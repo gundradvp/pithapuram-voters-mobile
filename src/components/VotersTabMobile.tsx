@@ -407,35 +407,33 @@ export const VotersTabMobile: React.FC<VotersTabMobileProps> = ({
                 </div>
               </div>
 
-              {/* Name, Photo, Kriya Badge & Details */}
+              {/* Name, Card Trigger, Kriya Badge & Details */}
               <div className="flex items-start gap-3 mt-1">
-                {/* Photo or Default Avatar */}
-                <div className="relative shrink-0">
-                  {v.photo_url || v.photo ? (
-                    <img
-                      src={resolvePhotoUrl(v.photo_url || v.photo)}
-                      alt={v.n}
-                      loading="lazy"
-                      className="w-12 h-14 object-cover rounded-xl border border-slate-700 bg-slate-950 shadow-sm"
-                      onError={(e) => {
-                        (e.currentTarget as HTMLElement).style.display = 'none';
-                        const fallback = (e.currentTarget.nextElementSibling as HTMLElement);
-                        if (fallback) fallback.style.display = 'flex';
-                      }}
-                    />
-                  ) : null}
-                  <div
-                    className="w-12 h-14 rounded-xl bg-slate-800/90 border border-slate-700/60 flex flex-col items-center justify-center text-slate-500 shadow-inner"
-                    style={{ display: (v.photo_url || v.photo) ? 'none' : 'flex' }}
-                  >
-                    <User className="w-5 h-5 text-slate-400" />
-                    <span className="text-[9px] font-black text-slate-400 mt-0.5">{v.g === 'M' ? 'M' : 'F'}</span>
+                {/* Clickable Card Badge Trigger */}
+                <button
+                  type="button"
+                  onClick={() => onOpenSlip(v)}
+                  className="w-12 h-14 rounded-2xl bg-gradient-to-b from-slate-800 to-slate-900 border border-slate-700/80 hover:border-amber-500/80 active:scale-95 flex flex-col items-center justify-center text-slate-400 shrink-0 shadow-inner transition-all group relative cursor-pointer"
+                  title={language === 'te' ? 'పూర్తి ఓటర్ కార్డు చూడటానికి ట్యాప్ చేయండి' : 'Tap to view complete official card'}
+                >
+                  <div className="w-6 h-6 rounded-lg bg-amber-500/20 text-amber-400 flex items-center justify-center group-hover:scale-110 transition-transform">
+                    <span className="text-[12px]">📄</span>
                   </div>
-                </div>
+                  <span className="text-[8px] font-black text-amber-300 mt-1 uppercase tracking-tight">
+                    {v.card_url || v.card ? 'కార్డు' : 'స్లిప్'}
+                  </span>
+                  {(v.card_url || v.card) && (
+                    <span className="absolute -top-1 -right-1 w-2.5 h-2.5 rounded-full bg-emerald-500 border border-slate-900 shadow"></span>
+                  )}
+                </button>
 
-                <div className="flex-1 min-w-0">
+                <div 
+                  className="flex-1 min-w-0 cursor-pointer"
+                  onClick={() => onOpenSlip(v)}
+                  title={language === 'te' ? 'పూర్తి ఓటర్ కార్డు చూడటానికి ట్యాప్ చేయండి' : 'Tap to view complete official card'}
+                >
                   <div className="flex items-center gap-1.5 flex-wrap">
-                    <h3 className="text-sm font-black text-white">{v.n}</h3>
+                    <h3 className="text-sm font-black text-white hover:text-amber-300 transition-colors">{v.n}</h3>
                     {v.kriya && (
                       <span 
                         className={`px-1.5 py-0.2 rounded text-[8px] font-extrabold uppercase tracking-wide flex items-center gap-0.5 ${
@@ -607,14 +605,14 @@ export const VotersTabMobile: React.FC<VotersTabMobileProps> = ({
                     </a>
                   ) : null}
 
-                  {/* Slip */}
+                  {/* Slip & Card */}
                   <button
                     onClick={() => onOpenSlip(v)}
-                    className="p-1.5 bg-slate-800 hover:bg-slate-700 text-slate-300 rounded-lg border border-slate-700 text-xs flex items-center gap-1 font-bold"
-                    title="View & Share Voter Slip"
+                    className="p-1.5 bg-slate-800 hover:bg-slate-700 text-slate-300 rounded-lg border border-slate-700 text-xs flex items-center gap-1 font-bold active:scale-95 transition-all"
+                    title="View Full Official Voter Card & Slip"
                   >
                     <Printer className="w-3 h-3 text-amber-400" />
-                    <span>{t.slip}</span>
+                    <span>{v.card_url || v.card ? (language === 'te' ? 'కార్డు / స్లిప్' : 'Card / Slip') : t.slip}</span>
                   </button>
                 </div>
 
