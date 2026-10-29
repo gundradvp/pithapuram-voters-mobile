@@ -86,6 +86,21 @@ _మీ అమూల్యమైన ఓటును గాజు గ్లాస
                 src={resolvePhotoUrl(voter.card_url || voter.card)}
                 alt={`Official Voter Card ${voter.s}`}
                 className="w-full h-auto rounded-xl object-contain shadow-inner"
+                onError={(e) => {
+                  const target = e.currentTarget as HTMLImageElement;
+                  const currentSrc = target.src;
+                  const cardPath = voter.card_url || voter.card;
+                  if (!cardPath) return;
+                  const cleanPath = cardPath.startsWith('/') ? cardPath : `/${cardPath}`;
+                  const gitHubRaw = `https://raw.githubusercontent.com/gundradvp/pithapuram-voters-mobile/main/public${cleanPath}`;
+                  const jsdelivrCdn = `https://cdn.jsdelivr.net/gh/gundradvp/pithapuram-voters-mobile@main/public${cleanPath}`;
+                  
+                  if (!currentSrc.includes('raw.githubusercontent.com') && !currentSrc.includes('cdn.jsdelivr.net')) {
+                    target.src = gitHubRaw;
+                  } else if (currentSrc.includes('raw.githubusercontent.com')) {
+                    target.src = jsdelivrCdn;
+                  }
+                }}
               />
             </div>
           </div>

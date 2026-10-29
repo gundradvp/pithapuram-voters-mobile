@@ -23,8 +23,7 @@ dist-ssr
 *.sln
 *.sw?
 
-# Voter Photos & Cards (hosted externally on Google Drive / CDN)
+# Voter Photos (hosted externally on Google Drive / CDN)
 public/photos/
-public/cards/
 
 

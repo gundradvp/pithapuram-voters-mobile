@@ -31,6 +31,22 @@ export function resolvePhotoUrl(rawUrl?: string): string | undefined {
       const cleanPath = rawUrl.startsWith('/') ? rawUrl : `/${rawUrl}`;
       return `${cleanBase}${cleanPath}`;
     }
+    // Cloud Sandbox / Bolt environment auto-resolution:
+    if (typeof window !== 'undefined') {
+      const hostname = window.location.hostname;
+      const isCloudEnv = 
+        hostname.includes('bolt.new') || 
+        hostname.includes('webcontainer') || 
+        hostname.includes('stackblitz') ||
+        hostname.includes('github.dev') ||
+        hostname.includes('codesandbox') ||
+        (!hostname.includes('localhost') && hostname !== '127.0.0.1' && hostname !== '');
+      
+      if (isCloudEnv) {
+        const cleanPath = rawUrl.startsWith('/') ? rawUrl : `/${rawUrl}`;
+        return `https://raw.githubusercontent.com/gundradvp/pithapuram-voters-mobile/main/public${cleanPath}`;
+      }
+    }
   } catch (e) {
     // Fallback silently if storage unavailable
   }
