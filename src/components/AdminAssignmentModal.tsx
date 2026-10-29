@@ -14,7 +14,9 @@ import {
   ExternalLink,
   Users,
   Copy,
-  CheckCircle2
+  CheckCircle2,
+  Trees,
+  MapPin
 } from 'lucide-react';
 import { 
   VolunteerAssignment, 
@@ -70,6 +72,21 @@ export const AdminAssignmentModal: React.FC<AdminAssignmentModalProps> = ({
   localUnits.forEach(u => {
     wardLabels[u.id] = u.clean_village || u.local_body;
   });
+
+  const getUnitBadge = (w: string) => {
+    switch (w) {
+      case 'ward_14':
+        return { label: '🏛️ పిఠాపురం వార్డు 14', cls: 'bg-blue-950/60 border-blue-500/40 text-blue-300' };
+      case 'gollaprolu_ward_11':
+        return { label: '🏡 గొల్లప్రోలు వార్డు 11', cls: 'bg-emerald-950/60 border-emerald-500/40 text-emerald-300' };
+      case 'gp_durgada':
+        return { label: '🌾 దుర్గడ పంచాయతీ (1,874)', cls: 'bg-amber-950/60 border-amber-500/40 text-amber-300' };
+      case 'gp_vannepudi':
+        return { label: '🌴 వన్నెపూడి పంచాయతీ (3,201)', cls: 'bg-purple-950/60 border-purple-500/40 text-purple-300' };
+      default:
+        return { label: `📍 ${wardLabels[w] || w}`, cls: 'bg-slate-800 border-slate-700 text-slate-300' };
+    }
+  };
 
   const resetForm = () => {
     setName('');
@@ -275,9 +292,42 @@ export const AdminAssignmentModal: React.FC<AdminAssignmentModalProps> = ({
 
               {/* Municipality / Local Wards Picker */}
               <div>
-                <label className="block text-[10px] font-bold text-slate-300 mb-1">
-                  {language === 'te' ? 'మున్సిపాలిటీ / స్థానిక వార్డులు (ఎంచుకోండి):' : 'Municipal / Local Wards (Select):'}
-                </label>
+                <div className="flex items-center justify-between mb-1.5 flex-wrap gap-1">
+                  <label className="block text-[10px] font-bold text-slate-300">
+                    {language === 'te' ? 'స్థానిక వార్డులు / పంచాయతీలు (ఎంచుకోండి):' : 'Local Wards / Panchayats (Select):'}
+                  </label>
+                  <div className="flex items-center gap-1">
+                    <button
+                      type="button"
+                      onClick={() => {
+                        setSelectedWards(prev => Array.from(new Set([...prev, 'gp_durgada', 'gp_vannepudi'])));
+                      }}
+                      className="px-2 py-0.5 bg-amber-500/20 hover:bg-amber-500 hover:text-slate-950 text-amber-300 rounded text-[9.5px] font-bold border border-amber-500/30 transition-colors"
+                      title="దుర్గడ & వన్నెపూడి రెండూ ఒకేసారి ఎంచుకోండి"
+                    >
+                      + దుర్గడ & వన్నెపూడి
+                    </button>
+                    <button
+                      type="button"
+                      onClick={() => {
+                        setSelectedWards(['ward_14', 'gollaprolu_ward_11', 'gp_durgada', 'gp_vannepudi']);
+                      }}
+                      className="px-2 py-0.5 bg-blue-500/20 hover:bg-blue-500 hover:text-white text-blue-300 rounded text-[9.5px] font-bold border border-blue-500/30 transition-colors"
+                    >
+                      + మొత్తం 4
+                    </button>
+                    {selectedWards.length > 0 && (
+                      <button
+                        type="button"
+                        onClick={() => setSelectedWards([])}
+                        className="px-1.5 py-0.5 bg-slate-800 text-slate-400 hover:text-white rounded text-[9.5px]"
+                      >
+                        క్లియర్ ✕
+                      </button>
+                    )}
+                  </div>
+                </div>
+
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-1.5">
                   {/* Pithapuram Ward 14 */}
                   <button
@@ -285,7 +335,7 @@ export const AdminAssignmentModal: React.FC<AdminAssignmentModalProps> = ({
                     onClick={() => toggleWardSelection('ward_14')}
                     className={`p-2 rounded-xl border text-left flex items-center justify-between text-xs transition-all ${
                       selectedWards.includes('ward_14')
-                        ? 'bg-blue-950/80 border-blue-400 text-blue-200'
+                        ? 'bg-blue-950/80 border-blue-400 text-blue-200 shadow-sm'
                         : 'bg-slate-900 border-slate-800 text-slate-400 hover:border-slate-700'
                     }`}
                   >
@@ -305,7 +355,7 @@ export const AdminAssignmentModal: React.FC<AdminAssignmentModalProps> = ({
                     onClick={() => toggleWardSelection('gollaprolu_ward_11')}
                     className={`p-2 rounded-xl border text-left flex items-center justify-between text-xs transition-all ${
                       selectedWards.includes('gollaprolu_ward_11')
-                        ? 'bg-emerald-950/80 border-emerald-400 text-emerald-200'
+                        ? 'bg-emerald-950/80 border-emerald-400 text-emerald-200 shadow-sm'
                         : 'bg-slate-900 border-slate-800 text-slate-400 hover:border-slate-700'
                     }`}
                   >
@@ -317,6 +367,46 @@ export const AdminAssignmentModal: React.FC<AdminAssignmentModalProps> = ({
                       <span className="text-[10px] text-slate-400">991 ఓటర్లు (రాయవరం రోడ్...)</span>
                     </div>
                     {selectedWards.includes('gollaprolu_ward_11') && <Check className="w-3.5 h-3.5 text-emerald-400" />}
+                  </button>
+
+                  {/* Durgada Gram Panchayat */}
+                  <button
+                    type="button"
+                    onClick={() => toggleWardSelection('gp_durgada')}
+                    className={`p-2 rounded-xl border text-left flex items-center justify-between text-xs transition-all ${
+                      selectedWards.includes('gp_durgada')
+                        ? 'bg-amber-950/80 border-amber-400 text-amber-200 shadow-sm'
+                        : 'bg-slate-900 border-slate-800 text-slate-400 hover:border-slate-700'
+                    }`}
+                  >
+                    <div>
+                      <div className="font-bold flex items-center gap-1">
+                        <MapPin className="w-3.5 h-3.5 text-amber-400" />
+                        <span>దుర్గడ పంచాయతీ</span>
+                      </div>
+                      <span className="text-[10px] text-slate-400">1,874 ఓటర్లు (దుర్గడ సర్వ ఓటర్లు)</span>
+                    </div>
+                    {selectedWards.includes('gp_durgada') && <Check className="w-3.5 h-3.5 text-amber-400" />}
+                  </button>
+
+                  {/* Vannepudi Gram Panchayat */}
+                  <button
+                    type="button"
+                    onClick={() => toggleWardSelection('gp_vannepudi')}
+                    className={`p-2 rounded-xl border text-left flex items-center justify-between text-xs transition-all ${
+                      selectedWards.includes('gp_vannepudi')
+                        ? 'bg-purple-950/80 border-purple-400 text-purple-200 shadow-sm'
+                        : 'bg-slate-900 border-slate-800 text-slate-400 hover:border-slate-700'
+                    }`}
+                  >
+                    <div>
+                      <div className="font-bold flex items-center gap-1">
+                        <Trees className="w-3.5 h-3.5 text-purple-400" />
+                        <span>వన్నెపూడి పంచాయతీ</span>
+                      </div>
+                      <span className="text-[10px] text-slate-400">3,201 ఓటర్లు (వన్నెపూడి సర్వ ఓటర్లు)</span>
+                    </div>
+                    {selectedWards.includes('gp_vannepudi') && <Check className="w-3.5 h-3.5 text-purple-400" />}
                   </button>
                 </div>
               </div>
@@ -412,20 +502,19 @@ export const AdminAssignmentModal: React.FC<AdminAssignmentModalProps> = ({
                   {a.municipalWards.length > 0 && (
                     <div className="flex flex-wrap items-center gap-1">
                       <span className="text-[10px] font-bold text-slate-400 uppercase mr-1">
-                        మున్సిపల్ వార్డులు:
+                        స్థానిక వార్డులు / పంచాయతీలు:
                       </span>
-                      {a.municipalWards.map(w => (
-                        <span
-                          key={w}
-                          className={`px-2 py-0.5 rounded-md text-[10px] font-bold border ${
-                            w === 'ward_14'
-                              ? 'bg-blue-950/60 border-blue-500/40 text-blue-300'
-                              : 'bg-emerald-950/60 border-emerald-500/40 text-emerald-300'
-                          }`}
-                        >
-                          {w === 'ward_14' ? '🏛️ పిఠాపురం వార్డు 14' : '🏡 గొల్లప్రోలు వార్డు 11'}
-                        </span>
-                      ))}
+                      {a.municipalWards.map(w => {
+                        const badge = getUnitBadge(w);
+                        return (
+                          <span
+                            key={w}
+                            className={`px-2 py-0.5 rounded-md text-[10px] font-bold border ${badge.cls}`}
+                          >
+                            {badge.label}
+                          </span>
+                        );
+                      })}
                     </div>
                   )}
 

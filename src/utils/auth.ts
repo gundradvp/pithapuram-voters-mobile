@@ -28,8 +28,8 @@ export const DEFAULT_ASSIGNMENTS: VolunteerAssignment[] = [
     phone: '9000273028',
     name: 'దుర్గా ప్రసాద్ (Durga Prasad)',
     assemblyBooths: [11, 12, 13],
-    municipalWards: ['ward_14', 'gollaprolu_ward_11'],
-    notes: 'పిఠాపురం అసెంబ్లీ & మునిసిపాలిటీ ఇంచార్జ్',
+    municipalWards: ['ward_14', 'gollaprolu_ward_11', 'gp_durgada', 'gp_vannepudi'],
+    notes: 'పిఠాపురం అసెంబ్లీ & స్థానిక ఎన్నికల కోఆర్డినేటర్',
     assignedAt: new Date().toISOString()
   },
   {
@@ -62,6 +62,22 @@ export function getAssignments(): VolunteerAssignment[] {
     if (!Array.isArray(parsed) || parsed.length === 0) {
       localStorage.setItem(ASSIGNMENTS_STORAGE_KEY, JSON.stringify(DEFAULT_ASSIGNMENTS));
       return DEFAULT_ASSIGNMENTS;
+    }
+    // Auto-migrate: ensure Durga Prasad (9000273028) has all active loaded units (Durgada & Vannepudi)
+    const dp = parsed.find((a: VolunteerAssignment) => cleanPhoneNumber(a.phone) === '9000273028');
+    if (dp) {
+      let changed = false;
+      if (!dp.municipalWards.includes('gp_durgada')) {
+        dp.municipalWards.push('gp_durgada');
+        changed = true;
+      }
+      if (!dp.municipalWards.includes('gp_vannepudi')) {
+        dp.municipalWards.push('gp_vannepudi');
+        changed = true;
+      }
+      if (changed) {
+        localStorage.setItem(ASSIGNMENTS_STORAGE_KEY, JSON.stringify(parsed));
+      }
     }
     return parsed;
   } catch (err) {
@@ -141,9 +157,11 @@ export function generateAssignmentWhatsAppMessage(
   const municipalList = assignment.municipalWards.length > 0
     ? assignment.municipalWards.map(w => {
         const desc = localWardLabels && localWardLabels[w] ? ` (${localWardLabels[w]})` : '';
-        if (w === 'ward_14') return `• పిఠాపురం పురపాలక సంఘం - 14వ వార్డు${desc}`;
-        if (w === 'gollaprolu_ward_11') return `• గొల్లప్రోలు నగర పంచాయతీ - 11వ వార్డు${desc}`;
-        return `• స్థానిక వార్డు: ${w}${desc}`;
+        if (w === 'ward_14') return `• పిఠాపురం పురపాలక సంఘం - 14వ వార్డు (1,256 ఓటర్లు)${desc}`;
+        if (w === 'gollaprolu_ward_11') return `• గొల్లప్రోలు నగర పంచాయతీ - 11వ వార్డు (991 ఓటర్లు)${desc}`;
+        if (w === 'gp_durgada') return `• దుర్గడ గ్రామ పంచాయతీ (Durgada GP - 1,874 ఓటర్లు)${desc}`;
+        if (w === 'gp_vannepudi') return `• వన్నెపూడి గ్రామ పంచాయతీ (Vannepudi GP - 3,201 ఓటర్లు)${desc}`;
+        return `• స్థానిక వార్డు/పంచాయతీ: ${w}${desc}`;
       }).join('\n')
     : '• కేటాయించలేదు';
 
