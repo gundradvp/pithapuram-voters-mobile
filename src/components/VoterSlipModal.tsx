@@ -16,6 +16,21 @@ export const VoterSlipModal: React.FC<VoterSlipModalProps> = ({
 }) => {
   if (!voter || !boothInfo) return null;
 
+  const formatBoothLabel = (partNo: string | number) => {
+    const s = String(partNo);
+    if (s === 'mptc_durgada_1') return 'MPTC 1';
+    if (s === 'mptc_durgada_2') return 'MPTC 2';
+    if (s === 'mptc_durgada_3') return 'MPTC 3';
+    if (s === 'gp_durgada') return 'GP DURGADA';
+    if (s === 'ward_14') return 'WARD 14';
+    if (s === 'gollaprolu_ward_11') return 'WARD 11';
+    if (s === 'gp_vannepudi') return 'GP VANNEPUDI';
+    if (s.startsWith('mptc_')) return s.replace('mptc_', 'MPTC ').toUpperCase();
+    if (s.startsWith('ward_')) return s.replace('ward_', 'WARD ');
+    if (s.startsWith('gp_')) return s.replace('gp_', 'GP ').toUpperCase();
+    return `#${s}`;
+  };
+
   const handleShareWhatsApp = () => {
     const isMunicipal = boothInfo.election_type === 'municipal';
     const text = isMunicipal
@@ -123,9 +138,11 @@ _మీ అమూల్యమైన ఓటును గాజు గ్లాస
             <span className="text-[10px] uppercase font-bold text-slate-400 block">Voter S.No</span>
             <span className="text-2xl font-black text-amber-400 font-mono">#{voter.s}</span>
           </div>
-          <div className="bg-slate-950 border border-slate-800 p-2.5 rounded-xl">
+          <div className="bg-slate-950 border border-slate-800 p-2.5 rounded-xl flex flex-col justify-center">
             <span className="text-[10px] uppercase font-bold text-slate-400 block">Part / Booth</span>
-            <span className="text-2xl font-black text-emerald-400 font-mono">#{boothInfo.part_no}</span>
+            <span className="text-xl sm:text-2xl font-black text-emerald-400 font-mono truncate" title={String(boothInfo.part_no)}>
+              {formatBoothLabel(boothInfo.part_no)}
+            </span>
           </div>
         </div>
 
