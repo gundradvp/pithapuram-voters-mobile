@@ -35,6 +35,7 @@ const filesToSync = [
   'src/components/PhoneEditorModal.tsx',
   'src/components/InfluencerAssignModal.tsx',
   'src/components/VoterSlipModal.tsx',
+  'src/components/GroupPrintModal.tsx',
   'public/local_elections_index.json',
   'public/booths/booth_ward_14.json',
   'public/booths/ward_14.json',

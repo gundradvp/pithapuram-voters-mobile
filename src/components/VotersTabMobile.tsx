@@ -17,6 +17,7 @@ interface VotersTabMobileProps {
   onOpenInfluencerAssign: (targetName: string, currentInfId?: string, voterSno?: number) => void;
   onUpdateSurveyMark: (serialNo: number, status: VoterSurveyStatus | null) => void;
   onOpenSlip: (voter: MobileVoter) => void;
+  onOpenGroupPrint?: (title: string, subtitle: string, voters: MobileVoter[]) => void;
 }
 
 export const VotersTabMobile: React.FC<VotersTabMobileProps> = ({
@@ -29,7 +30,8 @@ export const VotersTabMobile: React.FC<VotersTabMobileProps> = ({
   onOpenLogVisit,
   onOpenInfluencerAssign,
   onUpdateSurveyMark,
-  onOpenSlip
+  onOpenSlip,
+  onOpenGroupPrint
 }) => {
   const [searchQuery, setSearchQuery] = useState('');
   const [selectedStreet, setSelectedStreet] = useState<string>('all');
@@ -484,7 +486,7 @@ _మీ అమూల్యమైన ఓటును గాజు గ్లాస
       </div>
 
       {/* Showing Count */}
-      <div className="flex items-center justify-between text-[11px] text-slate-400 px-1">
+      <div className="flex items-center justify-between text-[11px] text-slate-400 px-1 gap-2 flex-wrap">
         <span>
           {language === 'te' ? (
             <>
@@ -496,14 +498,40 @@ _మీ అమూల్యమైన ఓటును గాజు గ్లాస
             </>
           )}
         </span>
-        {searchQuery && (
-          <button 
-            onClick={() => setSearchQuery('')}
-            className="text-amber-400 font-bold hover:underline"
-          >
-            {t.clearSearch}
-          </button>
-        )}
+
+        <div className="flex items-center gap-2">
+          {filteredVoters.length > 0 && onOpenGroupPrint && (
+            <button
+              onClick={() => {
+                const groupTitle = selectedSurname !== 'all'
+                  ? `${selectedSurname} వంశ ఓటర్ల జాబితా`
+                  : selectedStreet !== 'all'
+                    ? `${selectedStreet} వీధి ఓటర్ల జాబితా`
+                    : filterMode !== 'all'
+                      ? `${filterMode.toUpperCase()} వర్గం ఓటర్ల జాబితా`
+                      : `బూత్ #${boothInfo.part_no} ఓటర్ల జాబితా`;
+                onOpenGroupPrint(
+                  groupTitle,
+                  `${boothInfo.clean_village || boothInfo.ps_address} • మొత్తం ${filteredVoters.length} మంది ఓటర్లు`,
+                  filteredVoters
+                );
+              }}
+              className="px-2 py-0.5 bg-slate-900 hover:bg-slate-800 text-amber-300 border border-amber-500/30 rounded-lg text-[10.5px] font-bold flex items-center gap-1 shadow-sm transition-all"
+              title="Print Current Filtered Voter List"
+            >
+              <Printer className="w-3 h-3 text-amber-400" />
+              <span>🖨️ ప్రింట్ ({filteredVoters.length})</span>
+            </button>
+          )}
+          {searchQuery && (
+            <button 
+              onClick={() => setSearchQuery('')}
+              className="text-amber-400 font-bold hover:underline"
+            >
+              {t.clearSearch}
+            </button>
+          )}
+        </div>
       </div>
 
       {/* Active Filter Indicator if Surname is filtered */}
@@ -662,6 +690,20 @@ _మీ అమూల్యమైన ఓటును గాజు గ్లాస
                         <MessageSquare className="w-3 h-3" />
                         <span>వాట్సాప్</span>
                       </button>
+                      {onOpenGroupPrint && (
+                        <button
+                          onClick={() => onOpenGroupPrint(
+                            `${clan.nameTe || clan.nameEn} (${clan.nameEn}) వంశ ఓటర్ల జాబితా`,
+                            `బూత్ #${boothInfo.part_no} — మొత్తం ${clan.totalVoters} ఓట్లు (${clan.pctOfBooth}%)`,
+                            clan.voters
+                          )}
+                          className="px-2 py-1 bg-slate-800 hover:bg-slate-700 text-amber-300 rounded-lg font-bold text-[10px] flex items-center gap-1 border border-slate-700 shadow-sm"
+                          title="Print Clan Voter Roster"
+                        >
+                          <Printer className="w-3 h-3 text-amber-400" />
+                          <span>ప్రింట్</span>
+                        </button>
+                      )}
                     </div>
                   </div>
                 </div>

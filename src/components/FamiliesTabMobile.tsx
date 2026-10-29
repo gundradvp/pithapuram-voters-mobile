@@ -38,6 +38,7 @@ interface FamiliesTabMobileProps {
   onOpenSupportPicker: (title: string, currentPct: number, currentNotes?: string, familyId?: string) => void;
   onOpenInfluencerAssign: (targetName: string, currentInfId?: string, familyId?: string) => void;
   onOpenSlip: (voter: MobileVoter) => void;
+  onOpenGroupPrint?: (title: string, subtitle: string, voters: MobileVoter[]) => void;
 }
 
 type TabMode = 'surnames' | 'houses';
@@ -55,7 +56,8 @@ export const FamiliesTabMobile: React.FC<FamiliesTabMobileProps> = ({
   onOpenPhoneEditor,
   onOpenSupportPicker,
   onOpenInfluencerAssign,
-  onOpenSlip
+  onOpenSlip,
+  onOpenGroupPrint
 }) => {
   const [tabMode, setTabMode] = useState<TabMode>('surnames');
   const [searchQuery, setSearchQuery] = useState('');
@@ -359,14 +361,33 @@ export const FamiliesTabMobile: React.FC<FamiliesTabMobileProps> = ({
           </div>
 
           {/* Showing Count */}
-          <div className="flex items-center justify-between text-[11px] text-slate-400 px-1">
+          <div className="flex items-center justify-between text-[11px] text-slate-400 px-1 gap-2 flex-wrap">
             <span>
               {language === 'te' ? `బూత్ #${boothInfo.part_no} లో ` : `In Booth #${boothInfo.part_no}: `}
               <strong className="text-white">{filteredClans.length}</strong> {language === 'te' ? 'ఇంటిపేర్లు' : 'Surname Clans'}
             </span>
-            <span className="font-mono text-amber-400">
-              {filteredClans.reduce((acc, c) => acc + c.totalVoters, 0)} {language === 'te' ? 'ఓటర్లు' : 'voters'}
-            </span>
+            <div className="flex items-center gap-2">
+              <span className="font-mono text-amber-400">
+                {filteredClans.reduce((acc, c) => acc + c.totalVoters, 0)} {language === 'te' ? 'ఓటర్లు' : 'voters'}
+              </span>
+              {onOpenGroupPrint && filteredClans.length > 0 && (
+                <button
+                  onClick={() => {
+                    const allVotersInClans = filteredClans.flatMap(c => c.voters);
+                    onOpenGroupPrint(
+                      `బూత్ #${boothInfo.part_no} — ${filteredClans.length} ఇంటిపేర్ల వంశ ఓటర్ల జాబితా`,
+                      `మొత్తం ${allVotersInClans.length} మంది ఓటర్లు`,
+                      allVotersInClans
+                    );
+                  }}
+                  className="px-2 py-0.5 bg-slate-900 hover:bg-slate-800 text-amber-300 border border-amber-500/30 rounded-lg text-[10.5px] font-bold flex items-center gap-1 shadow-sm transition-all"
+                  title="Print All Filtered Surnames"
+                >
+                  <Printer className="w-3 h-3 text-amber-400" />
+                  <span>🖨️ ఈ గ్రూప్ ప్రింట్</span>
+                </button>
+              )}
+            </div>
           </div>
 
           {/* Surnames Clan List */}
@@ -409,10 +430,24 @@ export const FamiliesTabMobile: React.FC<FamiliesTabMobileProps> = ({
                         </div>
                       </div>
 
-                      <div className="text-right">
+                      <div className="flex items-center gap-1.5 flex-col items-end">
                         <span className="px-2.5 py-1 bg-gradient-to-r from-red-600/30 to-amber-600/30 border border-amber-500/40 text-amber-300 font-mono font-black rounded-lg text-xs">
                           {jspPercent}% JSP
                         </span>
+                        {onOpenGroupPrint && (
+                          <button
+                            onClick={() => onOpenGroupPrint(
+                              `${clan.nameTe || clan.nameEn} (${clan.nameEn}) వంశ ఓటర్ల జాబితా`,
+                              `బూత్ #${boothInfo.part_no} — ${clan.totalVoters} మంది ఓటర్లు (${clan.pctOfBooth}%)`,
+                              clan.voters
+                            )}
+                            className="px-2 py-0.5 bg-slate-800 hover:bg-slate-700 text-amber-300 border border-slate-700 rounded-md text-[10px] font-bold flex items-center gap-1 shadow-sm transition-all"
+                            title="Print Clan Roster"
+                          >
+                            <Printer className="w-3 h-3 text-amber-400" />
+                            <span>ప్రింట్</span>
+                          </button>
+                        )}
                       </div>
                     </div>
 
@@ -824,10 +859,28 @@ export const FamiliesTabMobile: React.FC<FamiliesTabMobileProps> = ({
           </div>
 
           {/* Showing count */}
-          <div className="flex items-center justify-between text-[11px] text-slate-400 px-1">
+          <div className="flex items-center justify-between text-[11px] text-slate-400 px-1 gap-2 flex-wrap">
             <span>
               Showing <strong className="text-white">{filteredFamilies.length}</strong> Family Groups in Booth #{boothInfo.part_no}
             </span>
+            {onOpenGroupPrint && filteredFamilies.length > 0 && (
+              <button
+                onClick={() => {
+                  const allMemberSnos = Array.from(new Set(filteredFamilies.flatMap(f => f.memberSnos)));
+                  const allFamilyVoters = voters.filter(v => allMemberSnos.includes(v.s));
+                  onOpenGroupPrint(
+                    `బూత్ #${boothInfo.part_no} — ${filteredFamilies.length} కుటుంబాల జాబితా`,
+                    `మొత్తం ${allFamilyVoters.length} మంది ఓటర్లు`,
+                    allFamilyVoters
+                  );
+                }}
+                className="px-2 py-0.5 bg-slate-900 hover:bg-slate-800 text-amber-300 border border-amber-500/30 rounded-lg text-[10.5px] font-bold flex items-center gap-1 shadow-sm transition-all"
+                title="Print All Filtered Families"
+              >
+                <Printer className="w-3 h-3 text-amber-400" />
+                <span>🖨️ ఈ కుటుంబాలు ప్రింట్</span>
+              </button>
+            )}
           </div>
 
           {/* Families List */}
@@ -868,13 +921,28 @@ export const FamiliesTabMobile: React.FC<FamiliesTabMobileProps> = ({
                         </div>
                       </div>
 
-                      <button
-                        onClick={() => onEditFamily(fam)}
-                        className="p-1.5 bg-slate-800 hover:bg-slate-700 text-slate-300 rounded-lg text-xs"
-                        title="Edit Family Settings"
-                      >
-                        <Edit3 className="w-3.5 h-3.5" />
-                      </button>
+                      <div className="flex items-center gap-1">
+                        {onOpenGroupPrint && memberVoters.length > 0 && (
+                          <button
+                            onClick={() => onOpenGroupPrint(
+                              `${fam.name} — కుటుంబ సభ్యుల జాబితా`,
+                              `ఇంటి నెం: ${fam.houseNumbers.join(', ')} • ${memberVoters.length} మంది ఓటర్లు`,
+                              memberVoters
+                            )}
+                            className="p-1.5 bg-slate-800 hover:bg-slate-700 text-amber-300 rounded-lg text-xs border border-slate-700 flex items-center gap-1 shadow-sm transition-all"
+                            title="Print Family Roster"
+                          >
+                            <Printer className="w-3.5 h-3.5 text-amber-400" />
+                          </button>
+                        )}
+                        <button
+                          onClick={() => onEditFamily(fam)}
+                          className="p-1.5 bg-slate-800 hover:bg-slate-700 text-slate-300 rounded-lg text-xs"
+                          title="Edit Family Settings"
+                        >
+                          <Edit3 className="w-3.5 h-3.5" />
+                        </button>
+                      </div>
                     </div>
 
                     {/* Assigned Influencer Banner */}

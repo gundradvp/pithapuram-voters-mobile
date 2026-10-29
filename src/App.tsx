@@ -17,6 +17,7 @@ import { LogVisitModal } from './components/LogVisitModal';
 import { ThemeSelectorModal } from './components/ThemeSelectorModal';
 import { LoginModal } from './components/LoginModal';
 import { AdminAssignmentModal } from './components/AdminAssignmentModal';
+import { GroupPrintModal } from './components/GroupPrintModal';
 import {
   BoothData,
   BoothIndexItem,
@@ -171,6 +172,27 @@ export function App() {
     open: false,
     initialFamily: null
   });
+
+  const [groupPrintState, setGroupPrintState] = useState<{
+    open: boolean;
+    title: string;
+    subtitle?: string;
+    voters: MobileVoter[];
+  }>({
+    open: false,
+    title: '',
+    subtitle: '',
+    voters: []
+  });
+
+  const handleOpenGroupPrint = (title: string, subtitle: string, votersList: MobileVoter[]) => {
+    setGroupPrintState({
+      open: true,
+      title,
+      subtitle,
+      voters: votersList
+    });
+  };
 
   // 1. Load Booths Index and Local Elections Index
   useEffect(() => {
@@ -531,6 +553,7 @@ export function App() {
                 }}
                 onUpdateSurveyMark={handleUpdateSurveyMark}
                 onOpenSlip={v => setSelectedVoterForSlip(v)}
+                onOpenGroupPrint={handleOpenGroupPrint}
               />
             )}
 
@@ -565,6 +588,7 @@ export function App() {
                   });
                 }}
                 onOpenSlip={v => setSelectedVoterForSlip(v)}
+                onOpenGroupPrint={handleOpenGroupPrint}
               />
             )}
 
@@ -620,6 +644,7 @@ export function App() {
                   });
                 }}
                 onOpenSlip={v => setSelectedVoterForSlip(v)}
+                onOpenGroupPrint={handleOpenGroupPrint}
               />
             )}
 
@@ -766,6 +791,20 @@ export function App() {
           language={lang}
           onSelectTheme={handleSelectTheme}
           onClose={() => setIsThemeModalOpen(false)}
+        />
+      )}
+
+      {/* Group & Surname Clan A4 Print Modal */}
+      {groupPrintState.open && boothData && (
+        <GroupPrintModal
+          isOpen={groupPrintState.open}
+          title={groupPrintState.title}
+          subtitle={groupPrintState.subtitle}
+          boothInfo={boothData.booth_info}
+          voters={groupPrintState.voters}
+          profiles={profiles}
+          language={lang}
+          onClose={() => setGroupPrintState(prev => ({ ...prev, open: false }))}
         />
       )}
     </div>
