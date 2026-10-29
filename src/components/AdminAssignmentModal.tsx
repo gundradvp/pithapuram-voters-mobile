@@ -76,11 +76,17 @@ export const AdminAssignmentModal: React.FC<AdminAssignmentModalProps> = ({
   const getUnitBadge = (w: string) => {
     switch (w) {
       case 'ward_14':
-        return { label: '🏛️ పిఠాపురం వార్డు 14', cls: 'bg-blue-950/60 border-blue-500/40 text-blue-300' };
+        return { label: '🏛️ పిఠాపురం వార్డు 14 (1,256)', cls: 'bg-blue-950/60 border-blue-500/40 text-blue-300' };
       case 'gollaprolu_ward_11':
-        return { label: '🏡 గొల్లప్రోలు వార్డు 11', cls: 'bg-emerald-950/60 border-emerald-500/40 text-emerald-300' };
+        return { label: '🏡 గొల్లప్రోలు వార్డు 11 (991)', cls: 'bg-emerald-950/60 border-emerald-500/40 text-emerald-300' };
+      case 'mptc_durgada_1':
+        return { label: '🌾 దుర్గడ MPTC 1 (1,060)', cls: 'bg-teal-950/60 border-teal-500/40 text-teal-300' };
+      case 'mptc_durgada_2':
+        return { label: '🌾 దుర్గడ MPTC 2 (1,060)', cls: 'bg-cyan-950/60 border-cyan-500/40 text-cyan-300' };
+      case 'mptc_durgada_3':
+        return { label: '🌾 దుర్గడ MPTC 3 (1,874)', cls: 'bg-sky-950/60 border-sky-500/40 text-sky-300' };
       case 'gp_durgada':
-        return { label: '🌾 దుర్గడ పంచాయతీ (1,874)', cls: 'bg-amber-950/60 border-amber-500/40 text-amber-300' };
+        return { label: '🌾 దుర్గడ సమగ్ర పంచాయతీ (3,994)', cls: 'bg-amber-950/60 border-amber-500/40 text-amber-300' };
       case 'gp_vannepudi':
         return { label: '🌴 వన్నెపూడి పంచాయతీ (3,201)', cls: 'bg-purple-950/60 border-purple-500/40 text-purple-300' };
       default:
@@ -296,25 +302,26 @@ export const AdminAssignmentModal: React.FC<AdminAssignmentModalProps> = ({
                   <label className="block text-[10px] font-bold text-slate-300">
                     {language === 'te' ? 'స్థానిక వార్డులు / పంచాయతీలు (ఎంచుకోండి):' : 'Local Wards / Panchayats (Select):'}
                   </label>
-                  <div className="flex items-center gap-1">
+                  <div className="flex items-center gap-1 flex-wrap">
+                    <button
+                      type="button"
+                      onClick={() => {
+                        setSelectedWards(prev => Array.from(new Set([...prev, 'mptc_durgada_1', 'mptc_durgada_2', 'mptc_durgada_3'])));
+                      }}
+                      className="px-2 py-0.5 bg-teal-500/20 hover:bg-teal-500 hover:text-slate-950 text-teal-300 rounded text-[9.5px] font-bold border border-teal-500/30 transition-colors"
+                      title="దుర్గడ 3 MPTCలు ఒకేసారి ఎంచుకోండి"
+                    >
+                      + దుర్గడ 3 MPTCలు
+                    </button>
                     <button
                       type="button"
                       onClick={() => {
                         setSelectedWards(prev => Array.from(new Set([...prev, 'gp_durgada', 'gp_vannepudi'])));
                       }}
                       className="px-2 py-0.5 bg-amber-500/20 hover:bg-amber-500 hover:text-slate-950 text-amber-300 rounded text-[9.5px] font-bold border border-amber-500/30 transition-colors"
-                      title="దుర్గడ & వన్నెపూడి రెండూ ఒకేసారి ఎంచుకోండి"
+                      title="దుర్గడ & వన్నెపూడి GPలు రెండూ ఒకేసారి ఎంచుకోండి"
                     >
-                      + దుర్గడ & వన్నెపూడి
-                    </button>
-                    <button
-                      type="button"
-                      onClick={() => {
-                        setSelectedWards(['ward_14', 'gollaprolu_ward_11', 'gp_durgada', 'gp_vannepudi']);
-                      }}
-                      className="px-2 py-0.5 bg-blue-500/20 hover:bg-blue-500 hover:text-white text-blue-300 rounded text-[9.5px] font-bold border border-blue-500/30 transition-colors"
-                    >
-                      + మొత్తం 4
+                      + దుర్గడ & వన్నెపూడి GP
                     </button>
                     {selectedWards.length > 0 && (
                       <button
@@ -369,7 +376,67 @@ export const AdminAssignmentModal: React.FC<AdminAssignmentModalProps> = ({
                     {selectedWards.includes('gollaprolu_ward_11') && <Check className="w-3.5 h-3.5 text-emerald-400" />}
                   </button>
 
-                  {/* Durgada Gram Panchayat */}
+                  {/* Durgada MPTC 1 */}
+                  <button
+                    type="button"
+                    onClick={() => toggleWardSelection('mptc_durgada_1')}
+                    className={`p-2 rounded-xl border text-left flex items-center justify-between text-xs transition-all ${
+                      selectedWards.includes('mptc_durgada_1')
+                        ? 'bg-teal-950/80 border-teal-400 text-teal-200 shadow-sm'
+                        : 'bg-slate-900 border-slate-800 text-slate-400 hover:border-slate-700'
+                    }`}
+                  >
+                    <div>
+                      <div className="font-bold flex items-center gap-1">
+                        <MapPin className="w-3.5 h-3.5 text-teal-400" />
+                        <span>దుర్గడ MPTC 1</span>
+                      </div>
+                      <span className="text-[10px] text-slate-400">1,060 ఓటర్లు (వార్డులు 1 & 2)</span>
+                    </div>
+                    {selectedWards.includes('mptc_durgada_1') && <Check className="w-3.5 h-3.5 text-teal-400" />}
+                  </button>
+
+                  {/* Durgada MPTC 2 */}
+                  <button
+                    type="button"
+                    onClick={() => toggleWardSelection('mptc_durgada_2')}
+                    className={`p-2 rounded-xl border text-left flex items-center justify-between text-xs transition-all ${
+                      selectedWards.includes('mptc_durgada_2')
+                        ? 'bg-cyan-950/80 border-cyan-400 text-cyan-200 shadow-sm'
+                        : 'bg-slate-900 border-slate-800 text-slate-400 hover:border-slate-700'
+                    }`}
+                  >
+                    <div>
+                      <div className="font-bold flex items-center gap-1">
+                        <MapPin className="w-3.5 h-3.5 text-cyan-400" />
+                        <span>దుర్గడ MPTC 2</span>
+                      </div>
+                      <span className="text-[10px] text-slate-400">1,060 ఓటర్లు (వార్డులు 3 & 4)</span>
+                    </div>
+                    {selectedWards.includes('mptc_durgada_2') && <Check className="w-3.5 h-3.5 text-cyan-400" />}
+                  </button>
+
+                  {/* Durgada MPTC 3 */}
+                  <button
+                    type="button"
+                    onClick={() => toggleWardSelection('mptc_durgada_3')}
+                    className={`p-2 rounded-xl border text-left flex items-center justify-between text-xs transition-all ${
+                      selectedWards.includes('mptc_durgada_3')
+                        ? 'bg-sky-950/80 border-sky-400 text-sky-200 shadow-sm'
+                        : 'bg-slate-900 border-slate-800 text-slate-400 hover:border-slate-700'
+                    }`}
+                  >
+                    <div>
+                      <div className="font-bold flex items-center gap-1">
+                        <MapPin className="w-3.5 h-3.5 text-sky-400" />
+                        <span>దుర్గడ MPTC 3</span>
+                      </div>
+                      <span className="text-[10px] text-slate-400">1,874 ఓటర్లు (డోర్ నెం. 4-9)</span>
+                    </div>
+                    {selectedWards.includes('mptc_durgada_3') && <Check className="w-3.5 h-3.5 text-sky-400" />}
+                  </button>
+
+                  {/* Durgada Entire Gram Panchayat */}
                   <button
                     type="button"
                     onClick={() => toggleWardSelection('gp_durgada')}
@@ -382,9 +449,9 @@ export const AdminAssignmentModal: React.FC<AdminAssignmentModalProps> = ({
                     <div>
                       <div className="font-bold flex items-center gap-1">
                         <MapPin className="w-3.5 h-3.5 text-amber-400" />
-                        <span>దుర్గడ పంచాయతీ</span>
+                        <span>దుర్గడ సమగ్ర GP</span>
                       </div>
-                      <span className="text-[10px] text-slate-400">1,874 ఓటర్లు (దుర్గడ సర్వ ఓటర్లు)</span>
+                      <span className="text-[10px] text-slate-400">3,994 ఓటర్లు (MPTC 1+2+3 సర్వ ఓటర్లు)</span>
                     </div>
                     {selectedWards.includes('gp_durgada') && <Check className="w-3.5 h-3.5 text-amber-400" />}
                   </button>
