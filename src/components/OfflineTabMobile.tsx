@@ -15,6 +15,7 @@ interface OfflineTabMobileProps {
   onRefreshCache: () => void;
   onOpenBoothSelector: () => void;
   onImportCustomJson: (data: BoothData) => void;
+  onClearAndRefresh?: () => void;
 }
 
 export const OfflineTabMobile: React.FC<OfflineTabMobileProps> = ({
@@ -26,7 +27,8 @@ export const OfflineTabMobile: React.FC<OfflineTabMobileProps> = ({
   onSelectTheme,
   onRefreshCache,
   onOpenBoothSelector,
-  onImportCustomJson
+  onImportCustomJson,
+  onClearAndRefresh
 }) => {
   const { booth_info: info } = boothData;
   const [cacheSuccess, setCacheSuccess] = useState(false);
@@ -196,6 +198,17 @@ export const OfflineTabMobile: React.FC<OfflineTabMobileProps> = ({
             className="hidden"
           />
         </label>
+
+        {/* Action 4: Clear Stale Cache & Auto-Refresh from Server */}
+        {onClearAndRefresh && (
+          <button
+            onClick={onClearAndRefresh}
+            className="w-full py-2.5 bg-amber-500/15 hover:bg-amber-500/25 text-amber-300 rounded-xl font-bold flex items-center justify-center gap-2 border border-amber-500/40 transition-all text-xs shadow-sm"
+          >
+            <RefreshCw className="w-4 h-4 text-amber-400" />
+            <span>{language === 'te' ? '🧹 పాత క్యాష్ క్లియర్ చేసి తాజా డేటా డౌన్‌లోడ్ చేయండి' : 'Clear Stale Cache & Auto-Refresh Latest Data'}</span>
+          </button>
+        )}
       </div>
 
       {/* 3. BOOTH ASSIGNMENT & LOCK MANAGEMENT */}

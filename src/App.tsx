@@ -38,6 +38,8 @@ import {
   getCachedBoothData,
   saveCachedBoothData,
   isBoothCached,
+  isCacheStale,
+  clearStaleBoothCache,
   getVoterProfiles,
   saveVoterProfile,
   addVoterVisit,
@@ -194,30 +196,97 @@ export function App() {
     });
   };
 
-  // 1. Load Booths Index and Local Elections Index
-  useEffect(() => {
-    fetch('/booths_index.json')
-      .then(res => res.json())
-      .then(data => {
-        setBoothsIndex(data);
-      })
-      .catch(err => {
-        console.warn('Could not load booths index online:', err);
-      });
+  const [isRefreshing, setIsRefreshing] = useState<boolean>(false);
 
-    fetch('/local_elections_index.json')
-      .then(res => res.json())
-      .then(data => {
-        setLocalUnits(data);
-      })
-      .catch(err => {
-        console.warn('Could not load local elections index online:', err);
-      });
+  // Helper: Multi-source fetch for booth voter data (with GitHub/CDN fallbacks & no-store headers)
+  const fetchFreshBoothData = async (partNo: number | string): Promise<BoothData> => {
+    const ts = Date.now();
+    const fetchOptions: RequestInit = {
+      cache: 'no-store',
+      headers: {
+        'Cache-Control': 'no-cache, no-store, must-revalidate',
+        'Pragma': 'no-cache'
+      }
+    };
+
+    const urlsToTry = [
+      `/booths/booth_${partNo}.json?v=${ts}`,
+      `/booths/${partNo}.json?v=${ts}`,
+      `https://raw.githubusercontent.com/gundradvp/pithapuram-voters-mobile/main/public/booths/booth_${partNo}.json?v=${ts}`,
+      `https://raw.githubusercontent.com/gundradvp/pithapuram-voters-mobile/main/public/booths/${partNo}.json?v=${ts}`,
+      `https://cdn.jsdelivr.net/gh/gundradvp/pithapuram-voters-mobile@main/public/booths/booth_${partNo}.json`
+    ];
+
+    let lastError: any = null;
+    for (const url of urlsToTry) {
+      try {
+        const res = await fetch(url, fetchOptions);
+        if (res.ok) {
+          const data = await res.json();
+          if (data && data.booth_info && Array.isArray(data.voters)) {
+            return data as BoothData;
+          }
+        }
+      } catch (e) {
+        lastError = e;
+      }
+    }
+    throw lastError || new Error(`Could not fetch fresh data for unit #${partNo}`);
+  };
+
+  // Helper: Multi-source fetch for index files
+  const fetchFreshIndexData = async <T,>(filename: string, fallbackUrl: string): Promise<T> => {
+    const ts = Date.now();
+    const fetchOptions: RequestInit = {
+      cache: 'no-store',
+      headers: {
+        'Cache-Control': 'no-cache, no-store, must-revalidate',
+        'Pragma': 'no-cache'
+      }
+    };
+
+    try {
+      const res = await fetch(`/${filename}?v=${ts}`, fetchOptions);
+      if (res.ok) {
+        const data = await res.json();
+        if (Array.isArray(data) && data.length > 0) return data as T;
+      }
+    } catch (e) {
+      console.warn(`Local fetch for ${filename} failed, trying fallback`);
+    }
+
+    const resFallback = await fetch(`${fallbackUrl}?v=${ts}`, fetchOptions);
+    return await resFallback.json();
+  };
+
+  // 1. Load Booths Index and Local Elections Index
+  const loadIndexes = useCallback(() => {
+    fetchFreshIndexData<BoothIndexItem[]>(
+      'booths_index.json',
+      'https://raw.githubusercontent.com/gundradvp/pithapuram-voters-mobile/main/public/booths_index.json'
+    )
+      .then(data => setBoothsIndex(data))
+      .catch(err => console.warn('Could not load booths index:', err));
+
+    fetchFreshIndexData<LocalElectionUnit[]>(
+      'local_elections_index.json',
+      'https://raw.githubusercontent.com/gundradvp/pithapuram-voters-mobile/main/public/local_elections_index.json'
+    )
+      .then(data => setLocalUnits(data))
+      .catch(err => console.warn('Could not load local elections index:', err));
   }, []);
 
-  // 2. Load Selected Unit Data (Offline First Pattern)
-  const loadBooth = useCallback(async (partNo: number | string) => {
-    setIsLoading(true);
+  useEffect(() => {
+    // If cache is stale from older app builds, clear stale booths so users don't see outdated data
+    if (isCacheStale()) {
+      clearStaleBoothCache();
+    }
+    loadIndexes();
+  }, [loadIndexes]);
+
+  // 2. Load Selected Unit Data (Offline-First + Immediate Auto-Fresh Update)
+  const loadBooth = useCallback(async (partNo: number | string, isSilent: boolean = false) => {
+    if (!isSilent) setIsLoading(true);
     setErrorMsg(null);
 
     // Step A: Load profiles, families, influencers immediately from localStorage
@@ -231,17 +300,12 @@ export function App() {
       setBoothData(cached);
       setFamilies(getFamilyGroups(partNo, cached.voters));
       setIsCached(true);
-      setIsLoading(false);
+      if (!isSilent) setIsLoading(false);
     }
 
-    // Step C: Fetch latest over network
+    // Step C: Fetch latest fresh data over network with cache-busting & fallbacks
     try {
-      let res = await fetch(`/booths/booth_${partNo}.json?v=${Date.now()}`);
-      if (!res.ok) {
-        res = await fetch(`/booths/${partNo}.json?v=${Date.now()}`);
-      }
-      if (!res.ok) throw new Error(`HTTP error ${res.status}`);
-      const onlineData: BoothData = await res.json();
+      const onlineData = await fetchFreshBoothData(partNo);
       setBoothData(onlineData);
       saveCachedBoothData(partNo, onlineData);
       setFamilies(getFamilyGroups(partNo, onlineData.voters));
@@ -260,6 +324,58 @@ export function App() {
       setIsLoading(false);
     }
   }, []);
+
+  // 3. User-triggered or Programmatic Refresh
+  const handleRefreshData = useCallback(async (isManual: boolean = true) => {
+    if (isManual) setIsRefreshing(true);
+    try {
+      loadIndexes();
+      await loadBooth(currentPartNo, true);
+      if (isManual) {
+        setScoreNotification(
+          lang === 'te' 
+            ? '✅ తాజా ఓటర్ల సమాచారం ఆటో-రిఫ్రెష్ అయ్యింది!' 
+            : '✅ Fresh voter data auto-refreshed successfully!'
+        );
+        setTimeout(() => setScoreNotification(null), 3000);
+      }
+    } catch (e) {
+      console.warn('Refresh error:', e);
+    } finally {
+      if (isManual) setIsRefreshing(false);
+    }
+  }, [currentPartNo, loadBooth, loadIndexes, lang]);
+
+  // 4. Auto-Refresh on Window Focus & Tab Visibility Change (Mobile/Browser wake)
+  useEffect(() => {
+    const handleVisibilityOrFocus = () => {
+      if (document.visibilityState === 'visible') {
+        handleRefreshData(false);
+      }
+    };
+    document.addEventListener('visibilitychange', handleVisibilityOrFocus);
+    window.addEventListener('focus', handleVisibilityOrFocus);
+    return () => {
+      document.removeEventListener('visibilitychange', handleVisibilityOrFocus);
+      window.removeEventListener('focus', handleVisibilityOrFocus);
+    };
+  }, [handleRefreshData]);
+
+  // 5. Periodic Auto-Refresh every 60s when active
+  useEffect(() => {
+    const timer = setInterval(() => {
+      if (document.visibilityState === 'visible') {
+        handleRefreshData(false);
+      }
+    }, 60000);
+    return () => clearInterval(timer);
+  }, [handleRefreshData]);
+
+  // Handle Clearing Cache & Reloading Fresh
+  const handleClearCacheAndReload = useCallback(async () => {
+    clearStaleBoothCache();
+    await handleRefreshData(true);
+  }, [handleRefreshData]);
 
   useEffect(() => {
     loadBooth(currentPartNo);
@@ -451,6 +567,8 @@ export function App() {
         language={lang}
         theme={theme}
         session={session}
+        isRefreshing={isRefreshing}
+        onRefreshData={() => handleRefreshData(true)}
         onToggleLanguage={toggleLanguage}
         onOpenThemeSelector={() => setIsThemeModalOpen(true)}
         onOpenBoothSelector={() => setIsBoothSelectorOpen(true)}
@@ -660,6 +778,7 @@ export function App() {
                 onRefreshCache={() => setIsCached(isBoothCached(currentPartNo))}
                 onOpenBoothSelector={() => setIsBoothSelectorOpen(true)}
                 onImportCustomJson={handleImportCustomJson}
+                onClearAndRefresh={handleClearCacheAndReload}
               />
             )}
           </>

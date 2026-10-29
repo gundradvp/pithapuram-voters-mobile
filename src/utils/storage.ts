@@ -37,8 +37,15 @@ export function setAdminPin(newPin: string): void {
 // -------------------------------------------------------------
 // Offline Booth Caching (Full Offline Field Work Support)
 // -------------------------------------------------------------
+export const DATA_CACHE_VERSION = '2026.10.29.v3';
+const CACHE_VERSION_KEY = 'jsp_data_cache_version';
+
 function getBoothStorageKey(partNo: number | string): string {
   return `jsp_offline_booth_${partNo}`;
+}
+
+export function isCacheStale(): boolean {
+  return localStorage.getItem(CACHE_VERSION_KEY) !== DATA_CACHE_VERSION;
 }
 
 export function getCachedBoothData(partNo: number | string): BoothData | null {
@@ -55,10 +62,24 @@ export function getCachedBoothData(partNo: number | string): BoothData | null {
 export function saveCachedBoothData(partNo: number | string, data: BoothData): boolean {
   try {
     localStorage.setItem(getBoothStorageKey(partNo), JSON.stringify(data));
+    localStorage.setItem(CACHE_VERSION_KEY, DATA_CACHE_VERSION);
     return true;
   } catch (err) {
     console.error('Failed to cache booth data locally:', err);
     return false;
+  }
+}
+
+export function clearStaleBoothCache(): void {
+  try {
+    Object.keys(localStorage).forEach(key => {
+      if (key.startsWith('jsp_offline_booth_')) {
+        localStorage.removeItem(key);
+      }
+    });
+    localStorage.setItem(CACHE_VERSION_KEY, DATA_CACHE_VERSION);
+  } catch (err) {
+    console.warn('Could not clear stale booth cache:', err);
   }
 }
 

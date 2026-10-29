@@ -1,5 +1,5 @@
 import React from 'react';
-import { Lock, Unlock, Wifi, WifiOff, Languages, Palette, LogOut, Crown, UserCheck } from 'lucide-react';
+import { Lock, Unlock, Wifi, WifiOff, Languages, Palette, LogOut, Crown, UserCheck, RefreshCw } from 'lucide-react';
 import { BoothInfo } from '../types';
 import { Language } from '../utils/i18n';
 import { ThemeId, THEMES } from '../utils/theme';
@@ -12,6 +12,8 @@ interface HeaderMobileProps {
   language: Language;
   theme: ThemeId;
   session: UserSession | null;
+  isRefreshing?: boolean;
+  onRefreshData?: () => void;
   onToggleLanguage: () => void;
   onOpenThemeSelector: () => void;
   onOpenBoothSelector: () => void;
@@ -26,6 +28,8 @@ export const HeaderMobile: React.FC<HeaderMobileProps> = ({
   language,
   theme,
   session,
+  isRefreshing,
+  onRefreshData,
   onToggleLanguage,
   onOpenThemeSelector,
   onOpenBoothSelector,
@@ -86,6 +90,25 @@ export const HeaderMobile: React.FC<HeaderMobileProps> = ({
           >
             <Crown className="w-3 h-3" />
             <span className="hidden xs:inline">కేటాయింపులు</span>
+          </button>
+        )}
+
+        {/* Live Auto-Refresh Button */}
+        {onRefreshData && (
+          <button
+            onClick={onRefreshData}
+            disabled={isRefreshing}
+            className={`flex items-center gap-1 px-1.5 py-1 rounded-lg text-[10px] font-bold border transition-all ${
+              isRefreshing
+                ? 'bg-amber-500/20 text-amber-300 border-amber-500/50 animate-pulse'
+                : 'bg-slate-800/80 text-slate-300 hover:text-white border-slate-700 hover:border-amber-400/50 active:scale-95 shadow-sm'
+            }`}
+            title={language === 'te' ? 'తాజా సమాచారం ఆటో-రిఫ్రెష్ (Live Refresh)' : 'Auto-Refresh Latest Data'}
+          >
+            <RefreshCw className={`w-3.5 h-3.5 text-amber-400 ${isRefreshing ? 'animate-spin' : ''}`} />
+            <span className="hidden sm:inline">
+              {isRefreshing ? (language === 'te' ? 'రిఫ్రెష్...' : 'Sync...') : (language === 'te' ? 'రిఫ్రెష్' : 'Refresh')}
+            </span>
           </button>
         )}
 

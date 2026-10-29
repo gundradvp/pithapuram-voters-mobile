@@ -6,6 +6,7 @@ const COMMIT_SHA = 'main';
 
 const filesToSync = [
   'sync.js',
+  'index.html',
   'package.json',
   'src/types.ts',
   'src/utils/auth.ts',

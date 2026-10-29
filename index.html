@@ -10,6 +10,23 @@
     <link rel="manifest" href="/manifest.json" />
     <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🚩</text></svg>" />
     <title>JSP Booth Field Voter App — Pithapuram (AC #37)</title>
+    <script>
+      (function() {
+        try {
+          var explicit = localStorage.getItem('jsp_theme_explicit_selection');
+          var saved = localStorage.getItem('jsp_app_theme_pref');
+          var theme = (saved && (saved !== 'solar-crm' || explicit === 'true')) ? saved : 'jsp-dark';
+          document.documentElement.setAttribute('data-theme', theme);
+          if (theme === 'solar-crm' || theme === 'jsp-light' || theme === 'ocean-light' || theme === 'daylight') {
+            document.documentElement.classList.remove('dark');
+            document.documentElement.setAttribute('data-theme-mode', 'light');
+          } else {
+            document.documentElement.classList.add('dark');
+            document.documentElement.setAttribute('data-theme-mode', 'dark');
+          }
+        } catch(e) {}
+      })();
+    </script>
   </head>
   <body class="bg-slate-950 text-slate-100 antialiased font-sans select-none overflow-x-hidden">
     <div id="root"></div>

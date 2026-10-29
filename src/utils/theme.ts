@@ -25,6 +25,19 @@ export interface ThemeConfig {
 
 export const THEMES: ThemeConfig[] = [
   {
+    id: 'jsp-dark',
+    nameTe: '🚩 జనసేన సిగ్నేచర్ డార్క్ (JSP Dark)',
+    nameEn: '🚩 JSP Signature Dark',
+    descTe: 'అఫీషియల్ పార్టీ కలర్స్ — డార్క్ స్లేట్, ఫ్లేమ్ రెడ్ & అంబర్ గ్లాస్',
+    descEn: 'Official party colors — Charcoal slate, flame red & amber glass',
+    icon: '🔥',
+    isDark: true,
+    bgPreview: '#020617',
+    cardPreview: '#0f172a',
+    accentPreview: '#ef4444',
+    badgePreview: '#f59e0b'
+  },
+  {
     id: 'solar-crm',
     nameTe: '🌞 తేజో సోలార్ CRM (Tejo Clean)',
     nameEn: '🌞 Tejo Solar CRM Clean',
@@ -77,19 +90,6 @@ export const THEMES: ThemeConfig[] = [
     badgePreview: '#ffedd5'
   },
   {
-    id: 'jsp-dark',
-    nameTe: '🚩 జనసేన సిగ్నేచర్ డార్క్ (JSP Dark)',
-    nameEn: '🚩 JSP Signature Dark',
-    descTe: 'అఫీషియల్ పార్టీ కలర్స్ — డార్క్ స్లేట్, ఫ్లేమ్ రెడ్ & అంబర్ గ్లాస్',
-    descEn: 'Official party colors — Charcoal slate, flame red & amber glass',
-    icon: '🔥',
-    isDark: true,
-    bgPreview: '#020617',
-    cardPreview: '#0f172a',
-    accentPreview: '#ef4444',
-    badgePreview: '#f59e0b'
-  },
-  {
     id: 'oled-black',
     nameTe: '🌙 రాత్రి సర్వే (OLED Pure Black)',
     nameEn: '🌙 OLED Pure Black',
@@ -119,14 +119,17 @@ export const THEMES: ThemeConfig[] = [
 
 export function getSavedTheme(): ThemeId {
   const saved = localStorage.getItem(THEME_STORAGE_KEY) as ThemeId | null;
-  if (saved && THEMES.some(t => t.id === saved)) {
+  const explicit = localStorage.getItem('jsp_theme_explicit_selection');
+  // Default to JSP Signature Dark ('jsp-dark') unless user explicitly picked another theme
+  if (saved && (saved !== 'solar-crm' || explicit === 'true') && THEMES.some(t => t.id === saved)) {
     return saved;
   }
-  return 'solar-crm'; // Default to solar-crm or jsp-dark
+  return 'jsp-dark';
 }
 
 export function setSavedTheme(theme: ThemeId): void {
   localStorage.setItem(THEME_STORAGE_KEY, theme);
+  localStorage.setItem('jsp_theme_explicit_selection', 'true');
   applyThemeToDom(theme);
 }
 
