@@ -1,5 +1,5 @@
 import React, { useState, useMemo } from 'react';
-import { Search, Phone, PhoneCall, MessageSquare, Send, Printer, CheckCircle2, Flag, UserX, AlertCircle, Sparkles, Home, UserCheck, Sliders, Plus, Clock, User, Volume2, Users, Building, ChevronDown, ChevronUp } from 'lucide-react';
+import { Search, Phone, PhoneCall, MessageSquare, Send, Printer, CheckCircle2, Flag, UserX, AlertCircle, Sparkles, Home, UserCheck, Sliders, Plus, Clock, User, Volume2, Users, Building, ChevronDown, ChevronUp, Copy } from 'lucide-react';
 import { MobileVoter, BoothInfo, VoterSurveyStatus, VoterCampaignProfile } from '../types';
 import { Language, translations } from '../utils/i18n';
 import { resolvePhotoUrl } from '../utils/photoResolver';
@@ -42,6 +42,15 @@ export const VotersTabMobile: React.FC<VotersTabMobileProps> = ({
   >('all');
   const [visibleCount, setVisibleCount] = useState(30);
   const [activeMenuSno, setActiveMenuSno] = useState<number | null>(null);
+  const [copiedPhoneId, setCopiedPhoneId] = useState<string | null>(null);
+
+  const handleCopyPhone = (number: string, id: string) => {
+    navigator.clipboard.writeText(number);
+    setCopiedPhoneId(id);
+    setTimeout(() => {
+      setCopiedPhoneId(null);
+    }, 2000);
+  };
 
   const t = translations[language];
 
@@ -623,13 +632,27 @@ _మీ అమూల్యమైన ఓటును గాజు గ్లాస
 
                     <div className="flex items-center gap-1.5">
                       {clan.headPhone && (
-                        <a
-                          href={`tel:${clan.headPhone}`}
-                          className="p-1.5 bg-slate-800 hover:bg-slate-700 text-emerald-400 rounded-lg"
-                          title="Call Elder"
-                        >
-                          <Phone className="w-3.5 h-3.5" />
-                        </a>
+                        <>
+                          <a
+                            href={`tel:${clan.headPhone}`}
+                            className="p-1.5 bg-slate-800 hover:bg-slate-700 text-emerald-400 rounded-lg flex items-center gap-1"
+                            title="Call Elder"
+                          >
+                            <Phone className="w-3.5 h-3.5" />
+                          </a>
+                          <button
+                            type="button"
+                            onClick={() => handleCopyPhone(clan.headPhone!, `head_${clan.id}`)}
+                            className="p-1.5 bg-slate-800 hover:bg-slate-700 text-slate-300 hover:text-white rounded-lg"
+                            title="Copy Elder Phone"
+                          >
+                            {copiedPhoneId === `head_${clan.id}` ? (
+                              <CheckCircle2 className="w-3.5 h-3.5 text-emerald-400" />
+                            ) : (
+                              <Copy className="w-3.5 h-3.5 text-amber-400" />
+                            )}
+                          </button>
+                        </>
                       )}
                       <button
                         onClick={() => handleShareClanWhatsApp(clan)}
@@ -684,6 +707,62 @@ _మీ అమూల్యమైన ఓటును గాజు గ్లాస
                                 {getLeaningBadge(pct)}
                               </button>
                             </div>
+
+                            {/* Contact Row in Clan Roster */}
+                            {(m.k_m || prof.customPhone) && (
+                              <div className="flex items-center justify-between pt-0.5 text-[10px]">
+                                <div className="flex items-center gap-1.5 flex-wrap">
+                                  {m.k_m && (
+                                    <span className="inline-flex items-center gap-1 bg-red-950/60 border border-red-500/30 px-1.5 py-0.2 rounded text-[9.5px]">
+                                      <span className="text-red-300 font-bold">🚩 క్రియ:</span>
+                                      <a href={`tel:${m.k_m}`} className="font-mono text-amber-300 font-bold hover:underline flex items-center gap-0.5" title="Call">
+                                        <Phone className="w-2 h-2 text-emerald-400" />
+                                        <span>{m.k_m}</span>
+                                      </a>
+                                      <button
+                                        type="button"
+                                        onClick={(e) => {
+                                          e.stopPropagation();
+                                          handleCopyPhone(m.k_m!, `clan_km_${m.s}`);
+                                        }}
+                                        className="text-slate-400 hover:text-white p-0.5"
+                                        title="Copy Kriya Phone"
+                                      >
+                                        {copiedPhoneId === `clan_km_${m.s}` ? (
+                                          <span className="text-[8px] text-emerald-400 font-bold">✓</span>
+                                        ) : (
+                                          <Copy className="w-2.5 h-2.5 text-amber-400" />
+                                        )}
+                                      </button>
+                                    </span>
+                                  )}
+                                  {prof.customPhone && prof.customPhone !== m.k_m && (
+                                    <span className="inline-flex items-center gap-1 bg-emerald-950/60 border border-emerald-500/30 px-1.5 py-0.2 rounded text-[9.5px]">
+                                      <span className="text-emerald-300 font-bold">📱:</span>
+                                      <a href={`tel:${prof.customPhone}`} className="font-mono text-emerald-300 font-bold hover:underline flex items-center gap-0.5" title="Call">
+                                        <Phone className="w-2 h-2 text-emerald-400" />
+                                        <span>{prof.customPhone}</span>
+                                      </a>
+                                      <button
+                                        type="button"
+                                        onClick={(e) => {
+                                          e.stopPropagation();
+                                          handleCopyPhone(prof.customPhone!, `clan_cp_${m.s}`);
+                                        }}
+                                        className="text-slate-400 hover:text-white p-0.5"
+                                        title="Copy Phone"
+                                      >
+                                        {copiedPhoneId === `clan_cp_${m.s}` ? (
+                                          <span className="text-[8px] text-emerald-400 font-bold">✓</span>
+                                        ) : (
+                                          <Copy className="w-2.5 h-2.5 text-emerald-400" />
+                                        )}
+                                      </button>
+                                    </span>
+                                  )}
+                                </div>
+                              </div>
+                            )}
                           </div>
                         );
                       })}
@@ -828,18 +907,64 @@ _మీ అమూల్యమైన ఓటును గాజు గ్లాస
                 )}
 
                 {/* Contact Phone Row (Kriya Phone + Custom Phone) */}
-                <div className="mt-2 pt-1.5 border-t border-slate-800/80 flex items-center justify-between text-[11px] flex-wrap gap-1">
-                  <div className="flex items-center gap-2">
+                <div className="mt-2 pt-1.5 border-t border-slate-800/80 flex items-center justify-between text-[11px] flex-wrap gap-1.5">
+                  <div className="flex items-center gap-2 flex-wrap">
                     {v.k_m && (
-                      <span className="text-red-300 font-mono text-[10px] bg-red-950/40 px-1.5 py-0.5 rounded border border-red-500/30">
-                        🚩 Kriya: {v.k_m}
-                      </span>
+                      <div className="inline-flex items-center gap-1.5 bg-red-950/70 border border-red-500/40 px-2 py-0.5 rounded-lg text-[10.5px]">
+                        <span className="text-red-300 font-bold">🚩 క్రియ:</span>
+                        <a
+                          href={`tel:${v.k_m}`}
+                          className="font-mono font-black text-amber-300 hover:text-white hover:underline flex items-center gap-1"
+                          title={language === 'te' ? 'కాల్ చేయండి (Click to Call)' : 'Click to Call'}
+                        >
+                          <Phone className="w-2.5 h-2.5 text-emerald-400" />
+                          <span>{v.k_m}</span>
+                        </a>
+                        <button
+                          type="button"
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            handleCopyPhone(v.k_m!, `km_${v.s}`);
+                          }}
+                          className="p-1 hover:bg-red-900/80 rounded text-slate-300 hover:text-white transition-colors flex items-center gap-0.5"
+                          title={language === 'te' ? 'క్రియా నంబర్ కాపీ చేయండి (Click to Copy)' : 'Copy Kriya Number'}
+                        >
+                          {copiedPhoneId === `km_${v.s}` ? (
+                            <span className="text-[9px] text-emerald-400 font-bold">✓ కాపీ</span>
+                          ) : (
+                            <Copy className="w-2.5 h-2.5 text-amber-400" />
+                          )}
+                        </button>
+                      </div>
                     )}
 
                     {prof.customPhone && prof.customPhone !== v.k_m && (
-                      <span className="text-emerald-400 font-mono text-[10px] bg-emerald-950/40 px-1.5 py-0.5 rounded border border-emerald-500/30">
-                        📱 Phone: {prof.customPhone}
-                      </span>
+                      <div className="inline-flex items-center gap-1.5 bg-emerald-950/60 border border-emerald-500/40 px-2 py-0.5 rounded-lg text-[10.5px]">
+                        <span className="text-emerald-300 font-bold">📱 ఫోన్:</span>
+                        <a
+                          href={`tel:${prof.customPhone}`}
+                          className="font-mono font-black text-emerald-200 hover:text-white hover:underline flex items-center gap-1"
+                          title={language === 'te' ? 'కాల్ చేయండి (Click to Call)' : 'Click to Call'}
+                        >
+                          <Phone className="w-2.5 h-2.5 text-emerald-400" />
+                          <span>{prof.customPhone}</span>
+                        </a>
+                        <button
+                          type="button"
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            handleCopyPhone(prof.customPhone!, `cp_${v.s}`);
+                          }}
+                          className="p-1 hover:bg-emerald-900/80 rounded text-slate-300 hover:text-white transition-colors flex items-center gap-0.5"
+                          title={language === 'te' ? 'ఫోన్ నంబర్ కాపీ చేయండి (Click to Copy)' : 'Copy Phone Number'}
+                        >
+                          {copiedPhoneId === `cp_${v.s}` ? (
+                            <span className="text-[9px] text-emerald-400 font-bold">✓ కాపీ</span>
+                          ) : (
+                            <Copy className="w-2.5 h-2.5 text-emerald-400" />
+                          )}
+                        </button>
+                      </div>
                     )}
 
                     {!phone && (
@@ -949,6 +1074,28 @@ _మీ అమూల్యమైన ఓటును గాజు గ్లాస
                       <Send className="w-3 h-3" />
                       <span>{t.sms}</span>
                     </a>
+                  ) : null}
+
+                  {/* Click to Copy Phone */}
+                  {phone ? (
+                    <button
+                      type="button"
+                      onClick={() => handleCopyPhone(phone, `bar_${v.s}`)}
+                      className="p-1.5 bg-slate-800 hover:bg-slate-700 text-slate-300 hover:text-white rounded-lg border border-slate-700 text-xs flex items-center gap-1 font-bold active:scale-95 transition-all"
+                      title={language === 'te' ? 'ఫోన్ నంబర్ కాపీ చేయండి (Click to Copy)' : 'Copy Phone Number'}
+                    >
+                      {copiedPhoneId === `bar_${v.s}` ? (
+                        <>
+                          <CheckCircle2 className="w-3 h-3 text-emerald-400" />
+                          <span className="text-emerald-400 font-bold">{language === 'te' ? 'కాపీ అయింది' : 'Copied'}</span>
+                        </>
+                      ) : (
+                        <>
+                          <Copy className="w-3 h-3 text-amber-400" />
+                          <span>{language === 'te' ? 'కాపీ' : 'Copy'}</span>
+                        </>
+                      )}
+                    </button>
                   ) : null}
 
                   {/* Slip & Card */}

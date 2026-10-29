@@ -14,7 +14,9 @@ import {
   ChevronUp,
   Building,
   Trophy,
-  Award
+  Award,
+  Copy,
+  CheckCircle2
 } from 'lucide-react';
 import { FamilyGroup, MobileVoter, Influencer, VoterCampaignProfile, BoothInfo } from '../types';
 import { Language, translations } from '../utils/i18n';
@@ -61,6 +63,15 @@ export const FamiliesTabMobile: React.FC<FamiliesTabMobileProps> = ({
   const [surnameFilter, setSurnameFilter] = useState<SurnameFilter>('all');
   const [expandedFamId, setExpandedFamId] = useState<string | null>(null);
   const [expandedSurname, setExpandedSurname] = useState<string | null>(null);
+  const [copiedPhoneId, setCopiedPhoneId] = useState<string | null>(null);
+
+  const handleCopyPhone = (number: string, id: string) => {
+    navigator.clipboard.writeText(number);
+    setCopiedPhoneId(id);
+    setTimeout(() => {
+      setCopiedPhoneId(null);
+    }, 2000);
+  };
 
   const t = translations[language];
 
@@ -460,10 +471,32 @@ export const FamiliesTabMobile: React.FC<FamiliesTabMobileProps> = ({
                                     <span className="font-bold text-white text-xs truncate">{e.n}</span>
                                     <span className="text-[10px] text-slate-400">({e.a}y)</span>
                                   </div>
-                                  <div className="text-[10px] text-slate-400 truncate">
+                                  <div className="text-[10px] text-slate-400 truncate flex items-center gap-1.5 flex-wrap">
                                     {e.r && <span>{e.r} • </span>}
                                     <span className="font-mono">H: {e.hn}</span>
-                                    {phone && <span className="text-emerald-400 font-mono ml-1.5">📱 {phone}</span>}
+                                    {e.k_m && (
+                                      <span className="inline-flex items-center gap-1 bg-red-950/60 border border-red-500/30 px-1.5 py-0.2 rounded text-[9px]">
+                                        <span className="text-red-300 font-bold">🚩 క్రియ:</span>
+                                        <a href={`tel:${e.k_m}`} className="font-mono text-amber-300 font-bold hover:underline">
+                                          {e.k_m}
+                                        </a>
+                                        <button
+                                          type="button"
+                                          onClick={() => handleCopyPhone(e.k_m!, `eld_km_${e.s}`)}
+                                          className="text-slate-400 hover:text-white"
+                                          title="Copy Kriya"
+                                        >
+                                          {copiedPhoneId === `eld_km_${e.s}` ? (
+                                            <span className="text-[8px] text-emerald-400 font-bold">✓</span>
+                                          ) : (
+                                            <Copy className="w-2.5 h-2.5 text-amber-400" />
+                                          )}
+                                        </button>
+                                      </span>
+                                    )}
+                                    {prof.customPhone && prof.customPhone !== e.k_m && (
+                                      <span className="text-emerald-400 font-mono">📱 {prof.customPhone}</span>
+                                    )}
                                   </div>
                                 </div>
 
@@ -477,6 +510,18 @@ export const FamiliesTabMobile: React.FC<FamiliesTabMobileProps> = ({
                                       >
                                         <Phone className="w-3 h-3" />
                                       </a>
+                                      <button
+                                        type="button"
+                                        onClick={() => handleCopyPhone(phone, `eld_phone_${e.s}`)}
+                                        className="p-1.5 bg-slate-800 hover:bg-slate-700 text-slate-300 hover:text-white rounded-lg"
+                                        title="Copy Phone Number"
+                                      >
+                                        {copiedPhoneId === `eld_phone_${e.s}` ? (
+                                          <CheckCircle2 className="w-3 h-3 text-emerald-400" />
+                                        ) : (
+                                          <Copy className="w-3 h-3 text-amber-400" />
+                                        )}
+                                      </button>
                                       <a
                                         href={`https://wa.me/91${phone}?text=${encodeURIComponent(elderMsg)}`}
                                         target="_blank"
@@ -555,6 +600,52 @@ export const FamiliesTabMobile: React.FC<FamiliesTabMobileProps> = ({
                                 {getLeaningBadge(support)}
                               </div>
 
+                              {/* Kriya & Phone Pill */}
+                              {(voter.k_m || prof.customPhone) && (
+                                <div className="flex items-center gap-1.5 flex-wrap text-[9.5px] pt-0.5">
+                                  {voter.k_m && (
+                                    <span className="inline-flex items-center gap-1 bg-red-950/60 border border-red-500/40 px-1.5 py-0.2 rounded">
+                                      <span className="text-red-300 font-bold">🚩 క్రియ:</span>
+                                      <a href={`tel:${voter.k_m}`} className="font-mono text-amber-300 font-bold hover:underline" title="Call Kriya">
+                                        {voter.k_m}
+                                      </a>
+                                      <button
+                                        type="button"
+                                        onClick={() => handleCopyPhone(voter.k_m!, `fam_km_${voter.s}`)}
+                                        className="text-slate-400 hover:text-white p-0.5"
+                                        title="Copy Kriya Number"
+                                      >
+                                        {copiedPhoneId === `fam_km_${voter.s}` ? (
+                                          <span className="text-[8px] text-emerald-400 font-bold">✓</span>
+                                        ) : (
+                                          <Copy className="w-2.5 h-2.5 text-amber-400" />
+                                        )}
+                                      </button>
+                                    </span>
+                                  )}
+                                  {prof.customPhone && prof.customPhone !== voter.k_m && (
+                                    <span className="inline-flex items-center gap-1 bg-emerald-950/60 border border-emerald-500/40 px-1.5 py-0.2 rounded">
+                                      <span className="text-emerald-300 font-bold">📱:</span>
+                                      <a href={`tel:${prof.customPhone}`} className="font-mono text-emerald-300 font-bold hover:underline">
+                                        {prof.customPhone}
+                                      </a>
+                                      <button
+                                        type="button"
+                                        onClick={() => handleCopyPhone(prof.customPhone!, `fam_cp_${voter.s}`)}
+                                        className="text-slate-400 hover:text-white p-0.5"
+                                        title="Copy Phone"
+                                      >
+                                        {copiedPhoneId === `fam_cp_${voter.s}` ? (
+                                          <span className="text-[8px] text-emerald-400 font-bold">✓</span>
+                                        ) : (
+                                          <Copy className="w-2.5 h-2.5 text-emerald-400" />
+                                        )}
+                                      </button>
+                                    </span>
+                                  )}
+                                </div>
+                              )}
+
                               {/* Actions */}
                               <div className="flex items-center justify-between pt-1 gap-1">
                                 <div className="flex items-center gap-1">
@@ -567,6 +658,18 @@ export const FamiliesTabMobile: React.FC<FamiliesTabMobileProps> = ({
                                       >
                                         <Phone className="w-2.5 h-2.5" /> Call
                                       </a>
+                                      <button
+                                        type="button"
+                                        onClick={() => handleCopyPhone(phone, `fam_roster_copy_${voter.s}`)}
+                                        className="p-1 bg-slate-800 hover:bg-slate-700 text-slate-300 hover:text-white rounded-md text-[10px] flex items-center gap-0.5"
+                                        title="Copy Phone"
+                                      >
+                                        {copiedPhoneId === `fam_roster_copy_${voter.s}` ? (
+                                          <CheckCircle2 className="w-2.5 h-2.5 text-emerald-400" />
+                                        ) : (
+                                          <Copy className="w-2.5 h-2.5 text-amber-400" />
+                                        )}
+                                      </button>
                                       <a
                                         href={`https://wa.me/91${phone}?text=${encodeURIComponent(`నమస్కారం ${voter.n} గారు, జనసేన పార్టీ పిఠాపురం బూత్ #${boothInfo.part_no} నుండి సంప్రదిస్తున్నాము.`)}`}
                                         target="_blank"
@@ -879,6 +982,30 @@ export const FamiliesTabMobile: React.FC<FamiliesTabMobileProps> = ({
                                 )}
                               </div>
 
+                              {/* Kriya Phone Pill */}
+                              {m.k_m && (
+                                <div className="flex items-center gap-1.5 flex-wrap text-[9.5px] pt-0.5">
+                                  <span className="inline-flex items-center gap-1 bg-red-950/60 border border-red-500/40 px-1.5 py-0.2 rounded">
+                                    <span className="text-red-300 font-bold">🚩 క్రియ:</span>
+                                    <a href={`tel:${m.k_m}`} className="font-mono text-amber-300 font-bold hover:underline" title="Call Kriya">
+                                      {m.k_m}
+                                    </a>
+                                    <button
+                                      type="button"
+                                      onClick={() => handleCopyPhone(m.k_m!, `fam_m_km_${m.s}`)}
+                                      className="text-slate-400 hover:text-white p-0.5"
+                                      title="Copy Kriya Number"
+                                    >
+                                      {copiedPhoneId === `fam_m_km_${m.s}` ? (
+                                        <span className="text-[8px] text-emerald-400 font-bold">✓</span>
+                                      ) : (
+                                        <Copy className="w-2.5 h-2.5 text-amber-400" />
+                                      )}
+                                    </button>
+                                  </span>
+                                </div>
+                              )}
+
                               {/* Quick Dial & Actions */}
                               <div className="flex items-center justify-between pt-1 gap-1">
                                 <div className="flex items-center gap-1">
@@ -891,6 +1018,18 @@ export const FamiliesTabMobile: React.FC<FamiliesTabMobileProps> = ({
                                       >
                                         <Phone className="w-2.5 h-2.5" /> Call
                                       </a>
+                                      <button
+                                        type="button"
+                                        onClick={() => handleCopyPhone(phone, `fam_m_phone_${m.s}`)}
+                                        className="p-1 bg-slate-800 hover:bg-slate-700 text-slate-300 hover:text-white rounded-md text-[10px] flex items-center gap-0.5"
+                                        title="Copy Phone"
+                                      >
+                                        {copiedPhoneId === `fam_m_phone_${m.s}` ? (
+                                          <CheckCircle2 className="w-2.5 h-2.5 text-emerald-400" />
+                                        ) : (
+                                          <Copy className="w-2.5 h-2.5 text-amber-400" />
+                                        )}
+                                      </button>
                                       <a
                                         href={`https://wa.me/91${phone}?text=${encodeURIComponent(`నమస్కారం ${m.n} గారు, జనసేన పార్టీ పిఠాపురం బూత్ #${boothInfo.part_no} నుండి సంప్రదిస్తున్నాము.`)}`}
                                         target="_blank"

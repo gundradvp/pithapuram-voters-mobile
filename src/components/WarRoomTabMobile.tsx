@@ -20,7 +20,9 @@ import {
   Home,
   Clock,
   Sparkles,
-  Building
+  Building,
+  Copy,
+  Phone
 } from 'lucide-react';
 import {
   BoothData,
@@ -66,6 +68,14 @@ export const WarRoomTabMobile: React.FC<WarRoomTabMobileProps> = ({
   onOpenSlip
 }) => {
   const [activeFilter, setActiveFilter] = useState<WarRoomFilter>('swing');
+  const [copiedPhoneId, setCopiedPhoneId] = useState<string | null>(null);
+
+  const handleCopyPhone = (number: string, id: string) => {
+    navigator.clipboard.writeText(number);
+    setCopiedPhoneId(id);
+    setTimeout(() => setCopiedPhoneId(null), 2000);
+  };
+
   const t = translations[language];
 
   // Calculate dynamic winning score
@@ -520,6 +530,54 @@ export const WarRoomTabMobile: React.FC<WarRoomTabMobileProps> = ({
                   <span>•</span>
                   <span>{t.houseNo}: <strong className="text-amber-300 font-mono">{v.hn || '-'}</strong></span>
                 </div>
+
+                {/* Kriya & Phone Pill */}
+                {(v.k_m || prof.customPhone) && (
+                  <div className="flex items-center gap-1.5 flex-wrap text-[9.5px] mt-1">
+                    {v.k_m && (
+                      <span className="inline-flex items-center gap-1 bg-red-950/60 border border-red-500/40 px-1.5 py-0.2 rounded">
+                        <span className="text-red-300 font-bold">🚩 క్రియ:</span>
+                        <a href={`tel:${v.k_m}`} className="font-mono text-amber-300 font-bold hover:underline flex items-center gap-0.5" title="Call Kriya">
+                          <Phone className="w-2 h-2 text-emerald-400" />
+                          <span>{v.k_m}</span>
+                        </a>
+                        <button
+                          type="button"
+                          onClick={() => handleCopyPhone(v.k_m!, `wr_km_${v.s}`)}
+                          className="text-slate-400 hover:text-white p-0.5"
+                          title="Copy Kriya Phone"
+                        >
+                          {copiedPhoneId === `wr_km_${v.s}` ? (
+                            <span className="text-[8px] text-emerald-400 font-bold">✓</span>
+                          ) : (
+                            <Copy className="w-2.5 h-2.5 text-amber-400" />
+                          )}
+                        </button>
+                      </span>
+                    )}
+                    {prof.customPhone && prof.customPhone !== v.k_m && (
+                      <span className="inline-flex items-center gap-1 bg-emerald-950/60 border border-emerald-500/40 px-1.5 py-0.2 rounded">
+                        <span className="text-emerald-300 font-bold">📱:</span>
+                        <a href={`tel:${prof.customPhone}`} className="font-mono text-emerald-300 font-bold hover:underline flex items-center gap-0.5">
+                          <Phone className="w-2 h-2 text-emerald-400" />
+                          <span>{prof.customPhone}</span>
+                        </a>
+                        <button
+                          type="button"
+                          onClick={() => handleCopyPhone(prof.customPhone!, `wr_cp_${v.s}`)}
+                          className="text-slate-400 hover:text-white p-0.5"
+                          title="Copy Phone"
+                        >
+                          {copiedPhoneId === `wr_cp_${v.s}` ? (
+                            <span className="text-[8px] text-emerald-400 font-bold">✓</span>
+                          ) : (
+                            <Copy className="w-2.5 h-2.5 text-emerald-400" />
+                          )}
+                        </button>
+                      </span>
+                    )}
+                  </div>
+                )}
               </div>
 
               {/* Visit Tracker Status */}
@@ -549,6 +607,24 @@ export const WarRoomTabMobile: React.FC<WarRoomTabMobileProps> = ({
                         <PhoneCall className="w-3 h-3 text-emerald-400" />
                         <span>{t.call}</span>
                       </a>
+                      <button
+                        type="button"
+                        onClick={() => handleCopyPhone(phone, `wr_bar_${v.s}`)}
+                        className="px-2 py-1 bg-slate-800 hover:bg-slate-700 text-slate-300 hover:text-white rounded-lg text-[10px] font-bold flex items-center gap-1"
+                        title="Copy Phone Number"
+                      >
+                        {copiedPhoneId === `wr_bar_${v.s}` ? (
+                          <>
+                            <CheckCircle2 className="w-3 h-3 text-emerald-400" />
+                            <span className="text-emerald-400">{language === 'te' ? 'కాపీ' : 'Copied'}</span>
+                          </>
+                        ) : (
+                          <>
+                            <Copy className="w-3 h-3 text-amber-400" />
+                            <span>{language === 'te' ? 'కాపీ' : 'Copy'}</span>
+                          </>
+                        )}
+                      </button>
                       <a
                         href={`https://wa.me/91${phone}`}
                         target="_blank"

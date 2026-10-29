@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { X, Phone, PhoneCall, MessageSquare, Send, Check } from 'lucide-react';
+import { X, Phone, PhoneCall, MessageSquare, Send, Check, Copy, CheckCircle2 } from 'lucide-react';
 import { MobileVoter, VoterCampaignProfile } from '../types';
 
 interface PhoneEditorModalProps {
@@ -18,6 +18,13 @@ export const PhoneEditorModal: React.FC<PhoneEditorModalProps> = ({
   const [phone, setPhone] = useState(profile?.customPhone || '');
   const [altPhone, setAltPhone] = useState(profile?.altPhone || '');
   const [saved, setSaved] = useState(false);
+  const [copiedKriya, setCopiedKriya] = useState(false);
+
+  const handleCopyKriya = (num: string) => {
+    navigator.clipboard.writeText(num);
+    setCopiedKriya(true);
+    setTimeout(() => setCopiedKriya(false), 2000);
+  };
 
   const handleSave = (e: React.FormEvent) => {
     e.preventDefault();
@@ -57,7 +64,14 @@ export const PhoneEditorModal: React.FC<PhoneEditorModalProps> = ({
           <div className="bg-red-950/30 border border-red-500/40 rounded-xl p-2.5 flex items-center justify-between">
             <div>
               <span className="text-[10px] uppercase font-bold text-red-300 block">🚩 JSP Kriya Registered Mobile</span>
-              <span className="text-sm font-mono font-black text-white">{voter.k_m}</span>
+              <a
+                href={`tel:${voter.k_m}`}
+                className="text-sm font-mono font-black text-amber-300 hover:text-white hover:underline flex items-center gap-1 mt-0.5"
+                title="Click to Call"
+              >
+                <PhoneCall className="w-3.5 h-3.5 text-emerald-400" />
+                <span>{voter.k_m}</span>
+              </a>
             </div>
             <div className="flex items-center gap-1.5">
               <a
@@ -67,6 +81,18 @@ export const PhoneEditorModal: React.FC<PhoneEditorModalProps> = ({
               >
                 <PhoneCall className="w-3.5 h-3.5" />
               </a>
+              <button
+                type="button"
+                onClick={() => handleCopyKriya(voter.k_m!)}
+                className="p-2 bg-slate-800 hover:bg-slate-700 text-slate-300 hover:text-white rounded-lg text-xs flex items-center gap-1"
+                title="Copy Kriya Phone Number"
+              >
+                {copiedKriya ? (
+                  <CheckCircle2 className="w-3.5 h-3.5 text-emerald-400" />
+                ) : (
+                  <Copy className="w-3.5 h-3.5 text-amber-400" />
+                )}
+              </button>
               <a
                 href={`https://wa.me/91${voter.k_m}?text=${encodeURIComponent(`నమస్కారం ${voter.n} గారు, జనసేన పార్టీ పిఠాపురం కార్యాలయం నుండి సంప్రదిస్తున్నాము.`)}`}
                 target="_blank"
