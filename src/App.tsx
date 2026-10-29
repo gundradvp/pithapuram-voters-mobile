@@ -542,6 +542,7 @@ export function App() {
                 influencers={influencers}
                 profiles={profiles}
                 boothInfo={boothData.booth_info}
+                language={lang}
                 onCreateFamily={() => setCreateFamilyState({ open: true, initialFamily: null })}
                 onEditFamily={fam => setCreateFamilyState({ open: true, initialFamily: fam })}
                 onOpenPhoneEditor={v => setSelectedVoterForPhone(v)}

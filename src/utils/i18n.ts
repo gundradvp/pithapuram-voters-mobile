@@ -101,6 +101,20 @@ export const translations = {
     markOpponent: 'ప్రత్యర్థి',
     clearStatus: 'స్టేటస్ తీసివేయండి',
 
+    // Surname & Phonetic Search & Winning Formula
+    groupBySurname: '🏛️ ఇంటిపేర్ల వర్గీకరణ',
+    listView: '👥 ఓటర్ల జాబితా',
+    phoneticSearch: 'ఫోనెటిక్ శోధన (ఉచ్ఛారణ ఆధారంగా)',
+    phoneticActive: '🔊 ఫోనెటిక్ ఆన్',
+    allSurnames: 'అన్ని ఇంటిపేర్లు',
+    surnameClan: 'ఇంటిపేరు / వంశం',
+    winningFormula: 'గెలుపు ఫార్ములా (50%+ ఓట్లు)',
+    top10ClansPower: 'టాప్ 10 కులాలు / కుటుంబాల ఓటు బలం',
+    clanStrength: 'ఓట్ల బలం',
+    clanElders: 'కుటుంబ పెద్దలు (60+ సం)',
+    clanYouth: 'యువత (18-25 సం)',
+    whatsappClanMessage: 'కుటుంబ పెద్దకు వాట్సాప్ సందేశం',
+
     // Field Visit Modal
     visitModalTitle: 'ఓటరును కలిసిన వివరాలు (విజిట్ లాగ్)',
     directContact: 'నేరుగా సంప్రదించండి:',
@@ -258,6 +272,20 @@ export const translations = {
     markDoubtful: 'Doubtful',
     markOpponent: 'Opponent',
     clearStatus: 'Clear Status',
+
+    // Surname & Phonetic Search & Winning Formula
+    groupBySurname: '🏛️ By Surnames',
+    listView: '👥 Voters List',
+    phoneticSearch: 'Phonetic Sound-alike Search',
+    phoneticActive: '🔊 Phonetic ON',
+    allSurnames: 'All Surnames',
+    surnameClan: 'Surname Clan',
+    winningFormula: 'Winning Formula (50%+ Votes)',
+    top10ClansPower: 'Top 10 Surnames Vote Share',
+    clanStrength: 'Clan Votes',
+    clanElders: 'Clan Elders (60+ Yrs)',
+    clanYouth: 'Youth Electors (18-25 Yrs)',
+    whatsappClanMessage: 'WhatsApp Clan Elder',
 
     // Field Visit Modal
     visitModalTitle: 'Field Visit Tracker & Touchpoint Log',

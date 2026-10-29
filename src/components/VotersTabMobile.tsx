@@ -1,8 +1,10 @@
 import React, { useState, useMemo } from 'react';
-import { Search, Phone, PhoneCall, MessageSquare, Send, Printer, CheckCircle2, Flag, UserX, AlertCircle, Sparkles, Home, UserCheck, Sliders, Plus, Clock, User } from 'lucide-react';
+import { Search, Phone, PhoneCall, MessageSquare, Send, Printer, CheckCircle2, Flag, UserX, AlertCircle, Sparkles, Home, UserCheck, Sliders, Plus, Clock, User, Volume2, Users, Building, ChevronDown, ChevronUp } from 'lucide-react';
 import { MobileVoter, BoothInfo, VoterSurveyStatus, VoterCampaignProfile } from '../types';
 import { Language, translations } from '../utils/i18n';
 import { resolvePhotoUrl } from '../utils/photoResolver';
+import { matchesPhoneticSearch } from '../utils/phoneticSearch';
+import { classifyBoothSurnames, extractSurname, SurnameGroup } from '../utils/surnameClassifier';
 
 interface VotersTabMobileProps {
   voters: MobileVoter[];
@@ -31,6 +33,10 @@ export const VotersTabMobile: React.FC<VotersTabMobileProps> = ({
 }) => {
   const [searchQuery, setSearchQuery] = useState('');
   const [selectedStreet, setSelectedStreet] = useState<string>('all');
+  const [selectedSurname, setSelectedSurname] = useState<string>('all');
+  const [viewMode, setViewMode] = useState<'list' | 'surnames'>('list');
+  const [isPhoneticEnabled, setIsPhoneticEnabled] = useState<boolean>(true);
+  const [expandedSurnameId, setExpandedSurnameId] = useState<string | null>(null);
   const [filterMode, setFilterMode] = useState<
     'all' | 'full' | 'soft' | 'strong' | 'neutral' | 'opponent' | 'exact' | 'similar' | 'kriya_all' | 'voted' | 'has_phone'
   >('all');
@@ -38,6 +44,11 @@ export const VotersTabMobile: React.FC<VotersTabMobileProps> = ({
   const [activeMenuSno, setActiveMenuSno] = useState<number | null>(null);
 
   const t = translations[language];
+
+  // Precomputed Surnames Grouping
+  const surnameGroups = useMemo(() => {
+    return classifyBoothSurnames(voters, profiles);
+  }, [voters, profiles]);
 
   // Unique streets list for chips
   const streetsList = useMemo(() => {
@@ -63,16 +74,26 @@ export const VotersTabMobile: React.FC<VotersTabMobileProps> = ({
       const pct = prof.supportPct !== undefined ? prof.supportPct : (v.kriya ? 100 : 50);
       const phone = prof.customPhone || v.k_m;
 
-      // 1. Text Search
+      // 1. Text Search (Phonetic Sound-alike + Exact Substring)
       if (q) {
-        const nMatch = v.n.toLowerCase().includes(q);
-        const rMatch = v.r.toLowerCase().includes(q);
-        const idMatch = v.id.toLowerCase().includes(q);
-        const hnMatch = v.hn.toLowerCase().includes(q);
-        const pMatch = phone && phone.includes(q);
-        const infMatch = prof.influencerName?.toLowerCase().includes(q);
-        const secMatch = v.sec?.toLowerCase().includes(q);
-        if (!nMatch && !rMatch && !idMatch && !hnMatch && !pMatch && !infMatch && !secMatch) return false;
+        if (isPhoneticEnabled) {
+          if (!matchesPhoneticSearch(q, v, phone, prof.influencerName)) return false;
+        } else {
+          const nMatch = v.n.toLowerCase().includes(q);
+          const rMatch = v.r.toLowerCase().includes(q);
+          const idMatch = v.id.toLowerCase().includes(q);
+          const hnMatch = v.hn.toLowerCase().includes(q);
+          const pMatch = phone && phone.includes(q);
+          const infMatch = prof.influencerName?.toLowerCase().includes(q);
+          const secMatch = v.sec?.toLowerCase().includes(q);
+          if (!nMatch && !rMatch && !idMatch && !hnMatch && !pMatch && !infMatch && !secMatch) return false;
+        }
+      }
+
+      // Surname Filter
+      if (selectedSurname !== 'all') {
+        const { en } = extractSurname(v);
+        if (en !== selectedSurname) return false;
       }
 
       // Street Filter
@@ -94,7 +115,7 @@ export const VotersTabMobile: React.FC<VotersTabMobileProps> = ({
 
       return true;
     });
-  }, [voters, searchQuery, selectedStreet, filterMode, profiles]);
+  }, [voters, searchQuery, selectedStreet, selectedSurname, filterMode, profiles, isPhoneticEnabled]);
 
   // Counts for pills
   const counts = useMemo(() => {
@@ -134,6 +155,22 @@ export const VotersTabMobile: React.FC<VotersTabMobileProps> = ({
   }, [voters, profiles]);
 
   const displayedVoters = filteredVoters.slice(0, visibleCount);
+
+  // Surnames matching query or selected surname
+  const displayedSurnameGroups = useMemo(() => {
+    if (selectedSurname !== 'all') {
+      return surnameGroups.filter(g => g.id === selectedSurname);
+    }
+    const q = searchQuery.toLowerCase().trim();
+    if (!q) return surnameGroups;
+    return surnameGroups.filter(g => {
+      return (
+        g.nameEn.toLowerCase().includes(q) ||
+        g.nameTe.toLowerCase().includes(q) ||
+        g.voters.some(v => matchesPhoneticSearch(q, v))
+      );
+    });
+  }, [surnameGroups, selectedSurname, searchQuery]);
 
   const getLeaningBadge = (pct?: number) => {
     const p = pct !== undefined ? pct : 50;
@@ -196,23 +233,121 @@ export const VotersTabMobile: React.FC<VotersTabMobileProps> = ({
     }
   };
 
+  const handleShareClanWhatsApp = (clan: SurnameGroup) => {
+    const isMunicipal = boothInfo.election_type === 'municipal';
+    const locationName = isMunicipal
+      ? `${boothInfo.local_body || 'పురపాలక సంఘం'} (${boothInfo.ward_no ? `${boothInfo.ward_no}వ వార్డు` : ''})`
+      : `పిఠాపురం నియోజకవర్గం — ${boothInfo.clean_village || 'గ్రామం'}`;
+    
+    const text = `*🚩 జై జనసేన — ${locationName}*
+*గౌరవనీయులైన ${clan.nameTe} (${clan.nameEn}) కుటుంబ పెద్దలకు నమస్కారం!*
+
+మన ప్రాంత/వార్డు అభివృద్ధి కొరకు మరియు మన ప్రియతమ నాయకుడు పవన్ కళ్యాణ్ గారి నాయకత్వంలో మంచి పరిపాలన కోసం, మీ *${clan.nameTe}* వంశ కుటుంబ సభ్యులందరి ఆశీస్సులు, సంపూర్ణ మద్దతు *గాజు గ్లాసు* గుర్తుకు అందించవలసిందిగా వినమ్రంగా కోరుతున్నాము.
+
+📊 *మీ కుటుంబ ఓటర్ల బలం:* ${clan.totalVoters} ఓట్లు (బూత్ #${boothInfo.part_no})
+🏛️ *పోలింగ్ కేంద్రం:* ${boothInfo.ps_address}
+
+_మీ అమూల్యమైన ఓటును గాజు గ్లాసు గుర్తుపై వేసి జనసేన పార్టీ అభ్యర్థిని భారీ మెజారిటీతో గెలిపించండి!_ 🚩`;
+
+    const cleanPhone = clan.headPhone ? clan.headPhone.replace(/[^0-9]/g, '') : '';
+    const url = `https://wa.me/${cleanPhone}?text=${encodeURIComponent(text)}`;
+    window.open(url, '_blank');
+  };
+
   return (
     <div className="space-y-3 pb-24 text-xs">
-      {/* Search Input */}
+      {/* Search Input & View Mode Controls */}
       <div className="sticky top-[51px] z-30 bg-slate-950/95 backdrop-blur-md pt-2 pb-1 space-y-2">
-        <div className="relative">
-          <Search className="w-4 h-4 absolute left-3 top-3 text-slate-400" />
-          <input
-            type="text"
-            value={searchQuery}
-            onChange={e => {
-              setSearchQuery(e.target.value);
-              setVisibleCount(30);
-            }}
-            placeholder={t.searchPlaceholder}
-            className="w-full bg-slate-900 border border-slate-800 rounded-xl pl-9 pr-3 py-2 text-xs text-white placeholder-slate-500 focus:outline-none focus:border-amber-400 shadow-md"
-          />
+        <div className="flex items-center gap-1.5">
+          <div className="relative flex-1">
+            <Search className="w-4 h-4 absolute left-3 top-3 text-slate-400" />
+            <input
+              type="text"
+              value={searchQuery}
+              onChange={e => {
+                setSearchQuery(e.target.value);
+                setVisibleCount(30);
+              }}
+              placeholder={language === 'te' ? 'పేరు, ఇంటిపేరు (శబ్దోచ్ఛారణ), ఫోన్, ID...' : t.searchPlaceholder}
+              className="w-full bg-slate-900 border border-slate-800 rounded-xl pl-9 pr-3 py-2 text-xs text-white placeholder-slate-500 focus:outline-none focus:border-amber-400 shadow-md"
+            />
+          </div>
+
+          {/* Phonetic Search Toggle */}
+          <button
+            onClick={() => setIsPhoneticEnabled(!isPhoneticEnabled)}
+            className={`px-2 py-2 rounded-xl text-[10px] font-bold border transition-all flex items-center gap-1 shrink-0 ${
+              isPhoneticEnabled
+                ? 'bg-amber-500/20 border-amber-500/60 text-amber-300 font-extrabold shadow-sm'
+                : 'bg-slate-900 border-slate-800 text-slate-500 hover:text-slate-300'
+            }`}
+            title={language === 'te' ? 'ఫోనెటిక్ శోధన (ఉచ్ఛారణ ఆధారంగా ఒకేలా ఉండే పేర్లను కనుగొంటుంది)' : 'Phonetic Sound-alike Search'}
+          >
+            <Volume2 className="w-3.5 h-3.5" />
+            <span className="hidden sm:inline font-mono text-[9px]">{isPhoneticEnabled ? '🔊 ON' : 'OFF'}</span>
+          </button>
+
+          {/* View Mode Toggle: List vs Surname Groups */}
+          <div className="bg-slate-900 border border-slate-800 rounded-xl p-0.5 flex items-center shrink-0">
+            <button
+              onClick={() => setViewMode('list')}
+              className={`px-2 py-1.5 rounded-lg text-[10px] font-bold transition-all flex items-center gap-1 ${
+                viewMode === 'list'
+                  ? 'bg-amber-500 text-slate-950 font-black'
+                  : 'text-slate-400 hover:text-white'
+              }`}
+              title="Standard Voter List View"
+            >
+              <Users className="w-3.5 h-3.5" />
+              <span className="hidden xs:inline">{language === 'te' ? 'జాబితా' : 'List'}</span>
+            </button>
+            <button
+              onClick={() => setViewMode('surnames')}
+              className={`px-2 py-1.5 rounded-lg text-[10px] font-bold transition-all flex items-center gap-1 ${
+                viewMode === 'surnames'
+                  ? 'bg-amber-500 text-slate-950 font-black'
+                  : 'text-slate-400 hover:text-white'
+              }`}
+              title="Group Voters by Surname Clan"
+            >
+              <Building className="w-3.5 h-3.5" />
+              <span className="hidden xs:inline">{language === 'te' ? 'ఇంటిపేర్లు' : 'Surnames'}</span>
+            </button>
+          </div>
         </div>
+
+        {/* Surnames Quick Chips */}
+        {surnameGroups.length > 0 && (
+          <div className="flex items-center gap-1.5 overflow-x-auto py-0.5 scrollbar-none text-[10.5px]">
+            <span className="text-amber-400 font-bold flex-shrink-0 flex items-center gap-1">
+              🏛️ {language === 'te' ? 'ఇంటిపేరు:' : 'Surname:'}
+            </span>
+            <button
+              onClick={() => { setSelectedSurname('all'); setVisibleCount(30); }}
+              className={`px-2 py-0.5 rounded-md font-bold whitespace-nowrap transition-all ${
+                selectedSurname === 'all'
+                  ? 'bg-amber-500 text-slate-950 font-black'
+                  : 'bg-slate-900 text-slate-400 hover:text-white border border-slate-800'
+              }`}
+            >
+              {language === 'te' ? 'అన్నీ' : 'All'}
+            </button>
+            {surnameGroups.slice(0, 15).map(g => (
+              <button
+                key={g.id}
+                onClick={() => { setSelectedSurname(selectedSurname === g.id ? 'all' : g.id); setVisibleCount(30); }}
+                className={`px-2 py-0.5 rounded-md font-bold whitespace-nowrap transition-all flex items-center gap-1 ${
+                  selectedSurname === g.id
+                    ? 'bg-amber-500 text-slate-950 font-black'
+                    : 'bg-slate-900 text-amber-300 hover:text-white border border-amber-500/30'
+                }`}
+              >
+                <span>{g.nameTe || g.nameEn}</span>
+                <span className="font-mono text-[9.5px] opacity-80">({g.totalVoters})</span>
+              </button>
+            ))}
+          </div>
+        )}
 
         {/* Street / Locality Quick Filter Chips */}
         {streetsList.length > 1 && (
@@ -362,12 +497,211 @@ export const VotersTabMobile: React.FC<VotersTabMobileProps> = ({
         )}
       </div>
 
-      {/* Voter Cards List */}
-      <div className="space-y-2.5">
+      {/* Active Filter Indicator if Surname is filtered */}
+      {selectedSurname !== 'all' && (
+        <div className="bg-amber-500/10 border border-amber-500/30 rounded-xl px-3 py-1.5 flex items-center justify-between text-[11px]">
+          <span className="text-amber-300 font-bold flex items-center gap-1.5">
+            🏛️ {language === 'te' ? 'ఎంచుకున్న ఇంటిపేరు:' : 'Filtered Surname:'} <strong className="text-white font-mono">{selectedSurname}</strong>
+          </span>
+          <button
+            onClick={() => setSelectedSurname('all')}
+            className="text-amber-400 font-bold hover:underline text-[10px]"
+          >
+            {language === 'te' ? 'అన్నీ చూపించు ✕' : 'Show All ✕'}
+          </button>
+        </div>
+      )}
+
+      {/* Main Content Area: By Surnames Clan View vs Standard List */}
+      {viewMode === 'surnames' ? (
+        <div className="space-y-3">
+          <div className="bg-gradient-to-r from-amber-950/40 via-slate-900 to-slate-900 border border-amber-500/40 rounded-2xl p-3 flex items-center justify-between">
+            <div>
+              <h3 className="text-xs font-black text-white flex items-center gap-1.5">
+                🏛️ {language === 'te' ? 'ఇంటిపేర్ల వర్గీకరణ & వంశ బలం' : 'Surname Clan Strength'}
+              </h3>
+              <p className="text-[10px] text-slate-400">
+                {language === 'te'
+                  ? `ఈ బూత్‌లో మొత్తం ${surnameGroups.length} ఇంటిపేర్లు ఉన్నాయి. టాప్ 10 కుటుంబాల ఓట్లు గెలుపును నిర్ణయిస్తాయి.`
+                  : `${surnameGroups.length} unique surnames in this booth. Top clans hold key to victory.`}
+              </p>
+            </div>
+            <span className="px-2 py-1 bg-amber-500/20 text-amber-300 border border-amber-500/40 rounded-lg font-mono font-black text-xs">
+              {displayedSurnameGroups.length} Clans
+            </span>
+          </div>
+
+          {displayedSurnameGroups.map((clan) => {
+            const isExpanded = expandedSurnameId === clan.id;
+            return (
+              <div
+                key={clan.id}
+                className={`bg-slate-900 border rounded-2xl overflow-hidden transition-all shadow-md ${
+                  clan.supportPct >= 75
+                    ? 'border-emerald-500/40 bg-gradient-to-r from-emerald-950/15 via-slate-900 to-slate-900'
+                    : clan.supportPct >= 50
+                      ? 'border-amber-500/40 bg-gradient-to-r from-amber-950/15 via-slate-900 to-slate-900'
+                      : 'border-slate-800'
+                }`}
+              >
+                {/* Clan Top Info */}
+                <div className="p-3.5 space-y-2.5">
+                  <div className="flex items-start justify-between gap-2">
+                    <div className="space-y-0.5">
+                      <div className="flex items-center gap-2 flex-wrap">
+                        <span className="w-5 h-5 rounded-full bg-amber-500/20 text-amber-300 font-mono text-[10px] font-black flex items-center justify-center border border-amber-500/40">
+                          #{clan.rank}
+                        </span>
+                        <h3 className="text-sm font-black text-white">
+                          {clan.nameTe} <span className="text-slate-400 text-xs font-mono font-bold">({clan.nameEn})</span>
+                        </h3>
+                        {clan.targetPriority === 'high' && (
+                          <span className="px-1.5 py-0.2 bg-red-600/30 text-red-300 border border-red-500/50 rounded text-[9px] font-black">
+                            🎯 {language === 'te' ? 'కీలక వంశం' : 'Key Clan'}
+                          </span>
+                        )}
+                        {clan.kriyaCount > 0 && (
+                          <span className="px-1.5 py-0.2 bg-gradient-to-r from-red-600 to-amber-600 text-white rounded text-[9px] font-black flex items-center gap-0.5">
+                            ⭐ {clan.kriyaCount} క్రియా
+                          </span>
+                        )}
+                      </div>
+                      <div className="text-[11px] text-slate-400 flex items-center gap-2 flex-wrap">
+                        <span className="text-amber-400 font-mono font-black">{clan.totalVoters} ఓట్లు</span>
+                        <span>•</span>
+                        <span className="text-slate-300">{clan.pctOfBooth}% బూత్ ఓట్లు</span>
+                        <span>•</span>
+                        <span>👨 {clan.maleCount} / 👩 {clan.femaleCount}</span>
+                        <span>•</span>
+                        <span>🏠 {clan.houseNumbers.length} ఇళ్లు</span>
+                      </div>
+                    </div>
+
+                    {/* Support Leaning Badge */}
+                    <div className="text-right">
+                      <span className={`px-2 py-0.5 rounded-full text-[10px] font-black inline-block border ${
+                        clan.supportPct >= 75
+                          ? 'bg-emerald-600/30 text-emerald-300 border-emerald-500/40'
+                          : clan.supportPct >= 50
+                            ? 'bg-amber-600/30 text-amber-300 border-amber-500/40'
+                            : 'bg-slate-800 text-slate-300 border-slate-700'
+                      }`}>
+                        🚩 {clan.supportPct}% {language === 'te' ? 'మద్దతు' : 'Support'}
+                      </span>
+                    </div>
+                  </div>
+
+                  {/* Vote Breakdown Progress Bar */}
+                  <div className="space-y-1">
+                    <div className="w-full h-1.5 bg-slate-800 rounded-full overflow-hidden flex">
+                      <div style={{ width: `${(clan.fullCount / clan.totalVoters) * 100}%` }} className="bg-red-600" title={`100% Full: ${clan.fullCount}`} />
+                      <div style={{ width: `${(clan.strongCount / clan.totalVoters) * 100}%` }} className="bg-emerald-500" title={`75% Strong: ${clan.strongCount}`} />
+                      <div style={{ width: `${(clan.neutralCount / clan.totalVoters) * 100}%` }} className="bg-amber-500" title={`Neutral/Swing: ${clan.neutralCount}`} />
+                      <div style={{ width: `${(clan.opponentCount / clan.totalVoters) * 100}%` }} className="bg-slate-600" title={`Opponents: ${clan.opponentCount}`} />
+                    </div>
+                    <div className="flex items-center justify-between text-[9.5px] text-slate-400">
+                      <span className="text-red-400 font-bold">మనవాళ్లు: {clan.fullCount + clan.strongCount}</span>
+                      <span className="text-amber-400 font-bold">స్వింగ్: {clan.neutralCount}</span>
+                      <span className="text-slate-500">వ్యతిరేకం: {clan.opponentCount}</span>
+                    </div>
+                  </div>
+
+                  {/* Elder & Influencer Touchpoint Banner */}
+                  <div className="bg-slate-950/70 border border-slate-800/80 rounded-xl p-2.5 flex items-center justify-between text-[11px]">
+                    <div className="space-y-0.5">
+                      <span className="text-[10px] text-slate-400 font-bold block flex items-center gap-1">
+                        <User className="w-3 h-3 text-amber-400" />
+                        {language === 'te' ? 'కుటుంబ పెద్ద / ప్రముఖులు:' : 'Clan Head / Elder:'}
+                      </span>
+                      <div className="text-white font-bold flex items-center gap-1.5">
+                        <span className="truncate max-w-[170px]">{clan.headName || 'Elder'}</span>
+                        {clan.headPhone && (
+                          <span className="text-emerald-400 font-mono text-[10px]">({clan.headPhone})</span>
+                        )}
+                      </div>
+                    </div>
+
+                    <div className="flex items-center gap-1.5">
+                      {clan.headPhone && (
+                        <a
+                          href={`tel:${clan.headPhone}`}
+                          className="p-1.5 bg-slate-800 hover:bg-slate-700 text-emerald-400 rounded-lg"
+                          title="Call Elder"
+                        >
+                          <Phone className="w-3.5 h-3.5" />
+                        </a>
+                      )}
+                      <button
+                        onClick={() => handleShareClanWhatsApp(clan)}
+                        className="px-2 py-1 bg-emerald-600 hover:bg-emerald-500 text-white rounded-lg font-black text-[10px] flex items-center gap-1 shadow-sm"
+                        title="Send Glass Symbol Appeal to Family Elder on WhatsApp"
+                      >
+                        <MessageSquare className="w-3 h-3" />
+                        <span>వాట్సాప్</span>
+                      </button>
+                    </div>
+                  </div>
+                </div>
+
+                {/* Clan Members Accordion */}
+                <div className="border-t border-slate-800 bg-slate-950/60">
+                  <button
+                    onClick={() => setExpandedSurnameId(isExpanded ? null : clan.id)}
+                    className="w-full px-3.5 py-1.5 flex items-center justify-between text-[11px] text-amber-400 font-bold hover:bg-slate-800/40"
+                  >
+                    <span>{clan.nameTe} వంశ ఓటర్లు ({clan.voters.length} మంది)</span>
+                    {isExpanded ? <ChevronUp className="w-3.5 h-3.5" /> : <ChevronDown className="w-3.5 h-3.5" />}
+                  </button>
+
+                  {isExpanded && (
+                    <div className="p-3 space-y-2 divide-y divide-slate-800/50">
+                      {clan.voters.map(m => {
+                        const prof = profiles[m.s] || {};
+                        const pct = prof.supportPct !== undefined ? prof.supportPct : (m.kriya ? 100 : 50);
+
+                        return (
+                          <div key={m.s} className="pt-2 first:pt-0 space-y-1">
+                            <div className="flex items-center justify-between">
+                              <div className="flex items-center gap-1.5">
+                                <span className="font-mono text-amber-400 font-bold">#{m.s}</span>
+                                <span className="font-mono text-[10px] text-emerald-400">{m.id}</span>
+                                <span className="text-white font-bold text-xs">{m.n}</span>
+                              </div>
+                              <button
+                                onClick={() => onOpenSlip(m)}
+                                className="px-2 py-0.5 bg-slate-800 hover:bg-amber-500 hover:text-slate-950 text-amber-300 rounded font-bold text-[9px] border border-slate-700"
+                              >
+                                {m.card_url || m.card ? '📄 కార్డు' : 'స్లిప్'}
+                              </button>
+                            </div>
+
+                            <div className="flex items-center justify-between text-[10.5px] text-slate-400">
+                              <span>ఇంటి నెం: <strong className="text-amber-300 font-mono">{m.hn}</strong> • {m.a}Y • {m.g === 'M' ? 'పురుషుడు' : 'మహిళ'}</span>
+                              <button
+                                onClick={() => onOpenSupportPicker(m.n, pct, prof.notes, m.s)}
+                                className="hover:scale-105"
+                              >
+                                {getLeaningBadge(pct)}
+                              </button>
+                            </div>
+                          </div>
+                        );
+                      })}
+                    </div>
+                  )}
+                </div>
+              </div>
+            );
+          })}
+        </div>
+      ) : (
+        /* Voter Cards List (Standard List View) */
+        <div className="space-y-2.5">
         {displayedVoters.map(v => {
           const prof = profiles[v.s] || {};
           const phone = prof.customPhone || v.k_m;
           const pct = prof.supportPct !== undefined ? prof.supportPct : (v.kriya ? 100 : 50);
+          const sn = extractSurname(v);
 
           return (
             <div
@@ -434,6 +768,18 @@ export const VotersTabMobile: React.FC<VotersTabMobileProps> = ({
                 >
                   <div className="flex items-center gap-1.5 flex-wrap">
                     <h3 className="text-sm font-black text-white hover:text-amber-300 transition-colors">{v.n}</h3>
+                    <button
+                      type="button"
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        setSelectedSurname(selectedSurname === sn.en ? 'all' : sn.en);
+                        setVisibleCount(30);
+                      }}
+                      className="px-1.5 py-0.2 rounded bg-amber-500/10 hover:bg-amber-500/20 text-amber-300 border border-amber-500/30 text-[9px] font-bold inline-flex items-center gap-0.5"
+                      title={language === 'te' ? 'ఈ ఇంటిపేరు ఓటర్లను మాత్రమే చూడండి' : 'Filter by this surname'}
+                    >
+                      <span>🏛️ {sn.te || sn.en}</span>
+                    </button>
                     {v.kriya && (
                       <span 
                         className={`px-1.5 py-0.2 rounded text-[8px] font-extrabold uppercase tracking-wide flex items-center gap-0.5 ${
@@ -678,6 +1024,7 @@ export const VotersTabMobile: React.FC<VotersTabMobileProps> = ({
           );
         })}
       </div>
+      )}
 
       {/* Load More Button */}
       {displayedVoters.length < filteredVoters.length && (

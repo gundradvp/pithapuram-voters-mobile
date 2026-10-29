@@ -19,7 +19,8 @@ import {
   UserCheck,
   Home,
   Clock,
-  Sparkles
+  Sparkles,
+  Building
 } from 'lucide-react';
 import {
   BoothData,
@@ -35,6 +36,7 @@ import {
   downloadBoothAsJson
 } from '../utils/storage';
 import { Language, translations } from '../utils/i18n';
+import { classifyBoothSurnames, calculateWinningFormula } from '../utils/surnameClassifier';
 
 interface WarRoomTabMobileProps {
   boothData: BoothData;
@@ -70,6 +72,13 @@ export const WarRoomTabMobile: React.FC<WarRoomTabMobileProps> = ({
   const winningScore: WinningScoreCalculation = useMemo(() => {
     return calculateWinningScore(boothData, profiles);
   }, [boothData, profiles]);
+
+  // Top Surnames Winning Blueprint calculation
+  const { clanGroups, winningFormula } = useMemo(() => {
+    const groups = classifyBoothSurnames(boothData.voters, profiles);
+    const formula = calculateWinningFormula(groups, boothData.voters.length);
+    return { clanGroups: groups, winningFormula: formula };
+  }, [boothData.voters, profiles]);
 
   // Analyze visits & ground issues
   const visitStats = useMemo(() => {
@@ -237,6 +246,103 @@ export const WarRoomTabMobile: React.FC<WarRoomTabMobileProps> = ({
               </p>
             )}
           </div>
+        </div>
+      </div>
+
+      {/* Top 10 Surnames 50%+ Winning Blueprint */}
+      <div className="bg-gradient-to-br from-slate-900 via-slate-900 to-amber-950/40 border border-amber-500/40 rounded-3xl p-4 shadow-xl space-y-3">
+        <div className="flex items-center justify-between">
+          <div className="flex items-center gap-2">
+            <div className="p-2 bg-gradient-to-br from-amber-500 to-red-600 text-slate-950 rounded-xl font-black">
+              <Building className="w-5 h-5 text-slate-950" />
+            </div>
+            <div>
+              <span className="text-[10px] uppercase font-bold text-amber-400 tracking-wider">
+                {language === 'te' ? 'ఇంటిపేర్ల గెలుపు ఫార్ములా' : 'Clan Power Blueprint'}
+              </span>
+              <h3 className="text-sm font-black text-white">
+                {language === 'te' ? 'టాప్ 10 ఇంటిపేర్లతో 50%+ గెలుపు వ్యూహం' : 'Top 10 Surnames Victory Path'}
+              </h3>
+            </div>
+          </div>
+          <span className="text-[11px] font-mono font-bold text-amber-400 bg-amber-500/10 px-2.5 py-1 rounded-full border border-amber-500/30">
+            {winningFormula.top10Percentage}% {language === 'te' ? 'ఓటు వాటా' : 'Vote Share'}
+          </span>
+        </div>
+
+        {/* Clan Formula Key Numbers */}
+        <div className="grid grid-cols-3 gap-2 text-center">
+          <div className="bg-slate-950/80 border border-slate-800 rounded-xl p-2">
+            <span className="text-[9px] text-slate-400 block">{language === 'te' ? 'టాప్ 10 ఓట్లు' : 'Top 10 Electors'}</span>
+            <span className="text-sm font-black text-white font-mono">{winningFormula.top10VoterCount}</span>
+            <span className="text-[9px] text-slate-500 block font-mono">{boothData.voters.length} లో {winningFormula.top10Percentage}%</span>
+          </div>
+          <div className="bg-slate-950/80 border border-red-500/30 rounded-xl p-2">
+            <span className="text-[9px] text-red-300 block">{language === 'te' ? 'పక్కా JSP ఓట్లు' : 'Locked JSP'}</span>
+            <span className="text-sm font-black text-red-400 font-mono">{winningFormula.top10JspSupporters}</span>
+            <span className="text-[9px] text-red-400/80 block font-mono">{winningFormula.top10VoterCount > 0 ? Math.round((winningFormula.top10JspSupporters / winningFormula.top10VoterCount) * 100) : 0}% locked</span>
+          </div>
+          <div className="bg-slate-950/80 border border-amber-500/30 rounded-xl p-2">
+            <span className="text-[9px] text-amber-300 block">{language === 'te' ? 'గెలవాల్సిన స్వింగ్' : 'Needed Swing'}</span>
+            <span className="text-sm font-black text-amber-400 font-mono">{winningFormula.votesNeededFromTop10ToWin}</span>
+            <span className="text-[9px] text-amber-400/80 block font-mono">మొత్తం {winningFormula.top10SwingVoters} లో</span>
+          </div>
+        </div>
+
+        {/* Strategy explanation */}
+        <div className="bg-slate-950/60 rounded-xl p-2.5 border border-slate-800 text-[11px] text-slate-300 leading-relaxed">
+          {winningFormula.votesNeededFromTop10ToWin === 0 ? (
+            <span className="text-emerald-400 font-bold">
+              ✓ {language === 'te' ? 'టాప్ 10 కుల/ఇంటిపెద్దల మద్దతుతో బూత్ గెలుపు టార్గెట్ ఇప్పటికే దాటిపోయింది!' : 'Winning threshold already achieved with top clans support!'}
+            </span>
+          ) : (
+            <span>
+              💡 {language === 'te' ? (
+                <>ఈ బూత్ లో టాప్ 10 ఇంటిపేర్లలోని <strong className="text-white">{winningFormula.top10SwingVoters} స్వింగ్ ఓట్లలో</strong> కేవలం <strong className="text-amber-400">{winningFormula.votesNeededFromTop10ToWin} ఓట్లను ({winningFormula.top10SwingVoters > 0 ? Math.round((winningFormula.votesNeededFromTop10ToWin / winningFormula.top10SwingVoters) * 100) : 0}%)</strong> గాజు గ్లాసు వైపునకు తిప్పితే ఈ బూత్ లో తిరుగులేని గెలుపు ఖాయం!</>
+              ) : (
+                <>Converting just <strong className="text-amber-400">{winningFormula.votesNeededFromTop10ToWin} ({winningFormula.top10SwingVoters > 0 ? Math.round((winningFormula.votesNeededFromTop10ToWin / winningFormula.top10SwingVoters) * 100) : 0}%)</strong> of the {winningFormula.top10SwingVoters} swing voters in top 10 clans guarantees absolute victory!</>
+              )}
+            </span>
+          )}
+        </div>
+
+        {/* Top 5 Surnames Quick Breakdown List */}
+        <div className="space-y-1.5 pt-1">
+          <div className="text-[10px] font-bold text-slate-400 uppercase tracking-wider flex justify-between">
+            <span>{language === 'te' ? 'ముఖ్యమైన ఇంటిపేర్లు (బలం)' : 'Key Clan Surnames (Power)'}</span>
+            <span>{language === 'te' ? 'ఓటర్లు / ఇళ్లు' : 'Voters / Houses'}</span>
+          </div>
+          {clanGroups.slice(0, 5).map((clan, idx) => {
+            const jspElectors = clan.fullCount + Math.round(clan.strongCount * 0.75);
+            return (
+              <div key={clan.id} className="bg-slate-950/80 rounded-xl p-2 border border-slate-800 flex items-center justify-between">
+                <div className="flex items-center gap-2">
+                  <span className="w-5 h-5 rounded-full bg-slate-800 text-amber-400 text-[10px] font-black flex items-center justify-center font-mono">
+                    #{idx + 1}
+                  </span>
+                  <div>
+                    <div className="font-bold text-white text-xs flex items-center gap-1.5">
+                      <span>{clan.nameTe || clan.nameEn}</span>
+                      <span className="text-[10px] font-normal text-slate-400 font-mono">({clan.nameEn})</span>
+                    </div>
+                    <div className="text-[9px] text-slate-400 flex items-center gap-2">
+                      <span>🏠 {clan.houseNumbers.length} {language === 'te' ? 'ఇళ్లు' : 'houses'}</span>
+                      <span>👴 {clan.topElders.length} {language === 'te' ? 'పెద్దలు' : 'elders'}</span>
+                      <span>🎯 {clan.topYouth.length} {language === 'te' ? 'యువత' : 'youth'}</span>
+                    </div>
+                  </div>
+                </div>
+                <div className="text-right">
+                  <div className="font-mono font-black text-amber-400 text-xs">
+                    {clan.totalVoters} <span className="text-[9px] text-slate-400 font-normal">({clan.pctOfBooth}%)</span>
+                  </div>
+                  <div className="text-[9px] font-mono text-emerald-400">
+                    {clan.supportPct}% JSP ({jspElectors} పక్కా)
+                  </div>
+                </div>
+              </div>
+            );
+          })}
         </div>
       </div>
 
