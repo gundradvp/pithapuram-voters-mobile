@@ -46,8 +46,6 @@ const filesToSync = [
   'public/booths/booth_gp_vannepudi.json',
   'public/booths/mptc_durgada_1.json',
   'public/booths/booth_mptc_durgada_1.json',
-  'public/booths/mptc_durgada_2.json',
-  'public/booths/booth_mptc_durgada_2.json',
   'public/booths/mptc_durgada_3.json',
   'public/booths/booth_mptc_durgada_3.json',
   'public/booths/gp_durgada.json',
