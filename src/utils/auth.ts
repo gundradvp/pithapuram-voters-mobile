@@ -159,8 +159,7 @@ export function generateAssignmentWhatsAppMessage(
         const desc = localWardLabels && localWardLabels[w] ? ` (${localWardLabels[w]})` : '';
         if (w === 'ward_14') return `• పిఠాపురం పురపాలక సంఘం - 14వ వార్డు (1,256 ఓటర్లు)${desc}`;
         if (w === 'gollaprolu_ward_11') return `• గొల్లప్రోలు నగర పంచాయతీ - 11వ వార్డు (991 ఓటర్లు)${desc}`;
-        if (w === 'mptc_durgada_1') return `• దుర్గడ MPTC-1 (వార్డులు 1, 2 - 1,060 ఓటర్లు)${desc}`;
-        if (w === 'mptc_durgada_2') return `• దుర్గడ MPTC-2 (వార్డులు 3, 4 - 1,060 ఓటర్లు)${desc}`;
+        if (w === 'mptc_durgada_1') return `• దుర్గడ MPTC-1 (వార్డులు 1-5 - 2,650 ఓటర్లు)${desc}`;
         if (w === 'mptc_durgada_3') return `• దుర్గడ MPTC-3 (డోర్ నెం. 4-9 - 1,874 ఓటర్లు)${desc}`;
         if (w === 'gp_durgada') return `• దుర్గడ సమగ్ర గ్రామ పంచాయతీ (Durgada GP - 3,994 ఓటర్లు)${desc}`;
         if (w === 'gp_vannepudi') return `• వన్నెపూడి గ్రామ పంచాయతీ (Vannepudi GP - 3,201 ఓటర్లు)${desc}`;

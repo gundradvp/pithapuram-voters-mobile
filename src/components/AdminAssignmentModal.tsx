@@ -80,9 +80,7 @@ export const AdminAssignmentModal: React.FC<AdminAssignmentModalProps> = ({
       case 'gollaprolu_ward_11':
         return { label: '🏡 గొల్లప్రోలు వార్డు 11 (991)', cls: 'bg-emerald-950/60 border-emerald-500/40 text-emerald-300' };
       case 'mptc_durgada_1':
-        return { label: '🌾 దుర్గడ MPTC 1 (1,060)', cls: 'bg-teal-950/60 border-teal-500/40 text-teal-300' };
-      case 'mptc_durgada_2':
-        return { label: '🌾 దుర్గడ MPTC 2 (1,060)', cls: 'bg-cyan-950/60 border-cyan-500/40 text-cyan-300' };
+        return { label: '🌾 దుర్గడ MPTC 1 (2,650)', cls: 'bg-teal-950/60 border-teal-500/40 text-teal-300' };
       case 'mptc_durgada_3':
         return { label: '🌾 దుర్గడ MPTC 3 (1,874)', cls: 'bg-sky-950/60 border-sky-500/40 text-sky-300' };
       case 'gp_durgada':
@@ -306,7 +304,7 @@ export const AdminAssignmentModal: React.FC<AdminAssignmentModalProps> = ({
                     <button
                       type="button"
                       onClick={() => {
-                        setSelectedWards(prev => Array.from(new Set([...prev, 'mptc_durgada_1', 'mptc_durgada_2', 'mptc_durgada_3'])));
+                        setSelectedWards(prev => Array.from(new Set([...prev, 'mptc_durgada_1', 'mptc_durgada_3'])));
                       }}
                       className="px-2 py-0.5 bg-teal-500/20 hover:bg-teal-500 hover:text-slate-950 text-teal-300 rounded text-[9.5px] font-bold border border-teal-500/30 transition-colors"
                       title="దుర్గడ 3 MPTCలు ఒకేసారి ఎంచుకోండి"
@@ -391,29 +389,9 @@ export const AdminAssignmentModal: React.FC<AdminAssignmentModalProps> = ({
                         <MapPin className="w-3.5 h-3.5 text-teal-400" />
                         <span>దుర్గడ MPTC 1</span>
                       </div>
-                      <span className="text-[10px] text-slate-400">1,060 ఓటర్లు (వార్డులు 1 & 2)</span>
+                      <span className="text-[10px] text-slate-400">2,650 ఓటర్లు (వార్డులు 1-5)</span>
                     </div>
                     {selectedWards.includes('mptc_durgada_1') && <Check className="w-3.5 h-3.5 text-teal-400" />}
-                  </button>
-
-                  {/* Durgada MPTC 2 */}
-                  <button
-                    type="button"
-                    onClick={() => toggleWardSelection('mptc_durgada_2')}
-                    className={`p-2 rounded-xl border text-left flex items-center justify-between text-xs transition-all ${
-                      selectedWards.includes('mptc_durgada_2')
-                        ? 'bg-cyan-950/80 border-cyan-400 text-cyan-200 shadow-sm'
-                        : 'bg-slate-900 border-slate-800 text-slate-400 hover:border-slate-700'
-                    }`}
-                  >
-                    <div>
-                      <div className="font-bold flex items-center gap-1">
-                        <MapPin className="w-3.5 h-3.5 text-cyan-400" />
-                        <span>దుర్గడ MPTC 2</span>
-                      </div>
-                      <span className="text-[10px] text-slate-400">1,060 ఓటర్లు (వార్డులు 3 & 4)</span>
-                    </div>
-                    {selectedWards.includes('mptc_durgada_2') && <Check className="w-3.5 h-3.5 text-cyan-400" />}
                   </button>
 
                   {/* Durgada MPTC 3 */}
