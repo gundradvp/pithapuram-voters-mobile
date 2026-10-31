@@ -1,15 +1,17 @@
 import React, { useState } from 'react';
-import { X, Check, Flag, Sparkles, AlertCircle, ThumbsUp, ThumbsDown, Sliders } from 'lucide-react';
+import { X, Check, Flag, Sparkles, AlertCircle, ThumbsUp, ThumbsDown, Sliders, Banknote, ShieldCheck, ShieldAlert } from 'lucide-react';
 import { Language, translations } from '../utils/i18n';
+import { MoneyInfluenceStatus } from '../types';
 
 interface SupportLeaningPickerProps {
   title: string;
   subtitle?: string;
   currentPct?: number;
   currentNotes?: string;
+  currentMoneyStatus?: MoneyInfluenceStatus;
   hasFamily?: boolean;
   language?: Language;
-  onSave: (pct: number, notes?: string, applyToFamily?: boolean) => void;
+  onSave: (pct: number, notes?: string, applyToFamily?: boolean, moneyStatus?: MoneyInfluenceStatus) => void;
   onClose: () => void;
 }
 
@@ -18,6 +20,7 @@ export const SupportLeaningPicker: React.FC<SupportLeaningPickerProps> = ({
   subtitle,
   currentPct = 50,
   currentNotes = '',
+  currentMoneyStatus = 'none',
   hasFamily = false,
   language = 'te',
   onSave,
@@ -25,6 +28,7 @@ export const SupportLeaningPicker: React.FC<SupportLeaningPickerProps> = ({
 }) => {
   const [pct, setPct] = useState<number>(currentPct);
   const [notes, setNotes] = useState<string>(currentNotes);
+  const [moneyStatus, setMoneyStatus] = useState<MoneyInfluenceStatus>(currentMoneyStatus);
   const [applyToFamily, setApplyToFamily] = useState<boolean>(false);
   const t = translations[language];
 
@@ -201,6 +205,68 @@ export const SupportLeaningPicker: React.FC<SupportLeaningPickerProps> = ({
           </div>
         </div>
 
+        {/* Cash / Money Influence Factor */}
+        <div className="space-y-1.5 pt-1 border-t border-slate-800">
+          <label className="text-[10px] uppercase font-bold text-slate-400 block flex items-center gap-1.5">
+            <Banknote className="w-3.5 h-3.5 text-emerald-400" />
+            <span>{language === 'te' ? 'నగదు / సాయం పంపిణీ ప్రభావం (Money Factor):' : 'Cash / Money Distribution Factor:'}</span>
+          </label>
+          <div className="space-y-1">
+            {[
+              {
+                status: 'none' as MoneyInfluenceStatus,
+                label: language === 'te' ? 'సాధారణం' : 'Normal (No cash influence)',
+                icon: Banknote,
+                color: 'border-slate-800 text-slate-400'
+              },
+              {
+                status: 'opponent_paid_safe' as MoneyInfluenceStatus,
+                label: language === 'te' ? '💰 ప్రత్యర్థి డబ్బు ఇచ్చారు — కానీ మనకే ఓటు (పక్కా)' : '💰 Took Opponent Cash — Still Votes JSP',
+                icon: ShieldCheck,
+                color: 'border-emerald-500/50 text-emerald-300 bg-emerald-950/20'
+              },
+              {
+                status: 'opponent_paid_swung' as MoneyInfluenceStatus,
+                label: language === 'te' ? '💸 డబ్బుతో మారిన ఓటు (ప్రత్యర్థికి వెళ్ళింది)' : '💸 Bought by Opponent (Lost to cash)',
+                icon: ShieldAlert,
+                color: 'border-rose-500/50 text-rose-300 bg-rose-950/20'
+              },
+              {
+                status: 'at_risk_cash' as MoneyInfluenceStatus,
+                label: language === 'te' ? '⚠️ డబ్బు ప్రభావం పడే అవకాశం ఉంది (రిస్క్)' : '⚠️ At Risk (Vulnerable to cash)',
+                icon: AlertCircle,
+                color: 'border-amber-500/50 text-amber-300 bg-amber-950/20'
+              },
+              {
+                status: 'counter_secured' as MoneyInfluenceStatus,
+                label: language === 'te' ? '🛡️ మన బృందం కౌంటర్ చేసి భరోసా ఇచ్చింది' : '🛡️ Countered & Secured by our team',
+                icon: ShieldCheck,
+                color: 'border-blue-500/50 text-blue-300 bg-blue-950/20'
+              }
+            ].map(opt => {
+              const isSelected = moneyStatus === opt.status;
+              const Icon = opt.icon;
+              return (
+                <div
+                  key={opt.status}
+                  onClick={() => setMoneyStatus(opt.status)}
+                  className={`p-1.5 px-2.5 rounded-xl border transition-all cursor-pointer flex items-center justify-between text-xs ${
+                    isSelected
+                      ? `${opt.color} ring-1 ring-amber-400 font-bold`
+                      : 'bg-slate-950/60 border-slate-800/80 hover:bg-slate-800/50 text-slate-300'
+                  }`}
+                >
+                  <div className="flex items-center gap-2">
+                    <Icon className="w-3.5 h-3.5 flex-shrink-0" />
+                    <span>{opt.label}</span>
+                  </div>
+                  {isSelected && <Check className="w-3.5 h-3.5 text-amber-400 flex-shrink-0" />}
+                </div>
+              );
+            })}
+          </div>
+        </div>
+
         {/* Campaign Notes */}
         <div>
           <label className="text-[10px] uppercase font-bold text-slate-400 block mb-1">
@@ -233,7 +299,7 @@ export const SupportLeaningPicker: React.FC<SupportLeaningPickerProps> = ({
         {/* Save Button */}
         <button
           onClick={() => {
-            onSave(pct, notes, applyToFamily);
+            onSave(pct, notes, applyToFamily, moneyStatus);
             onClose();
           }}
           className="w-full py-2.5 bg-gradient-to-r from-amber-500 to-amber-600 hover:from-amber-400 hover:to-amber-500 text-slate-950 font-black rounded-xl text-xs flex items-center justify-center gap-1.5 shadow-md shadow-amber-950/40"

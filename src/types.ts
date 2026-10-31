@@ -103,6 +103,13 @@ export interface VoterVisit {
   keyIssue?: string; // "Pension", "Road", "Drinking Water", "Youth Job", "DWCRA"
 }
 
+export type MoneyInfluenceStatus = 
+  | 'none'
+  | 'opponent_paid_safe'    // 💰 ప్రత్యర్థి డబ్బు ఇచ్చారు - కానీ మనకే ఓటు (Took Cash, Votes JSP)
+  | 'opponent_paid_swung'   // 💸 డబ్బుతో చేజారిన ఓటు (Bought by Opponent - Swung)
+  | 'at_risk_cash'          // ⚠️ డబ్బు ప్రభావం పడే ప్రమాదం ఉంది (Vulnerable to Cash)
+  | 'counter_secured';      // 🛡️ మన బృందం కౌంటర్ చేసి భరోసా ఇచ్చింది (Countered & Secured)
+
 export interface VoterCampaignProfile {
   customPhone?: string;
   altPhone?: string;
@@ -114,6 +121,8 @@ export interface VoterCampaignProfile {
   notes?: string;
   survey_status?: VoterSurveyStatus | null;
   visits?: VoterVisit[];
+  moneyStatus?: MoneyInfluenceStatus;
+  moneyNotes?: string;
 }
 
 export interface MobileVoter {
@@ -150,6 +159,7 @@ export interface BoothData {
 }
 
 export interface WinningScoreCalculation {
+  mode: 'entry' | 'auto'; // 'entry': Pure candidate ground entry | 'auto': Statistical simulation
   totalElectors: number;
   expectedTurnoutPct: number;
   expectedPollVotes: number;
@@ -157,10 +167,17 @@ export interface WinningScoreCalculation {
   projectedJspVotes: number;
   projectedOpponentVotes: number;
   projectedNeutralVotes: number;
+  unsurveyedVotes?: number;
+  surveyedCount?: number;
   projectedLead: number;
   victoryProbability: number; // 0 to 100%
   status: 'safe_win' | 'likely_win' | 'battleground' | 'deficit_danger';
   neededToGuarantee: number;
+  // Money Influence Metrics
+  cashOpponentPaidSafeCount?: number;
+  cashOpponentPaidSwungCount?: number;
+  cashAtRiskCount?: number;
+  cashSecuredCount?: number;
 }
 
 export type TabType = 'voters' | 'families' | 'influencers' | 'warroom' | 'offline' | 'houses' | 'kriya' | 'stats';

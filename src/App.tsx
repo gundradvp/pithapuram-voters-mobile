@@ -18,6 +18,7 @@ import { ThemeSelectorModal } from './components/ThemeSelectorModal';
 import { LoginModal } from './components/LoginModal';
 import { AdminAssignmentModal } from './components/AdminAssignmentModal';
 import { GroupPrintModal } from './components/GroupPrintModal';
+import { SurnameLeaningModal } from './components/SurnameLeaningModal';
 import {
   BoothData,
   BoothIndexItem,
@@ -29,7 +30,8 @@ import {
   Influencer,
   VoterCampaignProfile,
   VoterVisit,
-  WinningScoreCalculation
+  WinningScoreCalculation,
+  MoneyInfluenceStatus
 } from './types';
 import {
   getAssignedBooth,
@@ -42,6 +44,7 @@ import {
   clearStaleBoothCache,
   getVoterProfiles,
   saveVoterProfile,
+  saveBatchVoterProfiles,
   addVoterVisit,
   getFamilyGroups,
   saveFamilyGroup,
@@ -50,6 +53,7 @@ import {
   saveInfluencer,
   calculateWinningScore
 } from './utils/storage';
+import { classifyBoothSurnames } from './utils/surnameClassifier';
 import {
   UserSession,
   getUserSession,
@@ -147,6 +151,7 @@ export function App() {
     subtitle?: string;
     currentPct: number;
     currentNotes?: string;
+    currentMoneyStatus?: MoneyInfluenceStatus;
     voterSno?: number;
     familyId?: string;
     hasFamily?: boolean;
@@ -155,6 +160,45 @@ export function App() {
     title: '',
     currentPct: 50
   });
+
+  const [surnameLeaningState, setSurnameLeaningState] = useState<{
+    open: boolean;
+    initialClanId?: string;
+  }>({
+    open: false
+  });
+
+  // Default hide Victory Predictor state (user requested: by default hide this booth victory predictor)
+  const [showVictoryPredictor, setShowVictoryPredictor] = useState<boolean>(() => {
+    try {
+      return localStorage.getItem('jsp_show_victory_predictor') === 'true';
+    } catch {
+      return false;
+    }
+  });
+
+  const handleToggleVictoryPredictor = (show: boolean) => {
+    setShowVictoryPredictor(show);
+    try {
+      localStorage.setItem('jsp_show_victory_predictor', String(show));
+    } catch {}
+  };
+
+  // Option to toggle between 'entry' (pure candidate ground truth) and 'auto' (statistical simulation)
+  const [victoryPredictorMode, setVictoryPredictorMode] = useState<'entry' | 'auto'>(() => {
+    try {
+      return (localStorage.getItem('jsp_victory_mode') as 'entry' | 'auto') || 'entry';
+    } catch {
+      return 'entry';
+    }
+  });
+
+  const handleToggleVictoryMode = (mode: 'entry' | 'auto') => {
+    setVictoryPredictorMode(mode);
+    try {
+      localStorage.setItem('jsp_victory_mode', mode);
+    } catch {}
+  };
 
   const [influencerAssignState, setInfluencerAssignState] = useState<{
     open: boolean;
@@ -386,8 +430,8 @@ export function App() {
   // Compute Winning Score dynamically
   const winningScore: WinningScoreCalculation | null = useMemo(() => {
     if (!boothData) return null;
-    return calculateWinningScore(boothData, profiles);
-  }, [boothData, profiles]);
+    return calculateWinningScore(boothData, profiles, victoryPredictorMode);
+  }, [boothData, profiles, victoryPredictorMode]);
 
   // Show score bump toast notification
   const triggerScoreNotice = (msg: string) => {
@@ -420,12 +464,22 @@ export function App() {
   };
 
   // Handle Support Leaning Save
-  const handleSaveSupport = (pct: number, notes?: string, applyToFamily?: boolean) => {
+  const handleSaveSupport = (
+    pct: number,
+    notes?: string,
+    applyToFamily?: boolean,
+    moneyStatus?: MoneyInfluenceStatus
+  ) => {
     const { voterSno, familyId } = supportPickerState;
 
     if (voterSno) {
       const voter = boothData?.voters.find(v => v.s === voterSno);
-      saveVoterProfile(currentPartNo, voterSno, { supportPct: pct, notes });
+      const updates: Partial<VoterCampaignProfile> = {
+        supportPct: pct,
+        notes,
+        moneyStatus: moneyStatus !== 'none' ? moneyStatus : undefined
+      };
+      saveVoterProfile(currentPartNo, voterSno, updates);
 
       // Apply to all family members if requested
       if (applyToFamily && voter) {
@@ -436,7 +490,7 @@ export function App() {
           saveFamilyGroup(currentPartNo, famKey);
 
           famKey.memberSnos.forEach(sno => {
-            saveVoterProfile(currentPartNo, sno, { supportPct: pct });
+            saveVoterProfile(currentPartNo, sno, updates);
           });
           setFamilies(getFamilyGroups(currentPartNo));
         }
@@ -444,8 +498,12 @@ export function App() {
 
       setProfiles(getVoterProfiles(currentPartNo));
 
-      // Notification based on support category
-      if (pct === 100) {
+      // Notification based on money status and support category
+      if (moneyStatus === 'opponent_paid_safe') {
+        triggerScoreNotice(lang === 'te' ? '💰 ప్రత్యర్థి డబ్బు ఇచ్చినా గ్లాసుకే ఓటు అని నమోదు అయ్యింది!' : '💰 Took opponent cash, confirmed Glass voter!');
+      } else if (moneyStatus === 'opponent_paid_swung') {
+        triggerScoreNotice(lang === 'te' ? '💸 డబ్బుతో మారిన ఓటుగా నమోదు చేయబడింది' : '💸 Marked as bought by opponent');
+      } else if (pct === 100) {
         triggerScoreNotice(lang === 'te' ? `🚩 100% మనవాళ్లే చేరారు! +1 మన ఓటు పెరిగింది` : `🚩 100% Supporter Added! +1 Projected JSP Vote`);
       } else if (pct >= 75) {
         triggerScoreNotice(lang === 'te' ? `🟢 మన మద్దతుదారుడు చేరారు! +0.75 ఓటు పెరిగింది` : `🟢 Strong Supporter Added! +0.75 Projected Vote`);
@@ -465,7 +523,10 @@ export function App() {
         saveFamilyGroup(currentPartNo, fam);
 
         fam.memberSnos.forEach(sno => {
-          saveVoterProfile(currentPartNo, sno, { supportPct: pct });
+          saveVoterProfile(currentPartNo, sno, {
+            supportPct: pct,
+            moneyStatus: moneyStatus !== 'none' ? moneyStatus : undefined
+          });
         });
         setFamilies(getFamilyGroups(currentPartNo));
         setProfiles(getVoterProfiles(currentPartNo));
@@ -473,6 +534,47 @@ export function App() {
         triggerScoreNotice(lang === 'te' ? `🏠 కుటుంబ సభ్యులందరి మద్దతు ${pct}% గా మారింది` : `🏠 Family sentiment updated to ${pct}%`);
       }
     }
+  };
+
+  // Handle Bulk Surname Leaning Save
+  const handleApplySurnameLeaning = (
+    surnameId: string,
+    supportPct: number,
+    moneyStatus: MoneyInfluenceStatus,
+    overrideExisting: boolean,
+    notes?: string
+  ) => {
+    if (!boothData) return;
+    const clans = classifyBoothSurnames(boothData.voters, profiles);
+    const clan = clans.find(c => c.id === surnameId);
+    if (!clan) return;
+
+    const targetSnos: number[] = [];
+    clan.voters.forEach(v => {
+      const existing = profiles[v.s];
+      if (overrideExisting || existing?.supportPct === undefined) {
+        targetSnos.push(v.s);
+      }
+    });
+
+    if (targetSnos.length === 0) {
+      triggerScoreNotice(lang === 'te' ? '⚠️ నమోదు చేయడానికి కొత్త ఓటర్లు లేరు (అందరూ ఇప్పటికే నమోదయ్యారు)' : 'No new voters to update in this clan');
+      return;
+    }
+
+    const updates: Partial<VoterCampaignProfile> = {
+      supportPct,
+      moneyStatus: moneyStatus !== 'none' ? moneyStatus : undefined,
+      notes: notes || undefined
+    };
+
+    const newProfiles = saveBatchVoterProfiles(currentPartNo, targetSnos, updates);
+    setProfiles(newProfiles);
+    triggerScoreNotice(
+      lang === 'te'
+        ? `✅ ${clan.nameTe || clan.nameEn} వంశంలోని ${targetSnos.length} మంది ఓటర్లకు ${supportPct}% మొగ్గు నమోదు చేయబడింది!`
+        : `Applied ${supportPct}% to ${targetSnos.length} voters of ${clan.nameEn} clan`
+    );
   };
 
   // Handle Field Visit Log
@@ -634,13 +736,40 @@ export function App() {
 
         {boothData && (
           <>
-            {/* Top Winning Score Banner (Shown on Voters tab) */}
+            {/* Top Winning Score Banner (Hidden by default on Voters tab) */}
             {activeTab === 'voters' && winningScore && (
-              <WinningScoreBanner
-                calc={winningScore}
-                language={lang}
-                onOpenWarRoom={() => setActiveTab('warroom')}
-              />
+              showVictoryPredictor ? (
+                <WinningScoreBanner
+                  calc={winningScore}
+                  language={lang}
+                  onOpenWarRoom={() => setActiveTab('warroom')}
+                  onToggleMode={handleToggleVictoryMode}
+                  onHide={() => handleToggleVictoryPredictor(false)}
+                />
+              ) : (
+                <div className="flex items-center justify-between mb-2.5 px-0.5">
+                  <button
+                    onClick={() => handleToggleVictoryPredictor(true)}
+                    className="w-full py-2 px-3 bg-gradient-to-r from-slate-900 via-slate-900 to-slate-950 hover:bg-slate-850 text-slate-300 hover:text-white border border-amber-500/30 rounded-2xl text-xs font-bold flex items-center justify-between shadow-md transition-all active:scale-[0.99] group"
+                    title="బూత్ గెలుపు అంచనా (విక్టరీ ప్రిడిక్టర్) వివరాలు చూడటానికి ట్యాప్ చేయండి"
+                  >
+                    <div className="flex items-center gap-2">
+                      <div className="p-1.5 rounded-lg bg-amber-500/10 text-amber-400 border border-amber-500/30 group-hover:scale-110 transition-transform">
+                        <Trophy className="w-3.5 h-3.5" />
+                      </div>
+                      <span className="font-black text-amber-300">
+                        {lang === 'te' ? '🏆 బూత్ గెలుపు అంచనా (విక్టరీ ప్రిడిక్టర్) ▾' : '🏆 Booth Victory Predictor ▾'}
+                      </span>
+                    </div>
+                    <div className="flex items-center gap-2">
+                      <span className="text-[10px] font-mono px-2 py-0.5 rounded-full bg-slate-800 text-slate-300 border border-slate-700">
+                        {victoryPredictorMode === 'entry' ? (lang === 'te' ? '📋 క్షేత్ర నమోదు' : 'Field Entry') : (lang === 'te' ? '🤖 సిమ్యులేషన్' : 'Simulation')}
+                      </span>
+                      <span className="text-amber-400 font-bold text-xs">▾</span>
+                    </div>
+                  </button>
+                </div>
+              )
             )}
 
             {/* TAB 1: Voters Tab */}
@@ -672,6 +801,7 @@ export function App() {
                 onUpdateSurveyMark={handleUpdateSurveyMark}
                 onOpenSlip={v => setSelectedVoterForSlip(v)}
                 onOpenGroupPrint={handleOpenGroupPrint}
+                onOpenSurnameLeaning={clanId => setSurnameLeaningState({ open: true, initialClanId: clanId })}
               />
             )}
 
@@ -861,6 +991,7 @@ export function App() {
           subtitle={supportPickerState.subtitle}
           currentPct={supportPickerState.currentPct}
           currentNotes={supportPickerState.currentNotes}
+          currentMoneyStatus={supportPickerState.voterSno ? profiles[supportPickerState.voterSno]?.moneyStatus : undefined}
           hasFamily={supportPickerState.hasFamily}
           language={lang}
           onSave={handleSaveSupport}
@@ -924,6 +1055,18 @@ export function App() {
           profiles={profiles}
           language={lang}
           onClose={() => setGroupPrintState(prev => ({ ...prev, open: false }))}
+        />
+      )}
+
+      {/* Bulk Surname Leaning Assigner Modal */}
+      {surnameLeaningState.open && boothData && (
+        <SurnameLeaningModal
+          isOpen={surnameLeaningState.open}
+          surnames={classifyBoothSurnames(boothData.voters, profiles)}
+          initialSurnameId={surnameLeaningState.initialClanId}
+          language={lang}
+          onApply={handleApplySurnameLeaning}
+          onClose={() => setSurnameLeaningState({ open: false })}
         />
       )}
     </div>

@@ -18,6 +18,7 @@ interface VotersTabMobileProps {
   onUpdateSurveyMark: (serialNo: number, status: VoterSurveyStatus | null) => void;
   onOpenSlip: (voter: MobileVoter) => void;
   onOpenGroupPrint?: (title: string, subtitle: string, voters: MobileVoter[]) => void;
+  onOpenSurnameLeaning?: (clanId?: string) => void;
 }
 
 export const VotersTabMobile: React.FC<VotersTabMobileProps> = ({
@@ -31,7 +32,8 @@ export const VotersTabMobile: React.FC<VotersTabMobileProps> = ({
   onOpenInfluencerAssign,
   onUpdateSurveyMark,
   onOpenSlip,
-  onOpenGroupPrint
+  onOpenGroupPrint,
+  onOpenSurnameLeaning
 }) => {
   const [searchQuery, setSearchQuery] = useState('');
   const [selectedStreet, setSelectedStreet] = useState<string>('all');
@@ -244,6 +246,21 @@ export const VotersTabMobile: React.FC<VotersTabMobileProps> = ({
     }
   };
 
+  const getMoneyBadge = (moneyStatus?: string) => {
+    switch (moneyStatus) {
+      case 'opponent_paid_safe':
+        return <span className="px-1.5 py-0.2 bg-emerald-950 text-emerald-300 border border-emerald-500/50 rounded text-[9px] font-black flex items-center gap-0.5" title="డబ్బులు తీసుకున్నా గాజు గ్లాసుకే వేస్తారు">💰 డబ్బు తీసుకున్నా గ్లాసుకే</span>;
+      case 'opponent_paid_swung':
+        return <span className="px-1.5 py-0.2 bg-rose-950 text-rose-300 border border-rose-500/50 rounded text-[9px] font-black flex items-center gap-0.5" title="డబ్బు ప్రభావంతో ప్రత్యర్థి వైపు తిరిగారు">💸 డబ్బుతో మారారు</span>;
+      case 'at_risk_cash':
+        return <span className="px-1.5 py-0.2 bg-amber-950 text-amber-300 border border-amber-500/50 rounded text-[9px] font-black flex items-center gap-0.5" title="డబ్బుతో మారే ప్రమాదం ఉంది">⚠️ డబ్బు రిస్క్</span>;
+      case 'counter_secured':
+        return <span className="px-1.5 py-0.2 bg-blue-950 text-blue-300 border border-blue-500/50 rounded text-[9px] font-black flex items-center gap-0.5" title="మన బృందం భరోసా ఇచ్చి ఓటు భద్రపరిచింది">🛡️ భరోసా ఇచ్చాం</span>;
+      default:
+        return null;
+    }
+  };
+
   const handleShareClanWhatsApp = (clan: SurnameGroup) => {
     const isMunicipal = boothInfo.election_type === 'municipal';
     const locationName = isMunicipal
@@ -333,6 +350,15 @@ _మీ అమూల్యమైన ఓటును గాజు గ్లాస
             <span className="text-amber-400 font-bold flex-shrink-0 flex items-center gap-1">
               🏛️ {language === 'te' ? 'ఇంటిపేరు:' : 'Surname:'}
             </span>
+            {onOpenSurnameLeaning && (
+              <button
+                onClick={() => onOpenSurnameLeaning(selectedSurname !== 'all' ? selectedSurname : undefined)}
+                className="px-2 py-0.5 rounded-md font-black whitespace-nowrap transition-all flex items-center gap-1 bg-gradient-to-r from-amber-500 to-amber-600 hover:from-amber-400 hover:to-amber-500 text-slate-950 shadow-sm"
+                title="ఇంటిపేరు ప్రకారం ఒకే క్లిక్‌తో మొగ్గు సెట్ చేయండి"
+              >
+                <span>⚡ మొగ్గు సెట్</span>
+              </button>
+            )}
             <button
               onClick={() => { setSelectedSurname('all'); setVisibleCount(30); }}
               className={`px-2 py-0.5 rounded-md font-bold whitespace-nowrap transition-all ${
@@ -682,6 +708,16 @@ _మీ అమూల్యమైన ఓటును గాజు గ్లాస
                           </button>
                         </>
                       )}
+                      {onOpenSurnameLeaning && (
+                        <button
+                          onClick={() => onOpenSurnameLeaning(clan.id)}
+                          className="px-2 py-1 bg-amber-500 hover:bg-amber-400 text-slate-950 rounded-lg font-black text-[10px] flex items-center gap-1 shadow-sm"
+                          title="ఈ వంశ ఓటర్లందరికీ మొగ్గు సెట్ చేయండి"
+                        >
+                          <Sliders className="w-3 h-3 text-slate-950" />
+                          <span>మొగ్గు</span>
+                        </button>
+                      )}
                       <button
                         onClick={() => handleShareClanWhatsApp(clan)}
                         className="px-2 py-1 bg-emerald-600 hover:bg-emerald-500 text-white rounded-lg font-black text-[10px] flex items-center gap-1 shadow-sm"
@@ -850,7 +886,8 @@ _మీ అమూల్యమైన ఓటును గాజు గ్లాస
                   </span>
                 </div>
 
-                <div className="flex items-center gap-1.5">
+                <div className="flex items-center gap-1.5 flex-wrap justify-end">
+                  {getMoneyBadge(prof.moneyStatus)}
                   {getStatusBadge(prof.survey_status)}
                   <button
                     onClick={() => onOpenSupportPicker(v.n, pct, prof.notes, v.s)}

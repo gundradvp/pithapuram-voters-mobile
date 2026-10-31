@@ -113,6 +113,23 @@ export function saveVoterProfile(partNo: number | string, sno: number, updates: 
   }
 }
 
+export function saveBatchVoterProfiles(
+  partNo: number | string,
+  snoList: number[],
+  updates: Partial<VoterCampaignProfile>
+): Record<number, VoterCampaignProfile> {
+  const profiles = getVoterProfiles(partNo);
+  snoList.forEach(sno => {
+    profiles[sno] = { ...profiles[sno], ...updates };
+  });
+  try {
+    localStorage.setItem(getVoterProfilesKey(partNo), JSON.stringify(profiles));
+  } catch (err) {
+    console.error('Failed to batch save voter profiles:', err);
+  }
+  return profiles;
+}
+
 export function addVoterVisit(partNo: number | string, sno: number, visit: VoterVisit): void {
   const profiles = getVoterProfiles(partNo);
   const current = profiles[sno] || {};
@@ -131,10 +148,15 @@ export function addVoterVisit(partNo: number | string, sno: number, visit: Voter
 
 // -------------------------------------------------------------
 // CAMPAIGN WINNING SCORE & MARGIN CALCULATOR (Winning Weapon)
+// Supports:
+// 1. 'entry' mode: Pure Ground Truth based strictly on candidate / survey entries
+// 2. 'auto' mode: Statistical Predictive Simulation with swing extrapolation
+// 3. Money / Cash Factor tracking (Opponent Cash vs Secured Votes)
 // -------------------------------------------------------------
 export function calculateWinningScore(
   boothData: BoothData,
-  profiles: Record<number, VoterCampaignProfile>
+  profiles: Record<number, VoterCampaignProfile>,
+  mode: 'entry' | 'auto' = 'entry'
 ): WinningScoreCalculation {
   const totalElectors = boothData.voters.length || 1;
   const expectedTurnoutPct = 80; // Historical Pithapuram turnout benchmark (~80%)
@@ -144,39 +166,111 @@ export function calculateWinningScore(
   let rawJspSum = 0;
   let rawOpponentSum = 0;
   let rawNeutralSum = 0;
+  let surveyedCount = 0;
+  let unsurveyedCount = 0;
+
+  // Money / Cash influence counters
+  let cashOpponentPaidSafeCount = 0;
+  let cashOpponentPaidSwungCount = 0;
+  let cashAtRiskCount = 0;
+  let cashSecuredCount = 0;
 
   boothData.voters.forEach(v => {
     const p = profiles[v.s] || {};
-    const pct = p.supportPct !== undefined ? p.supportPct : (v.kriya ? 100 : 50);
 
-    if (pct === 100) {
-      rawJspSum += 1.0;
-    } else if (pct >= 75) {
-      rawJspSum += 0.75;
-      rawNeutralSum += 0.25;
-    } else if (pct === 40) {
-      rawJspSum += 0.40;
-      rawNeutralSum += 0.60;
-    } else if (pct === 0) {
-      // Marked as Opponent: directly adds to opposition vote bank
-      rawOpponentSum += 1.0;
-    } else if (pct <= 25) {
-      rawJspSum += 0.15;
-      rawOpponentSum += 0.60;
-      rawNeutralSum += 0.25;
+    // Money Influence tracking
+    if (p.moneyStatus === 'opponent_paid_safe') cashOpponentPaidSafeCount++;
+    else if (p.moneyStatus === 'opponent_paid_swung') cashOpponentPaidSwungCount++;
+    else if (p.moneyStatus === 'at_risk_cash') cashAtRiskCount++;
+    else if (p.moneyStatus === 'counter_secured') cashSecuredCount++;
+
+    const isExplicitEntry = p.supportPct !== undefined;
+
+    if (mode === 'entry') {
+      // PURE ENTRY MODE (Candidate / Volunteer Ground Truth):
+      // Only count voters who have been explicitly marked or verified.
+      if (isExplicitEntry) {
+        surveyedCount++;
+        const pct = p.supportPct!;
+
+        // If money swung the vote to opponent:
+        if (p.moneyStatus === 'opponent_paid_swung') {
+          rawOpponentSum += 1.0;
+        } else if (pct === 100) {
+          rawJspSum += 1.0;
+        } else if (pct >= 75) {
+          rawJspSum += 0.75;
+          rawNeutralSum += 0.25;
+        } else if (pct === 40) {
+          rawJspSum += 0.40;
+          rawNeutralSum += 0.60;
+        } else if (pct === 0) {
+          rawOpponentSum += 1.0;
+        } else if (pct <= 25) {
+          rawJspSum += 0.15;
+          rawOpponentSum += 0.60;
+          rawNeutralSum += 0.25;
+        } else {
+          // 50% Neutral
+          rawNeutralSum += 1.0;
+        }
+      } else if (v.kriya) {
+        // Confirmed active Kriya volunteer
+        surveyedCount++;
+        rawJspSum += 1.0;
+      } else {
+        // Untagged voters are NOT assumed to vote for anyone!
+        unsurveyedCount++;
+      }
     } else {
-      // 50% Neutral swing: splits 50/50 naturally
-      rawJspSum += 0.35;
-      rawOpponentSum += 0.35;
-      rawNeutralSum += 0.30;
+      // AUTOMATIC / STATISTICAL PREDICTIVE SIMULATION MODE:
+      surveyedCount++;
+      const pct = p.supportPct !== undefined ? p.supportPct : (v.kriya ? 100 : 50);
+
+      if (p.moneyStatus === 'opponent_paid_swung') {
+        rawOpponentSum += 1.0;
+      } else if (pct === 100) {
+        rawJspSum += 1.0;
+      } else if (pct >= 75) {
+        rawJspSum += 0.75;
+        rawNeutralSum += 0.25;
+      } else if (pct === 40) {
+        rawJspSum += 0.40;
+        rawNeutralSum += 0.60;
+      } else if (pct === 0) {
+        rawOpponentSum += 1.0;
+      } else if (pct <= 25) {
+        rawJspSum += 0.15;
+        rawOpponentSum += 0.60;
+        rawNeutralSum += 0.25;
+      } else {
+        // 50% Neutral swing: splits 50/50 naturally
+        rawJspSum += 0.35;
+        rawOpponentSum += 0.35;
+        rawNeutralSum += 0.30;
+      }
     }
   });
 
-  // Scale with expected turnout rate
   const turnoutMultiplier = expectedTurnoutPct / 100;
-  const projectedJspVotes = Math.round(rawJspSum * turnoutMultiplier);
-  const projectedOpponentVotes = Math.round(rawOpponentSum * turnoutMultiplier);
-  const projectedNeutralVotes = Math.round(rawNeutralSum * turnoutMultiplier);
+  let projectedJspVotes = 0;
+  let projectedOpponentVotes = 0;
+  let projectedNeutralVotes = 0;
+  let unsurveyedVotes = 0;
+
+  if (mode === 'entry') {
+    // In pure entry mode, show actual confirmed votes
+    projectedJspVotes = Math.round(rawJspSum);
+    projectedOpponentVotes = Math.round(rawOpponentSum);
+    projectedNeutralVotes = Math.round(rawNeutralSum);
+    unsurveyedVotes = unsurveyedCount;
+  } else {
+    projectedJspVotes = Math.round(rawJspSum * turnoutMultiplier);
+    projectedOpponentVotes = Math.round(rawOpponentSum * turnoutMultiplier);
+    projectedNeutralVotes = Math.round(rawNeutralSum * turnoutMultiplier);
+    unsurveyedVotes = 0;
+  }
+
   const projectedLead = projectedJspVotes - projectedOpponentVotes;
 
   const victoryProbability = Math.min(
@@ -198,6 +292,7 @@ export function calculateWinningScore(
   }
 
   return {
+    mode,
     totalElectors,
     expectedTurnoutPct,
     expectedPollVotes,
@@ -205,10 +300,16 @@ export function calculateWinningScore(
     projectedJspVotes,
     projectedOpponentVotes,
     projectedNeutralVotes,
+    unsurveyedVotes,
+    surveyedCount,
     projectedLead,
     victoryProbability,
     status,
-    neededToGuarantee
+    neededToGuarantee,
+    cashOpponentPaidSafeCount,
+    cashOpponentPaidSwungCount,
+    cashAtRiskCount,
+    cashSecuredCount
   };
 }
 
