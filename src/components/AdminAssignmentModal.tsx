@@ -84,7 +84,7 @@ export const AdminAssignmentModal: React.FC<AdminAssignmentModalProps> = ({
       case 'mptc_durgada_3':
         return { label: '🌾 దుర్గడ MPTC 3 (1,874)', cls: 'bg-sky-950/60 border-sky-500/40 text-sky-300' };
       case 'gp_durgada':
-        return { label: '🌾 దుర్గడ సమగ్ర పంచాయతీ (3,994)', cls: 'bg-amber-950/60 border-amber-500/40 text-amber-300' };
+        return { label: '🌾 దుర్గడ సమగ్ర పంచాయతీ (4,524)', cls: 'bg-amber-950/60 border-amber-500/40 text-amber-300' };
       case 'gp_vannepudi':
         return { label: '🌴 వన్నెపూడి పంచాయతీ (3,201)', cls: 'bg-purple-950/60 border-purple-500/40 text-purple-300' };
       default:
@@ -307,9 +307,9 @@ export const AdminAssignmentModal: React.FC<AdminAssignmentModalProps> = ({
                         setSelectedWards(prev => Array.from(new Set([...prev, 'mptc_durgada_1', 'mptc_durgada_3'])));
                       }}
                       className="px-2 py-0.5 bg-teal-500/20 hover:bg-teal-500 hover:text-slate-950 text-teal-300 rounded text-[9.5px] font-bold border border-teal-500/30 transition-colors"
-                      title="దుర్గడ 3 MPTCలు ఒకేసారి ఎంచుకోండి"
+                      title="దుర్గడ 2 MPTCలు (MPTC 1 & 3) ఒకేసారి ఎంచుకోండి"
                     >
-                      + దుర్గడ 3 MPTCలు
+                      + దుర్గడ 2 MPTCలు
                     </button>
                     <button
                       type="button"
@@ -429,7 +429,7 @@ export const AdminAssignmentModal: React.FC<AdminAssignmentModalProps> = ({
                         <MapPin className="w-3.5 h-3.5 text-amber-400" />
                         <span>దుర్గడ సమగ్ర GP</span>
                       </div>
-                      <span className="text-[10px] text-slate-400">3,994 ఓటర్లు (MPTC 1+2+3 సర్వ ఓటర్లు)</span>
+                      <span className="text-[10px] text-slate-400">4,524 ఓటర్లు (MPTC 1 & 3 సమగ్ర సర్వ ఓటర్లు)</span>
                     </div>
                     {selectedWards.includes('gp_durgada') && <Check className="w-3.5 h-3.5 text-amber-400" />}
                   </button>
