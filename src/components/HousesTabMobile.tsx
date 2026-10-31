@@ -1,5 +1,5 @@
 import React, { useState, useMemo } from 'react';
-import { Home, Search, Users, Phone, MessageSquare, Printer, CheckCircle2, X } from 'lucide-react';
+import { Home, Search, Users, Phone, MessageSquare, Printer, CheckCircle2, X, Copy } from 'lucide-react';
 import { MobileVoter, BoothInfo, VoterSurveyStatus } from '../types';
 
 interface HousesTabMobileProps {
@@ -19,6 +19,30 @@ export const HousesTabMobile: React.FC<HousesTabMobileProps> = ({
 }) => {
   const [houseSearch, setHouseSearch] = useState('');
   const [expandedHouse, setExpandedHouse] = useState<string | null>(null);
+  const [copiedEpicId, setCopiedEpicId] = useState<string | null>(null);
+
+  const handleCopyEpic = (epic: string, id: string) => {
+    if (!epic) return;
+    try {
+      if (navigator?.clipboard?.writeText) {
+        navigator.clipboard.writeText(epic);
+      } else {
+        const textArea = document.createElement('textarea');
+        textArea.value = epic;
+        textArea.style.position = 'fixed';
+        textArea.style.opacity = '0';
+        document.body.appendChild(textArea);
+        textArea.focus();
+        textArea.select();
+        document.execCommand('copy');
+        document.body.removeChild(textArea);
+      }
+      setCopiedEpicId(id);
+      setTimeout(() => setCopiedEpicId(null), 2000);
+    } catch (err) {
+      console.error('Failed to copy EPIC:', err);
+    }
+  };
 
   // Group Voters by House Number
   const houseClusters = useMemo(() => {
@@ -164,7 +188,23 @@ export const HousesTabMobile: React.FC<HousesTabMobileProps> = ({
 
                         <div className="flex items-center justify-between text-[11px] text-slate-400">
                           <span>Rel: <strong className="text-slate-300">{m.r}</strong></span>
-                          <span className="font-mono text-emerald-400 text-[10px]">{m.id}</span>
+                          <button
+                            type="button"
+                            onClick={() => m.id && handleCopyEpic(m.id, `house_epic_${m.s}`)}
+                            className={`font-mono text-[10px] px-1.5 py-0.5 rounded border transition-all flex items-center gap-1 active:scale-95 cursor-pointer shadow-sm ${
+                              copiedEpicId === `house_epic_${m.s}`
+                                ? 'bg-emerald-950 text-emerald-300 border-emerald-500/80 ring-1 ring-emerald-500/50'
+                                : 'text-emerald-400 hover:text-white bg-slate-900 hover:bg-slate-800 border-slate-800 hover:border-emerald-500/50'
+                            }`}
+                            title="Click to copy EPIC"
+                          >
+                            <span>{m.id}</span>
+                            {copiedEpicId === `house_epic_${m.s}` ? (
+                              <CheckCircle2 className="w-2.5 h-2.5 text-emerald-400" />
+                            ) : (
+                              <Copy className="w-2 h-2 text-slate-500 hover:text-emerald-400" />
+                            )}
+                          </button>
                         </div>
 
                         {/* Action buttons */}

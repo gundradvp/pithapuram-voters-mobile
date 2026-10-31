@@ -122,6 +122,7 @@ export const VotersTabMobile: React.FC<VotersTabMobileProps> = ({
   const [visibleCount, setVisibleCount] = useState(INITIAL_VISIBLE_COUNT);
   const [activeMenuSno, setActiveMenuSno] = useState<number | null>(null);
   const [copiedPhoneId, setCopiedPhoneId] = useState<string | null>(null);
+  const [copiedEpicId, setCopiedEpicId] = useState<string | null>(null);
   const [selectedDuplicateCluster, setSelectedDuplicateCluster] = useState<{
     voters: MobileVoter[];
     reasonTe: string;
@@ -148,6 +149,31 @@ export const VotersTabMobile: React.FC<VotersTabMobileProps> = ({
     setTimeout(() => {
       setCopiedPhoneId(null);
     }, 2000);
+  };
+
+  const handleCopyEpic = (epic: string, id: string) => {
+    if (!epic || epic === 'NO-EPIC') return;
+    try {
+      if (navigator?.clipboard?.writeText) {
+        navigator.clipboard.writeText(epic);
+      } else {
+        const textArea = document.createElement('textarea');
+        textArea.value = epic;
+        textArea.style.position = 'fixed';
+        textArea.style.opacity = '0';
+        document.body.appendChild(textArea);
+        textArea.focus();
+        textArea.select();
+        document.execCommand('copy');
+        document.body.removeChild(textArea);
+      }
+      setCopiedEpicId(id);
+      setTimeout(() => {
+        setCopiedEpicId(null);
+      }, 2000);
+    } catch (err) {
+      console.error('Failed to copy EPIC:', err);
+    }
   };
 
   const t = translations[language];
@@ -1324,7 +1350,29 @@ _మీ అమూల్యమైన ఓటును గాజు గ్లాస
                             <div className="flex items-center justify-between">
                               <div className="flex items-center gap-1.5 flex-wrap">
                                 <span className="font-mono text-amber-400 font-bold">#{m.s}</span>
-                                <span className="font-mono text-[10px] text-emerald-400">{m.id}</span>
+                                <button
+                                  type="button"
+                                  onClick={(e) => {
+                                    e.stopPropagation();
+                                    if (m.id) handleCopyEpic(m.id, `clan_epic_${m.s}`);
+                                  }}
+                                  className={`font-mono text-[10px] px-1.5 py-0.5 rounded border transition-all flex items-center gap-1 active:scale-95 cursor-pointer shadow-sm ${
+                                    copiedEpicId === `clan_epic_${m.s}`
+                                      ? 'bg-emerald-950/90 text-emerald-300 border-emerald-500/80 ring-1 ring-emerald-500/50'
+                                      : 'text-emerald-400 hover:text-emerald-300 bg-slate-950 hover:bg-slate-800 border-slate-800 hover:border-emerald-500/50'
+                                  }`}
+                                  title={language === 'te' ? 'ఓటర్ ఐడీ (EPIC) కాపీ చేయండి' : 'Click to copy EPIC'}
+                                >
+                                  <span>{m.id}</span>
+                                  {copiedEpicId === `clan_epic_${m.s}` ? (
+                                    <span className="text-[8px] text-emerald-300 font-bold flex items-center gap-0.5">
+                                      <CheckCircle2 className="w-2.5 h-2.5 text-emerald-400" />
+                                      <span>{language === 'te' ? 'కాపీ' : 'Copied'}</span>
+                                    </span>
+                                  ) : (
+                                    <Copy className="w-2 h-2 text-slate-500 hover:text-emerald-400" />
+                                  )}
+                                </button>
                                 <span className={`font-bold text-xs ${isClanDeceased ? 'text-slate-400 line-through' : 'text-white'}`}>{m.n}</span>
                                 {getStatusBadge(prof.survey_status)}
                                 {dupAnalysis.voterDupMap[m.s] && (() => {
@@ -1533,9 +1581,29 @@ _మీ అమూల్యమైన ఓటును గాజు గ్లాస
                   <span className="px-2 py-0.5 bg-amber-500/20 text-amber-300 border border-amber-500/40 rounded-md text-[11px] font-mono font-black">
                     #{v.s}
                   </span>
-                  <span className="font-mono text-[11px] font-bold text-emerald-400 bg-slate-950 px-2 py-0.5 rounded border border-slate-800">
-                    {v.id || 'NO-EPIC'}
-                  </span>
+                  <button
+                    type="button"
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      if (v.id) handleCopyEpic(v.id, `epic_${v.s}`);
+                    }}
+                    className={`font-mono text-[11px] font-bold px-2 py-0.5 rounded border transition-all flex items-center gap-1 active:scale-95 cursor-pointer shadow-sm group ${
+                      copiedEpicId === `epic_${v.s}`
+                        ? 'bg-emerald-950/90 text-emerald-300 border-emerald-500/80 ring-1 ring-emerald-500/50'
+                        : 'text-emerald-400 hover:text-emerald-300 bg-slate-950 hover:bg-slate-800 border-slate-800 hover:border-emerald-500/50'
+                    }`}
+                    title={language === 'te' ? 'ఓటర్ ఐడీ (EPIC) కాపీ చేయండి' : 'Click to copy EPIC ID'}
+                  >
+                    <span>{v.id || 'NO-EPIC'}</span>
+                    {copiedEpicId === `epic_${v.s}` ? (
+                      <span className="text-[10px] text-emerald-300 font-sans font-bold flex items-center gap-0.5 animate-in fade-in">
+                        <CheckCircle2 className="w-3 h-3 text-emerald-400" />
+                        <span className="text-[9px] uppercase tracking-tight">{language === 'te' ? 'కాపీ అయింది' : 'Copied'}</span>
+                      </span>
+                    ) : (
+                      <Copy className="w-2.5 h-2.5 text-slate-500 group-hover:text-emerald-400 transition-colors" />
+                    )}
+                  </button>
                 </div>
 
                 <div className="flex items-center gap-1.5 flex-wrap justify-end">

@@ -118,9 +118,26 @@ export const DuplicateCompareModal: React.FC<DuplicateCompareModalProps> = ({
                       <span className="w-6 h-6 rounded-full bg-amber-500/20 text-amber-300 font-mono text-xs font-black flex items-center justify-center border border-amber-500/40">
                         #{v.s}
                       </span>
-                      <span className="font-mono text-xs font-bold text-emerald-400 bg-slate-900 px-2 py-0.5 rounded border border-slate-800">
-                        {v.id || 'NO-EPIC'}
-                      </span>
+                      <button
+                        type="button"
+                        onClick={() => v.id && handleCopy(v.id, `dup_epic_${v.s}`)}
+                        className={`font-mono text-xs font-bold px-2 py-0.5 rounded border transition-all flex items-center gap-1 active:scale-95 cursor-pointer shadow-sm ${
+                          copiedId === `dup_epic_${v.s}`
+                            ? 'bg-emerald-950 text-emerald-300 border-emerald-500/80 ring-1 ring-emerald-500/50'
+                            : 'text-emerald-400 hover:text-white bg-slate-900 hover:bg-slate-800 border-slate-800 hover:border-emerald-500/50'
+                        }`}
+                        title={language === 'te' ? 'ఓటర్ ఐడీ (EPIC) కాపీ చేయండి' : 'Click to copy EPIC'}
+                      >
+                        <span>{v.id || 'NO-EPIC'}</span>
+                        {copiedId === `dup_epic_${v.s}` ? (
+                          <span className="text-[10px] text-emerald-300 font-sans font-bold flex items-center gap-0.5">
+                            <CheckCircle2 className="w-3 h-3 text-emerald-400" />
+                            <span>{language === 'te' ? 'కాపీ అయింది' : 'Copied'}</span>
+                          </span>
+                        ) : (
+                          <Copy className="w-2.5 h-2.5 text-slate-500 hover:text-emerald-400" />
+                        )}
+                      </button>
                     </div>
 
                     <button

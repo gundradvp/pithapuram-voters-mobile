@@ -1,5 +1,5 @@
-import React from 'react';
-import { X, Share2, Printer, MapPin, Home, User } from 'lucide-react';
+import React, { useState } from 'react';
+import { X, Share2, Printer, MapPin, Home, User, Copy, CheckCircle2 } from 'lucide-react';
 import { MobileVoter, BoothInfo } from '../types';
 import { resolvePhotoUrl } from '../utils/photoResolver';
 
@@ -15,6 +15,31 @@ export const VoterSlipModal: React.FC<VoterSlipModalProps> = ({
   onClose
 }) => {
   if (!voter || !boothInfo) return null;
+
+  const [copiedEpic, setCopiedEpic] = useState(false);
+
+  const handleCopyEpic = () => {
+    if (!voter?.id) return;
+    try {
+      if (navigator?.clipboard?.writeText) {
+        navigator.clipboard.writeText(voter.id);
+      } else {
+        const textArea = document.createElement('textarea');
+        textArea.value = voter.id;
+        textArea.style.position = 'fixed';
+        textArea.style.opacity = '0';
+        document.body.appendChild(textArea);
+        textArea.focus();
+        textArea.select();
+        document.execCommand('copy');
+        document.body.removeChild(textArea);
+      }
+      setCopiedEpic(true);
+      setTimeout(() => setCopiedEpic(false), 2000);
+    } catch (err) {
+      console.error('Failed to copy EPIC:', err);
+    }
+  };
 
   const formatBoothLabel = (partNo: string | number) => {
     const s = String(partNo);
@@ -148,9 +173,28 @@ _మీ అమూల్యమైన ఓటును గాజు గ్లాస
 
         {/* Details Grid */}
         <div className="bg-slate-950/70 border border-slate-800/80 rounded-xl p-3 space-y-2 text-xs">
-          <div className="flex items-start justify-between border-b border-slate-800/60 pb-1.5">
+          <div className="flex items-center justify-between border-b border-slate-800/60 pb-1.5">
             <span className="text-slate-400 text-[11px]">EPIC Number:</span>
-            <span className="font-mono font-black text-emerald-400 text-sm">{voter.id}</span>
+            <button
+              type="button"
+              onClick={handleCopyEpic}
+              className={`font-mono font-black text-sm px-2 py-0.5 rounded border transition-all flex items-center gap-1.5 active:scale-95 cursor-pointer shadow-sm ${
+                copiedEpic
+                  ? 'bg-emerald-950 text-emerald-300 border-emerald-500 ring-1 ring-emerald-500/50'
+                  : 'bg-slate-900 text-emerald-400 hover:text-emerald-300 hover:bg-slate-800 border-slate-800 hover:border-emerald-500/50'
+              }`}
+              title="Click to copy Voter ID (EPIC)"
+            >
+              <span>{voter.id}</span>
+              {copiedEpic ? (
+                <span className="text-[10px] text-emerald-300 font-sans font-bold flex items-center gap-0.5">
+                  <CheckCircle2 className="w-3.5 h-3.5 text-emerald-400" />
+                  <span>కాపీ అయింది</span>
+                </span>
+              ) : (
+                <Copy className="w-3 h-3 text-slate-400 hover:text-emerald-400" />
+              )}
+            </button>
           </div>
 
           <div className="border-b border-slate-800/60 pb-1.5">

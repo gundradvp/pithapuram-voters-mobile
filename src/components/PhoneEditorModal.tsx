@@ -19,11 +19,23 @@ export const PhoneEditorModal: React.FC<PhoneEditorModalProps> = ({
   const [altPhone, setAltPhone] = useState(profile?.altPhone || '');
   const [saved, setSaved] = useState(false);
   const [copiedKriya, setCopiedKriya] = useState(false);
+  const [copiedEpic, setCopiedEpic] = useState(false);
 
   const handleCopyKriya = (num: string) => {
     navigator.clipboard.writeText(num);
     setCopiedKriya(true);
     setTimeout(() => setCopiedKriya(false), 2000);
+  };
+
+  const handleCopyEpic = (epic: string) => {
+    if (!epic) return;
+    try {
+      if (navigator?.clipboard?.writeText) {
+        navigator.clipboard.writeText(epic);
+      }
+      setCopiedEpic(true);
+      setTimeout(() => setCopiedEpic(false), 2000);
+    } catch {}
   };
 
   const handleSave = (e: React.FormEvent) => {
@@ -54,9 +66,25 @@ export const PhoneEditorModal: React.FC<PhoneEditorModalProps> = ({
             Voter Contact Management
           </div>
           <h3 className="text-base font-black text-white mt-0.5 truncate">{voter.n}</h3>
-          <p className="text-[11px] text-slate-400">
-            S.No: <strong className="text-amber-400 font-mono">#{voter.s}</strong> • EPIC: <strong className="text-emerald-400 font-mono">{voter.id}</strong> • H.No: <strong className="text-slate-300 font-mono">{voter.hn}</strong>
-          </p>
+          <div className="text-[11px] text-slate-400 flex items-center gap-1.5 flex-wrap mt-0.5">
+            <span>S.No: <strong className="text-amber-400 font-mono">#{voter.s}</strong></span>
+            <span>•</span>
+            <button
+              type="button"
+              onClick={() => handleCopyEpic(voter.id)}
+              className="inline-flex items-center gap-1 px-1.5 py-0.5 rounded bg-slate-900 hover:bg-slate-800 border border-slate-800 hover:border-emerald-500/50 text-emerald-400 font-mono text-[11px] font-bold active:scale-95 transition-all cursor-pointer"
+              title="Click to copy EPIC"
+            >
+              <span>EPIC: {voter.id}</span>
+              {copiedEpic ? (
+                <CheckCircle2 className="w-2.5 h-2.5 text-emerald-400" />
+              ) : (
+                <Copy className="w-2 h-2 text-slate-500" />
+              )}
+            </button>
+            <span>•</span>
+            <span>H.No: <strong className="text-slate-300 font-mono">{voter.hn}</strong></span>
+          </div>
         </div>
 
         {/* Existing Kriya Number if available */}
