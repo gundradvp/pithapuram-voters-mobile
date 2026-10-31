@@ -44,7 +44,7 @@ interface FamiliesTabMobileProps {
 }
 
 type TabMode = 'surnames' | 'houses';
-type SurnameFilter = 'all' | 'top10' | 'jsp' | 'swing' | 'elders' | 'duplicates';
+type SurnameFilter = 'all' | 'top10' | 'jsp' | 'swing' | 'elders' | 'duplicates' | 'duplicates_exact' | 'duplicates_50';
 
 export const FamiliesTabMobile: React.FC<FamiliesTabMobileProps> = ({
   families,
@@ -103,12 +103,22 @@ export const FamiliesTabMobile: React.FC<FamiliesTabMobileProps> = ({
     return clanGroups.filter(c => c.duplicateCount && c.duplicateCount > 0).length;
   }, [clanGroups]);
 
+  const clansWithExactDupsCount = useMemo(() => {
+    return clanGroups.filter(c => c.voters.some(v => dupAnalysis.voterDupMap[v.s]?.confidencePct >= 80)).length;
+  }, [clanGroups, dupAnalysis.voterDupMap]);
+
+  const clansWith50DupsCount = useMemo(() => {
+    return clanGroups.filter(c => c.voters.some(v => dupAnalysis.voterDupMap[v.s]?.confidencePct < 80)).length;
+  }, [clanGroups, dupAnalysis.voterDupMap]);
+
   // Filtered Surname Clans
   const filteredClans = useMemo(() => {
     const q = searchQuery.toLowerCase().trim();
     return clanGroups.filter((c, idx) => {
       // Filter by clan filter mode
       if (surnameFilter === 'duplicates' && (!c.duplicateCount || c.duplicateCount === 0)) return false;
+      if (surnameFilter === 'duplicates_exact' && !c.voters.some(v => dupAnalysis.voterDupMap[v.s]?.confidencePct >= 80)) return false;
+      if (surnameFilter === 'duplicates_50' && !c.voters.some(v => dupAnalysis.voterDupMap[v.s]?.confidencePct < 80)) return false;
       if (surnameFilter === 'top10' && idx >= 10) return false;
       if (surnameFilter === 'jsp' && (c.fullCount + Math.round(c.strongCount * 0.75)) <= c.opponentCount) return false;
       if (surnameFilter === 'swing' && c.neutralCount === 0) return false;
@@ -378,16 +388,44 @@ export const FamiliesTabMobile: React.FC<FamiliesTabMobileProps> = ({
                 <span>👴 {language === 'te' ? 'పెద్దలు ఉన్నవి' : '60+ Elders'}</span>
               </button>
 
+              {clansWithExactDupsCount > 0 && (
+                <button
+                  onClick={() => setSurnameFilter('duplicates_exact')}
+                  className={`px-2.5 py-1 rounded-lg font-bold whitespace-nowrap transition-all flex items-center gap-1 ${
+                    surnameFilter === 'duplicates_exact'
+                      ? 'bg-rose-950 text-rose-200 font-black shadow-sm ring-1 ring-rose-500'
+                      : 'bg-slate-900 text-rose-400 border border-rose-500/30'
+                  }`}
+                  title={language === 'te' ? '100% పక్కా డూప్లికేట్లు ఉన్న వంశాలు' : 'Surname clans with 100% exact duplicates'}
+                >
+                  <span>🔴 100% {language === 'te' ? 'డూప్లికేట్లు' : 'Exact Dups'} ({clansWithExactDupsCount})</span>
+                </button>
+              )}
+
+              {clansWith50DupsCount > 0 && (
+                <button
+                  onClick={() => setSurnameFilter('duplicates_50')}
+                  className={`px-2.5 py-1 rounded-lg font-bold whitespace-nowrap transition-all flex items-center gap-1 ${
+                    surnameFilter === 'duplicates_50'
+                      ? 'bg-amber-950 text-amber-200 font-black shadow-sm ring-1 ring-amber-500'
+                      : 'bg-slate-900 text-amber-400 border border-amber-500/30'
+                  }`}
+                  title={language === 'te' ? '50% అనుమానిత డూప్లికేట్లు ఉన్న వంశాలు' : 'Surname clans with 50% suspected duplicates'}
+                >
+                  <span>🟡 50% {language === 'te' ? 'డూప్లికేట్లు' : '50% Dups'} ({clansWith50DupsCount})</span>
+                </button>
+              )}
+
               <button
                 onClick={() => setSurnameFilter('duplicates')}
                 className={`px-2.5 py-1 rounded-lg font-bold whitespace-nowrap transition-all flex items-center gap-1 ${
                   surnameFilter === 'duplicates'
-                    ? 'bg-rose-950 text-rose-200 font-black shadow-sm ring-1 ring-rose-500'
-                    : 'bg-slate-900 text-amber-300 border border-amber-500/30'
+                    ? 'bg-purple-950 text-purple-200 font-black shadow-sm ring-1 ring-purple-500'
+                    : 'bg-slate-900 text-purple-300 border border-purple-500/30'
                 }`}
-                title={language === 'te' ? 'డూప్లికేట్ ఓట్లు ఉన్న వంశాలు' : 'Surname clans with duplicate votes'}
+                title={language === 'te' ? 'మొత్తం డూప్లికేట్ ఓట్లు ఉన్న వంశాలు' : 'All clans with duplicate votes'}
               >
-                <span>⚠️ {language === 'te' ? 'డూప్లికేట్లు' : 'Duplicates'} ({clansWithDuplicatesCount})</span>
+                <span>⚠️ {language === 'te' ? 'మొత్తం డూప్లికేట్లు' : 'All Dups'} ({clansWithDuplicatesCount})</span>
               </button>
             </div>
           </div>
@@ -664,13 +702,13 @@ export const FamiliesTabMobile: React.FC<FamiliesTabMobileProps> = ({
                                           matchLevel: dup.matchLevel
                                         })}
                                         className={`px-1.5 py-0.2 rounded text-[8.5px] font-black inline-flex items-center gap-0.5 border shadow-sm hover:scale-105 transition-all ${
-                                          dup.matchLevel === 'exact'
+                                          dup.confidencePct >= 80
                                             ? 'bg-rose-950 text-rose-300 border-rose-500/60'
                                             : 'bg-amber-950 text-amber-300 border-amber-500/60'
                                         }`}
                                         title={dup.reasonTe}
                                       >
-                                        <span>⚠️ డూప్లికేట్ (#{dup.matchingSnos.join(', #')})</span>
+                                        <span>⚠️ {dup.confidencePct >= 80 ? (language === 'te' ? '100% డూప్లికేట్' : '100% Dup') : (language === 'te' ? '50% డూప్లికేట్' : '50% Dup')} (#{dup.matchingSnos.join(', #')})</span>
                                       </button>
                                     );
                                   })()}

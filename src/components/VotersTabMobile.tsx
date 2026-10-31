@@ -44,7 +44,7 @@ export const VotersTabMobile: React.FC<VotersTabMobileProps> = ({
   const [isPhoneticEnabled, setIsPhoneticEnabled] = useState<boolean>(true);
   const [expandedSurnameId, setExpandedSurnameId] = useState<string | null>(null);
   const [filterMode, setFilterMode] = useState<
-    'all' | 'full' | 'soft' | 'strong' | 'neutral' | 'opponent' | 'exact' | 'similar' | 'kriya_all' | 'voted' | 'has_phone' | 'duplicates'
+    'all' | 'full' | 'soft' | 'strong' | 'neutral' | 'opponent' | 'exact' | 'similar' | 'kriya_all' | 'voted' | 'has_phone' | 'duplicates' | 'duplicates_exact' | 'duplicates_50'
   >('all');
   const [visibleCount, setVisibleCount] = useState(30);
   const [activeMenuSno, setActiveMenuSno] = useState<number | null>(null);
@@ -140,6 +140,8 @@ export const VotersTabMobile: React.FC<VotersTabMobileProps> = ({
 
       // 2. Leaning / Filter Mode
       if (filterMode === 'duplicates') return !!dupAnalysis.voterDupMap[v.s];
+      if (filterMode === 'duplicates_exact') return dupAnalysis.voterDupMap[v.s]?.confidencePct >= 80;
+      if (filterMode === 'duplicates_50') return dupAnalysis.voterDupMap[v.s]?.confidencePct < 80;
       if (filterMode === 'full') return pct === 100;
       if (filterMode === 'soft') return pct === 40;
       if (filterMode === 'strong') return pct !== undefined && pct >= 75 && pct < 100;
@@ -203,9 +205,11 @@ export const VotersTabMobile: React.FC<VotersTabMobileProps> = ({
       kriyaAll,
       voted,
       hasPhone,
-      duplicates: dupAnalysis.totalDuplicateVotersCount
+      duplicates: dupAnalysis.totalDuplicateVotersCount,
+      exactDups: dupAnalysis.exactCount,
+      partial50Dups: dupAnalysis.partial50Count
     };
-  }, [voters, profiles, dupAnalysis.totalDuplicateVotersCount]);
+  }, [voters, profiles, dupAnalysis.totalDuplicateVotersCount, dupAnalysis.exactCount, dupAnalysis.partial50Count]);
 
   const displayedVoters = filteredVoters.slice(0, visibleCount);
 
@@ -555,16 +559,44 @@ _మీ అమూల్యమైన ఓటును గాజు గ్లాస
             <span>{t.filterOpponent} ({counts.opponent})</span>
           </button>
 
+          {counts.exactDups > 0 && (
+            <button
+              onClick={() => { setFilterMode('duplicates_exact'); setVisibleCount(30); }}
+              className={`px-2.5 py-1 rounded-lg font-bold whitespace-nowrap transition-all flex items-center gap-1 ${
+                filterMode === 'duplicates_exact'
+                  ? 'bg-rose-950 text-rose-200 font-black shadow-sm ring-1 ring-rose-500'
+                  : 'bg-slate-900 text-rose-400 border border-rose-500/40 hover:bg-slate-800'
+              }`}
+              title={language === 'te' ? '100% పక్కా డూప్లికేట్ ఓట్లు (ఒకే EPIC లేదా ఒకే పేరు & బంధువు)' : '100% Exact Duplicates'}
+            >
+              <span>🔴 100% {language === 'te' ? 'డూప్లికేట్లు' : 'Exact Dups'} ({counts.exactDups})</span>
+            </button>
+          )}
+
+          {counts.partial50Dups > 0 && (
+            <button
+              onClick={() => { setFilterMode('duplicates_50'); setVisibleCount(30); }}
+              className={`px-2.5 py-1 rounded-lg font-bold whitespace-nowrap transition-all flex items-center gap-1 ${
+                filterMode === 'duplicates_50'
+                  ? 'bg-amber-950 text-amber-200 font-black shadow-sm ring-1 ring-amber-500'
+                  : 'bg-slate-900 text-amber-400 border border-amber-500/40 hover:bg-slate-800'
+              }`}
+              title={language === 'te' ? '50% అనుమానిత డూప్లికేట్ ఓట్లు (ఒకే పేరు & సమాన వయస్సు, బంధువు పేరు వేరు)' : '50% Suspected Duplicates'}
+            >
+              <span>🟡 50% {language === 'te' ? 'డూప్లికేట్లు' : '50% Dups'} ({counts.partial50Dups})</span>
+            </button>
+          )}
+
           <button
             onClick={() => { setFilterMode('duplicates'); setVisibleCount(30); }}
             className={`px-2.5 py-1 rounded-lg font-bold whitespace-nowrap transition-all flex items-center gap-1 ${
               filterMode === 'duplicates'
-                ? 'bg-rose-950 text-rose-200 font-black shadow-sm ring-1 ring-rose-500'
-                : 'bg-slate-900 text-amber-300 border border-amber-500/40 hover:bg-slate-800'
+                ? 'bg-purple-950 text-purple-200 font-black shadow-sm ring-1 ring-purple-500'
+                : 'bg-slate-900 text-purple-300 border border-purple-500/40 hover:bg-slate-800'
             }`}
-            title={language === 'te' ? 'డూప్లికేట్ / డబుల్ నమోదైన ఓటర్లను చూడండి' : 'Filter duplicate / double votes'}
+            title={language === 'te' ? 'అన్ని డూప్లికేట్లు (100% + 50%)' : 'All Duplicate Votes'}
           >
-            <span>⚠️ {t.filterDuplicates || 'డూప్లికేట్లు'} ({counts.duplicates})</span>
+            <span>⚠️ {language === 'te' ? 'మొత్తం డూప్లికేట్లు' : 'All Dups'} ({counts.duplicates})</span>
           </button>
         </div>
       </div>
@@ -849,13 +881,13 @@ _మీ అమూల్యమైన ఓటును గాజు గ్లాస
                                         matchLevel: dup.matchLevel
                                       })}
                                       className={`px-1.5 py-0.2 rounded text-[8.5px] font-black inline-flex items-center gap-0.5 border shadow-sm hover:scale-105 transition-all ${
-                                        dup.matchLevel === 'exact'
+                                        dup.confidencePct >= 80
                                           ? 'bg-rose-950 text-rose-300 border-rose-500/60'
                                           : 'bg-amber-950 text-amber-300 border-amber-500/60'
                                       }`}
                                       title={dup.reasonTe}
                                     >
-                                      <span>⚠️ డూప్లికేట్ (#{dup.matchingSnos.join(', #')})</span>
+                                      <span>⚠️ {dup.confidencePct >= 80 ? (language === 'te' ? '100% డూప్లికేట్' : '100% Dup') : (language === 'te' ? '50% డూప్లికేట్' : '50% Dup')} (#{dup.matchingSnos.join(', #')})</span>
                                     </button>
                                   );
                                 })()}
@@ -1046,13 +1078,13 @@ _మీ అమూల్యమైన ఓటును గాజు గ్లాస
                             });
                           }}
                           className={`px-1.5 py-0.5 rounded text-[9px] font-black inline-flex items-center gap-1 shadow-sm transition-all hover:scale-105 active:scale-95 ${
-                            dup.matchLevel === 'exact'
+                            dup.confidencePct >= 80
                               ? 'bg-rose-950 text-rose-300 border border-rose-500/60'
                               : 'bg-amber-950 text-amber-300 border border-amber-500/60'
                           }`}
                           title={`${dup.reasonTe} (సరిపోల్చడానికి ట్యాప్ చేయండి)`}
                         >
-                          <span>⚠️ {dup.matchLevel === 'exact' ? (language === 'te' ? 'డూప్లికేట్' : 'Duplicate') : (language === 'te' ? 'సంభావ్య డూప్లికేట్' : 'Probable Dup')}</span>
+                          <span>⚠️ {dup.confidencePct >= 80 ? (language === 'te' ? '100% డూప్లికేట్' : '100% Duplicate') : (language === 'te' ? '50% డూప్లికేట్' : '50% Duplicate')}</span>
                           <span className="font-mono font-bold underline">(#{dup.matchingSnos.join(', #')})</span>
                         </button>
                       );

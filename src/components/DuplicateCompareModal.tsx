@@ -52,17 +52,21 @@ export const DuplicateCompareModal: React.FC<DuplicateCompareModalProps> = ({
         <div className="p-4 bg-gradient-to-r from-red-950/80 via-slate-900 to-amber-950/80 border-b border-amber-500/30 flex items-center justify-between gap-3">
           <div className="flex items-center gap-2.5">
             <div className="w-9 h-9 rounded-2xl bg-amber-500/20 text-amber-400 border border-amber-500/40 flex items-center justify-center text-lg shadow-inner">
-              <AlertTriangle className="w-5 h-5 text-amber-400" />
+              <AlertTriangle className={`w-5 h-5 ${confidencePct <= 50 ? 'text-amber-400' : 'text-rose-400'}`} />
             </div>
             <div>
               <div className="flex items-center gap-2">
                 <h2 className="text-sm font-black text-white">
-                  {language === 'te' ? 'డూప్లికేట్ / డబుల్ ఓట్ల పోలిక' : 'Duplicate Voter Analysis'}
+                  {confidencePct <= 50
+                    ? (language === 'te' ? '50% అనుమానిత డూప్లికేట్ ఓట్ల పోలిక' : '50% Suspected Duplicate Match')
+                    : (language === 'te' ? 'డూప్లికేట్ / డబుల్ ఓట్ల పోలిక' : 'Duplicate Voter Analysis')}
                 </h2>
                 <span className={`px-2 py-0.5 rounded-full font-mono text-[10px] font-black border ${
                   matchLevel === 'exact'
                     ? 'bg-rose-950 text-rose-300 border-rose-500/60'
-                    : 'bg-amber-950 text-amber-300 border-amber-500/60'
+                    : matchLevel === 'high'
+                      ? 'bg-amber-950 text-amber-300 border-amber-500/60'
+                      : 'bg-yellow-950 text-yellow-300 border-yellow-500/60'
                 }`}>
                   {confidencePct}% {language === 'te' ? 'సమానత' : 'Match'}
                 </span>

@@ -1,11 +1,11 @@
 import { MobileVoter } from '../types';
 import { extractSurname } from './surnameClassifier';
 
-export type DuplicateMatchLevel = 'exact' | 'high' | 'probable';
+export type DuplicateMatchLevel = 'exact' | 'high' | 'probable' | 'partial_50';
 
 export interface DuplicateMatchInfo {
   matchLevel: DuplicateMatchLevel;
-  confidencePct: number;
+  confidencePct: number; // 100, 90, 80, 50
   reasonTe: string;
   reasonEn: string;
   matchingVoters: MobileVoter[];
@@ -27,8 +27,12 @@ export interface DuplicateAnalysisResult {
   voterDupMap: Record<number, DuplicateMatchInfo>;
   clusters: DuplicateCluster[];
   totalDuplicateVotersCount: number;
+  exactCount: number; // 80-100% match
+  partial50Count: number; // 50% match
   totalClustersCount: number;
   surnameDupCountMap: Record<string, number>;
+  surnameExactCountMap: Record<string, number>;
+  surname50CountMap: Record<string, number>;
 }
 
 function cleanStr(s?: string | null): string {
@@ -84,8 +88,8 @@ function getComparableRelNames(v: MobileVoter): { en: string; te: string } {
 }
 
 /**
- * Fast, accurate engine to detect definite & probable duplicate votes across a booth
- * Groups duplicates by EPIC, exact name+relation, and same name+household patterns.
+ * Fast, comprehensive duplicate voter analysis engine
+ * Classifies both 100% exact duplicates and 50% suspected/probable duplicate votes
  */
 export function analyzeDuplicateVoters(voters: MobileVoter[]): DuplicateAnalysisResult {
   const voterMap = new Map<number, MobileVoter>();
@@ -94,6 +98,7 @@ export function analyzeDuplicateVoters(voters: MobileVoter[]): DuplicateAnalysis
   const epicMap = new Map<string, MobileVoter[]>();
   const nameRelMap = new Map<string, MobileVoter[]>();
   const nameHnMap = new Map<string, MobileVoter[]>();
+  const nameGenderMap = new Map<string, MobileVoter[]>();
 
   for (const v of voters) {
     const ep = (v.id || (v as any).epic || '').trim().toUpperCase();
@@ -106,6 +111,7 @@ export function analyzeDuplicateVoters(voters: MobileVoter[]): DuplicateAnalysis
     const { en: rEn, te: rTe } = getComparableRelNames(v);
     const g = v.g || '';
 
+    // Index by Name + Rel
     if (nEn && rEn) {
       const key = `${nEn}|${rEn}|${g}`;
       if (!nameRelMap.has(key)) nameRelMap.set(key, []);
@@ -116,6 +122,7 @@ export function analyzeDuplicateVoters(voters: MobileVoter[]): DuplicateAnalysis
       nameRelMap.get(key)!.push(v);
     }
 
+    // Index by Name + House
     const hn = cleanHouseNo(v.hn);
     if (nEn && hn) {
       const key = `${nEn}|${hn}|${g}`;
@@ -125,6 +132,17 @@ export function analyzeDuplicateVoters(voters: MobileVoter[]): DuplicateAnalysis
       const key = `${nTe}|${hn}|${g}`;
       if (!nameHnMap.has(key)) nameHnMap.set(key, []);
       nameHnMap.get(key)!.push(v);
+    }
+
+    // Index by Name + Gender for 50% match
+    if (nEn && nEn.length > 3) {
+      const key = `${nEn}|${g}`;
+      if (!nameGenderMap.has(key)) nameGenderMap.set(key, []);
+      nameGenderMap.get(key)!.push(v);
+    } else if (nTe && nTe.length > 3) {
+      const key = `${nTe}|${g}`;
+      if (!nameGenderMap.has(key)) nameGenderMap.set(key, []);
+      nameGenderMap.get(key)!.push(v);
     }
   }
 
@@ -155,7 +173,7 @@ export function analyzeDuplicateVoters(voters: MobileVoter[]): DuplicateAnalysis
     }
   }
 
-  // 1. Identical EPIC ID
+  // 1. Identical EPIC ID (100% Exact Duplicate)
   for (const [ep, list] of epicMap.entries()) {
     if (list.length > 1) {
       for (let i = 0; i < list.length; i++) {
@@ -173,7 +191,7 @@ export function analyzeDuplicateVoters(voters: MobileVoter[]): DuplicateAnalysis
     }
   }
 
-  // 2. Identical Name + Relative Name
+  // 2. Identical Name + Relative Name (90-98% High Duplicate)
   for (const [, list] of nameRelMap.entries()) {
     if (list.length > 1) {
       for (let i = 0; i < list.length; i++) {
@@ -206,7 +224,7 @@ export function analyzeDuplicateVoters(voters: MobileVoter[]): DuplicateAnalysis
               v2.s,
               'high',
               90,
-              `ఒకే పేరు & బంధువు పేరు (వేర్వేరు ఇళ్లు / చిరునామా)`,
+              `ఒకే పేరు & బంధువు పేరు (వేర్వేరు ఇళ్లు)`,
               `Same Name & Relative (Different House)`
             );
           }
@@ -215,7 +233,7 @@ export function analyzeDuplicateVoters(voters: MobileVoter[]): DuplicateAnalysis
     }
   }
 
-  // 3. Identical Name + Same House Number
+  // 3. Identical Name + Same House Number (80-82% Probable Duplicate)
   for (const [, list] of nameHnMap.entries()) {
     if (list.length > 1) {
       for (let i = 0; i < list.length; i++) {
@@ -241,11 +259,46 @@ export function analyzeDuplicateVoters(voters: MobileVoter[]): DuplicateAnalysis
     }
   }
 
+  // 4. 50% Duplicate Matches (Same Name & Gender with Age diff <= 4)
+  // Catches voters with same name & age enrolled with different relative name/spelling or house
+  for (const [, list] of nameGenderMap.entries()) {
+    if (list.length > 1) {
+      for (let i = 0; i < list.length; i++) {
+        for (let j = i + 1; j < list.length; j++) {
+          const v1 = list[i];
+          const v2 = list[j];
+          const k1 = `${v1.s}-${v2.s}`;
+          if (edgeMeta.has(k1)) continue; // Already covered by exact/high rule
+
+          const a1 = parseInt(v1.a, 10) || 0;
+          const a2 = parseInt(v2.a, 10) || 0;
+          const ageDiff = Math.abs(a1 - a2);
+
+          if (ageDiff <= 4) {
+            addEdge(
+              v1.s,
+              v2.s,
+              'partial_50',
+              50,
+              `50% అనుమానిత ఓటు: ఒకే పేరు, వయస్సు తేడా ${ageDiff}y (బంధువు పేరు వేరు)`,
+              `50% Suspected Match: Same Name & Age diff ${ageDiff}y (Diff Relative)`
+            );
+          }
+        }
+      }
+    }
+  }
+
   // Connected components to clusters
   const visited = new Set<number>();
   const clusters: DuplicateCluster[] = [];
   const voterDupMap: Record<number, DuplicateMatchInfo> = {};
   const surnameDupCountMap: Record<string, number> = {};
+  const surnameExactCountMap: Record<string, number> = {};
+  const surname50CountMap: Record<string, number> = {};
+
+  let exactCount = 0;
+  let partial50Count = 0;
 
   for (const sno of adj.keys()) {
     if (visited.has(sno)) continue;
@@ -272,7 +325,7 @@ export function analyzeDuplicateVoters(voters: MobileVoter[]): DuplicateAnalysis
       const clusterVoters = comp.map(s => voterMap.get(s)!).filter(Boolean);
 
       let bestConf = 0;
-      let bestLevel: DuplicateMatchLevel = 'probable';
+      let bestLevel: DuplicateMatchLevel = 'partial_50';
       let bestReasonTe = '';
       let bestReasonEn = '';
 
@@ -320,18 +373,30 @@ export function analyzeDuplicateVoters(voters: MobileVoter[]): DuplicateAnalysis
 
         const vSn = extractSurname(v).en || 'OTHER';
         surnameDupCountMap[vSn] = (surnameDupCountMap[vSn] || 0) + 1;
+
+        if (bestConf >= 80) {
+          exactCount++;
+          surnameExactCountMap[vSn] = (surnameExactCountMap[vSn] || 0) + 1;
+        } else {
+          partial50Count++;
+          surname50CountMap[vSn] = (surname50CountMap[vSn] || 0) + 1;
+        }
       }
     }
   }
 
-  // Sort clusters: exact first, then by size
+  // Sort clusters: higher confidence first, then by size
   clusters.sort((a, b) => b.confidencePct - a.confidencePct || b.voters.length - a.voters.length);
 
   return {
     clusters,
     voterDupMap,
     totalDuplicateVotersCount: Object.keys(voterDupMap).length,
+    exactCount,
+    partial50Count,
     totalClustersCount: clusters.length,
-    surnameDupCountMap
+    surnameDupCountMap,
+    surnameExactCountMap,
+    surname50CountMap
   };
 }
