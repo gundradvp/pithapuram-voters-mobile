@@ -10,7 +10,8 @@ import {
   AlertCircle,
   Save,
   Sparkles,
-  ArrowRightLeft
+  ArrowRightLeft,
+  RefreshCw
 } from 'lucide-react';
 import { Language } from '../utils/i18n';
 import {
@@ -18,6 +19,8 @@ import {
   applySyncToken,
   downloadCampaignBackupJson,
   persistProfilesToDisk,
+  savePreloadedProfiles,
+  fetchFreshProfiles,
   CampaignSyncBundle
 } from '../utils/storage';
 import { VoterCampaignProfile } from '../types';
@@ -120,6 +123,40 @@ export const SyncBackupModal: React.FC<SyncBackupModalProps> = ({
           ? 'లోకల్ సర్వర్ అందుబాటులో లేదు (మీరు బోల్ట్ క్లౌడ్ లో ఉంటే పైన ఉన్న "సింక్ కోడ్" వాడండి).'
           : e?.message || 'Failed to save to local disk'
       );
+      setSaveStatus(null);
+    }
+  };
+
+  // Reload Profiles from Disk File / Git
+  const handleReloadFromDisk = async () => {
+    setSaveStatus(language === 'te' ? 'ఫైల్ నుండి డేటా లోడ్ అవుతోంది...' : 'Loading from disk...');
+    setErrorMsg(null);
+    try {
+      const diskProfiles = await fetchFreshProfiles(partNo);
+      if (diskProfiles && Object.keys(diskProfiles).length > 0) {
+        savePreloadedProfiles(partNo, diskProfiles);
+        onSyncApplied({
+          version: 1,
+          timestamp: Date.now(),
+          partNo,
+          profiles: diskProfiles,
+          families: {},
+          influencers: {}
+        });
+        setSaveStatus(
+          language === 'te'
+            ? `🎉 విజయవంతంగా ${Object.keys(diskProfiles).length} మంది ఓటర్లు లోడ్ అయ్యారు!`
+            : `🎉 Successfully loaded ${Object.keys(diskProfiles).length} voters from disk!`
+        );
+        setTimeout(() => {
+          setSaveStatus(null);
+          onClose();
+        }, 1500);
+      } else {
+        throw new Error(language === 'te' ? 'ఈ బూత్ కు డిస్క్ ఫైల్ అందుబాటులో లేదు' : 'No profiles found on disk');
+      }
+    } catch (e: any) {
+      setErrorMsg(e?.message || 'Failed to reload from disk');
       setSaveStatus(null);
     }
   };
@@ -314,20 +351,29 @@ export const SyncBackupModal: React.FC<SyncBackupModalProps> = ({
         {activeTab === 'disk' && (
           <div className="space-y-3 bg-slate-950 p-3 rounded-2xl border border-slate-800 animate-in fade-in">
             <span className="font-bold text-amber-300 text-xs flex items-center gap-1">
-              💾 {language === 'te' ? 'ప్రాజెక్ట్ ఫైల్ కు శాశ్వతంగా సేవ్ చేయండి:' : 'Save to Project Codebase:'}
+              💾 {language === 'te' ? 'ప్రాజెక్ట్ ఫైల్ సింక్ (Project Disk & Cloud):' : 'Project Disk & Cloud:'}
             </span>
             <p className="text-[10.5px] text-slate-400 leading-relaxed">
               {language === 'te'
-                ? `ఈ ఆప్షన్ ద్వారా ప్రస్తుత బూత్ #${partNo} ఓటర్ల మార్కింగ్స్ నేరుగా మీ కంప్యూటర్‌లోని "public/profiles/profiles_${partNo}.json" ఫైల్‌లో సేవ్ అవుతాయి. ఆ తర్వాత గిట్‌హబ్‌కు పుష్ చేసి బోల్ట్‌లో sync.js రన్ చేస్తే బోల్ట్ క్లౌడ్‌లో కూడా ఈ మార్పులు శాశ్వతంగా కనిపిస్తాయి!`
-                : `Saves marked voters directly into your project file "public/profiles/profiles_${partNo}.json". Pushing to git and syncing to Bolt will permanently load these voters!`}
+                ? `ఈ ఆప్షన్ ద్వారా ప్రస్తుత బూత్ #${partNo} ఓటర్ల మార్కింగ్స్ నేరుగా "public/profiles/profiles_${partNo}.json" లో సేవ్ అవుతాయి లేదా డిస్క్ ఫైల్ నుండి బోల్ట్ లోకి వెంటనే లోడ్ చేసుకోవచ్చు.`
+                : `Saves or reloads marked voters directly from "public/profiles/profiles_${partNo}.json".`}
             </p>
-            <button
-              onClick={handleSaveToDisk}
-              className="w-full py-2.5 bg-gradient-to-r from-red-600 to-amber-600 hover:from-red-500 hover:to-amber-500 text-white font-black rounded-xl text-xs flex items-center justify-center gap-2 shadow-lg active:scale-95 transition-all"
-            >
-              <Save className="w-4 h-4 text-white" />
-              <span>{language === 'te' ? '💾 ప్రాజెక్ట్ ఫైల్ కు సేవ్ చేయండి (Save to Disk)' : '💾 Save to Project File'}</span>
-            </button>
+            <div className="space-y-2">
+              <button
+                onClick={handleSaveToDisk}
+                className="w-full py-2 bg-gradient-to-r from-red-600 to-amber-600 hover:from-red-500 hover:to-amber-500 text-white font-black rounded-xl text-xs flex items-center justify-center gap-2 shadow-lg active:scale-95 transition-all"
+              >
+                <Save className="w-4 h-4 text-white" />
+                <span>{language === 'te' ? '💾 ప్రాజెక్ట్ ఫైల్ కు సేవ్ చేయండి (Save to Disk)' : '💾 Save to Project File'}</span>
+              </button>
+              <button
+                onClick={handleReloadFromDisk}
+                className="w-full py-2 bg-slate-800 hover:bg-slate-700 text-amber-300 font-black rounded-xl text-xs flex items-center justify-center gap-2 border border-slate-700 shadow-md active:scale-95 transition-all"
+              >
+                <RefreshCw className="w-4 h-4 text-amber-400" />
+                <span>{language === 'te' ? '📥 డిస్క్ ఫైల్ నుండి రీలోడ్ చేయండి (Reload from Disk)' : '📥 Reload Profiles from Disk File'}</span>
+              </button>
+            </div>
           </div>
         )}
 

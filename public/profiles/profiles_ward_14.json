@@ -1,5 +1,413 @@
 {
   "1": {
+    "survey_status": null,
+    "supportPct": 100
+  },
+  "2": {
+    "supportPct": 100,
+    "survey_status": "supporter"
+  },
+  "3": {
+    "supportPct": 100,
+    "survey_status": "supporter"
+  },
+  "4": {
+    "supportPct": 100,
+    "survey_status": "supporter"
+  },
+  "6": {
+    "supportPct": 100,
+    "survey_status": "supporter"
+  },
+  "7": {
+    "supportPct": 100,
+    "survey_status": "supporter"
+  },
+  "8": {
+    "survey_status": "supporter",
+    "supportPct": 100
+  },
+  "9": {
+    "supportPct": 100,
+    "survey_status": "supporter"
+  },
+  "10": {
+    "supportPct": 100,
+    "survey_status": "supporter"
+  },
+  "12": {
+    "supportPct": 100,
+    "survey_status": "supporter"
+  },
+  "14": {
+    "supportPct": 100,
+    "survey_status": "supporter"
+  },
+  "15": {
+    "supportPct": 100,
+    "survey_status": "supporter"
+  },
+  "16": {
+    "supportPct": 100,
+    "survey_status": "supporter"
+  },
+  "17": {
+    "supportPct": 100,
+    "survey_status": "supporter"
+  },
+  "19": {
+    "supportPct": 100,
+    "survey_status": "supporter"
+  },
+  "21": {
+    "supportPct": 100,
+    "survey_status": "supporter"
+  },
+  "22": {
+    "supportPct": 100,
+    "survey_status": "supporter"
+  },
+  "23": {
+    "supportPct": 100,
+    "survey_status": "supporter"
+  },
+  "24": {
+    "supportPct": 100,
+    "survey_status": "supporter"
+  },
+  "25": {
+    "supportPct": 100,
+    "survey_status": "supporter"
+  },
+  "26": {
+    "supportPct": 100,
+    "survey_status": "supporter"
+  },
+  "28": {
+    "supportPct": 100,
+    "survey_status": "supporter"
+  },
+  "36": {
+    "supportPct": 50,
+    "survey_status": null
+  },
+  "37": {
+    "supportPct": 100,
+    "survey_status": "supporter"
+  },
+  "38": {
+    "supportPct": 100,
+    "survey_status": "supporter"
+  },
+  "39": {
+    "supportPct": 50,
+    "survey_status": null
+  },
+  "41": {
+    "supportPct": 100,
+    "survey_status": "supporter"
+  },
+  "43": {
+    "supportPct": 100,
+    "survey_status": "supporter"
+  },
+  "44": {
+    "supportPct": 100,
+    "survey_status": "supporter"
+  },
+  "45": {
+    "supportPct": 100,
+    "survey_status": "supporter"
+  },
+  "46": {
+    "supportPct": 100,
+    "survey_status": "supporter"
+  },
+  "47": {
+    "supportPct": 100,
+    "survey_status": "supporter"
+  },
+  "48": {
+    "supportPct": 100,
+    "survey_status": "supporter"
+  },
+  "49": {
+    "supportPct": 100,
+    "survey_status": "supporter"
+  },
+  "50": {
+    "supportPct": 50,
+    "survey_status": null
+  },
+  "52": {
+    "supportPct": 100,
+    "survey_status": "supporter"
+  },
+  "54": {
+    "supportPct": 100,
+    "survey_status": "supporter"
+  },
+  "58": {
+    "supportPct": 100,
+    "survey_status": "supporter"
+  },
+  "59": {
+    "supportPct": 100,
+    "survey_status": "supporter"
+  },
+  "60": {
+    "supportPct": 100,
+    "survey_status": "supporter"
+  },
+  "61": {
+    "supportPct": 100,
+    "survey_status": "supporter"
+  },
+  "62": {
+    "supportPct": 100,
+    "survey_status": "supporter"
+  },
+  "63": {
+    "supportPct": 100,
+    "survey_status": "supporter"
+  },
+  "64": {
+    "supportPct": 100,
+    "survey_status": "supporter"
+  },
+  "65": {
+    "supportPct": 100,
+    "survey_status": "supporter"
+  },
+  "66": {
+    "supportPct": 100,
+    "survey_status": "supporter"
+  },
+  "67": {
+    "supportPct": 100,
+    "survey_status": "supporter"
+  },
+  "68": {
+    "supportPct": 100,
+    "survey_status": "supporter"
+  },
+  "69": {
+    "supportPct": 100,
+    "survey_status": "supporter"
+  },
+  "71": {
+    "supportPct": 100,
+    "survey_status": "supporter"
+  },
+  "72": {
+    "supportPct": 100,
+    "survey_status": "supporter"
+  },
+  "73": {
+    "supportPct": 100,
+    "survey_status": "supporter"
+  },
+  "74": {
+    "supportPct": 100,
+    "survey_status": "supporter"
+  },
+  "75": {
+    "supportPct": 100,
+    "survey_status": "supporter"
+  },
+  "76": {
+    "supportPct": 100,
+    "survey_status": "supporter"
+  },
+  "77": {
+    "supportPct": 100,
+    "survey_status": "supporter"
+  },
+  "78": {
+    "supportPct": 100,
+    "survey_status": "supporter"
+  },
+  "79": {
+    "supportPct": 100,
+    "survey_status": "supporter"
+  },
+  "80": {
+    "supportPct": 100,
+    "survey_status": "supporter"
+  },
+  "81": {
+    "supportPct": 100,
+    "survey_status": "supporter"
+  },
+  "82": {
+    "supportPct": 100,
+    "survey_status": "supporter"
+  },
+  "83": {
+    "supportPct": 100,
+    "survey_status": "supporter"
+  },
+  "84": {
+    "supportPct": 100,
+    "survey_status": "supporter"
+  },
+  "85": {
+    "supportPct": 100,
+    "survey_status": "supporter"
+  },
+  "86": {
+    "supportPct": 100,
+    "survey_status": "supporter"
+  },
+  "87": {
+    "supportPct": 100,
+    "survey_status": "supporter"
+  },
+  "88": {
+    "supportPct": 100,
+    "survey_status": "supporter"
+  },
+  "89": {
+    "supportPct": 100,
+    "survey_status": "supporter"
+  },
+  "92": {
+    "supportPct": 100,
+    "survey_status": "supporter"
+  },
+  "93": {
+    "supportPct": 100,
+    "survey_status": "supporter"
+  },
+  "94": {
+    "supportPct": 100,
+    "survey_status": "supporter"
+  },
+  "95": {
+    "supportPct": 100,
+    "survey_status": "supporter"
+  },
+  "96": {
+    "supportPct": 100,
+    "survey_status": "supporter"
+  },
+  "97": {
+    "supportPct": 100,
+    "survey_status": "supporter"
+  },
+  "98": {
+    "supportPct": 100,
+    "survey_status": "supporter"
+  },
+  "99": {
+    "supportPct": 100,
+    "survey_status": "supporter"
+  },
+  "100": {
+    "supportPct": 100,
+    "survey_status": "supporter"
+  },
+  "101": {
+    "supportPct": 100,
+    "survey_status": "supporter"
+  },
+  "102": {
+    "supportPct": 100,
+    "survey_status": "supporter"
+  },
+  "103": {
+    "supportPct": 100,
+    "survey_status": "supporter"
+  },
+  "104": {
+    "supportPct": 100,
+    "survey_status": "supporter"
+  },
+  "109": {
+    "supportPct": 100,
+    "survey_status": "supporter"
+  },
+  "111": {
+    "supportPct": 100,
+    "survey_status": "supporter"
+  },
+  "112": {
+    "supportPct": 50,
+    "survey_status": null
+  },
+  "113": {
+    "supportPct": 100,
+    "survey_status": "supporter"
+  },
+  "114": {
+    "supportPct": 100,
+    "survey_status": "supporter"
+  },
+  "115": {
+    "supportPct": 100,
+    "survey_status": "supporter"
+  },
+  "116": {
+    "supportPct": 100,
+    "survey_status": "supporter"
+  },
+  "117": {
+    "supportPct": 100,
+    "survey_status": "supporter"
+  },
+  "118": {
+    "supportPct": 100,
+    "survey_status": "supporter"
+  },
+  "127": {
+    "supportPct": 100,
+    "survey_status": "supporter"
+  },
+  "128": {
+    "supportPct": 100,
+    "survey_status": "supporter"
+  },
+  "129": {
+    "supportPct": 100,
+    "survey_status": "supporter"
+  },
+  "131": {
+    "supportPct": 100,
+    "survey_status": "supporter"
+  },
+  "132": {
+    "supportPct": 100,
+    "survey_status": "supporter"
+  },
+  "133": {
+    "supportPct": 100,
+    "survey_status": "supporter"
+  },
+  "134": {
+    "supportPct": 100,
+    "survey_status": "supporter"
+  },
+  "135": {
+    "supportPct": 100,
+    "survey_status": "supporter"
+  },
+  "136": {
+    "supportPct": 100,
+    "survey_status": "supporter"
+  },
+  "137": {
+    "supportPct": 50,
+    "survey_status": null
+  },
+  "155": {
+    "supportPct": 100,
+    "survey_status": "supporter"
+  },
+  "156": {
+    "supportPct": 100,
+    "survey_status": "supporter"
+  },
+  "157": {
     "supportPct": 100,
     "survey_status": "supporter"
   }

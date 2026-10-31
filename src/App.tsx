@@ -343,15 +343,37 @@ export function App() {
     setProfiles(localProfiles);
     setInfluencers(getInfluencers(partNo));
 
-    // If local storage is empty for this booth, check pre-committed profiles on disk or github
-    if (Object.keys(localProfiles).length === 0) {
-      fetchFreshProfiles(partNo).then(diskProfiles => {
-        if (diskProfiles && Object.keys(diskProfiles).length > 0) {
-          savePreloadedProfiles(partNo, diskProfiles);
-          setProfiles(diskProfiles);
+    // Step A.1: Always fetch pre-committed profiles from disk/git and merge with local storage
+    fetchFreshProfiles(partNo).then(diskProfiles => {
+      if (diskProfiles && Object.keys(diskProfiles).length > 0) {
+        const currentLocal = getVoterProfiles(partNo);
+        // Merge: local modifications + disk pre-committed profiles
+        const merged: Record<number, VoterCampaignProfile> = { ...diskProfiles, ...currentLocal };
+        
+        for (const [snoStr, dp] of Object.entries(diskProfiles)) {
+          const sno = Number(snoStr);
+          if (!currentLocal[sno]) {
+            merged[sno] = dp;
+          } else {
+            // If disk has supporter status or 100% and local is unassigned, adopt disk
+            if (dp.survey_status && !currentLocal[sno].survey_status) {
+              merged[sno] = { ...merged[sno], ...dp };
+            }
+            if (dp.supportPct !== undefined && currentLocal[sno].supportPct === undefined) {
+              merged[sno] = { ...merged[sno], supportPct: dp.supportPct };
+            }
+          }
         }
-      }).catch(() => {});
-    }
+        
+        // If disk has more entries than local, adopt disk as base
+        const finalProfiles = Object.keys(diskProfiles).length >= Object.keys(currentLocal).length
+          ? { ...currentLocal, ...diskProfiles }
+          : merged;
+
+        savePreloadedProfiles(partNo, finalProfiles);
+        setProfiles(finalProfiles);
+      }
+    }).catch(() => {});
 
     // Step B: Check local cache first (Instant load)
     const cached = getCachedBoothData(partNo);
