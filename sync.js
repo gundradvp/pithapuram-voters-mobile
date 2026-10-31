@@ -39,6 +39,8 @@ const filesToSync = [
   'src/components/GroupPrintModal.tsx',
   'src/components/SurnameLeaningModal.tsx',
   'public/local_elections_index.json',
+  'public/booths/mptc_chebrolu_4.json',
+  'public/booths/booth_mptc_chebrolu_4.json',
   'public/booths/booth_ward_14.json',
   'public/booths/ward_14.json',
   'public/booths/booth_gollaprolu_ward_11.json',

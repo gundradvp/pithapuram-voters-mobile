@@ -6287,5 +6287,26 @@
     "kriya_percentage": 0.0,
     "volunteers_count": 0,
     "is_loaded": false
+  },
+  {
+    "id": "mptc_chebrolu_4",
+    "type": "mptc",
+    "mptc_name_te": "చేబ్రోలు MPTC 4 (వార్డులు 13-16)",
+    "mptc_name_en": "Chebrolu MPTC 4",
+    "mandal_te": "గొల్లప్రోలు",
+    "mandal_en": "Gollaprolu",
+    "village": "చేబ్రోలు (వార్డులు 13-16)",
+    "clean_village": "చేబ్రోలు MPTC 4 (2,979 ఓటర్లు)",
+    "ps_address": "చేబ్రోలు గ్రామ పంచాయతీ వార్డులు 13, 14, 15, 16 పోలింగ్ కేంద్రాలు (బూత్స్ 38, 39, 40, 41)",
+    "sections": "వార్డు 13 (741), వార్డు 14 (741), వార్డు 15 (741), వార్డు 16 (756)",
+    "total_voters": 2979,
+    "male_count": 1649,
+    "female_count": 1330,
+    "exact_kriya_count": 403,
+    "similar_kriya_count": 0,
+    "total_kriya_count": 403,
+    "kriya_percentage": 13.53,
+    "volunteers_count": 69,
+    "is_loaded": true
   }
 ]
