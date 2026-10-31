@@ -19,7 +19,7 @@ export interface VolunteerAssignment {
 
 const SESSION_STORAGE_KEY = 'jsp_user_session';
 const ASSIGNMENTS_STORAGE_KEY = 'jsp_volunteer_assignments';
-const ADMIN_PASSWORD_HASH = '1562'; // Static admin password requested by user
+const ADMIN_PASSWORD_HASH = '1555'; // Static admin password requested by user
 
 // Pre-seeded initial assignments based on user's requirements
 export const DEFAULT_ASSIGNMENTS: VolunteerAssignment[] = [

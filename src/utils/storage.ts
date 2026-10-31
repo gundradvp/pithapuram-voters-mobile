@@ -3,7 +3,7 @@ import { BoothData, VoterSurveyStatus, FamilyGroup, Influencer, VoterCampaignPro
 const ASSIGNED_BOOTH_KEY = 'jsp_mobile_assigned_booth';
 const BOOTH_LOCKED_KEY = 'jsp_mobile_booth_locked';
 const ADMIN_PIN_KEY = 'jsp_mobile_admin_pin';
-const DEFAULT_ADMIN_PIN = '1982';
+const DEFAULT_ADMIN_PIN = '1555';
 
 export function getAssignedBooth(): number | string | null {
   const val = localStorage.getItem(ASSIGNED_BOOTH_KEY);
