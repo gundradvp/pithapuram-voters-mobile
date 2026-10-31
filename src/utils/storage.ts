@@ -104,11 +104,54 @@ export function getVoterProfiles(partNo: number | string): Record<number, VoterC
   }
 }
 
+export function persistProfilesToDisk(partNo: number | string, profiles: Record<number, VoterCampaignProfile>): void {
+  try {
+    if (typeof fetch !== 'undefined') {
+      fetch('/api/save-profiles', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ partNo, profiles })
+      }).catch(() => {
+        // Silently ignore if running on cloud / bolt static host
+      });
+    }
+  } catch {}
+}
+
+export function savePreloadedProfiles(partNo: number | string, profiles: Record<number, VoterCampaignProfile>): void {
+  try {
+    safeStorage.setItem(getVoterProfilesKey(partNo), JSON.stringify(profiles));
+  } catch {}
+}
+
+export async function fetchFreshProfiles(partNo: number | string): Promise<Record<number, VoterCampaignProfile> | null> {
+  const ts = Date.now();
+  const urls = [
+    `/profiles/profiles_${partNo}.json?v=${ts}`,
+    `https://raw.githubusercontent.com/gundradvp/pithapuram-voters-mobile/main/public/profiles/profiles_${partNo}.json?v=${ts}`,
+    `https://cdn.jsdelivr.net/gh/gundradvp/pithapuram-voters-mobile@main/public/profiles/profiles_${partNo}.json`
+  ];
+
+  for (const url of urls) {
+    try {
+      const res = await fetch(url, { cache: 'no-store' });
+      if (res.ok) {
+        const data = await res.json();
+        if (data && typeof data === 'object' && Object.keys(data).length > 0) {
+          return data;
+        }
+      }
+    } catch {}
+  }
+  return null;
+}
+
 export function saveVoterProfile(partNo: number | string, sno: number, updates: Partial<VoterCampaignProfile>): void {
   const profiles = getVoterProfiles(partNo);
   profiles[sno] = { ...profiles[sno], ...updates };
   try {
     safeStorage.setItem(getVoterProfilesKey(partNo), JSON.stringify(profiles));
+    persistProfilesToDisk(partNo, profiles);
   } catch (err) {
     console.error('Failed to save voter profile:', err);
   }
@@ -125,6 +168,7 @@ export function saveBatchVoterProfiles(
   });
   try {
     safeStorage.setItem(getVoterProfilesKey(partNo), JSON.stringify(profiles));
+    persistProfilesToDisk(partNo, profiles);
   } catch (err) {
     console.error('Failed to batch save voter profiles:', err);
   }
@@ -569,4 +613,87 @@ export function exportSurveyReportCsv(
   link.click();
   document.body.removeChild(link);
   URL.revokeObjectURL(url);
+}
+
+// -------------------------------------------------------------
+// Campaign Data Cloud / Bolt Sync & Portable Transfer
+// -------------------------------------------------------------
+export interface CampaignSyncBundle {
+  version: number;
+  timestamp: number;
+  partNo: number | string;
+  profiles: Record<number, VoterCampaignProfile>;
+  families?: Record<string, FamilyGroup>;
+  influencers?: Record<string, Influencer>;
+}
+
+export function generateSyncToken(partNo: number | string): string {
+  const bundle: CampaignSyncBundle = {
+    version: 1,
+    timestamp: Date.now(),
+    partNo,
+    profiles: getVoterProfiles(partNo),
+    families: getFamilyGroups(partNo),
+    influencers: getInfluencers(partNo)
+  };
+
+  const json = JSON.stringify(bundle);
+  try {
+    return btoa(encodeURIComponent(json));
+  } catch {
+    return json;
+  }
+}
+
+export function applySyncToken(tokenString: string): CampaignSyncBundle {
+  let json = tokenString.trim();
+  try {
+    json = decodeURIComponent(atob(json));
+  } catch {
+    // If not base64, assume raw json string
+  }
+
+  const bundle = JSON.parse(json) as CampaignSyncBundle;
+  if (!bundle.partNo || !bundle.profiles) {
+    throw new Error('చెల్లని సింక్ కోడ్ (Invalid Sync Code)');
+  }
+
+  // Save to safeStorage
+  safeStorage.setItem(getVoterProfilesKey(bundle.partNo), JSON.stringify(bundle.profiles));
+  if (bundle.families) {
+    safeStorage.setItem(getFamiliesKey(bundle.partNo), JSON.stringify(bundle.families));
+  }
+  if (bundle.influencers) {
+    safeStorage.setItem(getInfluencersKey(bundle.partNo), JSON.stringify(bundle.influencers));
+  }
+
+  // Also persist to disk if running on dev server
+  persistProfilesToDisk(bundle.partNo, bundle.profiles);
+
+  return bundle;
+}
+
+export function downloadCampaignBackupJson(partNo: number | string): void {
+  const bundle: CampaignSyncBundle = {
+    version: 1,
+    timestamp: Date.now(),
+    partNo,
+    profiles: getVoterProfiles(partNo),
+    families: getFamilyGroups(partNo),
+    influencers: getInfluencers(partNo)
+  };
+  const fileName = `JSP_Pithapuram_Campaign_Part_${partNo}_${new Date().toISOString().slice(0, 10)}.json`;
+  const blob = new Blob([JSON.stringify(bundle, null, 2)], { type: 'application/json' });
+  const url = URL.createObjectURL(blob);
+  const link = document.createElement('a');
+  link.href = url;
+  link.download = fileName;
+  document.body.appendChild(link);
+  link.click();
+  document.body.removeChild(link);
+  URL.revokeObjectURL(url);
+}
+
+export function parseCampaignBackupJson(jsonContent: string): CampaignSyncBundle {
+  return applySyncToken(jsonContent);
 }

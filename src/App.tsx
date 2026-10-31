@@ -19,6 +19,7 @@ import { LoginModal } from './components/LoginModal';
 import { AdminAssignmentModal } from './components/AdminAssignmentModal';
 import { GroupPrintModal } from './components/GroupPrintModal';
 import { SurnameLeaningModal } from './components/SurnameLeaningModal';
+import { SyncBackupModal } from './components/SyncBackupModal';
 import {
   BoothData,
   BoothIndexItem,
@@ -51,7 +52,10 @@ import {
   deleteFamilyGroup,
   getInfluencers,
   saveInfluencer,
-  calculateWinningScore
+  calculateWinningScore,
+  fetchFreshProfiles,
+  savePreloadedProfiles,
+  CampaignSyncBundle
 } from './utils/storage';
 import { classifyBoothSurnames } from './utils/surnameClassifier';
 import {
@@ -141,6 +145,7 @@ export function App() {
 
   // Modals State
   const [isBoothSelectorOpen, setIsBoothSelectorOpen] = useState<boolean>(false);
+  const [isSyncModalOpen, setIsSyncModalOpen] = useState<boolean>(false);
   const [selectedVoterForSlip, setSelectedVoterForSlip] = useState<MobileVoter | null>(null);
   const [selectedVoterForPhone, setSelectedVoterForPhone] = useState<MobileVoter | null>(null);
   const [selectedVoterForVisit, setSelectedVoterForVisit] = useState<MobileVoter | null>(null);
@@ -337,6 +342,16 @@ export function App() {
     const localProfiles = getVoterProfiles(partNo);
     setProfiles(localProfiles);
     setInfluencers(getInfluencers(partNo));
+
+    // If local storage is empty for this booth, check pre-committed profiles on disk or github
+    if (Object.keys(localProfiles).length === 0) {
+      fetchFreshProfiles(partNo).then(diskProfiles => {
+        if (diskProfiles && Object.keys(diskProfiles).length > 0) {
+          savePreloadedProfiles(partNo, diskProfiles);
+          setProfiles(diskProfiles);
+        }
+      }).catch(() => {});
+    }
 
     // Step B: Check local cache first (Instant load)
     const cached = getCachedBoothData(partNo);
@@ -701,6 +716,20 @@ export function App() {
     setInfluencers(getInfluencers(pNo));
   };
 
+  // Handle Sync Applied (from Modal or Backup)
+  const handleSyncApplied = (bundle: CampaignSyncBundle) => {
+    if (String(bundle.partNo) === String(currentPartNo)) {
+      setProfiles(bundle.profiles);
+      if (bundle.families) setFamilies(bundle.families);
+      if (bundle.influencers) setInfluencers(bundle.influencers);
+    }
+    triggerScoreNotice(
+      lang === 'te'
+        ? `🎉 బూత్ #${bundle.partNo} డేటా విజయవంతంగా సింక్ అయ్యింది!`
+        : `🎉 Unit #${bundle.partNo} campaign data synced successfully!`
+    );
+  };
+
   return (
     <div className="min-h-screen bg-slate-950 text-slate-100 flex flex-col font-sans select-none antialiased">
       {/* Sticky Mobile Header with Language & Theme Toggle */}
@@ -713,6 +742,7 @@ export function App() {
         session={session}
         isRefreshing={isRefreshing}
         onRefreshData={() => handleRefreshData(true)}
+        onOpenSyncModal={() => setIsSyncModalOpen(true)}
         onToggleLanguage={toggleLanguage}
         onOpenThemeSelector={() => setIsThemeModalOpen(true)}
         onOpenBoothSelector={() => setIsBoothSelectorOpen(true)}
@@ -1115,6 +1145,18 @@ export function App() {
           language={lang}
           onApply={handleApplySurnameLeaning}
           onClose={() => setSurnameLeaningState({ open: false })}
+        />
+      )}
+
+      {/* Cloud & Bolt Campaign Data Sync & Backup Modal */}
+      {isSyncModalOpen && (
+        <SyncBackupModal
+          isOpen={isSyncModalOpen}
+          partNo={currentPartNo}
+          profiles={profiles}
+          language={lang}
+          onClose={() => setIsSyncModalOpen(false)}
+          onSyncApplied={handleSyncApplied}
         />
       )}
     </div>

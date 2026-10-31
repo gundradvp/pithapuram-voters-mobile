@@ -1,5 +1,5 @@
 import React from 'react';
-import { Lock, Unlock, Wifi, WifiOff, Languages, Palette, LogOut, Crown, UserCheck, RefreshCw } from 'lucide-react';
+import { Lock, Unlock, Wifi, WifiOff, Languages, Palette, LogOut, Crown, UserCheck, RefreshCw, ArrowRightLeft } from 'lucide-react';
 import { BoothInfo } from '../types';
 import { Language } from '../utils/i18n';
 import { ThemeId, THEMES } from '../utils/theme';
@@ -14,6 +14,7 @@ interface HeaderMobileProps {
   session: UserSession | null;
   isRefreshing?: boolean;
   onRefreshData?: () => void;
+  onOpenSyncModal?: () => void;
   onToggleLanguage: () => void;
   onOpenThemeSelector: () => void;
   onOpenBoothSelector: () => void;
@@ -30,6 +31,7 @@ export const HeaderMobile: React.FC<HeaderMobileProps> = ({
   session,
   isRefreshing,
   onRefreshData,
+  onOpenSyncModal,
   onToggleLanguage,
   onOpenThemeSelector,
   onOpenBoothSelector,
@@ -109,6 +111,18 @@ export const HeaderMobile: React.FC<HeaderMobileProps> = ({
             <span className="hidden sm:inline">
               {isRefreshing ? (language === 'te' ? 'రిఫ్రెష్...' : 'Sync...') : (language === 'te' ? 'రిఫ్రెష్' : 'Refresh')}
             </span>
+          </button>
+        )}
+
+        {/* Cloud & Bolt Sync Modal Button */}
+        {onOpenSyncModal && (
+          <button
+            onClick={onOpenSyncModal}
+            className="flex items-center gap-1 px-1.5 py-1 rounded-lg text-[10px] font-bold border transition-all bg-gradient-to-r from-red-600/30 to-amber-600/30 text-amber-300 border-amber-500/50 hover:bg-amber-500/30 active:scale-95 shadow-sm"
+            title={language === 'te' ? 'లోకల్ & బోల్ట్ క్లౌడ్ డేటా సింక్ (Sync Data between Local & Bolt)' : 'Sync Data between Local & Bolt'}
+          >
+            <ArrowRightLeft className="w-3.5 h-3.5 text-amber-400" />
+            <span className="hidden xs:inline">{language === 'te' ? 'సింక్' : 'Sync'}</span>
           </button>
         )}
 
