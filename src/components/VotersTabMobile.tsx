@@ -18,6 +18,8 @@ interface VotersTabMobileProps {
   onOpenLogVisit: (voter: MobileVoter) => void;
   onOpenInfluencerAssign: (targetName: string, currentInfId?: string, voterSno?: number) => void;
   onUpdateSurveyMark: (serialNo: number, status: VoterSurveyStatus | null) => void;
+  onQuickToggleOurs?: (serialNo: number) => void;
+  onQuickToggleVoted?: (serialNo: number) => void;
   onOpenSlip: (voter: MobileVoter) => void;
   onOpenGroupPrint?: (title: string, subtitle: string, voters: MobileVoter[]) => void;
   onOpenSurnameLeaning?: (clanId?: string) => void;
@@ -65,6 +67,8 @@ export const VotersTabMobile: React.FC<VotersTabMobileProps> = ({
   onOpenLogVisit,
   onOpenInfluencerAssign,
   onUpdateSurveyMark,
+  onQuickToggleOurs,
+  onQuickToggleVoted,
   onOpenSlip,
   onOpenGroupPrint,
   onOpenSurnameLeaning
@@ -78,8 +82,28 @@ export const VotersTabMobile: React.FC<VotersTabMobileProps> = ({
   const [isPhoneticEnabled, setIsPhoneticEnabled] = useState<boolean>(true);
   const [expandedSurnameId, setExpandedSurnameId] = useState<string | null>(null);
   const [filterMode, setFilterMode] = useState<
-    'all' | 'full' | 'soft' | 'strong' | 'neutral' | 'opponent' | 'exact' | 'similar' | 'kriya_all' | 'voted' | 'has_phone' | 'duplicates' | 'duplicates_exact' | 'duplicates_50'
+    'all' | 'full' | 'soft' | 'strong' | 'neutral' | 'opponent' | 'exact' | 'similar' | 'kriya_all' | 'voted' | 'not_voted' | 'ours_not_voted' | 'has_phone' | 'duplicates' | 'duplicates_exact' | 'duplicates_50'
   >('all');
+
+  const handleToggleOurs = (serialNo: number) => {
+    if (onQuickToggleOurs) {
+      onQuickToggleOurs(serialNo);
+      return;
+    }
+    const prof = profiles[serialNo] || {};
+    const isOurs = prof.supportPct === 100 || prof.survey_status === 'supporter';
+    onUpdateSurveyMark(serialNo, isOurs ? null : 'supporter');
+  };
+
+  const handleToggleVoted = (serialNo: number) => {
+    if (onQuickToggleVoted) {
+      onQuickToggleVoted(serialNo);
+      return;
+    }
+    const prof = profiles[serialNo] || {};
+    const isVoted = prof.survey_status === 'voted';
+    onUpdateSurveyMark(serialNo, isVoted ? null : 'voted');
+  };
   const [visibleCount, setVisibleCount] = useState(30);
   const [activeMenuSno, setActiveMenuSno] = useState<number | null>(null);
   const [copiedPhoneId, setCopiedPhoneId] = useState<string | null>(null);
@@ -229,6 +253,11 @@ export const VotersTabMobile: React.FC<VotersTabMobileProps> = ({
       if (filterMode === 'similar') return v.kriya && v.k_type !== 'exact';
       if (filterMode === 'kriya_all') return v.kriya;
       if (filterMode === 'voted') return prof.survey_status === 'voted';
+      if (filterMode === 'not_voted') return prof.survey_status !== 'voted';
+      if (filterMode === 'ours_not_voted') {
+        const isOurs = pct === 100 || prof.survey_status === 'supporter';
+        return isOurs && prof.survey_status !== 'voted';
+      }
       if (filterMode === 'has_phone') return !!phone;
 
       return true;
@@ -246,12 +275,16 @@ export const VotersTabMobile: React.FC<VotersTabMobileProps> = ({
     let similar = 0;
     let kriyaAll = 0;
     let voted = 0;
+    let notVoted = 0;
+    let oursNotVoted = 0;
     let hasPhone = 0;
 
     voters.forEach(v => {
       const prof = profiles[v.s] || {};
       const pct = prof.supportPct;
       const phone = prof.customPhone || v.k_m;
+      const isVoted = prof.survey_status === 'voted';
+      const isOurs = pct === 100 || prof.survey_status === 'supporter';
 
       if (pct !== undefined) {
         if (pct === 100) full++;
@@ -267,7 +300,12 @@ export const VotersTabMobile: React.FC<VotersTabMobileProps> = ({
         else similar++;
       }
 
-      if (prof.survey_status === 'voted') voted++;
+      if (isVoted) {
+        voted++;
+      } else {
+        notVoted++;
+        if (isOurs) oursNotVoted++;
+      }
       if (phone) hasPhone++;
     });
 
@@ -282,6 +320,8 @@ export const VotersTabMobile: React.FC<VotersTabMobileProps> = ({
       similar,
       kriyaAll,
       voted,
+      notVoted,
+      oursNotVoted,
       hasPhone,
       duplicates: dupAnalysis.totalDuplicateVotersCount,
       exactDups: dupAnalysis.exactCount,
@@ -622,6 +662,91 @@ _మీ అమూల్యమైన ఓటును గాజు గ్లాస
           </div>
         )}
 
+        {/* Polling Day Rapid Status Switcher & Turnout Tracker */}
+        <div className="bg-slate-900/95 border border-amber-500/30 rounded-2xl p-2.5 space-y-2 shadow-md">
+          <div className="flex items-center justify-between text-[11px]">
+            <span className="text-slate-300 font-black flex items-center gap-1.5">
+              <span className="w-2 h-2 rounded-full bg-emerald-400 animate-pulse"></span>
+              {language === 'te' ? '🗳️ పోలింగ్ డే లైవ్ ట్రాకర్:' : '🗳️ Polling Day Live Tracker:'}
+            </span>
+            <div className="flex items-center gap-2 font-mono text-[10.5px]">
+              <span className="text-emerald-400 font-bold bg-emerald-950/70 px-2 py-0.5 rounded-lg border border-emerald-500/30">
+                {counts.voted}/{counts.all} {language === 'te' ? 'ఓటేశారు' : 'Voted'} ({Math.round((counts.voted / (counts.all || 1)) * 100)}%)
+              </span>
+              <span className="text-amber-400 font-bold bg-amber-950/70 px-2 py-0.5 rounded-lg border border-amber-500/30">
+                {counts.notVoted} {language === 'te' ? 'పెండింగ్' : 'Pending'}
+              </span>
+            </div>
+          </div>
+
+          <div className="grid grid-cols-4 gap-1.5">
+            {/* 1. All */}
+            <button
+              type="button"
+              onClick={() => { setFilterMode('all'); setVisibleCount(30); }}
+              className={`py-1.5 px-1 rounded-xl text-[10.5px] font-bold border transition-all flex flex-col items-center justify-center ${
+                filterMode === 'all'
+                  ? 'bg-amber-500 text-slate-950 border-amber-400 font-black shadow-sm'
+                  : 'bg-slate-950 text-slate-400 border-slate-800 hover:text-white'
+              }`}
+            >
+              <span>{language === 'te' ? 'మొత్తం' : 'All'}</span>
+              <span className="font-mono text-[11px] font-black">{counts.all}</span>
+            </button>
+
+            {/* 2. Quick Switch: NOT YET VOTED (ఓటు వేయనివారు) */}
+            <button
+              type="button"
+              onClick={() => { setFilterMode('not_voted'); setVisibleCount(30); }}
+              className={`py-1.5 px-1 rounded-xl text-[10.5px] font-bold border transition-all flex flex-col items-center justify-center ${
+                filterMode === 'not_voted'
+                  ? 'bg-amber-500 text-slate-950 border-amber-300 font-black ring-2 ring-amber-400/50 shadow-md'
+                  : 'bg-amber-950/40 text-amber-300 border-amber-500/50 hover:bg-amber-950/70'
+              }`}
+              title={language === 'te' ? 'ఇంకా ఓటు వేయని ఓటర్లందరినీ చూడండి' : 'Show all voters who have not yet voted'}
+            >
+              <span className="truncate">{language === 'te' ? '⏳ ఓటు వేయనివారు' : '⏳ Not Voted'}</span>
+              <span className="font-mono text-[11px] font-black text-amber-300">
+                {counts.notVoted}
+              </span>
+            </button>
+
+            {/* 3. Quick Switch: OURS NOT YET VOTED (మనవాళ్లలో ఓటు వేయనివారు) */}
+            <button
+              type="button"
+              onClick={() => { setFilterMode('ours_not_voted'); setVisibleCount(30); }}
+              className={`py-1.5 px-1 rounded-xl text-[10.5px] font-bold border transition-all flex flex-col items-center justify-center ${
+                filterMode === 'ours_not_voted'
+                  ? 'bg-gradient-to-r from-red-600 to-amber-600 text-white border-red-400 font-black ring-2 ring-red-400/50 shadow-md'
+                  : 'bg-red-950/40 text-red-300 border-red-500/50 hover:bg-red-950/70'
+              }`}
+              title={language === 'te' ? 'మన మద్దతుదారుల్లో ఇంకా ఓటు వేయనివారిని వెంటనే బూతుకు తీసుకురండి' : 'Our supporters who have not yet voted'}
+            >
+              <span className="truncate">{language === 'te' ? '🚩 మన పెండింగ్' : '🚩 Ours Pending'}</span>
+              <span className="font-mono text-[11px] font-black text-red-200">
+                {counts.oursNotVoted}
+              </span>
+            </button>
+
+            {/* 4. Quick Switch: VOTED (ఓటేశారు) */}
+            <button
+              type="button"
+              onClick={() => { setFilterMode('voted'); setVisibleCount(30); }}
+              className={`py-1.5 px-1 rounded-xl text-[10.5px] font-bold border transition-all flex flex-col items-center justify-center ${
+                filterMode === 'voted'
+                  ? 'bg-emerald-600 text-white border-emerald-400 font-black ring-2 ring-emerald-400/50 shadow-md'
+                  : 'bg-emerald-950/40 text-emerald-300 border-emerald-500/50 hover:bg-emerald-950/70'
+              }`}
+              title={language === 'te' ? 'ఓటు వేసిన ఓటర్లను చూడండి' : 'Show all who have voted'}
+            >
+              <span className="truncate">{language === 'te' ? '✅ ఓటేశారు' : '✅ Voted'}</span>
+              <span className="font-mono text-[11px] font-black text-emerald-300">
+                {counts.voted}
+              </span>
+            </button>
+          </div>
+        </div>
+
         {/* Filter Pills */}
         <div className="flex items-center gap-1.5 overflow-x-auto py-1 scrollbar-none text-[11px]">
           <button
@@ -699,6 +824,28 @@ _మీ అమూల్యమైన ఓటును గాజు గ్లాస
             }`}
           >
             <span>{t.filterVoted} ({counts.voted})</span>
+          </button>
+
+          <button
+            onClick={() => { setFilterMode('not_voted'); setVisibleCount(30); }}
+            className={`px-2.5 py-1 rounded-lg font-bold whitespace-nowrap transition-all flex items-center gap-1 ${
+              filterMode === 'not_voted'
+                ? 'bg-amber-500 text-slate-950 font-black shadow-sm'
+                : 'bg-slate-900 text-amber-300 border border-amber-500/40'
+            }`}
+          >
+            <span>⏳ {language === 'te' ? 'ఓటు వేయనివారు' : 'Not Voted'} ({counts.notVoted})</span>
+          </button>
+
+          <button
+            onClick={() => { setFilterMode('ours_not_voted'); setVisibleCount(30); }}
+            className={`px-2.5 py-1 rounded-lg font-bold whitespace-nowrap transition-all flex items-center gap-1 ${
+              filterMode === 'ours_not_voted'
+                ? 'bg-gradient-to-r from-red-600 to-amber-600 text-white font-black shadow-sm'
+                : 'bg-slate-900 text-red-300 border border-red-500/40'
+            }`}
+          >
+            <span>🚩 {language === 'te' ? 'మన పెండింగ్' : 'Ours Pending'} ({counts.oursNotVoted})</span>
           </button>
 
           <button
@@ -816,6 +963,42 @@ _మీ అమూల్యమైన ఓటును గాజు గ్లాస
             className="text-amber-400 font-bold hover:underline text-[10px]"
           >
             {language === 'te' ? 'తీసివేయి ✕' : 'Clear ✕'}
+          </button>
+        </div>
+      )}
+
+      {/* Active Filter Indicator: Not Yet Voted */}
+      {filterMode === 'not_voted' && (
+        <div className="bg-amber-500/10 border border-amber-500/40 rounded-xl px-3 py-1.5 flex items-center justify-between text-[11px] animate-in fade-in">
+          <span className="text-amber-300 font-bold flex items-center gap-1.5">
+            ⏳ {language === 'te' ? 'ఇంకా ఓటు వేయని ఓటర్లు:' : 'Voters not yet voted:'}{' '}
+            <strong className="text-white font-mono bg-amber-500/20 px-1.5 py-0.5 rounded border border-amber-500/30">
+              {filteredVoters.length} {language === 'te' ? 'మంది' : 'electors'}
+            </strong>
+          </span>
+          <button
+            onClick={() => setFilterMode('all')}
+            className="text-amber-400 font-bold hover:underline text-[10px]"
+          >
+            {language === 'te' ? 'అన్నీ చూపించు ✕' : 'Show All ✕'}
+          </button>
+        </div>
+      )}
+
+      {/* Active Filter Indicator: Ours Pending */}
+      {filterMode === 'ours_not_voted' && (
+        <div className="bg-red-500/10 border border-red-500/40 rounded-xl px-3 py-1.5 flex items-center justify-between text-[11px] animate-in fade-in">
+          <span className="text-red-300 font-bold flex items-center gap-1.5">
+            🚩 {language === 'te' ? 'మన మద్దతుదారుల్లో ఇంకా ఓటు వేయనివారు:' : 'Our supporters not yet voted:'}{' '}
+            <strong className="text-white font-mono bg-red-500/20 px-1.5 py-0.5 rounded border border-red-500/30">
+              {filteredVoters.length} {language === 'te' ? 'మంది' : 'electors'}
+            </strong>
+          </span>
+          <button
+            onClick={() => setFilterMode('all')}
+            className="text-red-400 font-bold hover:underline text-[10px]"
+          >
+            {language === 'te' ? 'అన్నీ చూపించు ✕' : 'Show All ✕'}
           </button>
         </div>
       )}
@@ -1072,12 +1255,44 @@ _మీ అమూల్యమైన ఓటును గాజు గ్లాస
 
                             <div className="flex items-center justify-between text-[10.5px] text-slate-400">
                               <span>ఇంటి నెం: <strong className="text-amber-300 font-mono">{m.hn}</strong> • {m.a}Y • {m.g === 'M' ? 'పురుషుడు' : 'మహిళ'}</span>
-                              <button
-                                onClick={() => onOpenSupportPicker(m.n, pct !== undefined ? pct : 50, prof.notes, m.s)}
-                                className="hover:scale-105"
-                              >
-                                {getLeaningBadge(pct)}
-                              </button>
+                              <div className="flex items-center gap-1.5">
+                                <button
+                                  type="button"
+                                  onClick={(e) => {
+                                    e.stopPropagation();
+                                    handleToggleOurs(m.s);
+                                  }}
+                                  className={`px-1.5 py-0.5 rounded text-[9.5px] font-bold border transition-all ${
+                                    pct === 100 || prof.survey_status === 'supporter'
+                                      ? 'bg-gradient-to-r from-red-600 to-amber-600 text-white border-red-500 font-black shadow-sm'
+                                      : 'bg-slate-900 text-slate-400 border-slate-700 hover:text-white'
+                                  }`}
+                                  title="మనవాళ్లేనా? (Toggle Ours)"
+                                >
+                                  🚩 {pct === 100 || prof.survey_status === 'supporter' ? 'మనవాళ్లే' : 'మనవాళ్లు?'}
+                                </button>
+                                <button
+                                  type="button"
+                                  onClick={(e) => {
+                                    e.stopPropagation();
+                                    handleToggleVoted(m.s);
+                                  }}
+                                  className={`px-1.5 py-0.5 rounded text-[9.5px] font-bold border transition-all ${
+                                    prof.survey_status === 'voted'
+                                      ? 'bg-emerald-600 text-white border-emerald-500 font-black shadow-sm'
+                                      : 'bg-slate-900 text-slate-400 border-slate-700 hover:text-white'
+                                  }`}
+                                  title="ఓటు వేశారా? (Toggle Voted)"
+                                >
+                                  {prof.survey_status === 'voted' ? '✅ ఓటేశారు' : '🗳️ వేయలేదు'}
+                                </button>
+                                <button
+                                  onClick={() => onOpenSupportPicker(m.n, pct !== undefined ? pct : 50, prof.notes, m.s)}
+                                  className="hover:scale-105"
+                                >
+                                  {getLeaningBadge(pct)}
+                                </button>
+                              </div>
                             </div>
 
                             {/* Contact Row in Clan Roster */}
@@ -1421,6 +1636,52 @@ _మీ అమూల్యమైన ఓటును గాజు గ్లాస
                     <span>{prof.visits && prof.visits.length > 0 ? t.addVisit : t.logVisit}</span>
                   </button>
                 </div>
+
+                {/* ⚡ Quick Action Switches: Mark Ours & Mark Voted */}
+                {(() => {
+                  const isOurs = pct === 100 || prof.survey_status === 'supporter';
+                  const isVoted = prof.survey_status === 'voted';
+
+                  return (
+                    <div className="grid grid-cols-2 gap-2 pt-1 pb-0.5">
+                      {/* 1. Quick Switch for OURS (మనవాళ్లే) */}
+                      <button
+                        type="button"
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          handleToggleOurs(v.s);
+                        }}
+                        className={`py-2 px-3 rounded-xl text-xs font-black flex items-center justify-center gap-1.5 transition-all active:scale-95 shadow-sm border ${
+                          isOurs
+                            ? 'bg-gradient-to-r from-red-600 to-amber-600 text-white border-red-400 ring-2 ring-red-400/40 shadow-red-950/50'
+                            : 'bg-slate-950 hover:bg-slate-800 text-slate-300 border-slate-700 hover:border-amber-500/60'
+                        }`}
+                        title={isOurs ? 'మనవాళ్లే (ట్యాప్ చేస్తే రీసెట్ అవుతుంది)' : '100% మన మద్దతుదారుడిగా నమోదు చేయడానికి ట్యాప్ చేయండి'}
+                      >
+                        <Flag className={`w-3.5 h-3.5 ${isOurs ? 'text-white fill-white' : 'text-amber-400'}`} />
+                        <span>{isOurs ? (language === 'te' ? '🚩 మనవాళ్లే (100%)' : '🚩 Ours (100%)') : (language === 'te' ? '🚩 మనవాళ్లేనా? (Mark)' : '+ Mark Ours')}</span>
+                      </button>
+
+                      {/* 2. Quick Switch for VOTED (ఓటేశారు) */}
+                      <button
+                        type="button"
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          handleToggleVoted(v.s);
+                        }}
+                        className={`py-2 px-3 rounded-xl text-xs font-black flex items-center justify-center gap-1.5 transition-all active:scale-95 shadow-sm border ${
+                          isVoted
+                            ? 'bg-gradient-to-r from-emerald-600 to-teal-600 text-white border-emerald-400 ring-2 ring-emerald-400/40 shadow-emerald-950/50'
+                            : 'bg-slate-950 hover:bg-slate-800 text-slate-300 border-slate-700 hover:border-emerald-500/60'
+                        }`}
+                        title={isVoted ? 'ఓటేశారు (ట్యాప్ చేస్తే అన్‌మార్క్ అవుతుంది)' : 'ఓటు వేశారు అని మార్క్ చేయండి'}
+                      >
+                        <CheckCircle2 className={`w-3.5 h-3.5 ${isVoted ? 'text-white fill-emerald-800' : 'text-emerald-400'}`} />
+                        <span>{isVoted ? (language === 'te' ? '✅ ఓటేశారు (Voted)' : '✅ Voted') : (language === 'te' ? '🗳️ ఓటు వేయలేదు (Mark)' : 'Mark Voted')}</span>
+                      </button>
+                    </div>
+                  );
+                })()}
 
               {/* Action Buttons Bar: Call, WhatsApp, SMS, Slip, Mark */}
               <div className="flex items-center justify-between pt-1 border-t border-slate-800/60 gap-1.5">

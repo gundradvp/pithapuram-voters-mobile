@@ -647,6 +647,48 @@ export function App() {
     else if (status === 'opponent') triggerScoreNotice(lang === 'te' ? `🔴 ప్రత్యర్థిగా మార్క్ చేశారు` : `🔴 Marked Opponent for S.No #${serialNo}`);
   };
 
+  // Quick Switch 1: Toggle Ours (100% Supporter)
+  const handleQuickToggleOurs = (serialNo: number) => {
+    const existing = profiles[serialNo] || {};
+    const isCurrentlyOurs = existing.supportPct === 100 || existing.survey_status === 'supporter';
+
+    if (isCurrentlyOurs) {
+      saveVoterProfile(currentPartNo, serialNo, {
+        supportPct: 50,
+        survey_status: existing.survey_status === 'supporter' ? null : existing.survey_status
+      });
+      setProfiles(getVoterProfiles(currentPartNo));
+      triggerScoreNotice(lang === 'te' ? `⚪ #${serialNo} మద్దతు రీసెట్ చేయబడింది` : `⚪ S.No #${serialNo} support reset`);
+    } else {
+      saveVoterProfile(currentPartNo, serialNo, {
+        supportPct: 100,
+        survey_status: existing.survey_status || 'supporter'
+      });
+      setProfiles(getVoterProfiles(currentPartNo));
+      triggerScoreNotice(
+        lang === 'te'
+          ? `🚩 #${serialNo} మనవాళ్లే (100% మద్దతుదారు) గా నమోదయ్యారు! +1 మన ఓటు`
+          : `🚩 S.No #${serialNo} marked as Ours (100% Supporter)!`
+      );
+    }
+  };
+
+  // Quick Switch 2: Toggle Voted
+  const handleQuickToggleVoted = (serialNo: number) => {
+    const existing = profiles[serialNo] || {};
+    const isCurrentlyVoted = existing.survey_status === 'voted';
+    const newStatus: VoterSurveyStatus | null = isCurrentlyVoted ? null : 'voted';
+
+    saveVoterProfile(currentPartNo, serialNo, { survey_status: newStatus });
+    setProfiles(getVoterProfiles(currentPartNo));
+
+    if (isCurrentlyVoted) {
+      triggerScoreNotice(lang === 'te' ? `↩️ #${serialNo} ఓటు మార్కింగ్ తీసివేయబడింది` : `↩️ S.No #${serialNo} marked as not yet voted`);
+    } else {
+      triggerScoreNotice(lang === 'te' ? `✅ #${serialNo} ఓటేశారు అని నమోదైంది!` : `✅ S.No #${serialNo} marked as Voted!`);
+    }
+  };
+
   // Handle Custom JSON file import
   const handleImportCustomJson = (customData: BoothData) => {
     setBoothData(customData);
@@ -800,6 +842,8 @@ export function App() {
                   });
                 }}
                 onUpdateSurveyMark={handleUpdateSurveyMark}
+                onQuickToggleOurs={handleQuickToggleOurs}
+                onQuickToggleVoted={handleQuickToggleVoted}
                 onOpenSlip={v => setSelectedVoterForSlip(v)}
                 onOpenGroupPrint={handleOpenGroupPrint}
                 onOpenSurnameLeaning={clanId => setSurnameLeaningState({ open: true, initialClanId: clanId })}
