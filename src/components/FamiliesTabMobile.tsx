@@ -126,11 +126,13 @@ export const FamiliesTabMobile: React.FC<FamiliesTabMobileProps> = ({
 
       // Filter by query
       if (q) {
+        const cleanSno = q.replace(/^#/, '').trim();
         const enMatch = c.nameEn.toLowerCase().includes(q);
         const teMatch = c.nameTe.toLowerCase().includes(q);
         const elderMatch = c.voters.some(v => v.n.toLowerCase().includes(q) || v.r.toLowerCase().includes(q));
         const houseMatch = c.voters.some(v => v.hn && v.hn.toLowerCase().includes(q));
-        if (!enMatch && !teMatch && !elderMatch && !houseMatch) return false;
+        const snoMatch = cleanSno && !isNaN(Number(cleanSno)) ? c.voters.some(v => v.s === Number(cleanSno)) : false;
+        if (!enMatch && !teMatch && !elderMatch && !houseMatch && !snoMatch) return false;
       }
       return true;
     });

@@ -1,5 +1,5 @@
 import React, { useState, useMemo, useEffect } from 'react';
-import { Search, Phone, PhoneCall, MessageSquare, Send, Printer, CheckCircle2, Flag, UserX, AlertCircle, Sparkles, Home, UserCheck, Sliders, Plus, Clock, User, Volume2, Users, Building, ChevronDown, ChevronUp, Copy } from 'lucide-react';
+import { Search, Phone, PhoneCall, MessageSquare, Send, Printer, CheckCircle2, Flag, UserX, AlertCircle, Sparkles, Home, UserCheck, Sliders, Plus, Clock, User, Volume2, Users, Building, ChevronDown, ChevronUp, Copy, Hash } from 'lucide-react';
 import { MobileVoter, BoothInfo, VoterSurveyStatus, VoterCampaignProfile } from '../types';
 import { Language, translations } from '../utils/i18n';
 import { resolvePhotoUrl } from '../utils/photoResolver';
@@ -23,6 +23,38 @@ interface VotersTabMobileProps {
   onOpenSurnameLeaning?: (clanId?: string) => void;
 }
 
+export function parseSnoQuery(raw: string): ((sno: number) => boolean) | null {
+  const clean = raw.trim().replace(/^sno[:\s]*/i, '').replace(/^#+/, '').trim();
+  if (!clean) return null;
+
+  const rangeMatch = clean.match(/^(\d+)\s*(?:-|to|\.\.)\s*(\d+)$/i);
+  if (rangeMatch) {
+    const start = parseInt(rangeMatch[1], 10);
+    const end = parseInt(rangeMatch[2], 10);
+    const min = Math.min(start, end);
+    const max = Math.max(start, end);
+    return (sno: number) => sno >= min && sno <= max;
+  }
+
+  if (clean.includes(',') || (clean.includes(' ') && !clean.includes('-'))) {
+    const nums = clean
+      .split(/[,\s]+/)
+      .map(x => parseInt(x.trim(), 10))
+      .filter(x => !isNaN(x));
+    if (nums.length > 0) {
+      const set = new Set(nums);
+      return (sno: number) => set.has(sno);
+    }
+  }
+
+  const single = parseInt(clean, 10);
+  if (!isNaN(single)) {
+    return (sno: number) => sno === single;
+  }
+
+  return null;
+}
+
 export const VotersTabMobile: React.FC<VotersTabMobileProps> = ({
   voters,
   boothInfo,
@@ -38,6 +70,8 @@ export const VotersTabMobile: React.FC<VotersTabMobileProps> = ({
   onOpenSurnameLeaning
 }) => {
   const [searchQuery, setSearchQuery] = useState('');
+  const [snoQuery, setSnoQuery] = useState('');
+  const [isSnoFilterOpen, setIsSnoFilterOpen] = useState(false);
   const [selectedStreet, setSelectedStreet] = useState<string>('all');
   const [selectedSurname, setSelectedSurname] = useState<string>('all');
   const [viewMode, setViewMode] = useState<'list' | 'surnames'>('list');
@@ -62,6 +96,8 @@ export const VotersTabMobile: React.FC<VotersTabMobileProps> = ({
     setSelectedSurname('all');
     setSelectedStreet('all');
     setSearchQuery('');
+    setSnoQuery('');
+    setIsSnoFilterOpen(false);
     setFilterMode('all');
     setVisibleCount(30);
     setSelectedDuplicateCluster(null);
@@ -76,6 +112,38 @@ export const VotersTabMobile: React.FC<VotersTabMobileProps> = ({
   };
 
   const t = translations[language];
+
+  // Precomputed S.No Direct Filter Predicate
+  const snoFilterPredicate = useMemo(() => {
+    return parseSnoQuery(snoQuery);
+  }, [snoQuery]);
+
+  // Precomputed Main Search S.No Predicate (e.g. if user types "#286" or "sno:286" in main search)
+  const searchSnoPredicate = useMemo(() => {
+    const q = searchQuery.trim();
+    if (q.startsWith('#') || /^sno[:\s]+\d+/i.test(q)) {
+      return parseSnoQuery(q);
+    }
+    return null;
+  }, [searchQuery]);
+
+  // S.No Range Presets for quick jumping (e.g. 1-50, 51-100, 101-150...)
+  const snoRangePresets = useMemo(() => {
+    if (!voters.length) return [];
+    let maxSno = 0;
+    voters.forEach(v => {
+      if (v.s > maxSno) maxSno = v.s;
+    });
+    if (maxSno <= 0) maxSno = voters.length;
+    const step = maxSno > 1000 ? 100 : 50;
+    const presets: Array<{ label: string; start: number; end: number }> = [];
+    for (let i = 1; i <= maxSno; i += step) {
+      const start = i;
+      const end = Math.min(i + step - 1, maxSno);
+      presets.push({ label: `${start}-${end}`, start, end });
+    }
+    return presets;
+  }, [voters]);
 
   // Precomputed Duplicate Votes Analysis
   const dupAnalysis = useMemo(() => {
@@ -111,11 +179,21 @@ export const VotersTabMobile: React.FC<VotersTabMobileProps> = ({
       const pct = prof.supportPct;
       const phone = prof.customPhone || v.k_m;
 
-      // 1. Text Search (Phonetic Sound-alike + Exact Substring)
+      // Direct S.No Filter
+      if (snoFilterPredicate) {
+        if (!snoFilterPredicate(v.s)) return false;
+      }
+
+      // 1. Text Search (Phonetic Sound-alike + Exact Substring / S.No)
       if (q) {
-        if (isPhoneticEnabled) {
+        if (searchSnoPredicate) {
+          if (!searchSnoPredicate(v.s)) return false;
+        } else if (/^\d+$/.test(q) && String(v.s) === q) {
+          // Direct S.No match from search input!
+        } else if (isPhoneticEnabled) {
           if (!matchesPhoneticSearch(q, v, phone, prof.influencerName)) return false;
         } else {
+          const snoMatch = String(v.s) === q;
           const nMatch = v.n.toLowerCase().includes(q);
           const rMatch = v.r.toLowerCase().includes(q);
           const idMatch = v.id.toLowerCase().includes(q);
@@ -123,7 +201,7 @@ export const VotersTabMobile: React.FC<VotersTabMobileProps> = ({
           const pMatch = phone && phone.includes(q);
           const infMatch = prof.influencerName?.toLowerCase().includes(q);
           const secMatch = v.sec?.toLowerCase().includes(q);
-          if (!nMatch && !rMatch && !idMatch && !hnMatch && !pMatch && !infMatch && !secMatch) return false;
+          if (!snoMatch && !nMatch && !rMatch && !idMatch && !hnMatch && !pMatch && !infMatch && !secMatch) return false;
         }
       }
 
@@ -155,7 +233,7 @@ export const VotersTabMobile: React.FC<VotersTabMobileProps> = ({
 
       return true;
     });
-  }, [voters, searchQuery, selectedStreet, selectedSurname, filterMode, profiles, isPhoneticEnabled, dupAnalysis.voterDupMap]);
+  }, [voters, searchQuery, selectedStreet, selectedSurname, filterMode, profiles, isPhoneticEnabled, dupAnalysis.voterDupMap, snoFilterPredicate, searchSnoPredicate]);
 
   // Counts for pills
   const counts = useMemo(() => {
@@ -365,6 +443,20 @@ _మీ అమూల్యమైన ఓటును గాజు గ్లాస
             <span className="hidden sm:inline font-mono text-[9px]">{isPhoneticEnabled ? '🔊 ON' : 'OFF'}</span>
           </button>
 
+          {/* S.No Quick Filter Toggle Button */}
+          <button
+            onClick={() => setIsSnoFilterOpen(!isSnoFilterOpen)}
+            className={`px-2.5 py-2 rounded-xl text-[10px] font-bold border transition-all flex items-center gap-1 shrink-0 ${
+              isSnoFilterOpen || snoQuery
+                ? 'bg-amber-500 text-slate-950 border-amber-400 font-black shadow-md'
+                : 'bg-slate-900 border-slate-800 text-slate-400 hover:text-white hover:border-slate-700'
+            }`}
+            title={language === 'te' ? 'క్రమ సంఖ్య (S.No) ఆధారంగా ఫిల్టర్ చేయండి' : 'Filter directly by Voter Serial Number'}
+          >
+            <Hash className="w-3.5 h-3.5" />
+            <span className="font-mono text-[10px] font-bold">S.No</span>
+          </button>
+
           {/* View Mode Toggle: List vs Surname Groups */}
           <div className="bg-slate-900 border border-slate-800 rounded-xl p-0.5 flex items-center shrink-0">
             <button
@@ -393,6 +485,67 @@ _మీ అమూల్యమైన ఓటును గాజు గ్లాస
             </button>
           </div>
         </div>
+
+        {/* Expandable Direct S.No Filter Tray */}
+        {isSnoFilterOpen && (
+          <div className="bg-slate-900/95 border border-amber-500/40 rounded-2xl p-2.5 space-y-2 animate-in fade-in slide-in-from-top-1 duration-150 shadow-lg">
+            <div className="flex items-center gap-2">
+              <div className="relative flex-1">
+                <span className="absolute left-2.5 top-1/2 -translate-y-1/2 text-amber-400 font-mono font-black text-xs">#</span>
+                <input
+                  type="text"
+                  value={snoQuery}
+                  onChange={(e) => setSnoQuery(e.target.value)}
+                  placeholder={language === 'te' ? 'క్రమ సంఖ్య (ఉదా: 286 లేదా 100-150 లేదా 15,28,45)' : 'S.No (e.g., 286 or 100-150 or 15,28,45)'}
+                  className="w-full pl-7 pr-7 py-1.5 bg-slate-950 border border-slate-700 focus:border-amber-400 rounded-xl text-xs text-white placeholder-slate-500 font-mono focus:outline-none"
+                  autoFocus
+                />
+                {snoQuery && (
+                  <button
+                    onClick={() => setSnoQuery('')}
+                    className="absolute right-2 top-1/2 -translate-y-1/2 text-slate-400 hover:text-white text-xs px-1"
+                    title="క్లియర్"
+                  >
+                    ✕
+                  </button>
+                )}
+              </div>
+              {snoQuery && (
+                <button
+                  onClick={() => setSnoQuery('')}
+                  className="px-2 py-1.5 bg-slate-800 hover:bg-slate-700 text-slate-300 rounded-xl text-[10px] font-bold shrink-0"
+                >
+                  {language === 'te' ? 'క్లియర్' : 'Clear'}
+                </button>
+              )}
+            </div>
+
+            {/* Quick S.No Range Jump Chips */}
+            {snoRangePresets.length > 0 && (
+              <div className="flex items-center gap-1.5 overflow-x-auto py-0.5 scrollbar-none text-[10px]">
+                <span className="text-slate-400 font-bold shrink-0 text-[10px] flex items-center gap-1">
+                  🔢 {language === 'te' ? 'రేంజ్:' : 'Range:'}
+                </span>
+                {snoRangePresets.map((preset) => {
+                  const isActive = snoQuery === `${preset.start}-${preset.end}`;
+                  return (
+                    <button
+                      key={preset.label}
+                      onClick={() => setSnoQuery(isActive ? '' : `${preset.start}-${preset.end}`)}
+                      className={`px-2 py-0.5 rounded-lg font-mono font-bold whitespace-nowrap transition-all border ${
+                        isActive
+                          ? 'bg-amber-500 text-slate-950 border-amber-400 font-black shadow-sm'
+                          : 'bg-slate-950 text-slate-300 border-slate-800 hover:border-amber-500/50 hover:text-amber-300'
+                      }`}
+                    >
+                      #{preset.label}
+                    </button>
+                  );
+                })}
+              </div>
+            )}
+          </div>
+        )}
 
         {/* Surnames Quick Chips */}
         {surnameGroups.length > 0 && (
@@ -649,6 +802,23 @@ _మీ అమూల్యమైన ఓటును గాజు గ్లాస
           )}
         </div>
       </div>
+
+      {/* Active Filter Indicator if S.No is filtered */}
+      {snoQuery && (
+        <div className="bg-amber-500/10 border border-amber-500/40 rounded-xl px-3 py-1.5 flex items-center justify-between text-[11px] animate-in fade-in">
+          <span className="text-amber-300 font-bold flex items-center gap-1.5">
+            🔢 {language === 'te' ? 'క్రమ సంఖ్య (S.No) ఫిల్టర్:' : 'S.No Filter:'}{' '}
+            <strong className="text-white font-mono bg-amber-500/20 px-1.5 py-0.5 rounded border border-amber-500/30">#{snoQuery}</strong>
+            <span className="text-slate-400 font-normal">({filteredVoters.length} {language === 'te' ? 'మంది ఓటర్లు' : 'voters'})</span>
+          </span>
+          <button
+            onClick={() => setSnoQuery('')}
+            className="text-amber-400 font-bold hover:underline text-[10px]"
+          >
+            {language === 'te' ? 'తీసివేయి ✕' : 'Clear ✕'}
+          </button>
+        </div>
+      )}
 
       {/* Active Filter Indicator if Surname is filtered */}
       {selectedSurname !== 'all' && (

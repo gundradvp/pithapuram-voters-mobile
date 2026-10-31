@@ -42,6 +42,7 @@ const filesToSync = [
   'src/components/GroupPrintModal.tsx',
   'src/components/SurnameLeaningModal.tsx',
   'src/components/DuplicateCompareModal.tsx',
+  'public/booths_index.json',
   'public/local_elections_index.json',
   'public/booths/mptc_chebrolu_4.json',
   'public/booths/booth_mptc_chebrolu_4.json',
