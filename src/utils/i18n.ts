@@ -1,17 +1,18 @@
 import { useState, useEffect } from 'react';
+import { safeStorage } from './safeStorage';
 
 export type Language = 'te' | 'en';
 
 const LANG_STORAGE_KEY = 'jsp_app_language_pref';
 
 export function getSavedLanguage(): Language {
-  const saved = localStorage.getItem(LANG_STORAGE_KEY);
+  const saved = safeStorage.getItem(LANG_STORAGE_KEY);
   if (saved === 'en' || saved === 'te') return saved;
   return 'te'; // Default to Telugu as requested
 }
 
 export function setSavedLanguage(lang: Language): void {
-  localStorage.setItem(LANG_STORAGE_KEY, lang);
+  safeStorage.setItem(LANG_STORAGE_KEY, lang);
 }
 
 export const translations = {

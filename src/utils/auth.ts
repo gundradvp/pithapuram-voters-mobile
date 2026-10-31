@@ -1,3 +1,5 @@
+import { safeStorage } from './safeStorage';
+
 export type UserRole = 'admin' | 'volunteer';
 
 export interface UserSession {
@@ -53,14 +55,14 @@ export function cleanPhoneNumber(input: string): string {
 
 export function getAssignments(): VolunteerAssignment[] {
   try {
-    const raw = localStorage.getItem(ASSIGNMENTS_STORAGE_KEY);
+    const raw = safeStorage.getItem(ASSIGNMENTS_STORAGE_KEY);
     if (!raw) {
-      localStorage.setItem(ASSIGNMENTS_STORAGE_KEY, JSON.stringify(DEFAULT_ASSIGNMENTS));
+      safeStorage.setItem(ASSIGNMENTS_STORAGE_KEY, JSON.stringify(DEFAULT_ASSIGNMENTS));
       return DEFAULT_ASSIGNMENTS;
     }
     const parsed = JSON.parse(raw);
     if (!Array.isArray(parsed) || parsed.length === 0) {
-      localStorage.setItem(ASSIGNMENTS_STORAGE_KEY, JSON.stringify(DEFAULT_ASSIGNMENTS));
+      safeStorage.setItem(ASSIGNMENTS_STORAGE_KEY, JSON.stringify(DEFAULT_ASSIGNMENTS));
       return DEFAULT_ASSIGNMENTS;
     }
     // Auto-migrate: ensure Durga Prasad (9000273028) has all active loaded units (Durgada, Chebrolu & Vannepudi)
@@ -75,7 +77,7 @@ export function getAssignments(): VolunteerAssignment[] {
         }
       }
       if (changed) {
-        localStorage.setItem(ASSIGNMENTS_STORAGE_KEY, JSON.stringify(parsed));
+        safeStorage.setItem(ASSIGNMENTS_STORAGE_KEY, JSON.stringify(parsed));
       }
     }
     return parsed;
@@ -93,13 +95,13 @@ export function saveAssignment(assignment: VolunteerAssignment): void {
   } else {
     current.push(assignment);
   }
-  localStorage.setItem(ASSIGNMENTS_STORAGE_KEY, JSON.stringify(current));
+  safeStorage.setItem(ASSIGNMENTS_STORAGE_KEY, JSON.stringify(current));
 }
 
 export function deleteAssignment(idOrPhone: string): void {
   const current = getAssignments();
   const filtered = current.filter(a => a.id !== idOrPhone && a.phone !== idOrPhone);
-  localStorage.setItem(ASSIGNMENTS_STORAGE_KEY, JSON.stringify(filtered));
+  safeStorage.setItem(ASSIGNMENTS_STORAGE_KEY, JSON.stringify(filtered));
 }
 
 export function getVolunteerAssignment(phone: string): VolunteerAssignment | null {
@@ -110,7 +112,7 @@ export function getVolunteerAssignment(phone: string): VolunteerAssignment | nul
 
 export function getUserSession(): UserSession | null {
   try {
-    const raw = localStorage.getItem(SESSION_STORAGE_KEY);
+    const raw = safeStorage.getItem(SESSION_STORAGE_KEY);
     if (!raw) return null;
     return JSON.parse(raw);
   } catch {
@@ -120,14 +122,14 @@ export function getUserSession(): UserSession | null {
 
 export function setUserSession(session: UserSession | null): void {
   if (!session) {
-    localStorage.removeItem(SESSION_STORAGE_KEY);
+    safeStorage.removeItem(SESSION_STORAGE_KEY);
   } else {
-    localStorage.setItem(SESSION_STORAGE_KEY, JSON.stringify(session));
+    safeStorage.setItem(SESSION_STORAGE_KEY, JSON.stringify(session));
   }
 }
 
 export function logoutUser(): void {
-  localStorage.removeItem(SESSION_STORAGE_KEY);
+  safeStorage.removeItem(SESSION_STORAGE_KEY);
 }
 
 export function verifyAdminPassword(input: string): boolean {

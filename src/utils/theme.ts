@@ -1,3 +1,5 @@
+import { safeStorage } from './safeStorage';
+
 export type ThemeId = 
   | 'solar-crm' 
   | 'jsp-light' 
@@ -118,8 +120,8 @@ export const THEMES: ThemeConfig[] = [
 ];
 
 export function getSavedTheme(): ThemeId {
-  const saved = localStorage.getItem(THEME_STORAGE_KEY) as ThemeId | null;
-  const explicit = localStorage.getItem('jsp_theme_explicit_selection');
+  const saved = safeStorage.getItem(THEME_STORAGE_KEY) as ThemeId | null;
+  const explicit = safeStorage.getItem('jsp_theme_explicit_selection');
   // Default to JSP Signature Dark ('jsp-dark') unless user explicitly picked another theme
   if (saved && (saved !== 'solar-crm' || explicit === 'true') && THEMES.some(t => t.id === saved)) {
     return saved;
@@ -128,8 +130,8 @@ export function getSavedTheme(): ThemeId {
 }
 
 export function setSavedTheme(theme: ThemeId): void {
-  localStorage.setItem(THEME_STORAGE_KEY, theme);
-  localStorage.setItem('jsp_theme_explicit_selection', 'true');
+  safeStorage.setItem(THEME_STORAGE_KEY, theme);
+  safeStorage.setItem('jsp_theme_explicit_selection', 'true');
   applyThemeToDom(theme);
 }
 

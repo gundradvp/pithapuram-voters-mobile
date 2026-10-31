@@ -2,6 +2,7 @@ import React, { Component, ErrorInfo, ReactNode } from 'react';
 import ReactDOM from 'react-dom/client';
 import { App } from './App';
 import './index.css';
+import { safeStorage } from './utils/safeStorage';
 
 interface ErrorBoundaryProps {
   children: ReactNode;
@@ -30,8 +31,8 @@ class RootErrorBoundary extends Component<ErrorBoundaryProps, ErrorBoundaryState
 
   handleClearCacheAndReset = () => {
     try {
-      localStorage.clear();
-      sessionStorage.clear();
+      safeStorage.clear();
+      if (typeof sessionStorage !== 'undefined') sessionStorage.clear();
       window.location.reload();
     } catch {
       window.location.reload();

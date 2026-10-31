@@ -1,4 +1,5 @@
 import { BoothData, VoterSurveyStatus, FamilyGroup, Influencer, VoterCampaignProfile, MobileVoter, VoterVisit, WinningScoreCalculation } from '../types';
+import { safeStorage } from './safeStorage';
 
 const ASSIGNED_BOOTH_KEY = 'jsp_mobile_assigned_booth';
 const BOOTH_LOCKED_KEY = 'jsp_mobile_booth_locked';
@@ -6,32 +7,32 @@ const ADMIN_PIN_KEY = 'jsp_mobile_admin_pin';
 const DEFAULT_ADMIN_PIN = '1555';
 
 export function getAssignedBooth(): number | string | null {
-  const val = localStorage.getItem(ASSIGNED_BOOTH_KEY);
+  const val = safeStorage.getItem(ASSIGNED_BOOTH_KEY);
   if (!val) return null;
   const num = parseInt(val, 10);
   return isNaN(num) || val.includes('_') ? val : num;
 }
 
 export function setAssignedBooth(partNo: number | string, lock: boolean = true): void {
-  localStorage.setItem(ASSIGNED_BOOTH_KEY, partNo.toString());
-  localStorage.setItem(BOOTH_LOCKED_KEY, lock ? 'true' : 'false');
+  safeStorage.setItem(ASSIGNED_BOOTH_KEY, partNo.toString());
+  safeStorage.setItem(BOOTH_LOCKED_KEY, lock ? 'true' : 'false');
 }
 
 export function isBoothLocked(): boolean {
-  return localStorage.getItem(BOOTH_LOCKED_KEY) === 'true';
+  return safeStorage.getItem(BOOTH_LOCKED_KEY) === 'true';
 }
 
 export function unlockBooth(): void {
-  localStorage.setItem(BOOTH_LOCKED_KEY, 'false');
+  safeStorage.setItem(BOOTH_LOCKED_KEY, 'false');
 }
 
 export function verifyAdminPin(pin: string): boolean {
-  const storedPin = localStorage.getItem(ADMIN_PIN_KEY) || DEFAULT_ADMIN_PIN;
+  const storedPin = safeStorage.getItem(ADMIN_PIN_KEY) || DEFAULT_ADMIN_PIN;
   return pin.trim() === storedPin;
 }
 
 export function setAdminPin(newPin: string): void {
-  localStorage.setItem(ADMIN_PIN_KEY, newPin.trim());
+  safeStorage.setItem(ADMIN_PIN_KEY, newPin.trim());
 }
 
 // -------------------------------------------------------------
@@ -45,12 +46,12 @@ function getBoothStorageKey(partNo: number | string): string {
 }
 
 export function isCacheStale(): boolean {
-  return localStorage.getItem(CACHE_VERSION_KEY) !== DATA_CACHE_VERSION;
+  return safeStorage.getItem(CACHE_VERSION_KEY) !== DATA_CACHE_VERSION;
 }
 
 export function getCachedBoothData(partNo: number | string): BoothData | null {
   try {
-    const raw = localStorage.getItem(getBoothStorageKey(partNo));
+    const raw = safeStorage.getItem(getBoothStorageKey(partNo));
     if (!raw) return null;
     return JSON.parse(raw);
   } catch (err) {
@@ -61,8 +62,8 @@ export function getCachedBoothData(partNo: number | string): BoothData | null {
 
 export function saveCachedBoothData(partNo: number | string, data: BoothData): boolean {
   try {
-    localStorage.setItem(getBoothStorageKey(partNo), JSON.stringify(data));
-    localStorage.setItem(CACHE_VERSION_KEY, DATA_CACHE_VERSION);
+    safeStorage.setItem(getBoothStorageKey(partNo), JSON.stringify(data));
+    safeStorage.setItem(CACHE_VERSION_KEY, DATA_CACHE_VERSION);
     return true;
   } catch (err) {
     console.error('Failed to cache booth data locally:', err);
@@ -72,19 +73,19 @@ export function saveCachedBoothData(partNo: number | string, data: BoothData): b
 
 export function clearStaleBoothCache(): void {
   try {
-    Object.keys(localStorage).forEach(key => {
+    safeStorage.keys().forEach(key => {
       if (key.startsWith('jsp_offline_booth_')) {
-        localStorage.removeItem(key);
+        safeStorage.removeItem(key);
       }
     });
-    localStorage.setItem(CACHE_VERSION_KEY, DATA_CACHE_VERSION);
+    safeStorage.setItem(CACHE_VERSION_KEY, DATA_CACHE_VERSION);
   } catch (err) {
     console.warn('Could not clear stale booth cache:', err);
   }
 }
 
 export function isBoothCached(partNo: number | string): boolean {
-  return !!localStorage.getItem(getBoothStorageKey(partNo));
+  return !!safeStorage.getItem(getBoothStorageKey(partNo));
 }
 
 // -------------------------------------------------------------
@@ -96,7 +97,7 @@ function getVoterProfilesKey(partNo: number | string): string {
 
 export function getVoterProfiles(partNo: number | string): Record<number, VoterCampaignProfile> {
   try {
-    const raw = localStorage.getItem(getVoterProfilesKey(partNo));
+    const raw = safeStorage.getItem(getVoterProfilesKey(partNo));
     return raw ? JSON.parse(raw) : {};
   } catch {
     return {};
@@ -107,7 +108,7 @@ export function saveVoterProfile(partNo: number | string, sno: number, updates: 
   const profiles = getVoterProfiles(partNo);
   profiles[sno] = { ...profiles[sno], ...updates };
   try {
-    localStorage.setItem(getVoterProfilesKey(partNo), JSON.stringify(profiles));
+    safeStorage.setItem(getVoterProfilesKey(partNo), JSON.stringify(profiles));
   } catch (err) {
     console.error('Failed to save voter profile:', err);
   }
@@ -123,7 +124,7 @@ export function saveBatchVoterProfiles(
     profiles[sno] = { ...profiles[sno], ...updates };
   });
   try {
-    localStorage.setItem(getVoterProfilesKey(partNo), JSON.stringify(profiles));
+    safeStorage.setItem(getVoterProfilesKey(partNo), JSON.stringify(profiles));
   } catch (err) {
     console.error('Failed to batch save voter profiles:', err);
   }
@@ -140,7 +141,7 @@ export function addVoterVisit(partNo: number | string, sno: number, visit: Voter
     visits: [visit, ...currentVisits]
   };
   try {
-    localStorage.setItem(getVoterProfilesKey(partNo), JSON.stringify(profiles));
+    safeStorage.setItem(getVoterProfilesKey(partNo), JSON.stringify(profiles));
   } catch (err) {
     console.error('Failed to add voter visit:', err);
   }
@@ -333,12 +334,12 @@ function getFamiliesKey(partNo: number | string): string {
 
 export function getFamilyGroups(partNo: number | string, voters?: MobileVoter[]): Record<string, FamilyGroup> {
   try {
-    const raw = localStorage.getItem(getFamiliesKey(partNo));
+    const raw = safeStorage.getItem(getFamiliesKey(partNo));
     if (raw) return JSON.parse(raw);
 
     if (voters && voters.length > 0) {
       const generated = autoGenerateHouseFamilies(partNo, voters);
-      localStorage.setItem(getFamiliesKey(partNo), JSON.stringify(generated));
+      safeStorage.setItem(getFamiliesKey(partNo), JSON.stringify(generated));
       return generated;
     }
     return {};
@@ -383,7 +384,7 @@ export function saveFamilyGroup(partNo: number | string, family: FamilyGroup): v
   const families = getFamilyGroups(partNo);
   families[family.id] = family;
   try {
-    localStorage.setItem(getFamiliesKey(partNo), JSON.stringify(families));
+    safeStorage.setItem(getFamiliesKey(partNo), JSON.stringify(families));
   } catch (err) {
     console.error('Failed to save family group:', err);
   }
@@ -393,7 +394,7 @@ export function deleteFamilyGroup(partNo: number | string, familyId: string): vo
   const families = getFamilyGroups(partNo);
   delete families[familyId];
   try {
-    localStorage.setItem(getFamiliesKey(partNo), JSON.stringify(families));
+    safeStorage.setItem(getFamiliesKey(partNo), JSON.stringify(families));
   } catch (err) {
     console.error('Failed to delete family group:', err);
   }
@@ -408,7 +409,7 @@ function getInfluencersKey(partNo: number | string): string {
 
 export function getInfluencers(partNo: number | string): Record<string, Influencer> {
   try {
-    const raw = localStorage.getItem(getInfluencersKey(partNo));
+    const raw = safeStorage.getItem(getInfluencersKey(partNo));
     if (raw) return JSON.parse(raw);
 
     const defaults: Record<string, Influencer> = {
@@ -427,7 +428,7 @@ export function getInfluencers(partNo: number | string): Record<string, Influenc
         notes: 'Covers Temple street and Old SC Peta'
       }
     };
-    localStorage.setItem(getInfluencersKey(partNo), JSON.stringify(defaults));
+    safeStorage.setItem(getInfluencersKey(partNo), JSON.stringify(defaults));
     return defaults;
   } catch {
     return {};
@@ -438,7 +439,7 @@ export function saveInfluencer(partNo: number | string, influencer: Influencer):
   const list = getInfluencers(partNo);
   list[influencer.id] = influencer;
   try {
-    localStorage.setItem(getInfluencersKey(partNo), JSON.stringify(list));
+    safeStorage.setItem(getInfluencersKey(partNo), JSON.stringify(list));
   } catch (err) {
     console.error('Failed to save influencer:', err);
   }
@@ -448,7 +449,7 @@ export function deleteInfluencer(partNo: number | string, influencerId: string):
   const list = getInfluencers(partNo);
   delete list[influencerId];
   try {
-    localStorage.setItem(getInfluencersKey(partNo), JSON.stringify(list));
+    safeStorage.setItem(getInfluencersKey(partNo), JSON.stringify(list));
   } catch (err) {
     console.error('Failed to delete influencer:', err);
   }
