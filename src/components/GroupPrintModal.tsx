@@ -51,25 +51,29 @@ export const GroupPrintModal: React.FC<GroupPrintModalProps> = ({
     let list = [...voters];
 
     if (genderFilter === 'M') {
-      list = list.filter(v => v.g === 'M');
+      list = list.filter(v => v.g === 'M' || (v as any).gender_en === 'Male' || (v as any).gender_te === 'పురుషుడు');
     } else if (genderFilter === 'F') {
-      list = list.filter(v => v.g === 'F' || v.g === 'W');
+      list = list.filter(v => v.g === 'F' || v.g === 'W' || (v as any).gender_en === 'Female' || (v as any).gender_te === 'స్త్రీ');
     }
 
     list.sort((a, b) => {
-      if (sortBy === 'sno') return a.s - b.s;
+      const snoA = a.s ?? (a as any).sno ?? 0;
+      const snoB = b.s ?? (b as any).sno ?? 0;
+      if (sortBy === 'sno') return snoA - snoB;
       if (sortBy === 'hn') {
-        const hA = a.hn || '';
-        const hB = b.hn || '';
+        const hA = a.hn || (a as any).house_no || '';
+        const hB = b.hn || (b as any).house_no || '';
         return hA.localeCompare(hB, undefined, { numeric: true, sensitivity: 'base' });
       }
       if (sortBy === 'age_desc') {
-        const ageA = parseInt(String(a.a), 10) || 0;
-        const ageB = parseInt(String(b.a), 10) || 0;
+        const ageA = parseInt(String(a.a || (a as any).age), 10) || 0;
+        const ageB = parseInt(String(b.a || (b as any).age), 10) || 0;
         return ageB - ageA;
       }
       if (sortBy === 'name') {
-        return a.n.localeCompare(b.n, 'te');
+        const nA = a.n || (a as any).name_te || (a as any).name_en || '';
+        const nB = b.n || (b as any).name_te || (b as any).name_en || '';
+        return nA.localeCompare(nB, 'te');
       }
       return 0;
     });
@@ -90,16 +94,18 @@ export const GroupPrintModal: React.FC<GroupPrintModalProps> = ({
     let opponent = 0;
 
     sortedVoters.forEach(v => {
-      if (v.g === 'M') male++;
+      const isMale = v.g === 'M' || (v as any).gender_en === 'Male' || (v as any).gender_te === 'పురుషుడు';
+      if (isMale) male++;
       else female++;
 
-      const age = parseInt(String(v.a), 10) || 0;
+      const age = parseInt(String(v.a || (v as any).age), 10) || 0;
       if (age >= 60) elders++;
       if (age >= 18 && age <= 25) youth++;
 
       if (v.kriya || v.k_m) kriya++;
 
-      const prof = profiles[v.s];
+      const voterSno = v.s ?? (v as any).sno;
+      const prof = voterSno ? profiles[voterSno] : undefined;
       const pct = prof?.supportPct !== undefined ? prof.supportPct : (v.kriya ? 100 : 50);
 
       if (pct >= 75) jsp++;
@@ -409,9 +415,17 @@ export const GroupPrintModal: React.FC<GroupPrintModalProps> = ({
             </thead>
             <tbody className="divide-y divide-slate-300">
               {sortedVoters.map((v, index) => {
-                const prof = profiles[v.s] || {};
+                const voterSno = v.s ?? (v as any).sno;
+                const prof = voterSno ? profiles[voterSno] || {} : {};
                 const phone = prof.customPhone || v.k_m;
                 const pct = prof.supportPct !== undefined ? prof.supportPct : (v.kriya ? 100 : 50);
+
+                const voterId = v.id || (v as any).epic || '';
+                const voterName = v.n || ((v as any).name_en && (v as any).name_te ? `${(v as any).name_en} (${(v as any).name_te})` : (v as any).name_te || (v as any).name_en || '');
+                const voterRel = v.r || ((v as any).rel_name_en && (v as any).rel_name_te ? `${(v as any).rel_name_en} (${(v as any).rel_name_te})` : (v as any).rel_name_te || (v as any).rel_name_en || '');
+                const voterAge = v.a || (v as any).age || '';
+                const isMale = v.g === 'M' || (v as any).gender_en === 'Male' || (v as any).gender_te === 'పురుషుడు';
+                const voterHn = v.hn || (v as any).house_no || '';
 
                 let leaningText = '50% తటస్థ';
                 let leaningColor = 'text-amber-800';
@@ -431,7 +445,7 @@ export const GroupPrintModal: React.FC<GroupPrintModalProps> = ({
 
                 return (
                   <tr
-                    key={v.s}
+                    key={voterSno || index}
                     className="hover:bg-slate-50 transition-colors print-zebra"
                   >
                     {/* Index */}
@@ -441,18 +455,18 @@ export const GroupPrintModal: React.FC<GroupPrintModalProps> = ({
 
                     {/* Booth Serial No */}
                     <td className="py-1 px-1.5 text-center font-mono font-black text-slate-900 border-r border-slate-200">
-                      #{v.s}
+                      #{voterSno}
                     </td>
 
                     {/* EPIC */}
                     <td className="py-1 px-1.5 font-mono text-[9.5px] font-bold text-slate-800 border-r border-slate-200">
-                      {v.id}
+                      {voterId}
                     </td>
 
                     {/* Voter Name */}
                     <td className="py-1 px-2 font-bold text-slate-950 border-r border-slate-200">
                       <div className="leading-tight">
-                        <span>{v.n}</span>
+                        <span>{voterName}</span>
                         {v.kriya && (
                           <span className="ml-1 text-[8.5px] bg-red-100 text-red-800 px-1 py-0.2 rounded font-black border border-red-300">
                             🚩 క్రియ
@@ -464,18 +478,18 @@ export const GroupPrintModal: React.FC<GroupPrintModalProps> = ({
                     {/* Relation */}
                     {showRelation && (
                       <td className="py-1 px-1.5 text-slate-700 truncate max-w-[120px] border-r border-slate-200">
-                        {v.r || '—'}
+                        {voterRel || '—'}
                       </td>
                     )}
 
                     {/* Age / Gender */}
                     <td className="py-1 px-1.5 text-center font-mono text-slate-800 border-r border-slate-200">
-                      {v.a} / {v.g === 'M' ? 'పు' : 'మ'}
+                      {voterAge} / {isMale ? 'పు' : 'మ'}
                     </td>
 
                     {/* House No */}
                     <td className="py-1 px-1.5 text-center font-mono font-bold text-slate-900 border-r border-slate-200">
-                      {v.hn || '—'}
+                      {voterHn || '—'}
                     </td>
 
                     {/* Phone / Kriya Mobile */}
