@@ -104,6 +104,18 @@ export const VotersTabMobile: React.FC<VotersTabMobileProps> = ({
     const isVoted = prof.survey_status === 'voted';
     onUpdateSurveyMark(serialNo, isVoted ? null : 'voted');
   };
+
+  const handleToggleDeceased = (serialNo: number) => {
+    const prof = profiles[serialNo] || {};
+    const isDeceased = prof.survey_status === 'deceased';
+    onUpdateSurveyMark(serialNo, isDeceased ? null : 'deceased');
+  };
+
+  const handleToggleOutOfCity = (serialNo: number) => {
+    const prof = profiles[serialNo] || {};
+    const isOutOfCity = prof.survey_status === 'out_of_city';
+    onUpdateSurveyMark(serialNo, isOutOfCity ? null : 'out_of_city');
+  };
   const [visibleCount, setVisibleCount] = useState(30);
   const [activeMenuSno, setActiveMenuSno] = useState<number | null>(null);
   const [copiedPhoneId, setCopiedPhoneId] = useState<string | null>(null);
@@ -1346,7 +1358,7 @@ _మీ అమూల్యమైన ఓటును గాజు గ్లాస
 
                             <div className="flex items-center justify-between text-[10.5px] text-slate-400">
                               <span>ఇంటి నెం: <strong className="text-amber-300 font-mono">{m.hn}</strong> • {m.a}Y • {m.g === 'M' ? 'పురుషుడు' : 'మహిళ'}</span>
-                              <div className="flex items-center gap-1.5">
+                              <div className="flex items-center gap-1.5 flex-wrap justify-end">
                                 <button
                                   type="button"
                                   onClick={(e) => {
@@ -1376,6 +1388,36 @@ _మీ అమూల్యమైన ఓటును గాజు గ్లాస
                                   title="ఓటు వేశారా? (Toggle Voted)"
                                 >
                                   {prof.survey_status === 'voted' ? '✅ ఓటేశారు' : '🗳️ వేయలేదు'}
+                                </button>
+                                <button
+                                  type="button"
+                                  onClick={(e) => {
+                                    e.stopPropagation();
+                                    handleToggleOutOfCity(m.s);
+                                  }}
+                                  className={`px-1.5 py-0.5 rounded text-[9.5px] font-bold border transition-all ${
+                                    prof.survey_status === 'out_of_city'
+                                      ? 'bg-indigo-600 text-white border-indigo-400 font-black shadow-sm'
+                                      : 'bg-slate-900 text-indigo-300 border-slate-700 hover:bg-indigo-950/40'
+                                  }`}
+                                  title="ఊర్లో లేరు (Toggle Out of City)"
+                                >
+                                  {prof.survey_status === 'out_of_city' ? '✈️ ఊర్లో లేరు' : '✈️ లేరు'}
+                                </button>
+                                <button
+                                  type="button"
+                                  onClick={(e) => {
+                                    e.stopPropagation();
+                                    handleToggleDeceased(m.s);
+                                  }}
+                                  className={`px-1.5 py-0.5 rounded text-[9.5px] font-bold border transition-all ${
+                                    prof.survey_status === 'deceased'
+                                      ? 'bg-slate-700 text-slate-100 border-slate-400 font-black shadow-sm'
+                                      : 'bg-slate-900 text-slate-400 border-slate-700 hover:bg-slate-800'
+                                  }`}
+                                  title="మరణించారు (Toggle Deceased)"
+                                >
+                                  {prof.survey_status === 'deceased' ? '💀 మరణించారు' : '💀'}
                                 </button>
                                 <button
                                   onClick={() => onOpenSupportPicker(m.n, pct !== undefined ? pct : 50, prof.notes, m.s)}
@@ -1735,48 +1777,92 @@ _మీ అమూల్యమైన ఓటును గాజు గ్లాస
                   </button>
                 </div>
 
-                {/* ⚡ Quick Action Switches: Mark Ours & Mark Voted */}
+                {/* ⚡ Quick Action Switches: 1-Tap Controls on Main Card */}
                 {(() => {
                   const isOurs = pct === 100 || prof.survey_status === 'supporter';
                   const isVoted = prof.survey_status === 'voted';
+                  const isOutOfCity = prof.survey_status === 'out_of_city';
+                  const isDeceased = prof.survey_status === 'deceased';
 
                   return (
-                    <div className="grid grid-cols-2 gap-2 pt-1 pb-0.5">
-                      {/* 1. Quick Switch for OURS (మనవాళ్లే) */}
-                      <button
-                        type="button"
-                        onClick={(e) => {
-                          e.stopPropagation();
-                          handleToggleOurs(v.s);
-                        }}
-                        className={`py-2 px-3 rounded-xl text-xs font-black flex items-center justify-center gap-1.5 transition-all active:scale-95 shadow-sm border ${
-                          isOurs
-                            ? 'bg-gradient-to-r from-red-600 to-amber-600 text-white border-red-400 ring-2 ring-red-400/40 shadow-red-950/50'
-                            : 'bg-slate-950 hover:bg-slate-800 text-slate-300 border-slate-700 hover:border-amber-500/60'
-                        }`}
-                        title={isOurs ? 'మనవాళ్లే (ట్యాప్ చేస్తే రీసెట్ అవుతుంది)' : '100% మన మద్దతుదారుడిగా నమోదు చేయడానికి ట్యాప్ చేయండి'}
-                      >
-                        <Flag className={`w-3.5 h-3.5 ${isOurs ? 'text-white fill-white' : 'text-amber-400'}`} />
-                        <span>{isOurs ? (language === 'te' ? '🚩 మనవాళ్లే (100%)' : '🚩 Ours (100%)') : (language === 'te' ? '🚩 మనవాళ్లేనా? (Mark)' : '+ Mark Ours')}</span>
-                      </button>
+                    <div className="space-y-1.5 pt-1 pb-0.5">
+                      {/* Row 1: 🚩 మనవాళ్లే (100%) & ✅ ఓటేశారు (Voted) */}
+                      <div className="grid grid-cols-2 gap-2">
+                        {/* 1. Quick Switch for OURS (మనవాళ్లే) */}
+                        <button
+                          type="button"
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            handleToggleOurs(v.s);
+                          }}
+                          className={`py-2 px-2.5 rounded-xl text-xs font-black flex items-center justify-center gap-1.5 transition-all active:scale-95 shadow-sm border ${
+                            isOurs
+                              ? 'bg-gradient-to-r from-red-600 to-amber-600 text-white border-red-400 ring-2 ring-red-400/40 shadow-red-950/50'
+                              : 'bg-slate-950 hover:bg-slate-800 text-slate-300 border-slate-700 hover:border-amber-500/60'
+                          }`}
+                          title={isOurs ? 'మనవాళ్లే (ట్యాప్ చేస్తే రీసెట్ అవుతుంది)' : '100% మన మద్దతుదారుడిగా నమోదు చేయడానికి ట్యాప్ చేయండి'}
+                        >
+                          <Flag className={`w-3.5 h-3.5 ${isOurs ? 'text-white fill-white' : 'text-amber-400'}`} />
+                          <span className="truncate">{isOurs ? (language === 'te' ? '🚩 మనవాళ్లే (100%)' : '🚩 Ours (100%)') : (language === 'te' ? '🚩 మనవాళ్లేనా?' : '+ Mark Ours')}</span>
+                        </button>
 
-                      {/* 2. Quick Switch for VOTED (ఓటేశారు) */}
-                      <button
-                        type="button"
-                        onClick={(e) => {
-                          e.stopPropagation();
-                          handleToggleVoted(v.s);
-                        }}
-                        className={`py-2 px-3 rounded-xl text-xs font-black flex items-center justify-center gap-1.5 transition-all active:scale-95 shadow-sm border ${
-                          isVoted
-                            ? 'bg-gradient-to-r from-emerald-600 to-teal-600 text-white border-emerald-400 ring-2 ring-emerald-400/40 shadow-emerald-950/50'
-                            : 'bg-slate-950 hover:bg-slate-800 text-slate-300 border-slate-700 hover:border-emerald-500/60'
-                        }`}
-                        title={isVoted ? 'ఓటేశారు (ట్యాప్ చేస్తే అన్‌మార్క్ అవుతుంది)' : 'ఓటు వేశారు అని మార్క్ చేయండి'}
-                      >
-                        <CheckCircle2 className={`w-3.5 h-3.5 ${isVoted ? 'text-white fill-emerald-800' : 'text-emerald-400'}`} />
-                        <span>{isVoted ? (language === 'te' ? '✅ ఓటేశారు (Voted)' : '✅ Voted') : (language === 'te' ? '🗳️ ఓటు వేయలేదు (Mark)' : 'Mark Voted')}</span>
-                      </button>
+                        {/* 2. Quick Switch for VOTED (ఓటేశారు) */}
+                        <button
+                          type="button"
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            handleToggleVoted(v.s);
+                          }}
+                          className={`py-2 px-2.5 rounded-xl text-xs font-black flex items-center justify-center gap-1.5 transition-all active:scale-95 shadow-sm border ${
+                            isVoted
+                              ? 'bg-gradient-to-r from-emerald-600 to-teal-600 text-white border-emerald-400 ring-2 ring-emerald-400/40 shadow-emerald-950/50'
+                              : 'bg-slate-950 hover:bg-slate-800 text-slate-300 border-slate-700 hover:border-emerald-500/60'
+                          }`}
+                          title={isVoted ? 'ఓటేశారు (ట్యాప్ చేస్తే అన్‌మార్క్ అవుతుంది)' : 'ఓటు వేశారు అని మార్క్ చేయండి'}
+                        >
+                          <CheckCircle2 className={`w-3.5 h-3.5 ${isVoted ? 'text-white fill-emerald-800' : 'text-emerald-400'}`} />
+                          <span className="truncate">{isVoted ? (language === 'te' ? '✅ ఓటేశారు (Voted)' : '✅ Voted') : (language === 'te' ? '🗳️ ఓటు వేయలేదు' : 'Mark Voted')}</span>
+                        </button>
+                      </div>
+
+                      {/* Row 2: ✈️ ఊర్లో లేరు & 💀 మరణించారు */}
+                      <div className="grid grid-cols-2 gap-2">
+                        {/* 3. Quick Switch for OUT OF CITY (ఊర్లో లేరు) */}
+                        <button
+                          type="button"
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            handleToggleOutOfCity(v.s);
+                          }}
+                          className={`py-1.5 px-2.5 rounded-xl text-xs font-black flex items-center justify-center gap-1.5 transition-all active:scale-95 shadow-sm border ${
+                            isOutOfCity
+                              ? 'bg-gradient-to-r from-indigo-600 to-blue-700 text-white border-indigo-400 ring-2 ring-indigo-400/40 shadow-indigo-950/50'
+                              : 'bg-slate-950 hover:bg-slate-800 text-indigo-300 border-slate-700 hover:border-indigo-500/60'
+                          }`}
+                          title={isOutOfCity ? 'ఊర్లో లేరు (ట్యాప్ చేస్తే అన్‌మార్క్ అవుతుంది)' : 'ఊర్లో లేరు / వలస వెళ్లినట్లు మార్క్ చేయడానికి ట్యాప్ చేయండి'}
+                        >
+                          <span className="text-sm">✈️</span>
+                          <span className="truncate">{isOutOfCity ? (language === 'te' ? '✈️ ఊర్లో లేరు (Away)' : '✈️ Out of City') : (language === 'te' ? '✈️ ఊర్లో లేరు' : '+ Out of City')}</span>
+                        </button>
+
+                        {/* 4. Quick Switch for DECEASED (మరణించారు) */}
+                        <button
+                          type="button"
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            handleToggleDeceased(v.s);
+                          }}
+                          className={`py-1.5 px-2.5 rounded-xl text-xs font-black flex items-center justify-center gap-1.5 transition-all active:scale-95 shadow-sm border ${
+                            isDeceased
+                              ? 'bg-gradient-to-r from-slate-700 to-slate-800 text-white border-slate-400 ring-2 ring-slate-400/40 shadow-slate-950/50'
+                              : 'bg-slate-950 hover:bg-slate-800 text-slate-400 border-slate-700 hover:border-slate-500/60'
+                          }`}
+                          title={isDeceased ? 'మరణించారు (ట్యాప్ చేస్తే అన్‌మార్క్ అవుతుంది)' : 'మరణించినట్లు మార్క్ చేయడానికి ట్యాప్ చేయండి (బోగస్ ఓటింగ్ ఛాలెంజ్)'}
+                        >
+                          <span className="text-sm">💀</span>
+                          <span className="truncate">{isDeceased ? (language === 'te' ? '💀 మరణించారు (Dead)' : '💀 Deceased') : (language === 'te' ? '💀 మరణించారు' : '+ Deceased')}</span>
+                        </button>
+                      </div>
                     </div>
                   );
                 })()}
@@ -1895,7 +1981,7 @@ _మీ అమూల్యమైన ఓటును గాజు గ్లాస
 
                   {/* Status Dropdown */}
                   {activeMenuSno === v.s && (
-                    <div className="absolute right-0 bottom-8 z-30 bg-slate-900 border border-amber-500/40 rounded-xl p-1.5 shadow-2xl w-48 space-y-1 animate-in fade-in duration-100">
+                    <div className="absolute right-0 bottom-8 z-30 bg-slate-900 border border-amber-500/40 rounded-xl p-1.5 shadow-2xl w-44 space-y-1 animate-in fade-in duration-100">
                       <button
                         onClick={() => { onUpdateSurveyMark(v.s, 'voted'); setActiveMenuSno(null); }}
                         className="w-full text-left px-2 py-1.5 rounded-lg text-[11px] font-bold text-emerald-300 hover:bg-emerald-950/40 flex items-center gap-1.5"
@@ -1907,18 +1993,6 @@ _మీ అమూల్యమైన ఓటును గాజు గ్లాస
                         className="w-full text-left px-2 py-1.5 rounded-lg text-[11px] font-bold text-red-300 hover:bg-red-950/40 flex items-center gap-1.5"
                       >
                         <Flag className="w-3.5 h-3.5 text-red-400" /> {t.markSupporter}
-                      </button>
-                      <button
-                        onClick={() => { onUpdateSurveyMark(v.s, 'out_of_city'); setActiveMenuSno(null); }}
-                        className="w-full text-left px-2 py-1.5 rounded-lg text-[11px] font-bold text-indigo-300 hover:bg-indigo-950/40 flex items-center gap-1.5"
-                      >
-                        <span className="text-xs">✈️</span> {language === 'te' ? 'ఊర్లో లేరు (వలస)' : 'Mark Out of City'}
-                      </button>
-                      <button
-                        onClick={() => { onUpdateSurveyMark(v.s, 'deceased'); setActiveMenuSno(null); }}
-                        className="w-full text-left px-2 py-1.5 rounded-lg text-[11px] font-bold text-slate-300 hover:bg-slate-800 flex items-center gap-1.5"
-                      >
-                        <span className="text-xs">💀</span> {language === 'te' ? 'మరణించారు (చనిపోయారు)' : 'Mark Deceased'}
                       </button>
                       <button
                         onClick={() => { onUpdateSurveyMark(v.s, 'visited'); setActiveMenuSno(null); }}
