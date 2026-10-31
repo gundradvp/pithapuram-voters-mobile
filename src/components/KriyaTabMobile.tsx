@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Flag, Phone, MessageSquare, UserCheck, ShieldCheck, Search } from 'lucide-react';
+import { Flag, Phone, MessageSquare, UserCheck, ShieldCheck, Search, X } from 'lucide-react';
 import { MobileVoter, BoothInfo, BoothVolunteer } from '../types';
 
 interface KriyaTabMobileProps {
@@ -43,8 +43,18 @@ export const KriyaTabMobile: React.FC<KriyaTabMobileProps> = ({
             value={memberSearch}
             onChange={e => setMemberSearch(e.target.value)}
             placeholder="Search Kriya Member Name, Mobile, ID..."
-            className="w-full bg-slate-900 border border-slate-800 rounded-xl pl-9 pr-3 py-2 text-xs text-white placeholder-slate-500 focus:outline-none focus:border-amber-400 shadow-md"
+            className={`w-full bg-slate-900 border border-slate-800 rounded-xl pl-9 ${memberSearch ? 'pr-9' : 'pr-3'} py-2 text-xs text-white placeholder-slate-500 focus:outline-none focus:border-amber-400 shadow-md transition-all`}
           />
+          {memberSearch && (
+            <button
+              type="button"
+              onClick={() => setMemberSearch('')}
+              className="absolute right-2.5 top-1/2 -translate-y-1/2 p-1 text-slate-400 hover:text-white hover:bg-slate-800 rounded-full transition-colors flex items-center justify-center active:scale-95"
+              title="Clear search"
+            >
+              <X className="w-3.5 h-3.5 text-slate-400 hover:text-amber-400" />
+            </button>
+          )}
         </div>
 
         {/* Filter Pills */}

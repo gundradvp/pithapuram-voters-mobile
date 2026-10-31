@@ -263,8 +263,18 @@ export const CreateFamilyModal: React.FC<CreateFamilyModalProps> = ({
                 value={voterSearch}
                 onChange={e => setVoterSearch(e.target.value)}
                 placeholder="Search electors to add to this family..."
-                className="w-full bg-slate-950 border border-slate-800 rounded-xl pl-8 pr-3 py-1.5 text-white text-xs placeholder-slate-600 focus:outline-none focus:border-amber-400"
+                className={`w-full bg-slate-950 border border-slate-800 rounded-xl pl-8 ${voterSearch ? 'pr-8' : 'pr-3'} py-1.5 text-white text-xs placeholder-slate-600 focus:outline-none focus:border-amber-400 transition-all`}
               />
+              {voterSearch && (
+                <button
+                  type="button"
+                  onClick={() => setVoterSearch('')}
+                  className="absolute right-2 top-1/2 -translate-y-1/2 p-1 text-slate-400 hover:text-white hover:bg-slate-800 rounded-full transition-colors flex items-center justify-center active:scale-95"
+                  title="Clear search"
+                >
+                  <X className="w-3 h-3 text-slate-400 hover:text-amber-400" />
+                </button>
+              )}
             </div>
 
             <div className="max-h-36 overflow-y-auto space-y-1 bg-slate-950/80 p-2 rounded-xl border border-slate-800 divide-y divide-slate-800/40">

@@ -16,7 +16,8 @@ import {
   Trophy,
   Award,
   Copy,
-  CheckCircle2
+  CheckCircle2,
+  X
 } from 'lucide-react';
 import { FamilyGroup, MobileVoter, Influencer, VoterCampaignProfile, BoothInfo } from '../types';
 import { Language, translations } from '../utils/i18n';
@@ -328,8 +329,18 @@ export const FamiliesTabMobile: React.FC<FamiliesTabMobileProps> = ({
                 value={searchQuery}
                 onChange={e => setSearchQuery(e.target.value)}
                 placeholder={language === 'te' ? 'ఇంటిపేరు, పెద్దల పేరు, ఇంటి నెం శోధించండి...' : 'Search surname, elder name, house no...'}
-                className="w-full bg-slate-900 border border-slate-800 rounded-xl pl-9 pr-3 py-2 text-xs text-white placeholder-slate-500 focus:outline-none focus:border-amber-400 shadow-md"
+                className={`w-full bg-slate-900 border border-slate-800 rounded-xl pl-9 ${searchQuery ? 'pr-9' : 'pr-3'} py-2 text-xs text-white placeholder-slate-500 focus:outline-none focus:border-amber-400 shadow-md transition-all`}
               />
+              {searchQuery && (
+                <button
+                  type="button"
+                  onClick={() => setSearchQuery('')}
+                  className="absolute right-2.5 top-1/2 -translate-y-1/2 p-1 text-slate-400 hover:text-white hover:bg-slate-800 rounded-full transition-colors flex items-center justify-center active:scale-95"
+                  title={language === 'te' ? 'సెర్చ్ క్లియర్ చేయండి' : 'Clear search text'}
+                >
+                  <X className="w-3.5 h-3.5 text-slate-400 hover:text-amber-400" />
+                </button>
+              )}
             </div>
 
             {/* Filter Pills */}
@@ -875,8 +886,18 @@ export const FamiliesTabMobile: React.FC<FamiliesTabMobileProps> = ({
                   value={searchQuery}
                   onChange={e => setSearchQuery(e.target.value)}
                   placeholder="Search Family Name, Door No, Elder..."
-                  className="w-full bg-slate-900 border border-slate-800 rounded-xl pl-9 pr-3 py-2 text-xs text-white placeholder-slate-500 focus:outline-none focus:border-amber-400 shadow-md"
+                  className={`w-full bg-slate-900 border border-slate-800 rounded-xl pl-9 ${searchQuery ? 'pr-9' : 'pr-3'} py-2 text-xs text-white placeholder-slate-500 focus:outline-none focus:border-amber-400 shadow-md transition-all`}
                 />
+                {searchQuery && (
+                  <button
+                    type="button"
+                    onClick={() => setSearchQuery('')}
+                    className="absolute right-2.5 top-1/2 -translate-y-1/2 p-1 text-slate-400 hover:text-white hover:bg-slate-800 rounded-full transition-colors flex items-center justify-center active:scale-95"
+                    title={language === 'te' ? 'సెర్చ్ క్లియర్ చేయండి' : 'Clear search text'}
+                  >
+                    <X className="w-3.5 h-3.5 text-slate-400 hover:text-amber-400" />
+                  </button>
+                )}
               </div>
 
               <button

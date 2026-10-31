@@ -1,5 +1,5 @@
 import React, { useState, useMemo } from 'react';
-import { Home, Search, Users, Phone, MessageSquare, Printer, CheckCircle2 } from 'lucide-react';
+import { Home, Search, Users, Phone, MessageSquare, Printer, CheckCircle2, X } from 'lucide-react';
 import { MobileVoter, BoothInfo, VoterSurveyStatus } from '../types';
 
 interface HousesTabMobileProps {
@@ -69,8 +69,18 @@ export const HousesTabMobile: React.FC<HousesTabMobileProps> = ({
             value={houseSearch}
             onChange={e => setHouseSearch(e.target.value)}
             placeholder="Search House / Door No (e.g. 1-24, 2-15)..."
-            className="w-full bg-slate-900 border border-slate-800 rounded-xl pl-9 pr-3 py-2 text-xs text-white placeholder-slate-500 focus:outline-none focus:border-amber-400 shadow-md"
+            className={`w-full bg-slate-900 border border-slate-800 rounded-xl pl-9 ${houseSearch ? 'pr-9' : 'pr-3'} py-2 text-xs text-white placeholder-slate-500 focus:outline-none focus:border-amber-400 shadow-md transition-all`}
           />
+          {houseSearch && (
+            <button
+              type="button"
+              onClick={() => setHouseSearch('')}
+              className="absolute right-2.5 top-1/2 -translate-y-1/2 p-1 text-slate-400 hover:text-white hover:bg-slate-800 rounded-full transition-colors flex items-center justify-center active:scale-95"
+              title="Clear search"
+            >
+              <X className="w-3.5 h-3.5 text-slate-400 hover:text-amber-400" />
+            </button>
+          )}
         </div>
       </div>
 

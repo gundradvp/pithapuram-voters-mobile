@@ -304,8 +304,18 @@ export const BoothAssignmentModal: React.FC<BoothAssignmentModalProps> = ({
                     ? (language === 'te' ? 'బూత్ నెం, గ్రామం లేదా మండలం ద్వారా శోధించండి...' : 'Search by Booth #, Village, or Mandal...')
                     : (language === 'te' ? 'వార్డు నెం, మునిసిపాలిటీ లేదా గ్రామం ద్వారా శోధించండి...' : 'Search by Ward #, Municipality, Village...')
                 }
-                className="w-full bg-slate-950 border border-slate-800 rounded-xl pl-9 pr-3 py-2 text-xs text-white placeholder-slate-500 focus:outline-none focus:border-amber-400"
+                className={`w-full bg-slate-950 border border-slate-800 rounded-xl pl-9 ${searchTerm ? 'pr-9' : 'pr-3'} py-2 text-xs text-white placeholder-slate-500 focus:outline-none focus:border-amber-400 transition-all`}
               />
+              {searchTerm && (
+                <button
+                  type="button"
+                  onClick={() => setSearchTerm('')}
+                  className="absolute right-2.5 top-1/2 -translate-y-1/2 p-1 text-slate-400 hover:text-white hover:bg-slate-800 rounded-full transition-colors flex items-center justify-center active:scale-95"
+                  title={language === 'te' ? 'శోధన క్లియర్ చేయండి' : 'Clear search'}
+                >
+                  <X className="w-3.5 h-3.5 text-slate-400 hover:text-amber-400" />
+                </button>
+              )}
             </div>
 
             {/* Lock Toggle */}
