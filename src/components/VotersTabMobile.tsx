@@ -572,7 +572,13 @@ _మీ అమూల్యమైన ఓటును గాజు గ్లాస
       {selectedSurname !== 'all' && (
         <div className="bg-amber-500/10 border border-amber-500/30 rounded-xl px-3 py-1.5 flex items-center justify-between text-[11px]">
           <span className="text-amber-300 font-bold flex items-center gap-1.5">
-            🏛️ {language === 'te' ? 'ఎంచుకున్న ఇంటిపేరు:' : 'Filtered Surname:'} <strong className="text-white font-mono">{selectedSurname}</strong>
+            🏛️ {language === 'te' ? 'ఎంచుకున్న ఇంటిపేరు:' : 'Filtered Surname:'}{' '}
+            <strong className="text-white font-mono">
+              {(() => {
+                const grp = surnameGroups.find(g => g.id === selectedSurname);
+                return grp ? `${grp.nameTe} (${grp.nameEn})` : selectedSurname;
+              })()}
+            </strong>
           </span>
           <button
             onClick={() => setSelectedSurname('all')}

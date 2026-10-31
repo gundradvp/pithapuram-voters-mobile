@@ -102,10 +102,76 @@ const SURNAME_ALIASES: Record<string, string> = {
   'BOJJA': 'BOJJA',
   'PADALA': 'PADALA',
   'KANDA': 'KANDA',
-  'MOYILLA': 'MOYILLA'
+  'MOYILLA': 'MOYILLA',
+  'UMMIDII': 'UMMIDI',
+  'UMIDI': 'UMMIDI',
+  'VUMMIDI': 'UMMIDI',
+  'MUMMIDII': 'MUMMIDI',
+  'BOMMIDII': 'BOMMIDI',
+  'AAKULA': 'AKULA',
+  'YINTI': 'INTI',
+  'KARNEEDI': 'KARNIDI',
+  'KAMEDI': 'KARNIDI',
+  'KAMIDI': 'KARNIDI',
+  'KUMMA': 'KUMMARI',
+  'KOMMU': 'KOMMURI'
 };
 
 const CANONICAL_TELUGU_SURNAMES: Record<string, string> = {
+  'UMMIDI': 'ఉమ్మిడి',
+  'MUMMIDI': 'ముమ్మిడి',
+  'BOMMIDI': 'బొమ్మిడి',
+  'GUNDRA': 'గుండ్ర',
+  'VELUGULA': 'వెలుగుల',
+  'THOTA': 'తోట',
+  'INTI': 'ఇంటి',
+  'PENUGONDA': 'పెనుగొండ',
+  'KARRI': 'కర్రి',
+  'NAKKA': 'నక్కా',
+  'PENUMALLU': 'పెనుమళ్ళు',
+  'DADALA': 'దడాల',
+  'CHINTAPALLI': 'చింతపల్లి',
+  'BANDI': 'బండి',
+  'SURADA': 'సూరాడ',
+  'PILLI': 'పిల్లి',
+  'MERUGU': 'మెరుగు',
+  'PENKE': 'పెంకే',
+  'CHOKKA': 'చొక్కా',
+  'VEMAGIRI': 'వేమగిరి',
+  'DASARI': 'దాసరి',
+  'GANTA': 'గంటా',
+  'DASAM': 'దాసం',
+  'KARANAM': 'కరణం',
+  'KEERTHI': 'కీర్తి',
+  'YALLA': 'యల్లా',
+  'KAKADA': 'కాకడ',
+  'BATHINA': 'బత్తిన',
+  'PEDAPATI': 'పేడాపాటి',
+  'PILLA': 'పిల్లా',
+  'BANDARU': 'బండారు',
+  'GORLA': 'గొర్ల',
+  'ADAPA': 'అడపా',
+  'TANGELLA': 'తంగెళ్ళ',
+  'VASAMSETTI': 'వాసంశెట్టి',
+  'ORUGANTI': 'ఓరుగంటి',
+  'KAKI': 'కాకి',
+  'KARNIDI': 'కర్నీడి',
+  'PONNADA': 'పొన్నాడ',
+  'KOMMURI': 'కొమ్మూరి',
+  'KUMMARI': 'కుమ్మరి',
+  'KOPPULA': 'కొప్పుల',
+  'MUTHYALA': 'ముత్యాల',
+  'GUBBALA': 'గుబ్బల',
+  'MADDALA': 'మద్దాల',
+  'DESHLANKA': 'దేశిలంక',
+  'MEDIBOINA': 'మేడిబోయిన',
+  'SHAKHUNALA': 'శాఖునాల',
+  'ANUPOJU': 'అనుపోజు',
+  'UGGIRALA': 'ఉగ్గిరాల',
+  'GATTEM': 'గట్టెం',
+  'KONA': 'కోన',
+  'KAKINADA': 'కాకినాడ',
+  'NAGALLA': 'నాగళ్ళ',
   'SHIVAKOTI': 'శివకోటి',
   'VIPPARTHI': 'విప్పర్తి',
   'DEYYALA': 'దెయ్యాల',
@@ -221,7 +287,9 @@ export function extractSurname(voter: MobileVoter): { en: string; te: string } {
     // Attempt to extract from Telugu portion
     const teMatch = rawN.match(/\(([^)]+)\)/);
     if (teMatch) {
-      const teWords = teMatch[1].trim().split(/\s+/).filter(w => w.length > 1);
+      // Fix broken trailing single/double syllables separated by space (e.g. 'ఉమ్మి డి' -> 'ఉమ్మిడి', 'పొన్నా డ' -> 'పొన్నాడ', 'కొమ్మూ రి' -> 'కొమ్మూరి')
+      const cleanedTe = teMatch[1].trim().replace(/([\u0C00-\u0C7F]+)\s+([\u0C00-\u0C7F]{1,2})$/, '$1$2');
+      const teWords = cleanedTe.split(/\s+/).filter(w => w.length > 1);
       if (teWords.length > 0) {
         canonTe = teWords[teWords.length - 1];
       }
