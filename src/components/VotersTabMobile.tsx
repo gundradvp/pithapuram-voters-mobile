@@ -25,6 +25,9 @@ interface VotersTabMobileProps {
   onOpenSurnameLeaning?: (clanId?: string) => void;
 }
 
+const INITIAL_VISIBLE_COUNT = 50;
+const LOAD_MORE_STEP = 100;
+
 export function parseSnoQuery(raw: string): ((sno: number) => boolean) | null {
   const clean = raw.trim().replace(/^sno[:\s]*/i, '').replace(/^#+/, '').trim();
   if (!clean) return null;
@@ -116,7 +119,7 @@ export const VotersTabMobile: React.FC<VotersTabMobileProps> = ({
     const isOutOfCity = prof.survey_status === 'out_of_city';
     onUpdateSurveyMark(serialNo, isOutOfCity ? null : 'out_of_city');
   };
-  const [visibleCount, setVisibleCount] = useState(30);
+  const [visibleCount, setVisibleCount] = useState(INITIAL_VISIBLE_COUNT);
   const [activeMenuSno, setActiveMenuSno] = useState<number | null>(null);
   const [copiedPhoneId, setCopiedPhoneId] = useState<string | null>(null);
   const [selectedDuplicateCluster, setSelectedDuplicateCluster] = useState<{
@@ -135,7 +138,7 @@ export const VotersTabMobile: React.FC<VotersTabMobileProps> = ({
     setSnoQuery('');
     setIsSnoFilterOpen(false);
     setFilterMode('all');
-    setVisibleCount(30);
+    setVisibleCount(INITIAL_VISIBLE_COUNT);
     setSelectedDuplicateCluster(null);
   }, [boothInfo?.part_no]);
 
@@ -489,7 +492,7 @@ _మీ అమూల్యమైన ఓటును గాజు గ్లాస
               value={searchQuery}
               onChange={e => {
                 setSearchQuery(e.target.value);
-                setVisibleCount(30);
+                setVisibleCount(INITIAL_VISIBLE_COUNT);
               }}
               placeholder={language === 'te' ? 'పేరు, ఇంటిపేరు (శబ్దోచ్ఛారణ), ఫోన్, ID...' : t.searchPlaceholder}
               className={`w-full bg-slate-900 border border-slate-800 rounded-xl pl-9 ${searchQuery ? 'pr-9' : 'pr-3'} py-2 text-xs text-white placeholder-slate-500 focus:outline-none focus:border-amber-400 shadow-md transition-all`}
@@ -499,7 +502,7 @@ _మీ అమూల్యమైన ఓటును గాజు గ్లాస
                 type="button"
                 onClick={() => {
                   setSearchQuery('');
-                  setVisibleCount(30);
+                  setVisibleCount(INITIAL_VISIBLE_COUNT);
                 }}
                 className="absolute right-2.5 top-1/2 -translate-y-1/2 p-1 text-slate-400 hover:text-white hover:bg-slate-800 rounded-full transition-colors flex items-center justify-center active:scale-95"
                 title={language === 'te' ? 'సెర్చ్ క్లియర్ చేయండి' : 'Clear search text'}
@@ -644,7 +647,7 @@ _మీ అమూల్యమైన ఓటును గాజు గ్లాస
               </button>
             )}
             <button
-              onClick={() => { setSelectedSurname('all'); setVisibleCount(30); }}
+              onClick={() => { setSelectedSurname('all'); setVisibleCount(INITIAL_VISIBLE_COUNT); }}
               className={`px-2 py-0.5 rounded-md font-bold whitespace-nowrap transition-all ${
                 selectedSurname === 'all'
                   ? 'bg-amber-500 text-slate-950 font-black'
@@ -656,7 +659,7 @@ _మీ అమూల్యమైన ఓటును గాజు గ్లాస
             {surnameGroups.slice(0, 15).map(g => (
               <button
                 key={g.id}
-                onClick={() => { setSelectedSurname(selectedSurname === g.id ? 'all' : g.id); setVisibleCount(30); }}
+                onClick={() => { setSelectedSurname(selectedSurname === g.id ? 'all' : g.id); setVisibleCount(INITIAL_VISIBLE_COUNT); }}
                 className={`px-2 py-0.5 rounded-md font-bold whitespace-nowrap transition-all flex items-center gap-1 ${
                   selectedSurname === g.id
                     ? 'bg-amber-500 text-slate-950 font-black'
@@ -677,7 +680,7 @@ _మీ అమూల్యమైన ఓటును గాజు గ్లాస
               📍 {language === 'te' ? 'వీధి:' : 'Street:'}
             </span>
             <button
-              onClick={() => { setSelectedStreet('all'); setVisibleCount(30); }}
+              onClick={() => { setSelectedStreet('all'); setVisibleCount(INITIAL_VISIBLE_COUNT); }}
               className={`px-2 py-0.5 rounded-md font-bold whitespace-nowrap transition-all ${
                 selectedStreet === 'all'
                   ? 'bg-blue-600 text-white font-black'
@@ -689,7 +692,7 @@ _మీ అమూల్యమైన ఓటును గాజు గ్లాస
             {streetsList.map(([stName, cnt]) => (
               <button
                 key={stName}
-                onClick={() => { setSelectedStreet(stName); setVisibleCount(30); }}
+                onClick={() => { setSelectedStreet(stName); setVisibleCount(INITIAL_VISIBLE_COUNT); }}
                 className={`px-2 py-0.5 rounded-md font-bold whitespace-nowrap transition-all flex items-center gap-1 ${
                   selectedStreet === stName
                     ? 'bg-blue-500 text-slate-950 font-black'
@@ -724,7 +727,7 @@ _మీ అమూల్యమైన ఓటును గాజు గ్లాస
             {/* 1. All */}
             <button
               type="button"
-              onClick={() => { setFilterMode('all'); setVisibleCount(30); }}
+              onClick={() => { setFilterMode('all'); setVisibleCount(INITIAL_VISIBLE_COUNT); }}
               className={`py-1.5 px-1 rounded-xl text-[10.5px] font-bold border transition-all flex flex-col items-center justify-center ${
                 filterMode === 'all'
                   ? 'bg-amber-500 text-slate-950 border-amber-400 font-black shadow-sm'
@@ -738,7 +741,7 @@ _మీ అమూల్యమైన ఓటును గాజు గ్లాస
             {/* 2. Quick Switch: NOT YET VOTED (ఓటు వేయనివారు) */}
             <button
               type="button"
-              onClick={() => { setFilterMode('not_voted'); setVisibleCount(30); }}
+              onClick={() => { setFilterMode('not_voted'); setVisibleCount(INITIAL_VISIBLE_COUNT); }}
               className={`py-1.5 px-1 rounded-xl text-[10.5px] font-bold border transition-all flex flex-col items-center justify-center ${
                 filterMode === 'not_voted'
                   ? 'bg-amber-500 text-slate-950 border-amber-300 font-black ring-2 ring-amber-400/50 shadow-md'
@@ -755,7 +758,7 @@ _మీ అమూల్యమైన ఓటును గాజు గ్లాస
             {/* 3. Quick Switch: OURS NOT YET VOTED (మనవాళ్లలో ఓటు వేయనివారు) */}
             <button
               type="button"
-              onClick={() => { setFilterMode('ours_not_voted'); setVisibleCount(30); }}
+              onClick={() => { setFilterMode('ours_not_voted'); setVisibleCount(INITIAL_VISIBLE_COUNT); }}
               className={`py-1.5 px-1 rounded-xl text-[10.5px] font-bold border transition-all flex flex-col items-center justify-center ${
                 filterMode === 'ours_not_voted'
                   ? 'bg-gradient-to-r from-red-600 to-amber-600 text-white border-red-400 font-black ring-2 ring-red-400/50 shadow-md'
@@ -772,7 +775,7 @@ _మీ అమూల్యమైన ఓటును గాజు గ్లాస
             {/* 4. Quick Switch: VOTED (ఓటేశారు) */}
             <button
               type="button"
-              onClick={() => { setFilterMode('voted'); setVisibleCount(30); }}
+              onClick={() => { setFilterMode('voted'); setVisibleCount(INITIAL_VISIBLE_COUNT); }}
               className={`py-1.5 px-1 rounded-xl text-[10.5px] font-bold border transition-all flex flex-col items-center justify-center ${
                 filterMode === 'voted'
                   ? 'bg-emerald-600 text-white border-emerald-400 font-black ring-2 ring-emerald-400/50 shadow-md'
@@ -791,7 +794,7 @@ _మీ అమూల్యమైన ఓటును గాజు గ్లాస
         {/* Filter Pills */}
         <div className="flex items-center gap-1.5 overflow-x-auto py-1 scrollbar-none text-[11px]">
           <button
-            onClick={() => { setFilterMode('all'); setVisibleCount(30); }}
+            onClick={() => { setFilterMode('all'); setVisibleCount(INITIAL_VISIBLE_COUNT); }}
             className={`px-2.5 py-1 rounded-lg font-bold whitespace-nowrap transition-all ${
               filterMode === 'all'
                 ? 'bg-amber-500 text-slate-950 font-black shadow-sm'
@@ -802,7 +805,7 @@ _మీ అమూల్యమైన ఓటును గాజు గ్లాస
           </button>
 
           <button
-            onClick={() => { setFilterMode('full'); setVisibleCount(30); }}
+            onClick={() => { setFilterMode('full'); setVisibleCount(INITIAL_VISIBLE_COUNT); }}
             className={`px-2.5 py-1 rounded-lg font-bold whitespace-nowrap transition-all flex items-center gap-1 ${
               filterMode === 'full'
                 ? 'bg-red-600 text-white font-black shadow-sm'
@@ -813,7 +816,7 @@ _మీ అమూల్యమైన ఓటును గాజు గ్లాస
           </button>
 
           <button
-            onClick={() => { setFilterMode('soft'); setVisibleCount(30); }}
+            onClick={() => { setFilterMode('soft'); setVisibleCount(INITIAL_VISIBLE_COUNT); }}
             className={`px-2.5 py-1 rounded-lg font-bold whitespace-nowrap transition-all flex items-center gap-1 ${
               filterMode === 'soft'
                 ? 'bg-amber-600 text-slate-950 font-black shadow-sm'
@@ -824,7 +827,7 @@ _మీ అమూల్యమైన ఓటును గాజు గ్లాస
           </button>
 
           <button
-            onClick={() => { setFilterMode('strong'); setVisibleCount(30); }}
+            onClick={() => { setFilterMode('strong'); setVisibleCount(INITIAL_VISIBLE_COUNT); }}
             className={`px-2.5 py-1 rounded-lg font-bold whitespace-nowrap transition-all flex items-center gap-1 ${
               filterMode === 'strong'
                 ? 'bg-emerald-600 text-white font-black shadow-sm'
@@ -835,7 +838,7 @@ _మీ అమూల్యమైన ఓటును గాజు గ్లాస
           </button>
 
           <button
-            onClick={() => { setFilterMode('has_phone'); setVisibleCount(30); }}
+            onClick={() => { setFilterMode('has_phone'); setVisibleCount(INITIAL_VISIBLE_COUNT); }}
             className={`px-2.5 py-1 rounded-lg font-bold whitespace-nowrap transition-all flex items-center gap-1 ${
               filterMode === 'has_phone'
                 ? 'bg-blue-600 text-white font-black shadow-sm'
@@ -846,7 +849,7 @@ _మీ అమూల్యమైన ఓటును గాజు గ్లాస
           </button>
 
           <button
-            onClick={() => { setFilterMode('exact'); setVisibleCount(30); }}
+            onClick={() => { setFilterMode('exact'); setVisibleCount(INITIAL_VISIBLE_COUNT); }}
             className={`px-2.5 py-1 rounded-lg font-bold whitespace-nowrap transition-all flex items-center gap-1 ${
               filterMode === 'exact'
                 ? 'bg-gradient-to-r from-red-600 to-amber-600 text-white font-black shadow-sm'
@@ -857,7 +860,7 @@ _మీ అమూల్యమైన ఓటును గాజు గ్లాస
           </button>
 
           <button
-            onClick={() => { setFilterMode('voted'); setVisibleCount(30); }}
+            onClick={() => { setFilterMode('voted'); setVisibleCount(INITIAL_VISIBLE_COUNT); }}
             className={`px-2.5 py-1 rounded-lg font-bold whitespace-nowrap transition-all flex items-center gap-1 ${
               filterMode === 'voted'
                 ? 'bg-emerald-600 text-white font-black shadow-sm'
@@ -868,7 +871,7 @@ _మీ అమూల్యమైన ఓటును గాజు గ్లాస
           </button>
 
           <button
-            onClick={() => { setFilterMode('not_voted'); setVisibleCount(30); }}
+            onClick={() => { setFilterMode('not_voted'); setVisibleCount(INITIAL_VISIBLE_COUNT); }}
             className={`px-2.5 py-1 rounded-lg font-bold whitespace-nowrap transition-all flex items-center gap-1 ${
               filterMode === 'not_voted'
                 ? 'bg-amber-500 text-slate-950 font-black shadow-sm'
@@ -879,7 +882,7 @@ _మీ అమూల్యమైన ఓటును గాజు గ్లాస
           </button>
 
           <button
-            onClick={() => { setFilterMode('ours_not_voted'); setVisibleCount(30); }}
+            onClick={() => { setFilterMode('ours_not_voted'); setVisibleCount(INITIAL_VISIBLE_COUNT); }}
             className={`px-2.5 py-1 rounded-lg font-bold whitespace-nowrap transition-all flex items-center gap-1 ${
               filterMode === 'ours_not_voted'
                 ? 'bg-gradient-to-r from-red-600 to-amber-600 text-white font-black shadow-sm'
@@ -890,7 +893,7 @@ _మీ అమూల్యమైన ఓటును గాజు గ్లాస
           </button>
 
           <button
-            onClick={() => { setFilterMode('opponent'); setVisibleCount(30); }}
+            onClick={() => { setFilterMode('opponent'); setVisibleCount(INITIAL_VISIBLE_COUNT); }}
             className={`px-2.5 py-1 rounded-lg font-bold whitespace-nowrap transition-all flex items-center gap-1 ${
               filterMode === 'opponent'
                 ? 'bg-rose-900 text-rose-200 font-black shadow-sm'
@@ -902,7 +905,7 @@ _మీ అమూల్యమైన ఓటును గాజు గ్లాస
 
           {counts.exactDups > 0 && (
             <button
-              onClick={() => { setFilterMode('duplicates_exact'); setVisibleCount(30); }}
+              onClick={() => { setFilterMode('duplicates_exact'); setVisibleCount(INITIAL_VISIBLE_COUNT); }}
               className={`px-2.5 py-1 rounded-lg font-bold whitespace-nowrap transition-all flex items-center gap-1 ${
                 filterMode === 'duplicates_exact'
                   ? 'bg-rose-950 text-rose-200 font-black shadow-sm ring-1 ring-rose-500'
@@ -916,7 +919,7 @@ _మీ అమూల్యమైన ఓటును గాజు గ్లాస
 
           {counts.partial50Dups > 0 && (
             <button
-              onClick={() => { setFilterMode('duplicates_50'); setVisibleCount(30); }}
+              onClick={() => { setFilterMode('duplicates_50'); setVisibleCount(INITIAL_VISIBLE_COUNT); }}
               className={`px-2.5 py-1 rounded-lg font-bold whitespace-nowrap transition-all flex items-center gap-1 ${
                 filterMode === 'duplicates_50'
                   ? 'bg-amber-950 text-amber-200 font-black shadow-sm ring-1 ring-amber-500'
@@ -929,7 +932,7 @@ _మీ అమూల్యమైన ఓటును గాజు గ్లాస
           )}
 
           <button
-            onClick={() => { setFilterMode('duplicates'); setVisibleCount(30); }}
+            onClick={() => { setFilterMode('duplicates'); setVisibleCount(INITIAL_VISIBLE_COUNT); }}
             className={`px-2.5 py-1 rounded-lg font-bold whitespace-nowrap transition-all flex items-center gap-1 ${
               filterMode === 'duplicates'
                 ? 'bg-purple-950 text-purple-200 font-black shadow-sm ring-1 ring-purple-500'
@@ -941,7 +944,7 @@ _మీ అమూల్యమైన ఓటును గాజు గ్లాస
           </button>
 
           <button
-            onClick={() => { setFilterMode('out_of_city'); setVisibleCount(30); }}
+            onClick={() => { setFilterMode('out_of_city'); setVisibleCount(INITIAL_VISIBLE_COUNT); }}
             className={`px-2.5 py-1 rounded-lg font-bold whitespace-nowrap transition-all flex items-center gap-1 ${
               filterMode === 'out_of_city'
                 ? 'bg-indigo-600 text-white font-black shadow-sm'
@@ -953,7 +956,7 @@ _మీ అమూల్యమైన ఓటును గాజు గ్లాస
           </button>
 
           <button
-            onClick={() => { setFilterMode('deceased'); setVisibleCount(30); }}
+            onClick={() => { setFilterMode('deceased'); setVisibleCount(INITIAL_VISIBLE_COUNT); }}
             className={`px-2.5 py-1 rounded-lg font-bold whitespace-nowrap transition-all flex items-center gap-1 ${
               filterMode === 'deceased'
                 ? 'bg-slate-700 text-slate-100 font-black shadow-sm ring-1 ring-slate-400'
@@ -1580,7 +1583,7 @@ _మీ అమూల్యమైన ఓటును గాజు గ్లాస
                       onClick={(e) => {
                         e.stopPropagation();
                         setSelectedSurname(selectedSurname === sn.en ? 'all' : sn.en);
-                        setVisibleCount(30);
+                        setVisibleCount(INITIAL_VISIBLE_COUNT);
                       }}
                       className="px-1.5 py-0.2 rounded bg-amber-500/10 hover:bg-amber-500/20 text-amber-300 border border-amber-500/30 text-[9px] font-bold inline-flex items-center gap-0.5"
                       title={language === 'te' ? 'ఈ ఇంటిపేరు ఓటర్లను మాత్రమే చూడండి' : 'Filter by this surname'}
@@ -2030,16 +2033,28 @@ _మీ అమూల్యమైన ఓటును గాజు గ్లాస
       </div>
       )}
 
-      {/* Load More Button */}
+      {/* Load More Button (+100 Voters) */}
       {displayedVoters.length < filteredVoters.length && (
-        <button
-          onClick={() => setVisibleCount(prev => prev + 30)}
-          className="w-full py-3 bg-slate-900 hover:bg-slate-800 text-amber-400 font-black rounded-2xl border border-slate-800 text-xs shadow-md transition-all flex items-center justify-center gap-1"
-        >
-          {language === 'te' 
-            ? `ఇంకా ఓటర్లను చూడండి (${filteredVoters.length - displayedVoters.length} మిగిలి ఉన్నారు) ↓` 
-            : `Load More Electors (${filteredVoters.length - displayedVoters.length} remaining) ↓`}
-        </button>
+        <div className="space-y-2 pt-1">
+          <button
+            onClick={() => setVisibleCount(prev => prev + LOAD_MORE_STEP)}
+            className="w-full py-3.5 bg-gradient-to-r from-amber-500 via-amber-400 to-amber-500 hover:from-amber-400 hover:to-amber-300 text-slate-950 font-black rounded-2xl border border-amber-300 text-xs shadow-lg active:scale-95 transition-all flex items-center justify-center gap-1.5"
+          >
+            <span>↓ {language === 'te' ? 'ఇంకా 100 మంది ఓటర్లను చూడండి' : 'Load Next 100 Electors'}</span>
+            <span className="font-mono text-[11px] opacity-90">
+              (+{Math.min(LOAD_MORE_STEP, filteredVoters.length - displayedVoters.length)} • {filteredVoters.length - displayedVoters.length} {language === 'te' ? 'మిగిలి ఉన్నారు' : 'remaining'})
+            </span>
+          </button>
+
+          {filteredVoters.length - displayedVoters.length > LOAD_MORE_STEP && (
+            <button
+              onClick={() => setVisibleCount(filteredVoters.length)}
+              className="w-full py-2 bg-slate-900 hover:bg-slate-800 text-slate-400 hover:text-white font-bold rounded-xl border border-slate-800 text-[10.5px] transition-all flex items-center justify-center gap-1"
+            >
+              <span>⚡ {language === 'te' ? `మొత్తం ${filteredVoters.length} మంది ఓటర్లను ఒకేసారి చూపించు (Load All)` : `Load All ${filteredVoters.length} Electors`}</span>
+            </button>
+          )}
+        </div>
       )}
 
       {filteredVoters.length === 0 && (
@@ -2053,7 +2068,7 @@ _మీ అమూల్యమైన ఓటును గాజు గ్లాస
                 setSelectedStreet('all');
                 setFilterMode('all');
                 setSearchQuery('');
-                setVisibleCount(30);
+                setVisibleCount(INITIAL_VISIBLE_COUNT);
               }}
               className="mt-2 px-4 py-2 bg-amber-500 hover:bg-amber-400 text-slate-950 font-black rounded-xl text-xs transition-transform active:scale-95 shadow-md"
             >
