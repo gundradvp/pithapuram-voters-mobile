@@ -660,6 +660,11 @@ export function App() {
     if (status === 'voted') triggerScoreNotice(lang === 'te' ? `✅ ఓటు వేశారు అని మార్క్ చేశారు` : `✅ Marked Voted for S.No #${serialNo}`);
     else if (status === 'supporter') triggerScoreNotice(lang === 'te' ? `🚩 మన మద్దతుదారుడిగా మార్క్ చేశారు` : `🚩 Marked Supporter for S.No #${serialNo}`);
     else if (status === 'opponent') triggerScoreNotice(lang === 'te' ? `🔴 ప్రత్యర్థిగా మార్క్ చేశారు` : `🔴 Marked Opponent for S.No #${serialNo}`);
+    else if (status === 'deceased') triggerScoreNotice(lang === 'te' ? `💀 S.No #${serialNo} మరణించినట్లుగా నమోదు చేయబడింది` : `💀 S.No #${serialNo} marked Deceased`);
+    else if (status === 'out_of_city') triggerScoreNotice(lang === 'te' ? `✈️ S.No #${serialNo} ఊర్లో లేరుగా మార్క్ చేయబడింది` : `✈️ S.No #${serialNo} marked Out of City`);
+    else if (status === 'doubtful') triggerScoreNotice(lang === 'te' ? `⚠️ S.No #${serialNo} అనుమానంగా మార్క్ చేశారు` : `⚠️ Marked Doubtful for S.No #${serialNo}`);
+    else if (status === 'visited') triggerScoreNotice(lang === 'te' ? `📋 S.No #${serialNo} విజిట్ చేసినట్లుగా మార్క్ చేశారు` : `📋 Marked Visited for S.No #${serialNo}`);
+    else triggerScoreNotice(lang === 'te' ? `స్టేటస్ రీసెట్ చేయబడింది` : `Status cleared`);
   };
 
   // Quick Switch 1: Toggle Ours (100% Supporter)

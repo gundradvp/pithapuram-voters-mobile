@@ -82,7 +82,7 @@ export const VotersTabMobile: React.FC<VotersTabMobileProps> = ({
   const [isPhoneticEnabled, setIsPhoneticEnabled] = useState<boolean>(true);
   const [expandedSurnameId, setExpandedSurnameId] = useState<string | null>(null);
   const [filterMode, setFilterMode] = useState<
-    'all' | 'full' | 'soft' | 'strong' | 'neutral' | 'opponent' | 'exact' | 'similar' | 'kriya_all' | 'voted' | 'not_voted' | 'ours_not_voted' | 'has_phone' | 'duplicates' | 'duplicates_exact' | 'duplicates_50'
+    'all' | 'full' | 'soft' | 'strong' | 'neutral' | 'opponent' | 'exact' | 'similar' | 'kriya_all' | 'voted' | 'not_voted' | 'ours_not_voted' | 'has_phone' | 'duplicates' | 'duplicates_exact' | 'duplicates_50' | 'deceased' | 'out_of_city'
   >('all');
 
   const handleToggleOurs = (serialNo: number) => {
@@ -244,6 +244,8 @@ export const VotersTabMobile: React.FC<VotersTabMobileProps> = ({
       if (filterMode === 'duplicates') return !!dupAnalysis.voterDupMap[v.s];
       if (filterMode === 'duplicates_exact') return dupAnalysis.voterDupMap[v.s]?.confidencePct >= 80;
       if (filterMode === 'duplicates_50') return dupAnalysis.voterDupMap[v.s]?.confidencePct < 80;
+      if (filterMode === 'deceased') return prof.survey_status === 'deceased';
+      if (filterMode === 'out_of_city') return prof.survey_status === 'out_of_city';
       if (filterMode === 'full') return pct === 100;
       if (filterMode === 'soft') return pct === 40;
       if (filterMode === 'strong') return pct !== undefined && pct >= 75 && pct < 100;
@@ -253,10 +255,10 @@ export const VotersTabMobile: React.FC<VotersTabMobileProps> = ({
       if (filterMode === 'similar') return v.kriya && v.k_type !== 'exact';
       if (filterMode === 'kriya_all') return v.kriya;
       if (filterMode === 'voted') return prof.survey_status === 'voted';
-      if (filterMode === 'not_voted') return prof.survey_status !== 'voted';
+      if (filterMode === 'not_voted') return prof.survey_status !== 'voted' && prof.survey_status !== 'deceased';
       if (filterMode === 'ours_not_voted') {
         const isOurs = pct === 100 || prof.survey_status === 'supporter';
-        return isOurs && prof.survey_status !== 'voted';
+        return isOurs && prof.survey_status !== 'voted' && prof.survey_status !== 'deceased';
       }
       if (filterMode === 'has_phone') return !!phone;
 
@@ -278,13 +280,20 @@ export const VotersTabMobile: React.FC<VotersTabMobileProps> = ({
     let notVoted = 0;
     let oursNotVoted = 0;
     let hasPhone = 0;
+    let deceased = 0;
+    let outOfCity = 0;
 
     voters.forEach(v => {
       const prof = profiles[v.s] || {};
       const pct = prof.supportPct;
       const phone = prof.customPhone || v.k_m;
       const isVoted = prof.survey_status === 'voted';
+      const isDeceased = prof.survey_status === 'deceased';
+      const isOutOfCity = prof.survey_status === 'out_of_city';
       const isOurs = pct === 100 || prof.survey_status === 'supporter';
+
+      if (isDeceased) deceased++;
+      if (isOutOfCity) outOfCity++;
 
       if (pct !== undefined) {
         if (pct === 100) full++;
@@ -302,7 +311,7 @@ export const VotersTabMobile: React.FC<VotersTabMobileProps> = ({
 
       if (isVoted) {
         voted++;
-      } else {
+      } else if (!isDeceased) {
         notVoted++;
         if (isOurs) oursNotVoted++;
       }
@@ -323,6 +332,8 @@ export const VotersTabMobile: React.FC<VotersTabMobileProps> = ({
       notVoted,
       oursNotVoted,
       hasPhone,
+      deceased,
+      outOfCity,
       duplicates: dupAnalysis.totalDuplicateVotersCount,
       exactDups: dupAnalysis.exactCount,
       partial50Dups: dupAnalysis.partial50Count
@@ -403,6 +414,10 @@ export const VotersTabMobile: React.FC<VotersTabMobileProps> = ({
         return <span className="px-1.5 py-0.5 bg-emerald-600/30 text-emerald-300 border border-emerald-500/40 rounded text-[9px] font-bold flex items-center gap-0.5">✅ {t.markVoted}</span>;
       case 'supporter':
         return <span className="px-1.5 py-0.5 bg-red-600/30 text-red-300 border border-red-500/40 rounded text-[9px] font-bold flex items-center gap-0.5">🚩 {language === 'te' ? 'మద్దతుదారు' : 'Supporter'}</span>;
+      case 'deceased':
+        return <span className="px-1.5 py-0.5 bg-slate-800 text-slate-300 border border-slate-700 rounded text-[9px] font-black flex items-center gap-0.5 shadow-sm">💀 {language === 'te' ? 'మరణించారు' : 'Deceased'}</span>;
+      case 'out_of_city':
+        return <span className="px-1.5 py-0.5 bg-indigo-950 text-indigo-300 border border-indigo-500/50 rounded text-[9px] font-black flex items-center gap-0.5 shadow-sm">✈️ {language === 'te' ? 'ఊర్లో లేరు' : 'Out of City'}</span>;
       case 'visited':
         return <span className="px-1.5 py-0.5 bg-blue-600/30 text-blue-300 border border-blue-500/40 rounded text-[9px] font-bold flex items-center gap-0.5">📋 {language === 'te' ? 'వెళ్లాము' : 'Visited'}</span>;
       case 'opponent':
@@ -912,6 +927,30 @@ _మీ అమూల్యమైన ఓటును గాజు గ్లాస
           >
             <span>⚠️ {language === 'te' ? 'మొత్తం డూప్లికేట్లు' : 'All Dups'} ({counts.duplicates})</span>
           </button>
+
+          <button
+            onClick={() => { setFilterMode('out_of_city'); setVisibleCount(30); }}
+            className={`px-2.5 py-1 rounded-lg font-bold whitespace-nowrap transition-all flex items-center gap-1 ${
+              filterMode === 'out_of_city'
+                ? 'bg-indigo-600 text-white font-black shadow-sm'
+                : 'bg-slate-900 text-indigo-300 border border-indigo-500/40 hover:bg-slate-800'
+            }`}
+            title={language === 'te' ? 'ఊర్లో లేని / వలస వెళ్లిన ఓటర్లు' : 'Out of City / Migrated Voters'}
+          >
+            <span>✈️ {language === 'te' ? 'ఊర్లో లేరు' : 'Out of City'} ({counts.outOfCity})</span>
+          </button>
+
+          <button
+            onClick={() => { setFilterMode('deceased'); setVisibleCount(30); }}
+            className={`px-2.5 py-1 rounded-lg font-bold whitespace-nowrap transition-all flex items-center gap-1 ${
+              filterMode === 'deceased'
+                ? 'bg-slate-700 text-slate-100 font-black shadow-sm ring-1 ring-slate-400'
+                : 'bg-slate-900 text-slate-400 border border-slate-700 hover:bg-slate-800'
+            }`}
+            title={language === 'te' ? 'చనిపోయిన ఓటర్లు (బోగస్ ఓటింగ్ నివారణకు)' : 'Deceased Voters (Prevents Impersonation / Bogus Voting)'}
+          >
+            <span>💀 {language === 'te' ? 'మరణించారు' : 'Deceased'} ({counts.deceased})</span>
+          </button>
         </div>
       </div>
 
@@ -1011,6 +1050,42 @@ _మీ అమూల్యమైన ఓటును గాజు గ్లాస
           <button
             onClick={() => setFilterMode('all')}
             className="text-red-400 font-bold hover:underline text-[10px]"
+          >
+            {language === 'te' ? 'అన్నీ చూపించు ✕' : 'Show All ✕'}
+          </button>
+        </div>
+      )}
+
+      {/* Active Filter Indicator: Deceased */}
+      {filterMode === 'deceased' && (
+        <div className="bg-slate-800/80 border border-slate-700 rounded-xl px-3 py-1.5 flex items-center justify-between text-[11px] animate-in fade-in">
+          <span className="text-slate-300 font-bold flex items-center gap-1.5">
+            💀 {language === 'te' ? 'మరణించిన ఓటర్ల జాబితా (బోగస్ ఓటింగ్ ఛాలెంజ్ కొరకు):' : 'Deceased voters list:'}{' '}
+            <strong className="text-white font-mono bg-slate-700 px-1.5 py-0.5 rounded border border-slate-600">
+              {filteredVoters.length} {language === 'te' ? 'మంది' : 'electors'}
+            </strong>
+          </span>
+          <button
+            onClick={() => setFilterMode('all')}
+            className="text-amber-400 font-bold hover:underline text-[10px]"
+          >
+            {language === 'te' ? 'అన్నీ చూపించు ✕' : 'Show All ✕'}
+          </button>
+        </div>
+      )}
+
+      {/* Active Filter Indicator: Out of City */}
+      {filterMode === 'out_of_city' && (
+        <div className="bg-indigo-950/60 border border-indigo-500/40 rounded-xl px-3 py-1.5 flex items-center justify-between text-[11px] animate-in fade-in">
+          <span className="text-indigo-300 font-bold flex items-center gap-1.5">
+            ✈️ {language === 'te' ? 'ఊర్లో లేని / వలస వెళ్లిన ఓటర్లు:' : 'Out of City / Migrated electors:'}{' '}
+            <strong className="text-white font-mono bg-indigo-900 px-1.5 py-0.5 rounded border border-indigo-400/40">
+              {filteredVoters.length} {language === 'te' ? 'మంది' : 'electors'}
+            </strong>
+          </span>
+          <button
+            onClick={() => setFilterMode('all')}
+            className="text-indigo-300 font-bold hover:underline text-[10px]"
           >
             {language === 'te' ? 'అన్నీ చూపించు ✕' : 'Show All ✕'}
           </button>
@@ -1227,14 +1302,16 @@ _మీ అమూల్యమైన ఓటును గాజు గ్లాస
                       {clan.voters.map(m => {
                         const prof = profiles[m.s] || {};
                         const pct = prof.supportPct;
+                        const isClanDeceased = prof.survey_status === 'deceased';
 
                         return (
-                          <div key={m.s} className="pt-2 first:pt-0 space-y-1">
+                          <div key={m.s} className={`pt-2 first:pt-0 space-y-1 ${isClanDeceased ? 'opacity-70' : ''}`}>
                             <div className="flex items-center justify-between">
                               <div className="flex items-center gap-1.5 flex-wrap">
                                 <span className="font-mono text-amber-400 font-bold">#{m.s}</span>
                                 <span className="font-mono text-[10px] text-emerald-400">{m.id}</span>
-                                <span className="text-white font-bold text-xs">{m.n}</span>
+                                <span className={`font-bold text-xs ${isClanDeceased ? 'text-slate-400 line-through' : 'text-white'}`}>{m.n}</span>
+                                {getStatusBadge(prof.survey_status)}
                                 {dupAnalysis.voterDupMap[m.s] && (() => {
                                   const dup = dupAnalysis.voterDupMap[m.s];
                                   return (
@@ -1383,19 +1460,26 @@ _మీ అమూల్యమైన ఓటును గాజు గ్లాస
           const pct = prof.supportPct;
           const sn = extractSurname(v);
 
+          const isDeceased = prof.survey_status === 'deceased';
+          const isOutOfCity = prof.survey_status === 'out_of_city';
+
           return (
             <div
               key={v.s}
               className={`bg-slate-900/90 border rounded-2xl p-3.5 space-y-2.5 transition-all shadow-md relative ${
-                pct === 100
-                  ? 'border-red-500/50 bg-gradient-to-r from-red-950/25 via-slate-900 to-slate-900'
-                  : pct !== undefined && pct >= 75
-                    ? 'border-emerald-500/40 bg-gradient-to-r from-emerald-950/20 via-slate-900 to-slate-900'
-                    : pct === 40
-                      ? 'border-amber-500/40 bg-gradient-to-r from-amber-950/20 via-slate-900 to-slate-900'
-                      : pct === 0
-                        ? 'border-rose-900 bg-rose-950/20'
-                        : 'border-slate-800/80 hover:border-slate-700'
+                isDeceased
+                  ? 'border-slate-800 bg-slate-950/80 opacity-75 grayscale-[20%]'
+                  : isOutOfCity
+                    ? 'border-indigo-500/40 bg-gradient-to-r from-indigo-950/20 via-slate-900 to-slate-900'
+                    : pct === 100
+                      ? 'border-red-500/50 bg-gradient-to-r from-red-950/25 via-slate-900 to-slate-900'
+                      : pct !== undefined && pct >= 75
+                        ? 'border-emerald-500/40 bg-gradient-to-r from-emerald-950/20 via-slate-900 to-slate-900'
+                        : pct === 40
+                          ? 'border-amber-500/40 bg-gradient-to-r from-amber-950/20 via-slate-900 to-slate-900'
+                          : pct === 0
+                            ? 'border-rose-900 bg-rose-950/20'
+                            : 'border-slate-800/80 hover:border-slate-700'
               }`}
             >
               {/* Card Top Row: S.No, EPIC, Leaning & Survey Status */}
@@ -1448,7 +1532,7 @@ _మీ అమూల్యమైన ఓటును గాజు గ్లాస
                   title={language === 'te' ? 'పూర్తి ఓటర్ కార్డు చూడటానికి ట్యాప్ చేయండి' : 'Tap to view complete official card'}
                 >
                   <div className="flex items-center gap-1.5 flex-wrap">
-                    <h3 className="text-sm font-black text-white hover:text-amber-300 transition-colors">{v.n}</h3>
+                    <h3 className={`text-sm font-black transition-colors ${isDeceased ? 'text-slate-400 line-through' : 'text-white hover:text-amber-300'}`}>{v.n}</h3>
                     <button
                       type="button"
                       onClick={(e) => {
@@ -1789,17 +1873,29 @@ _మీ అమూల్యమైన ఓటును గాజు గ్లాస
                   <button
                     onClick={() => setActiveMenuSno(activeMenuSno === v.s ? null : v.s)}
                     className={`px-2 py-1 rounded-lg text-[10px] font-bold border transition-all flex items-center gap-1 ${
-                      prof.survey_status
-                        ? 'bg-amber-500/20 border-amber-500/40 text-amber-300 font-extrabold'
-                        : 'bg-slate-800 hover:bg-slate-700 text-slate-400 border-slate-700'
+                      prof.survey_status === 'deceased'
+                        ? 'bg-slate-800 border-slate-700 text-slate-300 font-extrabold'
+                        : prof.survey_status === 'out_of_city'
+                          ? 'bg-indigo-950 border-indigo-500/50 text-indigo-300 font-extrabold'
+                          : prof.survey_status
+                            ? 'bg-amber-500/20 border-amber-500/40 text-amber-300 font-extrabold'
+                            : 'bg-slate-800 hover:bg-slate-700 text-slate-400 border-slate-700'
                     }`}
                   >
-                    <span>{prof.survey_status ? prof.survey_status.toUpperCase() : t.pollStatus}</span>
+                    <span>
+                      {prof.survey_status === 'deceased'
+                        ? (language === 'te' ? '💀 మరణించారు' : '💀 DECEASED')
+                        : prof.survey_status === 'out_of_city'
+                          ? (language === 'te' ? '✈️ ఊర్లో లేరు' : '✈️ OUT OF CITY')
+                          : prof.survey_status
+                            ? prof.survey_status.toUpperCase()
+                            : t.pollStatus}
+                    </span>
                   </button>
 
                   {/* Status Dropdown */}
                   {activeMenuSno === v.s && (
-                    <div className="absolute right-0 bottom-8 z-30 bg-slate-900 border border-amber-500/40 rounded-xl p-1.5 shadow-2xl w-44 space-y-1 animate-in fade-in duration-100">
+                    <div className="absolute right-0 bottom-8 z-30 bg-slate-900 border border-amber-500/40 rounded-xl p-1.5 shadow-2xl w-48 space-y-1 animate-in fade-in duration-100">
                       <button
                         onClick={() => { onUpdateSurveyMark(v.s, 'voted'); setActiveMenuSno(null); }}
                         className="w-full text-left px-2 py-1.5 rounded-lg text-[11px] font-bold text-emerald-300 hover:bg-emerald-950/40 flex items-center gap-1.5"
@@ -1811,6 +1907,18 @@ _మీ అమూల్యమైన ఓటును గాజు గ్లాస
                         className="w-full text-left px-2 py-1.5 rounded-lg text-[11px] font-bold text-red-300 hover:bg-red-950/40 flex items-center gap-1.5"
                       >
                         <Flag className="w-3.5 h-3.5 text-red-400" /> {t.markSupporter}
+                      </button>
+                      <button
+                        onClick={() => { onUpdateSurveyMark(v.s, 'out_of_city'); setActiveMenuSno(null); }}
+                        className="w-full text-left px-2 py-1.5 rounded-lg text-[11px] font-bold text-indigo-300 hover:bg-indigo-950/40 flex items-center gap-1.5"
+                      >
+                        <span className="text-xs">✈️</span> {language === 'te' ? 'ఊర్లో లేరు (వలస)' : 'Mark Out of City'}
+                      </button>
+                      <button
+                        onClick={() => { onUpdateSurveyMark(v.s, 'deceased'); setActiveMenuSno(null); }}
+                        className="w-full text-left px-2 py-1.5 rounded-lg text-[11px] font-bold text-slate-300 hover:bg-slate-800 flex items-center gap-1.5"
+                      >
+                        <span className="text-xs">💀</span> {language === 'te' ? 'మరణించారు (చనిపోయారు)' : 'Mark Deceased'}
                       </button>
                       <button
                         onClick={() => { onUpdateSurveyMark(v.s, 'visited'); setActiveMenuSno(null); }}

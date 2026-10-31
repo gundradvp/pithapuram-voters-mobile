@@ -29,6 +29,8 @@ export const StatsTabMobile: React.FC<StatsTabMobileProps> = ({
     let voted = 0;
     let supportersMarked = 0;
     let visited = 0;
+    let deceased = 0;
+    let outOfCity = 0;
     let hasPhone = 0;
     let hasInfluencer = 0;
 
@@ -46,6 +48,8 @@ export const StatsTabMobile: React.FC<StatsTabMobileProps> = ({
       if (p.survey_status === 'voted') voted++;
       if (p.survey_status === 'supporter') supportersMarked++;
       if (p.survey_status === 'visited') visited++;
+      if (p.survey_status === 'deceased') deceased++;
+      if (p.survey_status === 'out_of_city') outOfCity++;
 
       if (p.customPhone || v.k_m) hasPhone++;
       if (p.influencerId) hasInfluencer++;
@@ -75,6 +79,8 @@ export const StatsTabMobile: React.FC<StatsTabMobileProps> = ({
       voted,
       supportersMarked,
       visited,
+      deceased,
+      outOfCity,
       hasPhone,
       hasInfluencer,
       phonePct: Math.round((hasPhone / totalVoters) * 100)
@@ -217,18 +223,26 @@ export const StatsTabMobile: React.FC<StatsTabMobileProps> = ({
           </span>
         </div>
 
-        <div className="grid grid-cols-3 gap-2 text-center text-[10px]">
+        <div className="grid grid-cols-5 gap-1.5 text-center text-[10px]">
           <div className="bg-slate-950 border border-slate-800 p-2 rounded-xl">
-            <span className="text-emerald-400 font-bold uppercase block">Voted</span>
-            <span className="text-lg font-black text-white font-mono">{stats.voted}</span>
+            <span className="text-emerald-400 font-bold uppercase block truncate">Voted</span>
+            <span className="text-base font-black text-white font-mono">{stats.voted}</span>
           </div>
           <div className="bg-slate-950 border border-slate-800 p-2 rounded-xl">
-            <span className="text-red-400 font-bold uppercase block">Supporters</span>
-            <span className="text-lg font-black text-white font-mono">{stats.supportersMarked}</span>
+            <span className="text-red-400 font-bold uppercase block truncate">Ours</span>
+            <span className="text-base font-black text-white font-mono">{stats.supportersMarked}</span>
           </div>
           <div className="bg-slate-950 border border-slate-800 p-2 rounded-xl">
-            <span className="text-blue-400 font-bold uppercase block">Door Visited</span>
-            <span className="text-lg font-black text-white font-mono">{stats.visited}</span>
+            <span className="text-blue-400 font-bold uppercase block truncate">Visited</span>
+            <span className="text-base font-black text-white font-mono">{stats.visited}</span>
+          </div>
+          <div className="bg-indigo-950/40 border border-indigo-500/30 p-2 rounded-xl">
+            <span className="text-indigo-300 font-bold uppercase block truncate">Away</span>
+            <span className="text-base font-black text-indigo-200 font-mono">{stats.outOfCity}</span>
+          </div>
+          <div className="bg-slate-800/80 border border-slate-700 p-2 rounded-xl">
+            <span className="text-slate-300 font-bold uppercase block truncate">Deceased</span>
+            <span className="text-base font-black text-slate-200 font-mono">{stats.deceased}</span>
           </div>
         </div>
 

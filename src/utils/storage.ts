@@ -203,7 +203,12 @@ export function calculateWinningScore(
   profiles: Record<number, VoterCampaignProfile>,
   mode: 'entry' | 'auto' = 'entry'
 ): WinningScoreCalculation {
-  const totalElectors = boothData.voters.length || 1;
+  // Exclude deceased electors from active living electorate
+  let deceasedCount = 0;
+  boothData.voters.forEach(v => {
+    if (profiles[v.s]?.survey_status === 'deceased') deceasedCount++;
+  });
+  const totalElectors = Math.max(1, (boothData.voters.length || 1) - deceasedCount);
   const expectedTurnoutPct = 80; // Historical Pithapuram turnout benchmark (~80%)
   const expectedPollVotes = Math.round((totalElectors * expectedTurnoutPct) / 100);
   const targetVotesToWin = Math.ceil(expectedPollVotes / 2) + 1;
@@ -222,6 +227,9 @@ export function calculateWinningScore(
 
   boothData.voters.forEach(v => {
     const p = profiles[v.s] || {};
+
+    // Deceased electors cannot vote; skip from active projections
+    if (p.survey_status === 'deceased') return;
 
     // Money Influence tracking
     if (p.moneyStatus === 'opponent_paid_safe') cashOpponentPaidSafeCount++;

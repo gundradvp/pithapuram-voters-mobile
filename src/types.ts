@@ -67,7 +67,7 @@ export interface BoothVolunteer {
   count: number;
 }
 
-export type VoterSurveyStatus = 'voted' | 'supporter' | 'doubtful' | 'opponent' | 'shifted' | 'visited';
+export type VoterSurveyStatus = 'voted' | 'supporter' | 'doubtful' | 'opponent' | 'shifted' | 'visited' | 'deceased' | 'out_of_city';
 
 export type SupportCategory = 'full_support' | 'strong_lean' | 'soft_lean' | 'neutral_swing' | 'doubtful' | 'opponent';
 
@@ -120,6 +120,7 @@ export interface VoterCampaignProfile {
   familyId?: string;
   notes?: string;
   survey_status?: VoterSurveyStatus | null;
+  outOfCityLocation?: string;
   visits?: VoterVisit[];
   moneyStatus?: MoneyInfluenceStatus;
   moneyNotes?: string;

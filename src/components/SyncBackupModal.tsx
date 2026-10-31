@@ -55,6 +55,8 @@ export const SyncBackupModal: React.FC<SyncBackupModalProps> = ({
   }).length;
   const votedCount = markedSnos.filter(s => profiles[Number(s)].survey_status === 'voted').length;
   const phonesCount = markedSnos.filter(s => !!profiles[Number(s)].customPhone).length;
+  const deceasedCount = markedSnos.filter(s => profiles[Number(s)].survey_status === 'deceased').length;
+  const outOfCityCount = markedSnos.filter(s => profiles[Number(s)].survey_status === 'out_of_city').length;
 
   // 1. Copy Sync Code
   const handleCopySyncCode = () => {
@@ -176,22 +178,26 @@ export const SyncBackupModal: React.FC<SyncBackupModalProps> = ({
         </div>
 
         {/* Live Marked Stats Summary */}
-        <div className="bg-slate-950/80 border border-slate-800 rounded-2xl p-2.5 grid grid-cols-4 gap-1.5 text-center text-[10px]">
+        <div className="bg-slate-950/80 border border-slate-800 rounded-2xl p-2.5 grid grid-cols-5 gap-1 text-center text-[10px]">
           <div className="p-1 rounded-xl bg-slate-900 border border-slate-800">
-            <span className="text-slate-400 block font-bold">{language === 'te' ? 'గుర్తించినవి' : 'Marked'}</span>
+            <span className="text-slate-400 block font-bold truncate">{language === 'te' ? 'గుర్తించినవి' : 'Marked'}</span>
             <span className="text-white font-mono font-black text-xs">{markedSnos.length}</span>
           </div>
           <div className="p-1 rounded-xl bg-red-950/40 border border-red-500/30">
-            <span className="text-red-300 block font-bold">{language === 'te' ? 'మనవాళ్లు' : 'Ours'}</span>
+            <span className="text-red-300 block font-bold truncate">{language === 'te' ? 'మనవాళ్లు' : 'Ours'}</span>
             <span className="text-red-300 font-mono font-black text-xs">{oursCount}</span>
           </div>
           <div className="p-1 rounded-xl bg-emerald-950/40 border border-emerald-500/30">
-            <span className="text-emerald-300 block font-bold">{language === 'te' ? 'ఓటేశారు' : 'Voted'}</span>
+            <span className="text-emerald-300 block font-bold truncate">{language === 'te' ? 'ఓటేశారు' : 'Voted'}</span>
             <span className="text-emerald-300 font-mono font-black text-xs">{votedCount}</span>
           </div>
-          <div className="p-1 rounded-xl bg-blue-950/40 border border-blue-500/30">
-            <span className="text-blue-300 block font-bold">{language === 'te' ? 'ఫోన్లు' : 'Phones'}</span>
-            <span className="text-blue-300 font-mono font-black text-xs">{phonesCount}</span>
+          <div className="p-1 rounded-xl bg-indigo-950/40 border border-indigo-500/30">
+            <span className="text-indigo-300 block font-bold truncate">{language === 'te' ? 'ఊర్లో లేరు' : 'Away'}</span>
+            <span className="text-indigo-300 font-mono font-black text-xs">{outOfCityCount}</span>
+          </div>
+          <div className="p-1 rounded-xl bg-slate-800 border border-slate-700">
+            <span className="text-slate-300 block font-bold truncate">{language === 'te' ? 'మరణించారు' : 'Deceased'}</span>
+            <span className="text-slate-200 font-mono font-black text-xs">{deceasedCount}</span>
           </div>
         </div>
 

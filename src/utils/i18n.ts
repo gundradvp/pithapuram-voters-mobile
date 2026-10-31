@@ -101,6 +101,12 @@ export const translations = {
     doorVisited: 'ఇంటికి వెళ్లాము',
     markDoubtful: 'అనుమానం',
     markOpponent: 'ప్రత్యర్థి',
+    markDeceased: 'మరణించారు (చనిపోయారు)',
+    markOutOfCity: 'ఊర్లో లేరు (వలస)',
+    deceased: 'మరణించారు',
+    outOfCity: 'ఊర్లో లేరు',
+    filterDeceased: '💀 మరణించారు',
+    filterOutOfCity: '✈️ ఊర్లో లేరు',
     clearStatus: 'స్టేటస్ తీసివేయండి',
 
     // Surname & Phonetic Search & Winning Formula
@@ -274,6 +280,12 @@ export const translations = {
     doorVisited: 'Door Visited',
     markDoubtful: 'Doubtful',
     markOpponent: 'Opponent',
+    markDeceased: 'Mark Deceased',
+    markOutOfCity: 'Mark Out of City',
+    deceased: 'Deceased',
+    outOfCity: 'Out of City',
+    filterDeceased: '💀 Deceased',
+    filterOutOfCity: '✈️ Out of City',
     clearStatus: 'Clear Status',
 
     // Surname & Phonetic Search & Winning Formula
