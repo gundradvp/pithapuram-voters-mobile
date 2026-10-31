@@ -5,6 +5,8 @@ import { Language, translations } from '../utils/i18n';
 import { resolvePhotoUrl } from '../utils/photoResolver';
 import { matchesPhoneticSearch } from '../utils/phoneticSearch';
 import { classifyBoothSurnames, extractSurname, SurnameGroup } from '../utils/surnameClassifier';
+import { analyzeDuplicateVoters, DuplicateMatchInfo } from '../utils/duplicateDetector';
+import { DuplicateCompareModal } from './DuplicateCompareModal';
 
 interface VotersTabMobileProps {
   voters: MobileVoter[];
@@ -42,11 +44,18 @@ export const VotersTabMobile: React.FC<VotersTabMobileProps> = ({
   const [isPhoneticEnabled, setIsPhoneticEnabled] = useState<boolean>(true);
   const [expandedSurnameId, setExpandedSurnameId] = useState<string | null>(null);
   const [filterMode, setFilterMode] = useState<
-    'all' | 'full' | 'soft' | 'strong' | 'neutral' | 'opponent' | 'exact' | 'similar' | 'kriya_all' | 'voted' | 'has_phone'
+    'all' | 'full' | 'soft' | 'strong' | 'neutral' | 'opponent' | 'exact' | 'similar' | 'kriya_all' | 'voted' | 'has_phone' | 'duplicates'
   >('all');
   const [visibleCount, setVisibleCount] = useState(30);
   const [activeMenuSno, setActiveMenuSno] = useState<number | null>(null);
   const [copiedPhoneId, setCopiedPhoneId] = useState<string | null>(null);
+  const [selectedDuplicateCluster, setSelectedDuplicateCluster] = useState<{
+    voters: MobileVoter[];
+    reasonTe: string;
+    reasonEn: string;
+    confidencePct: number;
+    matchLevel: any;
+  } | null>(null);
 
   // Auto-reset filters whenever the active booth/ward changes
   useEffect(() => {
@@ -55,6 +64,7 @@ export const VotersTabMobile: React.FC<VotersTabMobileProps> = ({
     setSearchQuery('');
     setFilterMode('all');
     setVisibleCount(30);
+    setSelectedDuplicateCluster(null);
   }, [boothInfo?.part_no]);
 
   const handleCopyPhone = (number: string, id: string) => {
@@ -67,10 +77,15 @@ export const VotersTabMobile: React.FC<VotersTabMobileProps> = ({
 
   const t = translations[language];
 
-  // Precomputed Surnames Grouping
+  // Precomputed Duplicate Votes Analysis
+  const dupAnalysis = useMemo(() => {
+    return analyzeDuplicateVoters(voters);
+  }, [voters]);
+
+  // Precomputed Surnames Grouping with Duplicate counts
   const surnameGroups = useMemo(() => {
-    return classifyBoothSurnames(voters, profiles);
-  }, [voters, profiles]);
+    return classifyBoothSurnames(voters, profiles, dupAnalysis.voterDupMap);
+  }, [voters, profiles, dupAnalysis.voterDupMap]);
 
   // Unique streets list for chips
   const streetsList = useMemo(() => {
@@ -124,6 +139,7 @@ export const VotersTabMobile: React.FC<VotersTabMobileProps> = ({
       }
 
       // 2. Leaning / Filter Mode
+      if (filterMode === 'duplicates') return !!dupAnalysis.voterDupMap[v.s];
       if (filterMode === 'full') return pct === 100;
       if (filterMode === 'soft') return pct === 40;
       if (filterMode === 'strong') return pct !== undefined && pct >= 75 && pct < 100;
@@ -137,7 +153,7 @@ export const VotersTabMobile: React.FC<VotersTabMobileProps> = ({
 
       return true;
     });
-  }, [voters, searchQuery, selectedStreet, selectedSurname, filterMode, profiles, isPhoneticEnabled]);
+  }, [voters, searchQuery, selectedStreet, selectedSurname, filterMode, profiles, isPhoneticEnabled, dupAnalysis.voterDupMap]);
 
   // Counts for pills
   const counts = useMemo(() => {
@@ -175,8 +191,21 @@ export const VotersTabMobile: React.FC<VotersTabMobileProps> = ({
       if (phone) hasPhone++;
     });
 
-    return { all: voters.length, full, soft, strong, neutral, opponent, exact, similar, kriyaAll, voted, hasPhone };
-  }, [voters, profiles]);
+    return {
+      all: voters.length,
+      full,
+      soft,
+      strong,
+      neutral,
+      opponent,
+      exact,
+      similar,
+      kriyaAll,
+      voted,
+      hasPhone,
+      duplicates: dupAnalysis.totalDuplicateVotersCount
+    };
+  }, [voters, profiles, dupAnalysis.totalDuplicateVotersCount]);
 
   const displayedVoters = filteredVoters.slice(0, visibleCount);
 
@@ -525,6 +554,18 @@ _మీ అమూల్యమైన ఓటును గాజు గ్లాస
           >
             <span>{t.filterOpponent} ({counts.opponent})</span>
           </button>
+
+          <button
+            onClick={() => { setFilterMode('duplicates'); setVisibleCount(30); }}
+            className={`px-2.5 py-1 rounded-lg font-bold whitespace-nowrap transition-all flex items-center gap-1 ${
+              filterMode === 'duplicates'
+                ? 'bg-rose-950 text-rose-200 font-black shadow-sm ring-1 ring-rose-500'
+                : 'bg-slate-900 text-amber-300 border border-amber-500/40 hover:bg-slate-800'
+            }`}
+            title={language === 'te' ? 'డూప్లికేట్ / డబుల్ నమోదైన ఓటర్లను చూడండి' : 'Filter duplicate / double votes'}
+          >
+            <span>⚠️ {t.filterDuplicates || 'డూప్లికేట్లు'} ({counts.duplicates})</span>
+          </button>
         </div>
       </div>
 
@@ -649,6 +690,11 @@ _మీ అమూల్యమైన ఓటును గాజు గ్లాస
                         {clan.kriyaCount > 0 && (
                           <span className="px-1.5 py-0.2 bg-gradient-to-r from-red-600 to-amber-600 text-white rounded text-[9px] font-black flex items-center gap-0.5">
                             ⭐ {clan.kriyaCount} క్రియా
+                          </span>
+                        )}
+                        {clan.duplicateCount !== undefined && clan.duplicateCount > 0 && (
+                          <span className="px-1.5 py-0.2 bg-rose-950 text-rose-300 border border-rose-500/60 rounded text-[9px] font-black flex items-center gap-0.5 shadow-sm">
+                            ⚠️ {clan.duplicateCount} {language === 'te' ? 'డూప్లికేట్లు' : 'Duplicates'}
                           </span>
                         )}
                       </div>
@@ -786,10 +832,33 @@ _మీ అమూల్యమైన ఓటును గాజు గ్లాస
                         return (
                           <div key={m.s} className="pt-2 first:pt-0 space-y-1">
                             <div className="flex items-center justify-between">
-                              <div className="flex items-center gap-1.5">
+                              <div className="flex items-center gap-1.5 flex-wrap">
                                 <span className="font-mono text-amber-400 font-bold">#{m.s}</span>
                                 <span className="font-mono text-[10px] text-emerald-400">{m.id}</span>
                                 <span className="text-white font-bold text-xs">{m.n}</span>
+                                {dupAnalysis.voterDupMap[m.s] && (() => {
+                                  const dup = dupAnalysis.voterDupMap[m.s];
+                                  return (
+                                    <button
+                                      type="button"
+                                      onClick={() => setSelectedDuplicateCluster({
+                                        voters: [m, ...dup.matchingVoters],
+                                        reasonTe: dup.reasonTe,
+                                        reasonEn: dup.reasonEn,
+                                        confidencePct: dup.confidencePct,
+                                        matchLevel: dup.matchLevel
+                                      })}
+                                      className={`px-1.5 py-0.2 rounded text-[8.5px] font-black inline-flex items-center gap-0.5 border shadow-sm hover:scale-105 transition-all ${
+                                        dup.matchLevel === 'exact'
+                                          ? 'bg-rose-950 text-rose-300 border-rose-500/60'
+                                          : 'bg-amber-950 text-amber-300 border-amber-500/60'
+                                      }`}
+                                      title={dup.reasonTe}
+                                    >
+                                      <span>⚠️ డూప్లికేట్ (#{dup.matchingSnos.join(', #')})</span>
+                                    </button>
+                                  );
+                                })()}
                               </div>
                               <button
                                 onClick={() => onOpenSlip(m)}
@@ -961,6 +1030,33 @@ _మీ అమూల్యమైన ఓటును గాజు గ్లాస
                     >
                       <span>🏛️ {sn.te || sn.en}</span>
                     </button>
+                    {dupAnalysis.voterDupMap[v.s] && (() => {
+                      const dup = dupAnalysis.voterDupMap[v.s];
+                      return (
+                        <button
+                          type="button"
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            setSelectedDuplicateCluster({
+                              voters: [v, ...dup.matchingVoters],
+                              reasonTe: dup.reasonTe,
+                              reasonEn: dup.reasonEn,
+                              confidencePct: dup.confidencePct,
+                              matchLevel: dup.matchLevel
+                            });
+                          }}
+                          className={`px-1.5 py-0.5 rounded text-[9px] font-black inline-flex items-center gap-1 shadow-sm transition-all hover:scale-105 active:scale-95 ${
+                            dup.matchLevel === 'exact'
+                              ? 'bg-rose-950 text-rose-300 border border-rose-500/60'
+                              : 'bg-amber-950 text-amber-300 border border-amber-500/60'
+                          }`}
+                          title={`${dup.reasonTe} (సరిపోల్చడానికి ట్యాప్ చేయండి)`}
+                        >
+                          <span>⚠️ {dup.matchLevel === 'exact' ? (language === 'te' ? 'డూప్లికేట్' : 'Duplicate') : (language === 'te' ? 'సంభావ్య డూప్లికేట్' : 'Probable Dup')}</span>
+                          <span className="font-mono font-bold underline">(#{dup.matchingSnos.join(', #')})</span>
+                        </button>
+                      );
+                    })()}
                     {v.kriya && (
                       <span 
                         className={`px-1.5 py-0.2 rounded text-[8px] font-extrabold uppercase tracking-wide flex items-center gap-0.5 ${
@@ -1306,6 +1402,19 @@ _మీ అమూల్యమైన ఓటును గాజు గ్లాస
             </button>
           )}
         </div>
+      )}
+      {/* Duplicate Compare Modal */}
+      {selectedDuplicateCluster && (
+        <DuplicateCompareModal
+          voters={selectedDuplicateCluster.voters}
+          reasonTe={selectedDuplicateCluster.reasonTe}
+          reasonEn={selectedDuplicateCluster.reasonEn}
+          confidencePct={selectedDuplicateCluster.confidencePct}
+          matchLevel={selectedDuplicateCluster.matchLevel}
+          language={language}
+          onClose={() => setSelectedDuplicateCluster(null)}
+          onOpenSlip={onOpenSlip}
+        />
       )}
     </div>
   );

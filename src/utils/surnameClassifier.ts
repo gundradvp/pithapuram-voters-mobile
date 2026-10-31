@@ -30,6 +30,8 @@ export interface SurnameGroup {
   topElders: MobileVoter[]; // 60+ yrs
   topYouth: MobileVoter[]; // 18-25 yrs
   targetPriority: 'high' | 'medium' | 'low';
+  duplicateCount?: number;
+  duplicateVoters?: MobileVoter[];
 }
 
 export interface WinningFormulaSummary {
@@ -307,7 +309,8 @@ export function extractSurname(voter: MobileVoter): { en: string; te: string } {
  */
 export function classifyBoothSurnames(
   voters: MobileVoter[],
-  profiles: Record<number, VoterCampaignProfile>
+  profiles: Record<number, VoterCampaignProfile>,
+  voterDupMap?: Record<number, any>
 ): SurnameGroup[] {
   const clanMap = new Map<string, { en: string; te: string; list: MobileVoter[] }>();
 
@@ -416,7 +419,9 @@ export function classifyBoothSurnames(
       assignedInfluencer: headProf.influencerName,
       topElders: elders.slice(0, 5),
       topYouth: youth.slice(0, 5),
-      targetPriority
+      targetPriority,
+      duplicateCount: voterDupMap ? clanVoters.filter(v => voterDupMap[v.s]).length : 0,
+      duplicateVoters: voterDupMap ? clanVoters.filter(v => voterDupMap[v.s]) : []
     };
   });
 

@@ -24,6 +24,8 @@ import {
   classifyBoothSurnames,
   calculateWinningFormula
 } from '../utils/surnameClassifier';
+import { analyzeDuplicateVoters, DuplicateMatchInfo } from '../utils/duplicateDetector';
+import { DuplicateCompareModal } from './DuplicateCompareModal';
 
 interface FamiliesTabMobileProps {
   families: Record<string, FamilyGroup>;
@@ -42,7 +44,7 @@ interface FamiliesTabMobileProps {
 }
 
 type TabMode = 'surnames' | 'houses';
-type SurnameFilter = 'all' | 'top10' | 'jsp' | 'swing' | 'elders';
+type SurnameFilter = 'all' | 'top10' | 'jsp' | 'swing' | 'elders' | 'duplicates';
 
 export const FamiliesTabMobile: React.FC<FamiliesTabMobileProps> = ({
   families,
@@ -66,6 +68,13 @@ export const FamiliesTabMobile: React.FC<FamiliesTabMobileProps> = ({
   const [expandedFamId, setExpandedFamId] = useState<string | null>(null);
   const [expandedSurname, setExpandedSurname] = useState<string | null>(null);
   const [copiedPhoneId, setCopiedPhoneId] = useState<string | null>(null);
+  const [selectedDuplicateCluster, setSelectedDuplicateCluster] = useState<{
+    voters: MobileVoter[];
+    reasonTe: string;
+    reasonEn: string;
+    confidencePct: number;
+    matchLevel: any;
+  } | null>(null);
 
   const handleCopyPhone = (number: string, id: string) => {
     navigator.clipboard.writeText(number);
@@ -77,18 +86,29 @@ export const FamiliesTabMobile: React.FC<FamiliesTabMobileProps> = ({
 
   const t = translations[language];
 
+  // Precomputed Duplicate Analysis
+  const dupAnalysis = useMemo(() => {
+    return analyzeDuplicateVoters(voters);
+  }, [voters]);
+
   // 1. Surname Clans & Winning Blueprint Memos
   const { clanGroups, winningFormula } = useMemo(() => {
-    const groups = classifyBoothSurnames(voters, profiles);
+    const groups = classifyBoothSurnames(voters, profiles, dupAnalysis.voterDupMap);
     const formula = calculateWinningFormula(groups, voters.length);
     return { clanGroups: groups, winningFormula: formula };
-  }, [voters, profiles]);
+  }, [voters, profiles, dupAnalysis.voterDupMap]);
+
+  // Count of clans containing duplicates
+  const clansWithDuplicatesCount = useMemo(() => {
+    return clanGroups.filter(c => c.duplicateCount && c.duplicateCount > 0).length;
+  }, [clanGroups]);
 
   // Filtered Surname Clans
   const filteredClans = useMemo(() => {
     const q = searchQuery.toLowerCase().trim();
     return clanGroups.filter((c, idx) => {
       // Filter by clan filter mode
+      if (surnameFilter === 'duplicates' && (!c.duplicateCount || c.duplicateCount === 0)) return false;
       if (surnameFilter === 'top10' && idx >= 10) return false;
       if (surnameFilter === 'jsp' && (c.fullCount + Math.round(c.strongCount * 0.75)) <= c.opponentCount) return false;
       if (surnameFilter === 'swing' && c.neutralCount === 0) return false;
@@ -357,6 +377,18 @@ export const FamiliesTabMobile: React.FC<FamiliesTabMobileProps> = ({
               >
                 <span>👴 {language === 'te' ? 'పెద్దలు ఉన్నవి' : '60+ Elders'}</span>
               </button>
+
+              <button
+                onClick={() => setSurnameFilter('duplicates')}
+                className={`px-2.5 py-1 rounded-lg font-bold whitespace-nowrap transition-all flex items-center gap-1 ${
+                  surnameFilter === 'duplicates'
+                    ? 'bg-rose-950 text-rose-200 font-black shadow-sm ring-1 ring-rose-500'
+                    : 'bg-slate-900 text-amber-300 border border-amber-500/30'
+                }`}
+                title={language === 'te' ? 'డూప్లికేట్ ఓట్లు ఉన్న వంశాలు' : 'Surname clans with duplicate votes'}
+              >
+                <span>⚠️ {language === 'te' ? 'డూప్లికేట్లు' : 'Duplicates'} ({clansWithDuplicatesCount})</span>
+              </button>
             </div>
           </div>
 
@@ -462,6 +494,11 @@ export const FamiliesTabMobile: React.FC<FamiliesTabMobileProps> = ({
                       {clan.kriyaCount > 0 && (
                         <span className="px-2 py-0.5 bg-red-950/60 border border-red-500/30 rounded-md text-red-300 font-bold">
                           🚩 {clan.kriyaCount} {language === 'te' ? 'క్రియ వాలంటీర్లు' : 'Kriya'}
+                        </span>
+                      )}
+                      {clan.duplicateCount !== undefined && clan.duplicateCount > 0 && (
+                        <span className="px-2 py-0.5 bg-rose-950 text-rose-300 border border-rose-500/50 rounded-md text-[10px] font-bold shadow-sm">
+                          ⚠️ {clan.duplicateCount} {language === 'te' ? 'డూప్లికేట్లు' : 'Duplicates'}
                         </span>
                       )}
                     </div>
@@ -614,6 +651,29 @@ export const FamiliesTabMobile: React.FC<FamiliesTabMobileProps> = ({
                                 <div className="flex items-center gap-1.5 flex-wrap">
                                   <span className="font-mono text-amber-400 font-bold text-xs">#{voter.s}</span>
                                   <span className="font-black text-white text-xs">{voter.n}</span>
+                                  {dupAnalysis.voterDupMap[voter.s] && (() => {
+                                    const dup = dupAnalysis.voterDupMap[voter.s];
+                                    return (
+                                      <button
+                                        type="button"
+                                        onClick={() => setSelectedDuplicateCluster({
+                                          voters: [voter, ...dup.matchingVoters],
+                                          reasonTe: dup.reasonTe,
+                                          reasonEn: dup.reasonEn,
+                                          confidencePct: dup.confidencePct,
+                                          matchLevel: dup.matchLevel
+                                        })}
+                                        className={`px-1.5 py-0.2 rounded text-[8.5px] font-black inline-flex items-center gap-0.5 border shadow-sm hover:scale-105 transition-all ${
+                                          dup.matchLevel === 'exact'
+                                            ? 'bg-rose-950 text-rose-300 border-rose-500/60'
+                                            : 'bg-amber-950 text-amber-300 border-amber-500/60'
+                                        }`}
+                                        title={dup.reasonTe}
+                                      >
+                                        <span>⚠️ డూప్లికేట్ (#{dup.matchingSnos.join(', #')})</span>
+                                      </button>
+                                    );
+                                  })()}
                                   {voter.kriya && (
                                     <span className="px-1 py-0.2 bg-red-600/30 text-amber-300 border border-red-500/30 rounded text-[8px] font-bold">
                                       🚩 Kriya
@@ -1143,6 +1203,20 @@ export const FamiliesTabMobile: React.FC<FamiliesTabMobileProps> = ({
             )}
           </div>
         </div>
+      )}
+
+      {/* Duplicate Compare Modal */}
+      {selectedDuplicateCluster && (
+        <DuplicateCompareModal
+          voters={selectedDuplicateCluster.voters}
+          reasonTe={selectedDuplicateCluster.reasonTe}
+          reasonEn={selectedDuplicateCluster.reasonEn}
+          confidencePct={selectedDuplicateCluster.confidencePct}
+          matchLevel={selectedDuplicateCluster.matchLevel}
+          language={language}
+          onClose={() => setSelectedDuplicateCluster(null)}
+          onOpenSlip={onOpenSlip}
+        />
       )}
     </div>
   );
