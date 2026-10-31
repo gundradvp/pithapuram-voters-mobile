@@ -87,6 +87,12 @@
     "supportPct": 100,
     "survey_status": "supporter"
   },
+  "30": {
+    "supportPct": 75
+  },
+  "34": {
+    "supportPct": 75
+  },
   "36": {
     "supportPct": 50,
     "survey_status": null
@@ -410,5 +416,252 @@
   "157": {
     "supportPct": 100,
     "survey_status": "supporter"
+  },
+  "158": {
+    "supportPct": 75
+  },
+  "159": {
+    "supportPct": 75
+  },
+  "160": {
+    "supportPct": 75
+  },
+  "161": {
+    "supportPct": 75
+  },
+  "162": {
+    "supportPct": 75
+  },
+  "163": {
+    "supportPct": 75
+  },
+  "164": {
+    "supportPct": 75
+  },
+  "166": {
+    "supportPct": 75
+  },
+  "167": {
+    "supportPct": 75
+  },
+  "169": {
+    "supportPct": 75
+  },
+  "170": {
+    "supportPct": 75
+  },
+  "204": {
+    "supportPct": 75
+  },
+  "206": {
+    "supportPct": 75
+  },
+  "207": {
+    "supportPct": 75
+  },
+  "209": {
+    "supportPct": 75
+  },
+  "212": {
+    "supportPct": 75
+  },
+  "213": {
+    "supportPct": 75
+  },
+  "214": {
+    "supportPct": 75
+  },
+  "524": {
+    "supportPct": 75
+  },
+  "525": {
+    "supportPct": 75
+  },
+  "527": {
+    "supportPct": 75
+  },
+  "786": {
+    "supportPct": 75
+  },
+  "787": {
+    "supportPct": 75
+  },
+  "788": {
+    "supportPct": 75
+  },
+  "789": {
+    "supportPct": 75
+  },
+  "790": {
+    "supportPct": 75
+  },
+  "805": {
+    "supportPct": 75
+  },
+  "808": {
+    "supportPct": 75
+  },
+  "809": {
+    "supportPct": 75
+  },
+  "810": {
+    "supportPct": 75
+  },
+  "811": {
+    "supportPct": 75
+  },
+  "812": {
+    "supportPct": 75
+  },
+  "813": {
+    "supportPct": 75
+  },
+  "818": {
+    "supportPct": 75
+  },
+  "819": {
+    "supportPct": 75
+  },
+  "820": {
+    "supportPct": 75
+  },
+  "821": {
+    "supportPct": 75
+  },
+  "824": {
+    "supportPct": 75
+  },
+  "828": {
+    "supportPct": 75
+  },
+  "831": {
+    "supportPct": 75
+  },
+  "832": {
+    "supportPct": 75
+  },
+  "833": {
+    "supportPct": 75
+  },
+  "834": {
+    "supportPct": 75
+  },
+  "835": {
+    "supportPct": 75
+  },
+  "836": {
+    "supportPct": 75
+  },
+  "837": {
+    "supportPct": 75
+  },
+  "839": {
+    "supportPct": 75
+  },
+  "840": {
+    "supportPct": 75
+  },
+  "841": {
+    "supportPct": 75
+  },
+  "843": {
+    "supportPct": 75
+  },
+  "844": {
+    "supportPct": 75
+  },
+  "845": {
+    "supportPct": 75
+  },
+  "852": {
+    "supportPct": 75
+  },
+  "855": {
+    "supportPct": 75
+  },
+  "888": {
+    "supportPct": 75
+  },
+  "891": {
+    "supportPct": 75
+  },
+  "893": {
+    "supportPct": 75
+  },
+  "894": {
+    "supportPct": 75
+  },
+  "896": {
+    "supportPct": 75
+  },
+  "897": {
+    "supportPct": 75
+  },
+  "949": {
+    "supportPct": 75
+  },
+  "950": {
+    "supportPct": 75
+  },
+  "951": {
+    "supportPct": 75
+  },
+  "954": {
+    "supportPct": 75
+  },
+  "955": {
+    "supportPct": 75
+  },
+  "956": {
+    "supportPct": 75
+  },
+  "957": {
+    "supportPct": 75
+  },
+  "958": {
+    "supportPct": 75
+  },
+  "959": {
+    "supportPct": 75
+  },
+  "960": {
+    "supportPct": 75
+  },
+  "961": {
+    "supportPct": 75
+  },
+  "1093": {
+    "supportPct": 100,
+    "survey_status": "supporter"
+  },
+  "1094": {
+    "supportPct": 100,
+    "survey_status": "supporter"
+  },
+  "1095": {
+    "supportPct": 100,
+    "survey_status": "supporter"
+  },
+  "1096": {
+    "supportPct": 100,
+    "survey_status": "supporter"
+  },
+  "1123": {
+    "supportPct": 75
+  },
+  "1124": {
+    "supportPct": 75
+  },
+  "1125": {
+    "supportPct": 75
+  },
+  "1126": {
+    "supportPct": 75
+  },
+  "1252": {
+    "supportPct": 75
+  },
+  "1254": {
+    "supportPct": 75
   }
 }

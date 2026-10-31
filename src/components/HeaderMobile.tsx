@@ -1,5 +1,5 @@
 import React from 'react';
-import { Lock, Unlock, Wifi, WifiOff, Languages, Palette, LogOut, Crown, UserCheck, RefreshCw, ArrowRightLeft } from 'lucide-react';
+import { Lock, Unlock, Wifi, WifiOff, Languages, Palette, LogOut, Crown, UserCheck, RefreshCw, ArrowRightLeft, ChevronDown } from 'lucide-react';
 import { BoothInfo } from '../types';
 import { Language } from '../utils/i18n';
 import { ThemeId, THEMES } from '../utils/theme';
@@ -42,9 +42,14 @@ export const HeaderMobile: React.FC<HeaderMobileProps> = ({
 
   return (
     <header className="sticky top-0 z-40 bg-slate-900/95 backdrop-blur-md border-b border-slate-800 px-3 py-2 shadow-lg flex items-center justify-between">
-      {/* Left: Emblem, Title & Part # */}
-      <div className="flex items-center gap-2 min-w-0">
-        <div className="w-8 h-8 rounded-lg bg-gradient-to-tr from-red-600 via-amber-600 to-red-600 flex items-center justify-center text-white font-black text-sm shadow-md shadow-red-900/40 flex-shrink-0 border border-amber-400/30">
+      {/* Left: Emblem, Title & Part # (Clickable Instant Booth/Ward Switcher) */}
+      <button
+        type="button"
+        onClick={onOpenBoothSelector}
+        className="flex items-center gap-2 min-w-0 text-left p-1 -ml-1 rounded-xl hover:bg-slate-800/80 active:scale-98 transition-all cursor-pointer group"
+        title={language === 'te' ? 'బూత్ లేదా వార్డును మార్చుకోవడానికి ట్యాప్ చేయండి' : 'Tap to switch Booth or Ward'}
+      >
+        <div className="w-8 h-8 rounded-lg bg-gradient-to-tr from-red-600 via-amber-600 to-red-600 flex items-center justify-center text-white font-black text-sm shadow-md shadow-red-900/40 flex-shrink-0 border border-amber-400/30 group-hover:scale-105 transition-transform">
           🚩
         </div>
         <div className="min-w-0">
@@ -60,9 +65,9 @@ export const HeaderMobile: React.FC<HeaderMobileProps> = ({
                   : 'bg-slate-800 text-slate-400'
             }`}>
               {boothInfo?.election_type === 'municipal' 
-                ? (language === 'te' ? '🏛️ మునిసిపల్ వార్డు' : '🏛️ Municipal Ward')
+                ? (language === 'te' ? '🏛️ వార్డు' : '🏛️ Ward')
                 : boothInfo?.election_type === 'panchayat'
-                  ? (language === 'te' ? '🏡 పంచాయతీ వార్డు' : '🏡 GP Ward')
+                  ? (language === 'te' ? '🏡 పంచాయతీ' : '🏡 GP')
                   : 'AC #37'}
             </span>
             {session?.role === 'admin' && (
@@ -71,15 +76,18 @@ export const HeaderMobile: React.FC<HeaderMobileProps> = ({
               </span>
             )}
           </div>
-          <h1 className="text-xs font-black text-white truncate leading-tight">
-            {boothInfo ? (
-              boothInfo.election_type === 'municipal'
-                ? `${language === 'te' ? 'వార్డు' : 'Ward'} #${boothInfo.ward_no || 14}: ${boothInfo.clean_village}`
-                : `${language === 'te' ? 'బూత్' : 'Booth'} #${boothInfo.part_no}: ${boothInfo.clean_village}`
-            ) : (language === 'te' ? 'బూత్ / వార్డు ఎంచుకోండి' : 'Select Assigned Unit')}
-          </h1>
+          <div className="flex items-center gap-1">
+            <h1 className="text-xs font-black text-white truncate leading-tight group-hover:text-amber-300 transition-colors">
+              {boothInfo ? (
+                boothInfo.election_type === 'municipal'
+                  ? `${language === 'te' ? 'వార్డు' : 'Ward'} #${boothInfo.ward_no || 14}: ${boothInfo.clean_village}`
+                  : `${language === 'te' ? 'బూత్' : 'Booth'} #${boothInfo.part_no}: ${boothInfo.clean_village}`
+              ) : (language === 'te' ? 'బూత్ / వార్డు ఎంచుకోండి' : 'Select Assigned Unit')}
+            </h1>
+            <ChevronDown className="w-3 h-3 text-slate-400 group-hover:text-amber-400 shrink-0 transition-transform group-hover:translate-y-0.5" />
+          </div>
         </div>
-      </div>
+      </button>
 
       {/* Right: Actions */}
       <div className="flex items-center gap-1 flex-shrink-0">

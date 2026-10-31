@@ -72,6 +72,7 @@ export const WarRoomTabMobile: React.FC<WarRoomTabMobileProps> = ({
 }) => {
   const [activeFilter, setActiveFilter] = useState<WarRoomFilter>('swing');
   const [copiedPhoneId, setCopiedPhoneId] = useState<string | null>(null);
+  const [targetLead, setTargetLead] = useState<number>(250);
 
   const handleCopyPhone = (number: string, id: string) => {
     navigator.clipboard.writeText(number);
@@ -92,6 +93,38 @@ export const WarRoomTabMobile: React.FC<WarRoomTabMobileProps> = ({
     const formula = calculateWinningFormula(groups, boothData.voters.length);
     return { clanGroups: groups, winningFormula: formula };
   }, [boothData.voters, profiles]);
+
+  // Target Majority Simulator Calculation
+  const marginSim = useMemo(() => {
+    const totalEligible = boothData.voters.filter(v => (profiles[v.s]?.survey_status !== 'deceased')).length;
+    const estTurnoutVotes = winningScore.expectedPollVotes || Math.round(totalEligible * ((winningScore.expectedTurnoutPct || 80) / 100));
+    
+    // JSP = (estTurnoutVotes + targetLead) / 2
+    const neededJspVotes = Math.min(estTurnoutVotes, Math.max(0, Math.ceil((estTurnoutVotes + targetLead) / 2)));
+    const currentJspVotes = winningScore.projectedJspVotes;
+    const remainingNeeded = Math.max(0, neededJspVotes - currentJspVotes);
+    
+    const uncommittedVotes = Math.max(1, (winningScore.projectedNeutralVotes || 0) + Math.max(0, totalEligible - winningScore.projectedJspVotes - winningScore.projectedOpponentVotes));
+    const requiredShareOfRemaining = Math.min(100, Math.round((remainingNeeded / uncommittedVotes) * 100));
+
+    let statusType: 'achieved' | 'easy' | 'ontrack' | 'hard' = 'ontrack';
+    if (remainingNeeded === 0) statusType = 'achieved';
+    else if (requiredShareOfRemaining <= 45) statusType = 'easy';
+    else if (requiredShareOfRemaining <= 65) statusType = 'ontrack';
+    else statusType = 'hard';
+
+    return {
+      targetLead,
+      totalEligible,
+      estTurnoutVotes,
+      neededJspVotes,
+      currentJspVotes,
+      remainingNeeded,
+      uncommittedVotes,
+      requiredShareOfRemaining,
+      statusType
+    };
+  }, [boothData.voters, profiles, winningScore, targetLead]);
 
   // Analyze visits & ground issues
   const visitStats = useMemo(() => {
@@ -258,6 +291,99 @@ export const WarRoomTabMobile: React.FC<WarRoomTabMobileProps> = ({
                 🎉 {t.thresholdReached}
               </p>
             )}
+          </div>
+        </div>
+      </div>
+
+      {/* Target Majority & Lead Simulator (Feature 10) */}
+      <div className="bg-slate-900 border-2 border-amber-500/50 rounded-3xl p-4 shadow-xl space-y-3">
+        <div className="flex items-center justify-between">
+          <div className="flex items-center gap-2">
+            <div className="p-2 bg-gradient-to-br from-red-600 to-amber-500 text-white rounded-xl font-black shadow-md">
+              <Flame className="w-5 h-5 text-white" />
+            </div>
+            <div>
+              <span className="text-[10px] uppercase font-bold text-amber-400 tracking-wider">
+                {language === 'te' ? 'వార్ రూమ్ సిమ్యులేటర్' : 'War Room Lead Calculator'}
+              </span>
+              <h3 className="text-sm font-black text-white">
+                {language === 'te' ? '🎯 టార్గెట్ మెజారిటీ & మ్యాజిక్ నంబర్ కాలిక్యులేటర్' : '🎯 Target Majority Simulator'}
+              </h3>
+            </div>
+          </div>
+
+          <div className="text-right">
+            <span className="text-[10px] text-slate-400 block font-bold">లక్ష్య మెజారిటీ</span>
+            <span className="text-base font-black text-amber-300 font-mono">+{marginSim.targetLead}</span>
+          </div>
+        </div>
+
+        {/* Lead Preset Selector */}
+        <div className="flex items-center gap-1.5 overflow-x-auto pb-1 scrollbar-none">
+          <span className="text-[10px] text-slate-400 font-bold shrink-0">మెజారిటీ:</span>
+          {[100, 200, 250, 350, 500].map(lead => (
+            <button
+              key={lead}
+              type="button"
+              onClick={() => setTargetLead(lead)}
+              className={`px-2.5 py-1 rounded-xl text-[11px] font-mono font-bold transition-all border shrink-0 ${
+                targetLead === lead
+                  ? 'bg-amber-500 text-slate-950 border-amber-400 font-black shadow-sm'
+                  : 'bg-slate-950 text-slate-300 border-slate-800 hover:border-slate-700'
+              }`}
+            >
+              +{lead}
+            </button>
+          ))}
+        </div>
+
+        {/* Simulator Magic Number Metrics */}
+        <div className="grid grid-cols-3 gap-2 text-center pt-1">
+          <div className="bg-slate-950/80 border border-slate-800 p-2.5 rounded-2xl">
+            <span className="text-[9.5px] text-slate-400 block font-bold">కావాల్సిన మొత్తం ఓట్లు</span>
+            <span className="text-base font-black text-amber-400 font-mono">{marginSim.neededJspVotes}</span>
+            <span className="text-[9px] text-slate-500 block">({Math.round((marginSim.neededJspVotes / Math.max(1, marginSim.estTurnoutVotes)) * 100)}% పోలింగ్ షేర్)</span>
+          </div>
+
+          <div className="bg-slate-950/80 border border-emerald-500/30 p-2.5 rounded-2xl">
+            <span className="text-[9.5px] text-emerald-400 block font-bold">ఇప్పటికే మన బలం</span>
+            <span className="text-base font-black text-emerald-400 font-mono">{marginSim.currentJspVotes}</span>
+            <span className="text-[9px] text-slate-500 block">ధృవీకరించబడినవి</span>
+          </div>
+
+          <div className="bg-slate-950/80 border border-red-500/40 p-2.5 rounded-2xl">
+            <span className="text-[9.5px] text-red-300 block font-bold">మ్యాజిక్ నంబర్ (ఇంకా రావాలి)</span>
+            <span className="text-base font-black text-red-400 font-mono">
+              {marginSim.remainingNeeded > 0 ? `${marginSim.remainingNeeded}` : '✓ 0'}
+            </span>
+            <span className="text-[9px] text-slate-500 block">
+              {marginSim.remainingNeeded > 0 ? `${marginSim.requiredShareOfRemaining}% స్వింగ్ ఓట్లు` : 'సాధించబడింది'}
+            </span>
+          </div>
+        </div>
+
+        {/* Strategic Feasibility Status Banner */}
+        <div className={`p-3 rounded-2xl border flex items-center justify-between text-xs ${
+          marginSim.statusType === 'achieved'
+            ? 'bg-emerald-950/60 border-emerald-500/60 text-emerald-300'
+            : marginSim.statusType === 'easy'
+              ? 'bg-teal-950/60 border-teal-500/60 text-teal-300'
+              : marginSim.statusType === 'ontrack'
+                ? 'bg-amber-950/60 border-amber-500/60 text-amber-300'
+                : 'bg-rose-950/60 border-rose-500/60 text-rose-300'
+        }`}>
+          <div>
+            <span className="font-black block text-xs">
+              {marginSim.statusType === 'achieved' && '🏆 టార్గెట్ మెజారిటీ ఇప్పటికే భద్రంగా ఉంది!'}
+              {marginSim.statusType === 'easy' && '🟢 సులువుగా గెలుస్తాం (Easy Achievable)'}
+              {marginSim.statusType === 'ontrack' && '🟡 ఆన్‌ట్రాక్: స్వింగ్ ఓటర్లపై దృష్టి పెట్టండి'}
+              {marginSim.statusType === 'hard' && '🔴 తీవ్ర గ్రౌండ్ పుష్ అవసరం (Intense Push Needed)'}
+            </span>
+            <p className="text-[10px] text-slate-400 mt-0.5">
+              {marginSim.remainingNeeded > 0
+                ? `మిగిలిన ${marginSim.uncommittedVotes} మంది స్వింగ్/న్యూట్రల్ ఓటర్లలో కనీసం ${marginSim.remainingNeeded} ఓట్లు (${marginSim.requiredShareOfRemaining}%) మనవైపు తిప్పుకుంటే పవన్ కళ్యాణ్ గారికి +${marginSim.targetLead} మెజారిటీ ఖాయం!`
+                : `ఈ బూత్‌లో మీరు నిర్దేశించిన +${marginSim.targetLead} మెజారిటీకి కావాల్సినంత బలం ఇప్పటికే జనసేన వైపు ఉంది!`}
+            </p>
           </div>
         </div>
       </div>

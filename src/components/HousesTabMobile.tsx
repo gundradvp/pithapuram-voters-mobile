@@ -8,6 +8,7 @@ interface HousesTabMobileProps {
   surveyMarks: Record<number, { status: VoterSurveyStatus; notes?: string }>;
   onUpdateSurveyMark: (serialNo: number, status: VoterSurveyStatus | null) => void;
   onOpenSlip: (voter: MobileVoter) => void;
+  onOpenGroupPrint?: (title: string, subtitle: string, voters: MobileVoter[]) => void;
 }
 
 export const HousesTabMobile: React.FC<HousesTabMobileProps> = ({
@@ -15,7 +16,8 @@ export const HousesTabMobile: React.FC<HousesTabMobileProps> = ({
   boothInfo,
   surveyMarks,
   onUpdateSurveyMark,
-  onOpenSlip
+  onOpenSlip,
+  onOpenGroupPrint
 }) => {
   const [houseSearch, setHouseSearch] = useState('');
   const [expandedHouse, setExpandedHouse] = useState<string | null>(null);
@@ -158,8 +160,26 @@ export const HousesTabMobile: React.FC<HousesTabMobileProps> = ({
                 </div>
 
                 <div className="flex items-center gap-2">
+                  {onOpenGroupPrint && cluster.members.length > 0 && (
+                    <button
+                      type="button"
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        onOpenGroupPrint(
+                          `ఇంటి నెం: ${cluster.houseNo} — కుటుంబ ఓటర్ల స్లిప్పులు`,
+                          `బూత్ #${boothInfo.part_no || boothInfo.ward_no} • ${cluster.members.length} మంది ఓటర్లు`,
+                          cluster.members
+                        );
+                      }}
+                      className="px-2 py-1 bg-slate-800 hover:bg-slate-700 text-amber-300 rounded-lg text-[10px] font-bold border border-slate-700 flex items-center gap-1 shadow-sm active:scale-95 transition-all"
+                      title="కుటుంబ స్లిప్పులు ప్రింట్ చేయండి"
+                    >
+                      <Printer className="w-3 h-3 text-amber-400" />
+                      <span className="hidden xs:inline">స్లిప్పులు</span>
+                    </button>
+                  )}
                   <span className="text-xs text-amber-400 font-bold">
-                    {isExpanded ? '▲ Collapse' : '▼ View ( ' + cluster.votersCount + ' )'}
+                    {isExpanded ? '▲' : '▼ ( ' + cluster.votersCount + ' )'}
                   </span>
                 </div>
               </div>

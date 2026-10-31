@@ -1,5 +1,5 @@
 import React, { useState, useMemo, useEffect } from 'react';
-import { Search, Phone, PhoneCall, MessageSquare, Send, Printer, CheckCircle2, Flag, UserX, AlertCircle, Sparkles, Home, UserCheck, Sliders, Plus, Clock, User, Volume2, Users, Building, ChevronDown, ChevronUp, Copy, Hash, X } from 'lucide-react';
+import { Search, Phone, PhoneCall, MessageSquare, Send, Printer, CheckCircle2, Flag, UserX, AlertCircle, Sparkles, Home, UserCheck, Sliders, Plus, Clock, User, Volume2, Users, Building, ChevronDown, ChevronUp, Copy, Hash, X, Mic, MicOff, Zap } from 'lucide-react';
 import { MobileVoter, BoothInfo, VoterSurveyStatus, VoterCampaignProfile } from '../types';
 import { Language, translations } from '../utils/i18n';
 import { resolvePhotoUrl } from '../utils/photoResolver';
@@ -7,6 +7,8 @@ import { matchesPhoneticSearch } from '../utils/phoneticSearch';
 import { classifyBoothSurnames, extractSurname, SurnameGroup } from '../utils/surnameClassifier';
 import { analyzeDuplicateVoters, DuplicateMatchInfo } from '../utils/duplicateDetector';
 import { DuplicateCompareModal } from './DuplicateCompareModal';
+import { SpeedDialModal } from './SpeedDialModal';
+import { HourlyTurnoutModal } from './HourlyTurnoutModal';
 
 interface VotersTabMobileProps {
   voters: MobileVoter[];
@@ -85,8 +87,11 @@ export const VotersTabMobile: React.FC<VotersTabMobileProps> = ({
   const [isPhoneticEnabled, setIsPhoneticEnabled] = useState<boolean>(true);
   const [expandedSurnameId, setExpandedSurnameId] = useState<string | null>(null);
   const [filterMode, setFilterMode] = useState<
-    'all' | 'full' | 'soft' | 'strong' | 'neutral' | 'opponent' | 'exact' | 'similar' | 'kriya_all' | 'voted' | 'not_voted' | 'ours_not_voted' | 'has_phone' | 'duplicates' | 'duplicates_exact' | 'duplicates_50' | 'deceased' | 'out_of_city'
+    'all' | 'full' | 'soft' | 'strong' | 'neutral' | 'opponent' | 'exact' | 'similar' | 'kriya_all' | 'voted' | 'not_voted' | 'ours_not_voted' | 'has_phone' | 'duplicates' | 'duplicates_exact' | 'duplicates_50' | 'deceased' | 'out_of_city' | 'seniors' | 'women' | 'men'
   >('all');
+  const [isSpeedDialOpen, setIsSpeedDialOpen] = useState(false);
+  const [isHourlyTurnoutOpen, setIsHourlyTurnoutOpen] = useState(false);
+  const [isVoiceListening, setIsVoiceListening] = useState(false);
 
   const handleToggleOurs = (serialNo: number) => {
     if (onQuickToggleOurs) {
@@ -173,6 +178,78 @@ export const VotersTabMobile: React.FC<VotersTabMobileProps> = ({
       }, 2000);
     } catch (err) {
       console.error('Failed to copy EPIC:', err);
+    }
+  };
+
+  const handleToggleVoiceSearch = () => {
+    const SpeechRec = (window as any).SpeechRecognition || (window as any).webkitSpeechRecognition;
+    if (!SpeechRec) {
+      alert(language === 'te' 
+        ? 'మీ బ్రౌజర్‌లో వాయిస్ సెర్చ్ సదుపాయం అందుబాటులో లేదు. Google Chrome వాడండి.' 
+        : 'Voice search is not supported in this browser. Please use Chrome.');
+      return;
+    }
+
+    if (isVoiceListening) {
+      setIsVoiceListening(false);
+      return;
+    }
+
+    try {
+      const recognition = new SpeechRec();
+      recognition.lang = language === 'te' ? 'te-IN' : 'en-IN';
+      recognition.continuous = false;
+      recognition.interimResults = false;
+
+      recognition.onstart = () => {
+        setIsVoiceListening(true);
+      };
+
+      recognition.onresult = (event: any) => {
+        const transcript = event.results[0]?.[0]?.transcript;
+        if (transcript) {
+          setSearchQuery(transcript);
+          setVisibleCount(INITIAL_VISIBLE_COUNT);
+        }
+        setIsVoiceListening(false);
+      };
+
+      recognition.onerror = () => {
+        setIsVoiceListening(false);
+      };
+
+      recognition.onend = () => {
+        setIsVoiceListening(false);
+      };
+
+      recognition.start();
+    } catch (err) {
+      console.error('Voice search failed to start:', err);
+      setIsVoiceListening(false);
+    }
+  };
+
+  const handleSendWhatsAppSlip = (v: MobileVoter, phone?: string) => {
+    const text = `🚩 *జనసేన పార్టీ - పిఠాపురం నియోజకవర్గం*
+🏛️ *గాజు గ్లాసు గుర్తుకే మన ఓటు!*
+
+నమస్తే *${v.n}* గారు,
+
+మీ అధికారిక ఓటర్ సమాచారం:
+🔢 *క్రమ సంఖ్య (S.No):* #${v.s}
+🆔 *ఓటర్ ఐడీ (EPIC):* ${v.id || '-'}
+🏠 *ఇంటి నెం:* ${v.hn || '-'}
+🏛️ *పోలింగ్ కేంద్రం:* ${boothInfo.ps_address || '-'}
+⏰ *పోలింగ్ సమయం:* ఉదయం 7:00 నుండి సాయంత్రం 5:00 వరకు
+
+_మీ అమూల్యమైన ఓటును గాజు గ్లాసు గుర్తుపై వేసి జనసేన అధినేత పవన్ కళ్యాణ్ గారిని భారీ మెజారిటీతో గెలిపించండి!_ 🚩`;
+
+    if (phone) {
+      const cleanPhone = phone.replace(/[^0-9]/g, '');
+      const fullPhone = cleanPhone.startsWith('91') ? cleanPhone : '91' + cleanPhone;
+      window.open(`https://wa.me/${fullPhone}?text=${encodeURIComponent(text)}`, '_blank');
+    } else {
+      window.open(`https://wa.me/?text=${encodeURIComponent(text)}`, '_blank');
     }
   };
 
@@ -302,6 +379,9 @@ export const VotersTabMobile: React.FC<VotersTabMobileProps> = ({
         return isOurs && prof.survey_status !== 'voted' && prof.survey_status !== 'deceased';
       }
       if (filterMode === 'has_phone') return !!phone;
+      if (filterMode === 'seniors') return Number(v.a || 0) >= 70 && prof.survey_status !== 'deceased';
+      if (filterMode === 'women') return v.g === 'F' && prof.survey_status !== 'deceased';
+      if (filterMode === 'men') return v.g === 'M' && prof.survey_status !== 'deceased';
 
       return true;
     });
@@ -323,6 +403,11 @@ export const VotersTabMobile: React.FC<VotersTabMobileProps> = ({
     let hasPhone = 0;
     let deceased = 0;
     let outOfCity = 0;
+    let seniors = 0;
+    let women = 0;
+    let men = 0;
+    let womenVoted = 0;
+    let menVoted = 0;
 
     voters.forEach(v => {
       const prof = profiles[v.s] || {};
@@ -335,6 +420,17 @@ export const VotersTabMobile: React.FC<VotersTabMobileProps> = ({
 
       if (isDeceased) deceased++;
       if (isOutOfCity) outOfCity++;
+
+      if (!isDeceased) {
+        if (Number(v.a || 0) >= 70) seniors++;
+        if (v.g === 'F') {
+          women++;
+          if (isVoted) womenVoted++;
+        } else if (v.g === 'M') {
+          men++;
+          if (isVoted) menVoted++;
+        }
+      }
 
       if (pct !== undefined) {
         if (pct === 100) full++;
@@ -375,6 +471,11 @@ export const VotersTabMobile: React.FC<VotersTabMobileProps> = ({
       hasPhone,
       deceased,
       outOfCity,
+      seniors,
+      women,
+      men,
+      womenVoted,
+      menVoted,
       duplicates: dupAnalysis.totalDuplicateVotersCount,
       exactDups: dupAnalysis.exactCount,
       partial50Dups: dupAnalysis.partial50Count
@@ -520,22 +621,41 @@ _మీ అమూల్యమైన ఓటును గాజు గ్లాస
                 setSearchQuery(e.target.value);
                 setVisibleCount(INITIAL_VISIBLE_COUNT);
               }}
-              placeholder={language === 'te' ? 'పేరు, ఇంటిపేరు (శబ్దోచ్ఛారణ), ఫోన్, ID...' : t.searchPlaceholder}
-              className={`w-full bg-slate-900 border border-slate-800 rounded-xl pl-9 ${searchQuery ? 'pr-9' : 'pr-3'} py-2 text-xs text-white placeholder-slate-500 focus:outline-none focus:border-amber-400 shadow-md transition-all`}
+              placeholder={isVoiceListening ? (language === 'te' ? '🎙️ వింటున్నాము... మాట్లాడండి...' : '🎙️ Listening...') : (language === 'te' ? 'పేరు, ఇంటిపేరు (శబ్దోచ్ఛారణ), ఫోన్, ID...' : t.searchPlaceholder)}
+              className={`w-full bg-slate-900 border ${isVoiceListening ? 'border-red-500 ring-2 ring-red-500/30' : 'border-slate-800'} rounded-xl pl-9 pr-16 py-2 text-xs text-white placeholder-slate-500 focus:outline-none focus:border-amber-400 shadow-md transition-all`}
             />
-            {searchQuery && (
+            <div className="absolute right-2 top-1/2 -translate-y-1/2 flex items-center gap-1">
+              {searchQuery && (
+                <button
+                  type="button"
+                  onClick={() => {
+                    setSearchQuery('');
+                    setVisibleCount(INITIAL_VISIBLE_COUNT);
+                  }}
+                  className="p-1 text-slate-400 hover:text-white hover:bg-slate-800 rounded-full transition-colors flex items-center justify-center active:scale-95"
+                  title={language === 'te' ? 'సెర్చ్ క్లియర్ చేయండి' : 'Clear search text'}
+                >
+                  <X className="w-3.5 h-3.5 text-slate-400 hover:text-amber-400" />
+                </button>
+              )}
+              {/* Telugu Voice Search Button */}
               <button
                 type="button"
-                onClick={() => {
-                  setSearchQuery('');
-                  setVisibleCount(INITIAL_VISIBLE_COUNT);
-                }}
-                className="absolute right-2.5 top-1/2 -translate-y-1/2 p-1 text-slate-400 hover:text-white hover:bg-slate-800 rounded-full transition-colors flex items-center justify-center active:scale-95"
-                title={language === 'te' ? 'సెర్చ్ క్లియర్ చేయండి' : 'Clear search text'}
+                onClick={handleToggleVoiceSearch}
+                className={`p-1 rounded-full transition-all flex items-center justify-center active:scale-95 ${
+                  isVoiceListening
+                    ? 'bg-red-600 text-white animate-pulse shadow-md ring-2 ring-red-400'
+                    : 'text-slate-400 hover:text-amber-400 hover:bg-slate-800'
+                }`}
+                title={
+                  isVoiceListening
+                    ? (language === 'te' ? 'వింటున్నాము... మాట్లాడండి (Listening...)' : 'Listening...')
+                    : (language === 'te' ? 'తెలుగు వాయిస్ సెర్చ్ (మాట్లాడి వెతకండి)' : 'Voice Search in Telugu')
+                }
               >
-                <X className="w-3.5 h-3.5 text-slate-400 hover:text-amber-400" />
+                <Mic className={`w-3.5 h-3.5 ${isVoiceListening ? 'animate-bounce text-white' : ''}`} />
               </button>
-            )}
+            </div>
           </div>
 
           {/* Phonetic Search Toggle */}
@@ -734,12 +854,12 @@ _మీ అమూల్యమైన ఓటును గాజు గ్లాస
 
         {/* Polling Day Rapid Status Switcher & Turnout Tracker */}
         <div className="bg-slate-900/95 border border-amber-500/30 rounded-2xl p-2.5 space-y-2 shadow-md">
-          <div className="flex items-center justify-between text-[11px]">
+          <div className="flex items-center justify-between text-[11px] flex-wrap gap-1">
             <span className="text-slate-300 font-black flex items-center gap-1.5">
               <span className="w-2 h-2 rounded-full bg-emerald-400 animate-pulse"></span>
               {language === 'te' ? '🗳️ పోలింగ్ డే లైవ్ ట్రాకర్:' : '🗳️ Polling Day Live Tracker:'}
             </span>
-            <div className="flex items-center gap-2 font-mono text-[10.5px]">
+            <div className="flex items-center gap-1.5 font-mono text-[10.5px]">
               <span className="text-emerald-400 font-bold bg-emerald-950/70 px-2 py-0.5 rounded-lg border border-emerald-500/30">
                 {counts.voted}/{counts.all} {language === 'te' ? 'ఓటేశారు' : 'Voted'} ({Math.round((counts.voted / (counts.all || 1)) * 100)}%)
               </span>
@@ -747,6 +867,44 @@ _మీ అమూల్యమైన ఓటును గాజు గ్లాస
                 {counts.notVoted} {language === 'te' ? 'పెండింగ్' : 'Pending'}
               </span>
             </div>
+          </div>
+
+          {/* Quick Action Tools: Speed Dial & Hourly Turnout */}
+          <div className="flex items-center justify-between gap-1.5 pt-0.5">
+            <button
+              type="button"
+              onClick={() => setIsSpeedDialOpen(true)}
+              className="flex-1 py-1.5 px-2 rounded-xl text-[10.5px] font-black bg-gradient-to-r from-red-600 via-amber-600 to-red-600 hover:from-red-500 hover:to-amber-500 text-white shadow-md active:scale-95 transition-all flex items-center justify-center gap-1.5 border border-amber-400/40"
+              title={language === 'te' ? 'మన పెండింగ్ ఓటర్ల స్పీడ్-డయలర్ ఓపెన్ చేయండి' : 'Open Pending Ours Speed-Dialer'}
+            >
+              <Zap className="w-3.5 h-3.5 text-amber-300 fill-amber-300 animate-pulse" />
+              <span>{language === 'te' ? `⚡ స్పీడ్-కాల్ (${counts.oursNotVoted})` : `⚡ Speed-Dial (${counts.oursNotVoted})`}</span>
+            </button>
+
+            <button
+              type="button"
+              onClick={() => setIsHourlyTurnoutOpen(true)}
+              className="flex-1 py-1.5 px-2 rounded-xl text-[10.5px] font-black bg-slate-800 hover:bg-slate-700 text-amber-300 border border-slate-700 hover:border-amber-500/40 shadow-sm active:scale-95 transition-all flex items-center justify-center gap-1.5"
+              title={language === 'te' ? 'గంట గంటకూ పోలింగ్ శాతం రికార్డ్ చేయండి & వార్ రూమ్‌కి పంపండి' : 'Record Hourly Turnout & Share to War Room'}
+            >
+              <Clock className="w-3.5 h-3.5 text-amber-400" />
+              <span>{language === 'te' ? '🕒 గంటల టర్నౌట్' : '🕒 Hourly Turnout'}</span>
+            </button>
+          </div>
+
+          {/* Gender Pulse Indicator */}
+          <div className="flex items-center justify-between text-[10px] bg-slate-950/60 px-2.5 py-1 rounded-xl border border-slate-800/80 text-slate-300 font-mono">
+            <span className="flex items-center gap-1">
+              <span>👩 స్త్రీ:</span>
+              <strong className="text-emerald-400 font-bold">{counts.womenVoted}/{counts.women}</strong>
+              <span className="text-slate-500">({Math.round((counts.womenVoted / Math.max(1, counts.women)) * 100)}%)</span>
+            </span>
+            <span>•</span>
+            <span className="flex items-center gap-1">
+              <span>👨 పురుషులు:</span>
+              <strong className="text-emerald-400 font-bold">{counts.menVoted}/{counts.men}</strong>
+              <span className="text-slate-500">({Math.round((counts.menVoted / Math.max(1, counts.men)) * 100)}%)</span>
+            </span>
           </div>
 
           <div className="grid grid-cols-4 gap-1.5">
@@ -991,6 +1149,45 @@ _మీ అమూల్యమైన ఓటును గాజు గ్లాస
             title={language === 'te' ? 'చనిపోయిన ఓటర్లు (బోగస్ ఓటింగ్ నివారణకు)' : 'Deceased Voters (Prevents Impersonation / Bogus Voting)'}
           >
             <span>💀 {language === 'te' ? 'మరణించారు' : 'Deceased'} ({counts.deceased})</span>
+          </button>
+
+          {/* 70+ Senior Citizens Filter */}
+          <button
+            onClick={() => { setFilterMode('seniors'); setVisibleCount(INITIAL_VISIBLE_COUNT); }}
+            className={`px-2.5 py-1 rounded-lg font-bold whitespace-nowrap transition-all flex items-center gap-1 ${
+              filterMode === 'seniors'
+                ? 'bg-amber-500 text-slate-950 font-black shadow-sm ring-1 ring-amber-400'
+                : 'bg-slate-900 text-amber-300 border border-amber-500/40 hover:bg-slate-800'
+            }`}
+            title={language === 'te' ? '70 ఏళ్లు పైబడిన సీనియర్ సిటిజన్లు (వాహన సహాయం)' : '70+ Senior Citizens (Assistance)'}
+          >
+            <span>👴 {language === 'te' ? '70+ వృద్ధులు' : '70+ Seniors'} ({counts.seniors})</span>
+          </button>
+
+          {/* Women Voters Filter */}
+          <button
+            onClick={() => { setFilterMode('women'); setVisibleCount(INITIAL_VISIBLE_COUNT); }}
+            className={`px-2.5 py-1 rounded-lg font-bold whitespace-nowrap transition-all flex items-center gap-1 ${
+              filterMode === 'women'
+                ? 'bg-rose-600 text-white font-black shadow-sm ring-1 ring-rose-400'
+                : 'bg-slate-900 text-rose-300 border border-rose-500/40 hover:bg-slate-800'
+            }`}
+            title={language === 'te' ? 'మహిళా ఓటర్లు మాత్రమే' : 'Women Voters'}
+          >
+            <span>👩 {language === 'te' ? 'మహిళలు' : 'Women'} ({counts.women})</span>
+          </button>
+
+          {/* Men Voters Filter */}
+          <button
+            onClick={() => { setFilterMode('men'); setVisibleCount(INITIAL_VISIBLE_COUNT); }}
+            className={`px-2.5 py-1 rounded-lg font-bold whitespace-nowrap transition-all flex items-center gap-1 ${
+              filterMode === 'men'
+                ? 'bg-blue-600 text-white font-black shadow-sm ring-1 ring-blue-400'
+                : 'bg-slate-900 text-blue-300 border border-blue-500/40 hover:bg-slate-800'
+            }`}
+            title={language === 'te' ? 'పురుష ఓటర్లు మాత్రమే' : 'Men Voters'}
+          >
+            <span>👨 {language === 'te' ? 'పురుషులు' : 'Men'} ({counts.men})</span>
           </button>
         </div>
       </div>
@@ -1702,6 +1899,11 @@ _మీ అమూల్యమైన ఓటును గాజు గ్లాస
                     <span>{t.relation}: <strong className="text-slate-300 font-medium">{v.r || '-'}</strong></span>
                     <span>•</span>
                     <span>{t.age}: <strong className="text-slate-300 font-medium">{v.a}Y ({v.g === 'M' ? (language === 'te' ? 'పురుషుడు' : 'M') : (language === 'te' ? 'మహిళ' : 'F')})</strong></span>
+                    {Number(v.a || 0) >= 70 && !isDeceased && (
+                      <span className="px-1.5 py-0.2 rounded bg-amber-500/20 text-amber-300 border border-amber-500/50 text-[9px] font-black inline-flex items-center gap-0.5">
+                        👴 {language === 'te' ? '70+ వృద్ధులు (వాహన సహాయం)' : '70+ Senior (Vehicle Needed)'}
+                      </span>
+                    )}
                     <span>•</span>
                     <span className="flex items-center gap-1">
                       <Home className="w-3 h-3 text-amber-400" />
@@ -1798,12 +2000,28 @@ _మీ అమూల్యమైన ఓటును గాజు గ్లాస
                     )}
                   </div>
 
-                  <button
-                    onClick={() => onOpenPhoneEditor(v)}
-                    className="text-amber-400 hover:text-amber-300 font-bold text-[10px] underline flex items-center gap-0.5"
-                  >
-                    {phone ? t.editPhone : t.addPhone}
-                  </button>
+                  <div className="flex items-center gap-2 shrink-0">
+                    {/* Direct 1-Tap WhatsApp Slip */}
+                    <button
+                      type="button"
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        handleSendWhatsAppSlip(v, phone);
+                      }}
+                      className="px-2 py-0.5 rounded-lg bg-emerald-950/80 hover:bg-emerald-900 border border-emerald-500/50 text-emerald-300 font-bold text-[10px] flex items-center gap-1 active:scale-95 transition-all shadow-sm"
+                      title={language === 'te' ? 'ఈ ఓటరుకు వాట్సాప్‌లో అధికారిక ఓటర్ స్లిప్ పంపండి' : 'Send Official WhatsApp Voter Slip'}
+                    >
+                      <MessageSquare className="w-3 h-3 text-emerald-400" />
+                      <span>{language === 'te' ? 'స్లిప్' : 'Slip'}</span>
+                    </button>
+
+                    <button
+                      onClick={() => onOpenPhoneEditor(v)}
+                      className="text-amber-400 hover:text-amber-300 font-bold text-[10px] underline flex items-center gap-0.5"
+                    >
+                      {phone ? t.editPhone : t.addPhone}
+                    </button>
+                  </div>
                 </div>
 
                 {/* Influencer Tag */}
@@ -2156,6 +2374,30 @@ _మీ అమూల్యమైన ఓటును గాజు గ్లాస
           language={language}
           onClose={() => setSelectedDuplicateCluster(null)}
           onOpenSlip={onOpenSlip}
+        />
+      )}
+
+      {/* Speed Dial Calling Queue Modal (Feature 1) */}
+      {isSpeedDialOpen && (
+        <SpeedDialModal
+          voters={voters}
+          profiles={profiles}
+          boothInfo={boothInfo}
+          language={language}
+          onQuickToggleVoted={handleToggleVoted}
+          onOpenPhoneEditor={onOpenPhoneEditor}
+          onClose={() => setIsSpeedDialOpen(false)}
+        />
+      )}
+
+      {/* Hourly Turnout Recorder Modal (Feature 2) */}
+      {isHourlyTurnoutOpen && (
+        <HourlyTurnoutModal
+          boothInfo={boothInfo}
+          voters={voters}
+          profiles={profiles}
+          language={language}
+          onClose={() => setIsHourlyTurnoutOpen(false)}
         />
       )}
     </div>
