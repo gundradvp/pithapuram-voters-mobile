@@ -92,21 +92,28 @@ export const BoothAssignmentModal: React.FC<BoothAssignmentModalProps> = ({
     ? localUnits.filter(u => assignedMunicipalWards.includes(u.id))
     : localUnits;
 
-  const filteredLocalUnits = availableLocalUnits.filter(u => {
-    if (localSubCategory !== 'all' && u.election_type !== localSubCategory) {
-      return false;
-    }
-    const q = searchTerm.toLowerCase().trim();
-    if (!q) return true;
-    return (
-      u.id.toLowerCase().includes(q) ||
-      u.village.toLowerCase().includes(q) ||
-      u.clean_village.toLowerCase().includes(q) ||
-      (u.mandal && u.mandal.toLowerCase().includes(q)) ||
-      u.local_body.toLowerCase().includes(q) ||
-      (u.sections && u.sections.toLowerCase().includes(q))
-    );
-  });
+  const filteredLocalUnits = availableLocalUnits
+    .filter(u => {
+      if (localSubCategory !== 'all' && u.election_type !== localSubCategory) {
+        return false;
+      }
+      const q = searchTerm.toLowerCase().trim();
+      if (!q) return true;
+      return (
+        (u.id || '').toLowerCase().includes(q) ||
+        (u.village || '').toLowerCase().includes(q) ||
+        (u.clean_village || '').toLowerCase().includes(q) ||
+        (u.mandal || '').toLowerCase().includes(q) ||
+        (u.local_body || '').toLowerCase().includes(q) ||
+        (u.sections || '').toLowerCase().includes(q)
+      );
+    })
+    .sort((a, b) => {
+      // Prioritize active/loaded units at the top
+      if (a.is_loaded && !b.is_loaded) return -1;
+      if (!a.is_loaded && b.is_loaded) return 1;
+      return 0;
+    });
 
   return (
     <div className="fixed inset-0 z-50 bg-black/90 backdrop-blur-md flex items-end sm:items-center justify-center p-3 animate-in fade-in duration-200">
