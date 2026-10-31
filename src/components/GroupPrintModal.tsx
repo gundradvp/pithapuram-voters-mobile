@@ -106,11 +106,16 @@ export const GroupPrintModal: React.FC<GroupPrintModalProps> = ({
 
       const voterSno = v.s ?? (v as any).sno;
       const prof = voterSno ? profiles[voterSno] : undefined;
-      const pct = prof?.supportPct !== undefined ? prof.supportPct : (v.kriya ? 100 : 50);
+      const hasEntry = prof?.supportPct !== undefined;
+      const pct = hasEntry ? prof!.supportPct! : undefined;
 
-      if (pct >= 75) jsp++;
-      else if (pct <= 25) opponent++;
-      else swing++;
+      if (hasEntry) {
+        if (pct! >= 75) jsp++;
+        else if (pct! <= 25) opponent++;
+        else swing++;
+      } else {
+        swing++;
+      }
     });
 
     return { total, male, female, elders, youth, kriya, jsp, swing, opponent };
@@ -418,7 +423,7 @@ export const GroupPrintModal: React.FC<GroupPrintModalProps> = ({
                 const voterSno = v.s ?? (v as any).sno;
                 const prof = voterSno ? profiles[voterSno] || {} : {};
                 const phone = prof.customPhone || v.k_m;
-                const pct = prof.supportPct !== undefined ? prof.supportPct : (v.kriya ? 100 : 50);
+                const pct = prof.supportPct; // undefined in pure entry mode if un-entered
 
                 const voterId = v.id || (v as any).epic || '';
                 const voterName = v.n || ((v as any).name_en && (v as any).name_te ? `${(v as any).name_en} (${(v as any).name_te})` : (v as any).name_te || (v as any).name_en || '');
@@ -427,20 +432,28 @@ export const GroupPrintModal: React.FC<GroupPrintModalProps> = ({
                 const isMale = v.g === 'M' || (v as any).gender_en === 'Male' || (v as any).gender_te === 'పురుషుడు';
                 const voterHn = v.hn || (v as any).house_no || '';
 
-                let leaningText = '50% తటస్థ';
-                let leaningColor = 'text-amber-800';
-                if (pct === 100) {
-                  leaningText = '🚩 100% JSP';
-                  leaningColor = 'text-red-700 font-black';
-                } else if (pct >= 75) {
-                  leaningText = '🚩 75% అనుకూలం';
-                  leaningColor = 'text-emerald-800 font-bold';
-                } else if (pct === 40) {
-                  leaningText = '⚡ 40% స్వింగ్';
-                  leaningColor = 'text-amber-800';
-                } else if (pct === 0) {
-                  leaningText = 'వ్యతిరేకం';
-                  leaningColor = 'text-slate-600';
+                let leaningText = '⚪ సర్వే కాలేదు';
+                let leaningColor = 'text-slate-500 font-medium';
+                if (pct !== undefined) {
+                  if (pct === 100) {
+                    leaningText = '🚩 100% JSP';
+                    leaningColor = 'text-red-700 font-black';
+                  } else if (pct >= 75) {
+                    leaningText = '🟢 75% అనుకూలం';
+                    leaningColor = 'text-emerald-800 font-bold';
+                  } else if (pct === 40) {
+                    leaningText = '🟡 40% సానుకూలం';
+                    leaningColor = 'text-amber-800 font-bold';
+                  } else if (pct === 0) {
+                    leaningText = '🔴 ప్రత్యర్థి';
+                    leaningColor = 'text-rose-800 font-bold';
+                  } else if (pct <= 25) {
+                    leaningText = '🟠 అనుమానం';
+                    leaningColor = 'text-orange-800 font-bold';
+                  } else {
+                    leaningText = '⚪ 50% తటస్థ';
+                    leaningColor = 'text-slate-700';
+                  }
                 }
 
                 return (

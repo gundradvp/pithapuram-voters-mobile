@@ -84,7 +84,7 @@ export const VotersTabMobile: React.FC<VotersTabMobileProps> = ({
 
     return voters.filter(v => {
       const prof = profiles[v.s] || {};
-      const pct = prof.supportPct !== undefined ? prof.supportPct : (v.kriya ? 100 : 50);
+      const pct = prof.supportPct;
       const phone = prof.customPhone || v.k_m;
 
       // 1. Text Search (Phonetic Sound-alike + Exact Substring)
@@ -117,7 +117,7 @@ export const VotersTabMobile: React.FC<VotersTabMobileProps> = ({
       // 2. Leaning / Filter Mode
       if (filterMode === 'full') return pct === 100;
       if (filterMode === 'soft') return pct === 40;
-      if (filterMode === 'strong') return pct >= 75 && pct < 100;
+      if (filterMode === 'strong') return pct !== undefined && pct >= 75 && pct < 100;
       if (filterMode === 'neutral') return pct === 50;
       if (filterMode === 'opponent') return pct === 0;
       if (filterMode === 'exact') return v.k_type === 'exact';
@@ -145,14 +145,16 @@ export const VotersTabMobile: React.FC<VotersTabMobileProps> = ({
 
     voters.forEach(v => {
       const prof = profiles[v.s] || {};
-      const pct = prof.supportPct !== undefined ? prof.supportPct : (v.kriya ? 100 : 50);
+      const pct = prof.supportPct;
       const phone = prof.customPhone || v.k_m;
 
-      if (pct === 100) full++;
-      else if (pct >= 75) strong++;
-      else if (pct === 40) soft++;
-      else if (pct === 0) opponent++;
-      else neutral++;
+      if (pct !== undefined) {
+        if (pct === 100) full++;
+        else if (pct >= 75) strong++;
+        else if (pct === 40) soft++;
+        else if (pct === 0) opponent++;
+        else if (pct === 50) neutral++;
+      }
 
       if (v.kriya) {
         kriyaAll++;
@@ -186,39 +188,45 @@ export const VotersTabMobile: React.FC<VotersTabMobileProps> = ({
   }, [surnameGroups, selectedSurname, searchQuery]);
 
   const getLeaningBadge = (pct?: number) => {
-    const p = pct !== undefined ? pct : 50;
-    if (p === 100) {
+    if (pct === undefined) {
+      return (
+        <span className="px-1.5 py-0.2 bg-slate-800/80 text-slate-400 border border-slate-700/80 rounded-md text-[9px] font-medium flex items-center gap-0.5">
+          ⚪ {language === 'te' ? 'సర్వే కాలేదు' : 'Unsurveyed'}
+        </span>
+      );
+    }
+    if (pct === 100) {
       return (
         <span className="px-1.5 py-0.2 bg-red-600/30 text-red-300 border border-red-500/50 rounded-md text-[9px] font-black flex items-center gap-0.5">
           🚩 {language === 'te' ? '100% మనవాళ్లే' : '100% Support'}
         </span>
       );
     }
-    if (p >= 75) {
+    if (pct >= 75) {
       return (
         <span className="px-1.5 py-0.2 bg-emerald-600/30 text-emerald-300 border border-emerald-500/50 rounded-md text-[9px] font-black flex items-center gap-0.5">
-          🟢 {p}% {language === 'te' ? 'అనుకూలం' : 'Strong'}
+          🟢 {pct}% {language === 'te' ? 'అనుకూలం' : 'Strong'}
         </span>
       );
     }
-    if (p === 40) {
+    if (pct === 40) {
       return (
         <span className="px-1.5 py-0.2 bg-amber-600/30 text-amber-300 border border-amber-500/50 rounded-md text-[9px] font-black flex items-center gap-0.5">
-          🟡 {p}% {language === 'te' ? 'సానుకూలం' : 'Positive'}
+          🟡 {pct}% {language === 'te' ? 'సానుకూలం' : 'Positive'}
         </span>
       );
     }
-    if (p === 0) {
+    if (pct === 0) {
       return (
         <span className="px-1.5 py-0.2 bg-rose-950/80 text-rose-400 border border-rose-500/50 rounded-md text-[9px] font-black flex items-center gap-0.5">
           🔴 0% {language === 'te' ? 'ప్రత్యర్థి' : 'Opponent'}
         </span>
       );
     }
-    if (p <= 25) {
+    if (pct <= 25) {
       return (
         <span className="px-1.5 py-0.2 bg-orange-600/30 text-orange-300 border border-orange-500/50 rounded-md text-[9px] font-bold flex items-center gap-0.5">
-          🟠 {p}% {language === 'te' ? 'అనుమానం' : 'Doubtful'}
+          🟠 {pct}% {language === 'te' ? 'అనుమానం' : 'Doubtful'}
         </span>
       );
     }
@@ -758,7 +766,7 @@ _మీ అమూల్యమైన ఓటును గాజు గ్లాస
                     <div className="p-3 space-y-2 divide-y divide-slate-800/50">
                       {clan.voters.map(m => {
                         const prof = profiles[m.s] || {};
-                        const pct = prof.supportPct !== undefined ? prof.supportPct : (m.kriya ? 100 : 50);
+                        const pct = prof.supportPct;
 
                         return (
                           <div key={m.s} className="pt-2 first:pt-0 space-y-1">
@@ -779,7 +787,7 @@ _మీ అమూల్యమైన ఓటును గాజు గ్లాస
                             <div className="flex items-center justify-between text-[10.5px] text-slate-400">
                               <span>ఇంటి నెం: <strong className="text-amber-300 font-mono">{m.hn}</strong> • {m.a}Y • {m.g === 'M' ? 'పురుషుడు' : 'మహిళ'}</span>
                               <button
-                                onClick={() => onOpenSupportPicker(m.n, pct, prof.notes, m.s)}
+                                onClick={() => onOpenSupportPicker(m.n, pct !== undefined ? pct : 50, prof.notes, m.s)}
                                 className="hover:scale-105"
                               >
                                 {getLeaningBadge(pct)}
@@ -857,7 +865,7 @@ _మీ అమూల్యమైన ఓటును గాజు గ్లాస
         {displayedVoters.map(v => {
           const prof = profiles[v.s] || {};
           const phone = prof.customPhone || v.k_m;
-          const pct = prof.supportPct !== undefined ? prof.supportPct : (v.kriya ? 100 : 50);
+          const pct = prof.supportPct;
           const sn = extractSurname(v);
 
           return (
@@ -866,7 +874,7 @@ _మీ అమూల్యమైన ఓటును గాజు గ్లాస
               className={`bg-slate-900/90 border rounded-2xl p-3.5 space-y-2.5 transition-all shadow-md relative ${
                 pct === 100
                   ? 'border-red-500/50 bg-gradient-to-r from-red-950/25 via-slate-900 to-slate-900'
-                  : pct >= 75
+                  : pct !== undefined && pct >= 75
                     ? 'border-emerald-500/40 bg-gradient-to-r from-emerald-950/20 via-slate-900 to-slate-900'
                     : pct === 40
                       ? 'border-amber-500/40 bg-gradient-to-r from-amber-950/20 via-slate-900 to-slate-900'
@@ -890,7 +898,7 @@ _మీ అమూల్యమైన ఓటును గాజు గ్లాస
                   {getMoneyBadge(prof.moneyStatus)}
                   {getStatusBadge(prof.survey_status)}
                   <button
-                    onClick={() => onOpenSupportPicker(v.n, pct, prof.notes, v.s)}
+                    onClick={() => onOpenSupportPicker(v.n, pct !== undefined ? pct : 50, prof.notes, v.s)}
                     className="hover:scale-105 transition-transform"
                     title={language === 'te' ? 'మద్దతు శాతాన్ని మార్చడానికి ట్యాప్ చేయండి' : 'Tap to change political leaning %'}
                   >

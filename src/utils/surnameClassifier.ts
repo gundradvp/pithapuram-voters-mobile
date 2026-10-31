@@ -287,15 +287,20 @@ export function classifyBoothSurnames(
       }
 
       const prof = profiles[v.s] || {};
-      const pct = prof.supportPct !== undefined ? prof.supportPct : (v.kriya ? 100 : 50);
+      const hasEntry = prof.supportPct !== undefined;
+      const pct = hasEntry ? prof.supportPct! : 50;
 
       totalScore += pct;
 
-      if (pct === 100) fullCount++;
-      else if (pct >= 75) strongCount++;
-      else if (pct === 40) neutralCount++;
-      else if (pct === 0) opponentCount++;
-      else neutralCount++;
+      if (hasEntry) {
+        if (pct === 100) fullCount++;
+        else if (pct >= 75) strongCount++;
+        else if (pct === 40) neutralCount++;
+        else if (pct === 0) opponentCount++;
+        else neutralCount++;
+      } else {
+        neutralCount++;
+      }
 
       if (!prof.visits || prof.visits.length === 0) {
         unvisitedCount++;

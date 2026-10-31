@@ -34,13 +34,13 @@ export const StatsTabMobile: React.FC<StatsTabMobileProps> = ({
 
     voters.forEach(v => {
       const p = profiles[v.s] || {};
-      const pct = p.supportPct !== undefined ? p.supportPct : (v.kriya ? 100 : 50);
+      const pct = p.supportPct; // Pure entry mode: undefined if un-entered
 
       if (pct === 100) fullSupport++;
-      else if (pct >= 75) strongLean++;
+      else if (pct !== undefined && pct >= 75) strongLean++;
       else if (pct === 40) softLean++;
       else if (pct === 0) opponent++;
-      else if (pct <= 25) doubtful++;
+      else if (pct !== undefined && pct <= 25) doubtful++;
       else neutralSwing++;
 
       if (p.survey_status === 'voted') voted++;

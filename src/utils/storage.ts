@@ -214,12 +214,9 @@ export function calculateWinningScore(
           // 50% Neutral
           rawNeutralSum += 1.0;
         }
-      } else if (v.kriya) {
-        // Confirmed active Kriya volunteer
-        surveyedCount++;
-        rawJspSum += 1.0;
       } else {
-        // Untagged voters are NOT assumed to vote for anyone!
+        // Pure Entry Mode: Untagged voters (even if registered on Kriya app)
+        // are NOT automatically assumed as 100% JSP support.
         unsurveyedCount++;
       }
     } else {
@@ -281,14 +278,28 @@ export function calculateWinningScore(
   const neededToGuarantee = Math.max(0, targetVotesToWin - projectedJspVotes);
 
   let status: WinningScoreCalculation['status'] = 'battleground';
-  if (projectedLead >= 50 && projectedJspVotes >= targetVotesToWin) {
-    status = 'safe_win';
-  } else if (projectedLead > 10) {
-    status = 'likely_win';
-  } else if (projectedLead < -15) {
-    status = 'deficit_danger';
+  if (mode === 'entry') {
+    if (surveyedCount === 0) {
+      status = 'battleground';
+    } else if (projectedJspVotes >= targetVotesToWin && projectedLead > 0) {
+      status = 'safe_win';
+    } else if (projectedJspVotes >= targetVotesToWin * 0.5 && projectedLead > 20) {
+      status = 'likely_win';
+    } else if (projectedOpponentVotes >= targetVotesToWin * 0.5 && projectedLead < -20) {
+      status = 'deficit_danger';
+    } else {
+      status = 'battleground';
+    }
   } else {
-    status = 'battleground';
+    if (projectedLead >= 50 && projectedJspVotes >= targetVotesToWin) {
+      status = 'safe_win';
+    } else if (projectedLead > 10) {
+      status = 'likely_win';
+    } else if (projectedLead < -15) {
+      status = 'deficit_danger';
+    } else {
+      status = 'battleground';
+    }
   }
 
   return {
@@ -350,9 +361,8 @@ export function autoGenerateHouseFamilies(partNo: number | string, voters: Mobil
     const famId = `fam_${hn.replace(/[^a-zA-Z0-9]/g, '_')}`;
     const head = members[0];
     const kriyaCount = members.filter(m => m.kriya).length;
-    let defaultPct = 50;
-    if (kriyaCount === members.length && members.length > 0) defaultPct = 100;
-    else if (kriyaCount > 0) defaultPct = 75;
+    // Pure entry mode: default to neutral 50%, candidate/team will explicitly set leaning
+    const defaultPct = 50;
 
     map[famId] = {
       id: famId,
@@ -360,7 +370,7 @@ export function autoGenerateHouseFamilies(partNo: number | string, voters: Mobil
       houseNumbers: [hn],
       headName: head.n,
       supportPct: defaultPct,
-      supportCategory: defaultPct === 100 ? 'full_support' : defaultPct >= 75 ? 'strong_lean' : 'neutral_swing',
+      supportCategory: 'neutral_swing',
       memberSnos: members.map(m => m.s),
       campaignNotes: ''
     };

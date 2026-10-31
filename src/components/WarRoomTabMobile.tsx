@@ -128,11 +128,11 @@ export const WarRoomTabMobile: React.FC<WarRoomTabMobileProps> = ({
 
     boothData.voters.forEach(v => {
       const p = profiles[v.s] || {};
-      const pct = p.supportPct !== undefined ? p.supportPct : (v.kriya ? 100 : 50);
+      const pct = p.supportPct; // Pure entry mode: undefined if un-entered
       const visits = p.visits || [];
 
-      // Swing: 40% Positive or 50% Neutral
-      if (pct === 40 || pct === 50) {
+      // Swing: 40% Positive, 50% Neutral, or un-entered
+      if (pct === undefined || pct === 40 || pct === 50) {
         swing.push(v);
       }
 
@@ -142,12 +142,12 @@ export const WarRoomTabMobile: React.FC<WarRoomTabMobileProps> = ({
       }
 
       // Doubtful: <= 25% but not 0%
-      if (pct > 0 && pct <= 25) {
+      if (pct !== undefined && pct > 0 && pct <= 25) {
         doubtful.push(v);
       }
 
-      // Confirmed Supporters: 100% or >= 75%
-      if (pct >= 75) {
+      // Confirmed Supporters: strictly explicitly entered 100% or >= 75%
+      if (pct !== undefined && pct >= 75) {
         supporters.push(v);
       }
 
