@@ -37,7 +37,7 @@ export function setAdminPin(newPin: string): void {
 // -------------------------------------------------------------
 // Offline Booth Caching (Full Offline Field Work Support)
 // -------------------------------------------------------------
-export const DATA_CACHE_VERSION = '2026.10.29.v3';
+export const DATA_CACHE_VERSION = '2026.10.31.v4';
 const CACHE_VERSION_KEY = 'jsp_data_cache_version';
 
 function getBoothStorageKey(partNo: number | string): string {

@@ -340,7 +340,7 @@ export function App() {
 
     // Step B: Check local cache first (Instant load)
     const cached = getCachedBoothData(partNo);
-    if (cached) {
+    if (cached && Array.isArray(cached.voters) && cached.voters.length > 0) {
       setBoothData(cached);
       setFamilies(getFamilyGroups(partNo, cached.voters));
       setIsCached(true);
@@ -775,6 +775,7 @@ export function App() {
             {/* TAB 1: Voters Tab */}
             {activeTab === 'voters' && (
               <VotersTabMobile
+                key={String(boothData.booth_info.part_no)}
                 voters={boothData.voters}
                 boothInfo={boothData.booth_info}
                 profiles={profiles}
@@ -808,6 +809,7 @@ export function App() {
             {/* TAB 2: Families Tab */}
             {activeTab === 'families' && (
               <FamiliesTabMobile
+                key={String(boothData.booth_info.part_no)}
                 families={families}
                 voters={boothData.voters}
                 influencers={influencers}
@@ -843,6 +845,7 @@ export function App() {
             {/* TAB 3: Influencers Command Tab */}
             {activeTab === 'influencers' && (
               <InfluencersTabMobile
+                key={String(boothData.booth_info.part_no)}
                 influencers={influencers}
                 voters={boothData.voters}
                 families={families}
@@ -867,6 +870,7 @@ export function App() {
             {/* TAB 4: Candidate War Room (Winning Weapon) */}
             {activeTab === 'warroom' && (
               <WarRoomTabMobile
+                key={String(boothData.booth_info.part_no)}
                 boothData={boothData}
                 profiles={profiles}
                 influencers={influencers}

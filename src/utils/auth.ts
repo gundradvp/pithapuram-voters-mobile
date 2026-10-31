@@ -28,7 +28,7 @@ export const DEFAULT_ASSIGNMENTS: VolunteerAssignment[] = [
     phone: '9000273028',
     name: 'దుర్గా ప్రసాద్ (Durga Prasad)',
     assemblyBooths: [11, 12, 13],
-    municipalWards: ['ward_14', 'gollaprolu_ward_11', 'gp_durgada', 'gp_vannepudi'],
+    municipalWards: ['ward_14', 'gollaprolu_ward_11', 'gp_durgada', 'gp_vannepudi', 'mptc_durgada_1', 'mptc_durgada_3', 'mptc_chebrolu_4'],
     notes: 'పిఠాపురం అసెంబ్లీ & స్థానిక ఎన్నికల కోఆర్డినేటర్',
     assignedAt: new Date().toISOString()
   },
@@ -63,17 +63,16 @@ export function getAssignments(): VolunteerAssignment[] {
       localStorage.setItem(ASSIGNMENTS_STORAGE_KEY, JSON.stringify(DEFAULT_ASSIGNMENTS));
       return DEFAULT_ASSIGNMENTS;
     }
-    // Auto-migrate: ensure Durga Prasad (9000273028) has all active loaded units (Durgada & Vannepudi)
+    // Auto-migrate: ensure Durga Prasad (9000273028) has all active loaded units (Durgada, Chebrolu & Vannepudi)
     const dp = parsed.find((a: VolunteerAssignment) => cleanPhoneNumber(a.phone) === '9000273028');
     if (dp) {
       let changed = false;
-      if (!dp.municipalWards.includes('gp_durgada')) {
-        dp.municipalWards.push('gp_durgada');
-        changed = true;
-      }
-      if (!dp.municipalWards.includes('gp_vannepudi')) {
-        dp.municipalWards.push('gp_vannepudi');
-        changed = true;
+      const requiredWards = ['gp_durgada', 'gp_vannepudi', 'mptc_durgada_1', 'mptc_durgada_3', 'mptc_chebrolu_4'];
+      for (const w of requiredWards) {
+        if (!dp.municipalWards.includes(w)) {
+          dp.municipalWards.push(w);
+          changed = true;
+        }
       }
       if (changed) {
         localStorage.setItem(ASSIGNMENTS_STORAGE_KEY, JSON.stringify(parsed));

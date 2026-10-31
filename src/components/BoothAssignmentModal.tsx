@@ -13,7 +13,8 @@ import {
   Sparkles, 
   CheckCircle2,
   Crown,
-  UserCheck
+  UserCheck,
+  MapPin
 } from 'lucide-react';
 import { BoothIndexItem, LocalElectionUnit } from '../types';
 import { verifyAdminPin } from '../utils/storage';
@@ -269,6 +270,17 @@ export const BoothAssignmentModal: React.FC<BoothAssignmentModalProps> = ({
                 >
                   <Home className="w-3 h-3" />
                   <span>{language === 'te' ? 'గ్రామ వార్డులు' : 'Panchayat Wards'}</span>
+                </button>
+                <button
+                  onClick={() => setLocalSubCategory('mptc')}
+                  className={`px-2.5 py-1 rounded-lg font-bold whitespace-nowrap transition-all flex items-center gap-1 ${
+                    localSubCategory === 'mptc'
+                      ? 'bg-purple-600 text-white font-black'
+                      : 'bg-slate-950 text-purple-300 hover:text-white border border-purple-500/30'
+                  }`}
+                >
+                  <MapPin className="w-3 h-3" />
+                  <span>{language === 'te' ? 'ఎంపీటీసీ (MPTC)' : 'MPTC Units'}</span>
                 </button>
               </div>
             )}

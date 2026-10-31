@@ -1,4 +1,4 @@
-import React, { useState, useMemo } from 'react';
+import React, { useState, useMemo, useEffect } from 'react';
 import { Search, Phone, PhoneCall, MessageSquare, Send, Printer, CheckCircle2, Flag, UserX, AlertCircle, Sparkles, Home, UserCheck, Sliders, Plus, Clock, User, Volume2, Users, Building, ChevronDown, ChevronUp, Copy } from 'lucide-react';
 import { MobileVoter, BoothInfo, VoterSurveyStatus, VoterCampaignProfile } from '../types';
 import { Language, translations } from '../utils/i18n';
@@ -47,6 +47,15 @@ export const VotersTabMobile: React.FC<VotersTabMobileProps> = ({
   const [visibleCount, setVisibleCount] = useState(30);
   const [activeMenuSno, setActiveMenuSno] = useState<number | null>(null);
   const [copiedPhoneId, setCopiedPhoneId] = useState<string | null>(null);
+
+  // Auto-reset filters whenever the active booth/ward changes
+  useEffect(() => {
+    setSelectedSurname('all');
+    setSelectedStreet('all');
+    setSearchQuery('');
+    setFilterMode('all');
+    setVisibleCount(30);
+  }, [boothInfo?.part_no]);
 
   const handleCopyPhone = (number: string, id: string) => {
     navigator.clipboard.writeText(number);
@@ -1279,9 +1288,23 @@ _మీ అమూల్యమైన ఓటును గాజు గ్లాస
       )}
 
       {filteredVoters.length === 0 && (
-        <div className="py-12 text-center text-slate-500 text-xs space-y-1">
+        <div className="py-12 text-center text-slate-500 text-xs space-y-2">
           <p className="font-bold text-slate-300 text-sm">{t.noVotersMatch}</p>
           <p>{t.tryAnotherSearch}</p>
+          {(selectedSurname !== 'all' || selectedStreet !== 'all' || filterMode !== 'all' || searchQuery) && (
+            <button
+              onClick={() => {
+                setSelectedSurname('all');
+                setSelectedStreet('all');
+                setFilterMode('all');
+                setSearchQuery('');
+                setVisibleCount(30);
+              }}
+              className="mt-2 px-4 py-2 bg-amber-500 hover:bg-amber-400 text-slate-950 font-black rounded-xl text-xs transition-transform active:scale-95 shadow-md"
+            >
+              {language === 'te' ? 'అన్ని ఫిల్టర్‌లను తీసివేయండి (Show All Voters)' : 'Reset All Filters'}
+            </button>
+          )}
         </div>
       )}
     </div>
