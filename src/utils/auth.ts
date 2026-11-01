@@ -41,7 +41,7 @@ export const DEFAULT_ASSIGNMENTS: VolunteerAssignment[] = [
     phone: '9000273028',
     name: 'దుర్గా ప్రసాద్ (Durga Prasad)',
     assemblyBooths: [11, 12, 13],
-    municipalWards: ['ward_14', 'gollaprolu_ward_11', 'gp_durgada', 'gp_vannepudi', 'mptc_durgada_1', 'mptc_durgada_3', 'mptc_chebrolu_4'],
+    municipalWards: ['ward_14', 'gollaprolu_ward_11', 'gp_durgada', 'gp_vannepudi', 'mptc_durgada_1', 'mptc_durgada_3', 'mptc_chebrolu_4', 'mptc_tatiparthy_2'],
     notes: 'పిఠాపురం అసెంబ్లీ & స్థానిక ఎన్నికల కోఆర్డినేటర్',
     assignedAt: new Date().toISOString()
   },
@@ -80,7 +80,7 @@ export function getAssignments(): VolunteerAssignment[] {
     const dp = parsed.find((a: VolunteerAssignment) => cleanPhoneNumber(a.phone) === '9000273028');
     if (dp) {
       let changed = false;
-      const requiredWards = ['gp_durgada', 'gp_vannepudi', 'mptc_durgada_1', 'mptc_durgada_3', 'mptc_chebrolu_4'];
+      const requiredWards = ['gp_durgada', 'gp_vannepudi', 'mptc_durgada_1', 'mptc_durgada_3', 'mptc_chebrolu_4', 'mptc_tatiparthy_2'];
       for (const w of requiredWards) {
         if (!dp.municipalWards.includes(w)) {
           dp.municipalWards.push(w);
@@ -175,6 +175,8 @@ export function generateAssignmentWhatsAppMessage(
         if (w === 'mptc_durgada_3') return `• దుర్గడ MPTC-3 (డోర్ నెం. 4-9 - 1,874 ఓటర్లు)${desc}`;
         if (w === 'gp_durgada') return `• దుర్గడ సమగ్ర గ్రామ పంచాయతీ (Durgada GP - 4,524 ఓటర్లు)${desc}`;
         if (w === 'gp_vannepudi') return `• వన్నెపూడి గ్రామ పంచాయతీ (Vannepudi GP - 3,201 ఓటర్లు)${desc}`;
+        if (w === 'mptc_chebrolu_4') return `• చేబ్రోలు MPTC-4 (వార్డులు 13-16 - 2,979 ఓటర్లు)${desc}`;
+        if (w === 'mptc_tatiparthy_2') return `• తాటిపర్తి MPTC-2 (వార్డులు 8-14 - 3,501 ఓటర్లు)${desc}`;
         return `• స్థానిక వార్డు/పంచాయతీ: ${w}${desc}`;
       }).join('\n')
     : '• కేటాయించలేదు';

@@ -48,6 +48,8 @@ const filesToSync = [
   'public/booths_index.json',
   'public/local_elections_index.json',
   'public/booths/mptc_chebrolu_4.json',
+  'public/booths/mptc_tatiparthy_2.json',
+  'public/booths/booth_mptc_tatiparthy_2.json',
   'public/booths/booth_mptc_chebrolu_4.json',
   'public/booths/booth_ward_14.json',
   'public/booths/ward_14.json',

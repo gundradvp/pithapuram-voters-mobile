@@ -6314,5 +6314,32 @@
     "local_body": "గొల్లప్రోలు మండల పరిషత్ (Gollaprolu Mandal)",
     "mandal": "GOLLAPROLU",
     "ward_no": 4
+  },
+  {
+    "id": "mptc_tatiparthy_2",
+    "type": "mptc",
+    "mptc_name_te": "తాటిపర్తి MPTC 2 (వార్డులు 8-14)",
+    "mptc_name_en": "Tatiparthy MPTC 2",
+    "mandal_te": "గొల్లప్రోలు",
+    "mandal_en": "Gollaprolu",
+    "village": "తాటిపర్తి MPTC 2 (వార్డులు 8-14)",
+    "clean_village": "తాటిపర్తి MPTC 2 (3,501 ఓటర్లు)",
+    "ps_address": "తాటిపర్తి గ్రామ పంచాయతీ వార్డులు 8, 9, 10, 11, 12, 13, 14 పోలింగ్ కేంద్రాలు (బూత్స్ 22, 23, 24, 25, 26, 27, 28)",
+    "sections": "వార్డు 8 (499), వార్డు 9 (499), వార్డు 10 (499), వార్డు 11 (499), వార్డు 12 (499), వార్డు 13 (499), వార్డు 14 (507)",
+    "total_voters": 3501,
+    "male_count": 1983,
+    "female_count": 1518,
+    "exact_kriya_count": 393,
+    "similar_kriya_count": 0,
+    "total_kriya_count": 393,
+    "kriya_percentage": 11.23,
+    "volunteers_count": 99,
+    "is_loaded": true,
+    "part_no": "mptc_tatiparthy_2",
+    "election_type": "mptc",
+    "category_label": "ఎంపీటీసీ ఎన్నికలు (MPTC Territorial)",
+    "local_body": "గొల్లప్రోలు మండల పరిషత్ (Gollaprolu Mandal)",
+    "mandal": "GOLLAPROLU",
+    "ward_no": 2
   }
 ]
