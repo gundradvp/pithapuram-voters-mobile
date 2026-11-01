@@ -318,6 +318,22 @@ export const BoothAssignmentModal: React.FC<BoothAssignmentModalProps> = ({
               )}
             </div>
 
+            {/* Quick Demo Booth Switcher */}
+            <button
+              type="button"
+              onClick={() => {
+                onSelectBooth('demo_booth', false);
+                onClose();
+              }}
+              className="w-full py-2 px-3 rounded-xl bg-amber-500/15 hover:bg-amber-500/25 text-amber-300 border border-amber-500/30 text-[11px] font-black flex items-center justify-between active:scale-98 transition-all"
+            >
+              <span className="flex items-center gap-1.5">
+                <span>🎮</span>
+                <span>{language === 'te' ? 'డెమో బూత్ (టెస్టింగ్ కోసం ప్లే చేయండి)' : 'Demo Booth (Play with sample data)'}</span>
+              </span>
+              <span className="text-[10px] bg-amber-500 text-slate-950 px-2 py-0.5 rounded-lg font-mono font-black">50 Voters</span>
+            </button>
+
             {/* Lock Toggle */}
             <div className="bg-slate-950/60 border border-slate-800 px-3 py-2 rounded-xl flex items-center justify-between">
               <span className="text-xs text-slate-300 font-medium flex items-center gap-1.5">

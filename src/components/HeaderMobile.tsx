@@ -75,6 +75,11 @@ export const HeaderMobile: React.FC<HeaderMobileProps> = ({
                 <Crown className="w-2.5 h-2.5" /> ADMIN
               </span>
             )}
+            {session?.role === 'demo' && (
+              <span className="px-1.5 py-0.2 rounded bg-amber-500 text-slate-950 text-[9px] font-black uppercase tracking-wider flex items-center gap-0.5 shadow-sm">
+                🎮 DEMO
+              </span>
+            )}
           </div>
           <div className="flex items-center gap-1">
             <h1 className="text-xs font-black text-white truncate leading-tight group-hover:text-amber-300 transition-colors">

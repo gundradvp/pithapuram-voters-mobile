@@ -20,6 +20,7 @@ import { AdminAssignmentModal } from './components/AdminAssignmentModal';
 import { GroupPrintModal } from './components/GroupPrintModal';
 import { SurnameLeaningModal } from './components/SurnameLeaningModal';
 import { SyncBackupModal } from './components/SyncBackupModal';
+import { DEMO_BOOTH_DATA, DEMO_PROFILES } from './utils/demoData';
 import {
   BoothData,
   BoothIndexItem,
@@ -130,6 +131,7 @@ export function App() {
       }
     }
   }, [session, currentAssignment, assignedAssemblyBooths, assignedMunicipalWards, currentPartNo]);
+
   const [boothData, setBoothData] = useState<BoothData | null>(null);
   const [activeTab, setActiveTab] = useState<TabType>('voters');
   const [isLocked, setIsLocked] = useState<boolean>(() => isBoothLocked());
@@ -338,6 +340,17 @@ export function App() {
     if (!isSilent) setIsLoading(true);
     setErrorMsg(null);
 
+    // If Demo Mode / Demo Booth is selected, load isolated demo dataset (never touches real data)
+    if (partNo === 'demo_booth' || partNo === 'demo' || partNo === 999) {
+      setBoothData(DEMO_BOOTH_DATA);
+      const demoLocal = getVoterProfiles('demo_booth');
+      setProfiles(Object.keys(demoLocal).length > 0 ? demoLocal : DEMO_PROFILES);
+      setFamilies({});
+      setInfluencers({});
+      setIsLoading(false);
+      return;
+    }
+
     // Step A: Load profiles, families, influencers immediately from localStorage
     const localProfiles = getVoterProfiles(partNo);
     setProfiles(localProfiles);
@@ -405,6 +418,14 @@ export function App() {
       setIsLoading(false);
     }
   }, []);
+
+  // Auto-switch to Demo Booth if Demo User
+  useEffect(() => {
+    if (session?.role === 'demo') {
+      setCurrentPartNo('demo_booth');
+      loadBooth('demo_booth');
+    }
+  }, [session?.role, loadBooth]);
 
   // 3. User-triggered or Programmatic Refresh
   const handleRefreshData = useCallback(async (isManual: boolean = true) => {
@@ -757,6 +778,13 @@ export function App() {
     );
   };
 
+  const handleExitDemo = () => {
+    logoutUser();
+    setSession(null);
+    setCurrentPartNo('ward_14');
+    loadBooth('ward_14');
+  };
+
   return (
     <div className="min-h-screen bg-slate-950 text-slate-100 flex flex-col font-sans select-none antialiased">
       {/* Sticky Mobile Header with Language & Theme Toggle */}
@@ -780,6 +808,26 @@ export function App() {
           setIsLoginModalOpen(true);
         }}
       />
+
+      {/* Demo Mode Notice Banner (Requirement 1 & 2) */}
+      {session?.role === 'demo' && (
+        <div className="bg-amber-500 text-slate-950 px-3 py-1.5 flex items-center justify-between text-xs font-black shadow-md sticky top-[49px] z-30">
+          <div className="flex items-center gap-1.5 truncate">
+            <span className="text-sm">🎮</span>
+            <span className="truncate">
+              {lang === 'te' 
+                ? 'డెమో మోడ్: శాంపుల్ డేటాతో ప్లే చేస్తున్నారు (అసలు డేటా సురక్షితం)' 
+                : 'Demo Mode: Testing with 50 sample voters (Real data safe)'}
+            </span>
+          </div>
+          <button
+            onClick={handleExitDemo}
+            className="px-2.5 py-0.5 bg-slate-950 text-amber-300 rounded-lg text-[10px] font-black uppercase tracking-wider shrink-0 hover:bg-slate-900 active:scale-95 transition-all shadow-sm"
+          >
+            {lang === 'te' ? 'ఎగ్జిట్ డెమో' : 'Exit Demo'}
+          </button>
+        </div>
+      )}
 
       {/* Floating Dynamic Score Notification Toast */}
       {scoreNotification && (

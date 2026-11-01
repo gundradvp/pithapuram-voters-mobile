@@ -1,12 +1,23 @@
 import { safeStorage } from './safeStorage';
 
-export type UserRole = 'admin' | 'volunteer';
+export type UserRole = 'admin' | 'volunteer' | 'demo';
 
 export interface UserSession {
   role: UserRole;
   phone: string;
   name: string;
   loginTime: number;
+}
+
+export function setDemoSession(): UserSession {
+  const session: UserSession = {
+    role: 'demo',
+    phone: '9999999999',
+    name: 'డెమో యూజర్ (Demo Mode)',
+    loginTime: Date.now()
+  };
+  setUserSession(session);
+  return session;
 }
 
 export interface VolunteerAssignment {

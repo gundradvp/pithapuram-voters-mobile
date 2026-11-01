@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { ShieldCheck, Phone, Lock, ArrowRight, UserCheck, KeyRound, Sparkles, AlertCircle } from 'lucide-react';
-import { UserSession, verifyAdminPassword, getVolunteerAssignment, setUserSession, cleanPhoneNumber } from '../utils/auth';
+import { UserSession, verifyAdminPassword, getVolunteerAssignment, setUserSession, cleanPhoneNumber, setDemoSession } from '../utils/auth';
 import { Language } from '../utils/i18n';
 
 interface LoginModalProps {
@@ -60,6 +60,12 @@ export const LoginModal: React.FC<LoginModalProps> = ({
     } else {
       setErrorMsg(language === 'te' ? 'పాస్‌వర్డ్ సరిపోలలేదు. దయచేసి మళ్ళీ ప్రయత్నించండి.' : 'Invalid Admin password. Please try again.');
     }
+  };
+
+  const handleDemoLogin = () => {
+    const session = setDemoSession();
+    setErrorMsg(null);
+    onLoginSuccess(session);
   };
 
   return (
@@ -220,6 +226,27 @@ export const LoginModal: React.FC<LoginModalProps> = ({
             </button>
           </form>
         )}
+
+        {/* Play with Demo Data Button (Requirement 1 & 2) */}
+        <div className="pt-2 border-t border-slate-800 text-center space-y-1">
+          <button
+            type="button"
+            onClick={handleDemoLogin}
+            className="w-full py-2.5 px-3 rounded-2xl font-black text-xs bg-gradient-to-r from-amber-500/20 via-slate-800 to-amber-500/20 hover:bg-slate-800 text-amber-300 border border-amber-500/40 hover:border-amber-400 flex items-center justify-center gap-2 active:scale-98 transition-all shadow-md group"
+          >
+            <Sparkles className="w-4 h-4 text-amber-400 group-hover:rotate-12 transition-transform" />
+            <span>
+              {language === 'te' 
+                ? '🎮 డెమో లాగిన్ (శాంపుల్ డేటాతో ప్లే చేయండి)' 
+                : '🎮 Demo Login (Play with Sample Data)'}
+            </span>
+          </button>
+          <p className="text-[10px] text-slate-500">
+            {language === 'te'
+              ? '🔒 అసలు డేటా మారదు. టెస్టింగ్ కోసం 50 మంది నమూనా ఓటర్లు లోడ్ అవుతారు.'
+              : '🔒 Safe testing mode. Loads 50 demo voters without affecting real data.'}
+          </p>
+        </div>
       </div>
     </div>
   );

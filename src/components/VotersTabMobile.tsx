@@ -1,5 +1,5 @@
 import React, { useState, useMemo, useEffect } from 'react';
-import { Search, Phone, PhoneCall, MessageSquare, Send, Printer, CheckCircle2, Flag, UserX, AlertCircle, Sparkles, Home, UserCheck, Sliders, Plus, Clock, User, Volume2, Users, Building, ChevronDown, ChevronUp, Copy, Hash, X, Mic, MicOff, Zap } from 'lucide-react';
+import { Search, Phone, PhoneCall, MessageSquare, Send, Printer, CheckCircle2, Flag, UserX, AlertCircle, Sparkles, Home, UserCheck, Sliders, Plus, Clock, User, Volume2, Users, Building, ChevronDown, ChevronUp, Copy, Hash, X, Mic, MicOff, Zap, RotateCcw, CheckSquare, Square } from 'lucide-react';
 import { MobileVoter, BoothInfo, VoterSurveyStatus, VoterCampaignProfile } from '../types';
 import { Language, translations } from '../utils/i18n';
 import { resolvePhotoUrl } from '../utils/photoResolver';
@@ -128,6 +128,70 @@ export const VotersTabMobile: React.FC<VotersTabMobileProps> = ({
   const [activeMenuSno, setActiveMenuSno] = useState<number | null>(null);
   const [copiedPhoneId, setCopiedPhoneId] = useState<string | null>(null);
   const [copiedEpicId, setCopiedEpicId] = useState<string | null>(null);
+  const [isSelectionMode, setIsSelectionMode] = useState(false);
+  const [selectedVoterSnos, setSelectedVoterSnos] = useState<Set<number>>(new Set());
+
+  const isAnyFilterActive = useMemo(() => {
+    return (
+      searchQuery.trim() !== '' ||
+      snoQuery.trim() !== '' ||
+      selectedSurname !== 'all' ||
+      selectedStreet !== 'all' ||
+      filterMode !== 'all'
+    );
+  }, [searchQuery, snoQuery, selectedSurname, selectedStreet, filterMode]);
+
+  const handleResetAllFilters = () => {
+    setSearchQuery('');
+    setSnoQuery('');
+    setIsSnoFilterOpen(false);
+    setSelectedSurname('all');
+    setSelectedStreet('all');
+    setFilterMode('all');
+    setVisibleCount(INITIAL_VISIBLE_COUNT);
+    setSelectedVoterSnos(new Set());
+    setIsSelectionMode(false);
+  };
+
+  const handleToggleSelectVoter = (sno: number) => {
+    setSelectedVoterSnos(prev => {
+      const next = new Set(prev);
+      if (next.has(sno)) next.delete(sno);
+      else next.add(sno);
+      return next;
+    });
+  };
+
+  const handleSelectAllDisplayed = () => {
+    const allSnos = displayedVoters.map(v => v.s);
+    setSelectedVoterSnos(new Set(allSnos));
+  };
+
+  const handlePrintSelected = () => {
+    if (!onOpenGroupPrint || selectedVoterSnos.size === 0) return;
+    const selected = voters.filter(v => selectedVoterSnos.has(v.s));
+    onOpenGroupPrint(
+      language === 'te' ? `ఎంచుకున్న ఓటర్ల స్లిప్పులు` : `Selected Voter Slips`,
+      `${boothInfo.clean_village || boothInfo.ps_address} • మొత్తం ${selected.length} మంది ఓటర్లు`,
+      selected
+    );
+  };
+
+  const handlePrintAll = () => {
+    if (!onOpenGroupPrint || filteredVoters.length === 0) return;
+    const groupTitle = selectedSurname !== 'all'
+      ? `${selectedSurname} వంశ ఓటర్ల స్లిప్పులు`
+      : selectedStreet !== 'all'
+        ? `${selectedStreet} వీధి ఓటర్ల స్లిప్పులు`
+        : filterMode !== 'all'
+          ? `${filterMode.toUpperCase()} వర్గం ఓటర్ల స్లిప్పులు`
+          : `బూత్ #${boothInfo.part_no || boothInfo.ward_no} ఓటర్ల స్లిప్పులు`;
+    onOpenGroupPrint(
+      groupTitle,
+      `${boothInfo.clean_village || boothInfo.ps_address} • మొత్తం ${filteredVoters.length} మంది ఓటర్లు`,
+      filteredVoters
+    );
+  };
   const [selectedDuplicateCluster, setSelectedDuplicateCluster] = useState<{
     voters: MobileVoter[];
     reasonTe: string;
@@ -977,6 +1041,18 @@ _మీ అమూల్యమైన ఓటును గాజు గ్లాస
 
         {/* Filter Pills */}
         <div className="flex items-center gap-1.5 overflow-x-auto py-1 scrollbar-none text-[11px]">
+          {isAnyFilterActive && (
+            <button
+              type="button"
+              onClick={handleResetAllFilters}
+              className="px-2.5 py-1 rounded-lg font-black whitespace-nowrap transition-all flex items-center gap-1 bg-red-600/30 hover:bg-red-600 text-amber-300 hover:text-white border border-red-500/50 shadow-sm active:scale-95 animate-in fade-in"
+              title={language === 'te' ? 'అన్ని ఫిల్టర్‌లను తీసివేయండి' : 'Reset All Filters'}
+            >
+              <RotateCcw className="w-3 h-3 text-amber-400" />
+              <span>{language === 'te' ? '🔄 ఫిల్టర్లు రీసెట్' : '🔄 Reset'}</span>
+            </button>
+          )}
+
           <button
             onClick={() => { setFilterMode('all'); setVisibleCount(INITIAL_VISIBLE_COUNT); }}
             className={`px-2.5 py-1 rounded-lg font-bold whitespace-nowrap transition-all ${
@@ -1206,36 +1282,53 @@ _మీ అమూల్యమైన ఓటును గాజు గ్లాస
           )}
         </span>
 
-        <div className="flex items-center gap-2">
+        <div className="flex items-center gap-1.5 flex-wrap">
           {filteredVoters.length > 0 && onOpenGroupPrint && (
-            <button
-              onClick={() => {
-                const groupTitle = selectedSurname !== 'all'
-                  ? `${selectedSurname} వంశ ఓటర్ల జాబితా`
-                  : selectedStreet !== 'all'
-                    ? `${selectedStreet} వీధి ఓటర్ల జాబితా`
-                    : filterMode !== 'all'
-                      ? `${filterMode.toUpperCase()} వర్గం ఓటర్ల జాబితా`
-                      : `బూత్ #${boothInfo.part_no} ఓటర్ల జాబితా`;
-                onOpenGroupPrint(
-                  groupTitle,
-                  `${boothInfo.clean_village || boothInfo.ps_address} • మొత్తం ${filteredVoters.length} మంది ఓటర్లు`,
-                  filteredVoters
-                );
-              }}
-              className="px-2 py-0.5 bg-slate-900 hover:bg-slate-800 text-amber-300 border border-amber-500/30 rounded-lg text-[10.5px] font-bold flex items-center gap-1 shadow-sm transition-all"
-              title="Print Current Filtered Voter List"
-            >
-              <Printer className="w-3 h-3 text-amber-400" />
-              <span>🖨️ ప్రింట్ ({filteredVoters.length})</span>
-            </button>
+            <>
+              {/* Print All Filtered Voters (Requirement 5) */}
+              <button
+                type="button"
+                onClick={handlePrintAll}
+                className="px-2 py-0.5 bg-slate-900 hover:bg-slate-800 text-amber-300 border border-amber-500/30 rounded-lg text-[10.5px] font-bold flex items-center gap-1 shadow-sm active:scale-95 transition-all"
+                title={language === 'te' ? 'అన్ని స్లిప్పులు ఒకేసారి ప్రింట్ చేయండి' : 'Print All Filtered Voter Slips'}
+              >
+                <Printer className="w-3 h-3 text-amber-400" />
+                <span>{language === 'te' ? `🖨️ అన్నీ ప్రింట్ (${filteredVoters.length})` : `🖨️ Print All (${filteredVoters.length})`}</span>
+              </button>
+
+              {/* Select Specific Voters for Printing (Requirement 5) */}
+              <button
+                type="button"
+                onClick={() => {
+                  setIsSelectionMode(!isSelectionMode);
+                  if (isSelectionMode) setSelectedVoterSnos(new Set());
+                }}
+                className={`px-2 py-0.5 rounded-lg text-[10.5px] font-bold flex items-center gap-1 border transition-all active:scale-95 shadow-sm ${
+                  isSelectionMode
+                    ? 'bg-amber-500 text-slate-950 border-amber-400 font-black ring-1 ring-amber-400'
+                    : 'bg-slate-900 hover:bg-slate-800 text-slate-300 border-slate-700'
+                }`}
+                title={language === 'te' ? 'నిర్దిష్ట ఓటర్ల స్లిప్పులు ఎంచుకుని ప్రింట్ చేయండి' : 'Select Specific Voters to Print'}
+              >
+                <CheckSquare className="w-3 h-3" />
+                <span>
+                  {isSelectionMode
+                    ? (language === 'te' ? `ఎంపిక చాలు (${selectedVoterSnos.size})` : `Done (${selectedVoterSnos.size})`)
+                    : (language === 'te' ? '☑️ ఎంపిక ప్రింట్' : '☑️ Select Print')}
+                </span>
+              </button>
+            </>
           )}
-          {searchQuery && (
+
+          {isAnyFilterActive && (
             <button 
-              onClick={() => setSearchQuery('')}
-              className="text-amber-400 font-bold hover:underline"
+              type="button"
+              onClick={handleResetAllFilters}
+              className="text-amber-400 font-bold hover:underline flex items-center gap-0.5 text-[10.5px]"
+              title="Reset all search & filters"
             >
-              {t.clearSearch}
+              <RotateCcw className="w-2.5 h-2.5" />
+              <span>{language === 'te' ? 'రీసెట్' : 'Reset'}</span>
             </button>
           )}
         </div>
@@ -1770,11 +1863,28 @@ _మీ అమూల్యమైన ఓటును గాజు గ్లాస
                           : pct === 0
                             ? 'border-rose-900 bg-rose-950/20'
                             : 'border-slate-800/80 hover:border-slate-700'
-              }`}
+              } ${selectedVoterSnos.has(v.s) ? 'ring-2 ring-emerald-500/80 border-emerald-500 shadow-emerald-950/50' : ''}`}
             >
               {/* Card Top Row: S.No, EPIC, Leaning & Survey Status */}
               <div className="flex items-center justify-between">
                 <div className="flex items-center gap-1.5">
+                  {isSelectionMode && (
+                    <button
+                      type="button"
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        handleToggleSelectVoter(v.s);
+                      }}
+                      className="p-0.5 text-amber-400 hover:text-white transition-transform active:scale-90"
+                      title={selectedVoterSnos.has(v.s) ? 'Deselect Voter' : 'Select Voter'}
+                    >
+                      {selectedVoterSnos.has(v.s) ? (
+                        <CheckSquare className="w-4 h-4 text-emerald-400 fill-emerald-400/20" />
+                      ) : (
+                        <Square className="w-4 h-4 text-slate-500 hover:text-amber-400" />
+                      )}
+                    </button>
+                  )}
                   <span className="px-2 py-0.5 bg-amber-500/20 text-amber-300 border border-amber-500/40 rounded-md text-[11px] font-mono font-black">
                     #{v.s}
                   </span>
@@ -2363,6 +2473,57 @@ _మీ అమూల్యమైన ఓటును గాజు గ్లాస
           )}
         </div>
       )}
+      {/* Floating Selection Toolbar for Multi-Print (Requirement 5) */}
+      {isSelectionMode && (
+        <div className="fixed bottom-14 left-0 right-0 z-40 p-2.5 bg-slate-900/95 backdrop-blur-md border-t-2 border-amber-500/80 shadow-2xl flex items-center justify-between gap-2 max-w-lg mx-auto animate-in slide-in-from-bottom-3 duration-200">
+          <div className="flex items-center gap-1.5 min-w-0">
+            <span className="w-7 h-7 rounded-lg bg-amber-500/20 text-amber-300 font-mono font-black text-xs flex items-center justify-center border border-amber-500/40 shrink-0">
+              {selectedVoterSnos.size}
+            </span>
+            <span className="text-[11px] font-bold text-white truncate">
+              {language === 'te' ? 'ఎంపికయ్యారు' : 'Selected'}
+            </span>
+          </div>
+
+          <div className="flex items-center gap-1 shrink-0">
+            <button
+              type="button"
+              onClick={handleSelectAllDisplayed}
+              className="px-2 py-1 rounded-lg bg-slate-800 hover:bg-slate-700 text-slate-300 hover:text-white text-[10px] font-bold border border-slate-700 active:scale-95"
+            >
+              {language === 'te' ? 'అన్నీ' : 'All'}
+            </button>
+            <button
+              type="button"
+              onClick={() => setSelectedVoterSnos(new Set())}
+              className="px-2 py-1 rounded-lg bg-slate-800 hover:bg-slate-700 text-slate-300 hover:text-white text-[10px] font-bold border border-slate-700 active:scale-95"
+            >
+              {language === 'te' ? 'క్లియర్' : 'Clear'}
+            </button>
+            <button
+              type="button"
+              onClick={handlePrintSelected}
+              disabled={selectedVoterSnos.size === 0}
+              className="px-3 py-1.5 rounded-xl bg-gradient-to-r from-red-600 via-amber-600 to-red-600 hover:from-red-500 hover:to-amber-500 text-white font-black text-[11px] flex items-center gap-1.5 shadow-md disabled:opacity-40 disabled:cursor-not-allowed active:scale-95 transition-all"
+            >
+              <Printer className="w-3.5 h-3.5" />
+              <span>{language === 'te' ? `ప్రింట్ (${selectedVoterSnos.size})` : `Print (${selectedVoterSnos.size})`}</span>
+            </button>
+            <button
+              type="button"
+              onClick={() => {
+                setIsSelectionMode(false);
+                setSelectedVoterSnos(new Set());
+              }}
+              className="p-1.5 rounded-lg bg-slate-800 text-slate-400 hover:text-white"
+              title="Cancel Selection Mode"
+            >
+              <X className="w-4 h-4" />
+            </button>
+          </div>
+        </div>
+      )}
+
       {/* Duplicate Compare Modal */}
       {selectedDuplicateCluster && (
         <DuplicateCompareModal
