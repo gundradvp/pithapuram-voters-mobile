@@ -1,5 +1,5 @@
 import React, { useState, useMemo, useEffect } from 'react';
-import { Search, Phone, PhoneCall, MessageSquare, Send, Printer, CheckCircle2, Flag, Star, UserX, AlertCircle, Sparkles, Home, UserCheck, Sliders, Plus, Clock, User, Volume2, Users, Building, ChevronDown, ChevronUp, Copy, Hash, X, Mic, MicOff, Zap, RotateCcw, CheckSquare, Square } from 'lucide-react';
+import { Search, Phone, PhoneCall, MessageSquare, Send, Printer, CheckCircle2, Flag, Star, UserX, AlertCircle, Sparkles, Home, UserCheck, Sliders, Plus, Clock, User, Volume2, Users, Building, ChevronDown, ChevronUp, Copy, Hash, X, Mic, MicOff, Zap, RotateCcw, CheckSquare, Square, Table, Edit3 } from 'lucide-react';
 import { MobileVoter, BoothInfo, VoterSurveyStatus, VoterCampaignProfile } from '../types';
 import { Language, translations } from '../utils/i18n';
 import { resolvePhotoUrl } from '../utils/photoResolver';
@@ -9,6 +9,7 @@ import { analyzeDuplicateVoters, DuplicateMatchInfo } from '../utils/duplicateDe
 import { DuplicateCompareModal } from './DuplicateCompareModal';
 import { SpeedDialModal } from './SpeedDialModal';
 import { HourlyTurnoutModal } from './HourlyTurnoutModal';
+import { VotersExcelGrid } from './VotersExcelGrid';
 
 interface VotersTabMobileProps {
   voters: MobileVoter[];
@@ -26,6 +27,9 @@ interface VotersTabMobileProps {
   onOpenGroupPrint?: (title: string, subtitle: string, voters: MobileVoter[], initialLayout?: 'slips' | 'table') => void;
   onOpenSurnameLeaning?: (clanId?: string) => void;
   onOpenBulkAssign?: (snos?: number[]) => void;
+  onUpdateCustomAlias?: (serialNo: number, alias: string) => void;
+  onUpdateCustomPhone?: (serialNo: number, phone: string) => void;
+  onUpdateSupportPct?: (serialNo: number, pct: number) => void;
 }
 
 const INITIAL_VISIBLE_COUNT = 50;
@@ -78,14 +82,32 @@ export const VotersTabMobile: React.FC<VotersTabMobileProps> = ({
   onOpenSlip,
   onOpenGroupPrint,
   onOpenSurnameLeaning,
-  onOpenBulkAssign
+  onOpenBulkAssign,
+  onUpdateCustomAlias,
+  onUpdateCustomPhone,
+  onUpdateSupportPct
 }) => {
   const [searchQuery, setSearchQuery] = useState('');
   const [snoQuery, setSnoQuery] = useState('');
   const [isSnoFilterOpen, setIsSnoFilterOpen] = useState(false);
   const [selectedStreet, setSelectedStreet] = useState<string>('all');
   const [selectedSurname, setSelectedSurname] = useState<string>('all');
-  const [viewMode, setViewMode] = useState<'list' | 'surnames'>('list');
+  const [viewMode, setViewMode] = useState<'list' | 'surnames' | 'excel'>(() => {
+    try {
+      const saved = localStorage.getItem('jsp_voter_view_mode') as 'list' | 'surnames' | 'excel';
+      if (saved && ['list', 'surnames', 'excel'].includes(saved)) return saved;
+      return typeof window !== 'undefined' && window.innerWidth >= 1024 ? 'excel' : 'list';
+    } catch {
+      return 'list';
+    }
+  });
+
+  const handleSetViewMode = (mode: 'list' | 'surnames' | 'excel') => {
+    setViewMode(mode);
+    try {
+      localStorage.setItem('jsp_voter_view_mode', mode);
+    } catch {}
+  };
   const [isPhoneticEnabled, setIsPhoneticEnabled] = useState<boolean>(true);
   const [expandedSurnameId, setExpandedSurnameId] = useState<string | null>(null);
   const [filterMode, setFilterMode] = useState<
@@ -403,7 +425,7 @@ _దయచేసి మీ ఓటు హక్కును వినియోగ
         } else if (/^\d+$/.test(q) && String(v.s) === q) {
           // Direct S.No match from search input!
         } else if (isPhoneticEnabled) {
-          if (!matchesPhoneticSearch(q, v, phone, prof.influencerName)) return false;
+          if (!matchesPhoneticSearch(q, v, phone, prof.influencerName, prof.customAlias)) return false;
         } else {
           const snoMatch = String(v.s) === q;
           const nMatch = v.n.toLowerCase().includes(q);
@@ -413,7 +435,8 @@ _దయచేసి మీ ఓటు హక్కును వినియోగ
           const pMatch = phone && phone.includes(q);
           const infMatch = prof.influencerName?.toLowerCase().includes(q);
           const secMatch = v.sec?.toLowerCase().includes(q);
-          if (!snoMatch && !nMatch && !rMatch && !idMatch && !hnMatch && !pMatch && !infMatch && !secMatch) return false;
+          const aliasMatch = prof.customAlias?.toLowerCase().includes(q);
+          if (!snoMatch && !nMatch && !rMatch && !idMatch && !hnMatch && !pMatch && !infMatch && !secMatch && !aliasMatch) return false;
         }
       }
 
@@ -565,7 +588,7 @@ _దయచేసి మీ ఓటు హక్కును వినియోగ
       return (
         g.nameEn.toLowerCase().includes(q) ||
         g.nameTe.toLowerCase().includes(q) ||
-        g.voters.some(v => matchesPhoneticSearch(q, v))
+        g.voters.some(v => matchesPhoneticSearch(q, v, undefined, undefined, profiles[v.s]?.customAlias))
       );
     });
   }, [surnameGroups, selectedSurname, searchQuery]);
@@ -679,6 +702,37 @@ _దయచేసి మీ ఓటు హక్కును వినియోగ
 
   return (
     <div className="space-y-3 pb-24 text-xs">
+      {/* Laptop / Desktop Excel Grid Mode Suggestion Bar */}
+      <div className="hidden md:flex items-center justify-between p-2.5 bg-gradient-to-r from-emerald-950/70 via-slate-900 to-slate-900 border border-emerald-500/40 rounded-2xl text-xs shadow-md">
+        <div className="flex items-center gap-2">
+          <div className="w-7 h-7 rounded-lg bg-emerald-600/30 border border-emerald-500/50 flex items-center justify-center text-emerald-300">
+            <Table className="w-4 h-4 text-emerald-400" />
+          </div>
+          <div>
+            <span className="font-bold text-white">
+              {language === 'te' ? 'ల్యాప్‌టాప్ / డెస్క్‌టాప్ మోడ్: ఎక్సెల్ డేటా గ్రిడ్ లభ్యం' : 'Laptop / Desktop Mode: Excel Grid View Available'}
+            </span>
+            <span className="text-[11px] text-slate-400 block">
+              {language === 'te'
+                ? 'మొదటి కాలమ్‌లో కార్డు చిత్రం, పక్కన పార్స్ చేసిన డేటా & మీ సొంత ఇన్పుట్ / సెర్చ్ అలియాస్ (kanniaha) ఎడిట్ చేసుకోండి'
+                : 'Card Image, parsed text and custom input alias (kanniaha) editor'}
+            </span>
+          </div>
+        </div>
+        <button
+          type="button"
+          onClick={() => handleSetViewMode(viewMode === 'excel' ? 'list' : 'excel')}
+          className={`px-3 py-1.5 rounded-xl font-bold text-xs flex items-center gap-1.5 transition-all shadow-sm cursor-pointer ${
+            viewMode === 'excel'
+              ? 'bg-slate-800 hover:bg-slate-700 text-slate-300 border border-slate-700'
+              : 'bg-emerald-600 hover:bg-emerald-500 text-white shadow-emerald-950/50'
+          }`}
+        >
+          <Table className="w-3.5 h-3.5" />
+          <span>{viewMode === 'excel' ? '📱 సాధారణ జాబితాకు మారండి' : '📊 ఎక్సెల్ వ్యూ ఓపెన్ చేయండి'}</span>
+        </button>
+      </div>
+
       {/* Search Input & View Mode Controls */}
       <div className="sticky top-[51px] z-30 bg-slate-950/95 backdrop-blur-md pt-2 pb-1 space-y-2">
         <div className="flex items-center gap-1.5">
@@ -756,13 +810,13 @@ _దయచేసి మీ ఓటు హక్కును వినియోగ
             <span className="font-mono text-[10px] font-bold">S.No</span>
           </button>
 
-          {/* View Mode Toggle: List vs Surname Groups */}
+          {/* View Mode Toggle: List vs Surname Groups vs Excel Grid */}
           <div className="bg-slate-900 border border-slate-800 rounded-xl p-0.5 flex items-center shrink-0">
             <button
-              onClick={() => setViewMode('list')}
+              onClick={() => handleSetViewMode('list')}
               className={`px-2 py-1.5 rounded-lg text-[10px] font-bold transition-all flex items-center gap-1 ${
                 viewMode === 'list'
-                  ? 'bg-amber-500 text-slate-950 font-black'
+                  ? 'bg-amber-500 text-slate-950 font-black shadow-sm'
                   : 'text-slate-400 hover:text-white'
               }`}
               title="Standard Voter List View"
@@ -771,16 +825,28 @@ _దయచేసి మీ ఓటు హక్కును వినియోగ
               <span className="hidden xs:inline">{language === 'te' ? 'జాబితా' : 'List'}</span>
             </button>
             <button
-              onClick={() => setViewMode('surnames')}
+              onClick={() => handleSetViewMode('surnames')}
               className={`px-2 py-1.5 rounded-lg text-[10px] font-bold transition-all flex items-center gap-1 ${
                 viewMode === 'surnames'
-                  ? 'bg-amber-500 text-slate-950 font-black'
+                  ? 'bg-amber-500 text-slate-950 font-black shadow-sm'
                   : 'text-slate-400 hover:text-white'
               }`}
               title="Group Voters by Surname Clan"
             >
               <Building className="w-3.5 h-3.5" />
               <span className="hidden xs:inline">{language === 'te' ? 'ఇంటిపేర్లు' : 'Surnames'}</span>
+            </button>
+            <button
+              onClick={() => handleSetViewMode('excel')}
+              className={`px-2.5 py-1.5 rounded-lg text-[10px] font-bold transition-all flex items-center gap-1.5 ${
+                viewMode === 'excel'
+                  ? 'bg-emerald-600 text-white font-black shadow-md ring-1 ring-emerald-400/50'
+                  : 'text-emerald-400 hover:text-white hover:bg-slate-800/60'
+              }`}
+              title={language === 'te' ? 'ఎక్సెల్ డేటాషీట్ గ్రిడ్ (కార్డు, పార్స్ డేటా & మీ ఇన్పుట్)' : 'Excel Grid View (Card, Parsed Data & Your Input)'}
+            >
+              <Table className="w-3.5 h-3.5 text-emerald-400" />
+              <span className="font-black">{language === 'te' ? '📊 ఎక్సెల్' : '📊 Excel'}</span>
             </button>
           </div>
         </div>
@@ -1481,8 +1547,26 @@ _దయచేసి మీ ఓటు హక్కును వినియోగ
         </div>
       )}
 
-      {/* Main Content Area: By Surnames Clan View vs Standard List */}
-      {viewMode === 'surnames' ? (
+      {/* Main Content Area: Excel Spreadsheet Grid vs Surnames Clan View vs Standard List */}
+      {viewMode === 'excel' ? (
+        <VotersExcelGrid
+          voters={voters}
+          boothInfo={boothInfo}
+          profiles={profiles}
+          language={language}
+          onUpdateCustomAlias={onUpdateCustomAlias || (() => {})}
+          onUpdateCustomPhone={onUpdateCustomPhone}
+          onUpdateSupportPct={onUpdateSupportPct}
+          onUpdateSurveyMark={onUpdateSurveyMark}
+          onQuickToggleOurs={onQuickToggleOurs}
+          onQuickToggleVoted={onQuickToggleVoted}
+          onOpenSlip={onOpenSlip}
+          onOpenPhoneEditor={onOpenPhoneEditor}
+          onOpenSupportPicker={onOpenSupportPicker}
+          onOpenLogVisit={onOpenLogVisit}
+          onOpenGroupPrint={onOpenGroupPrint}
+        />
+      ) : viewMode === 'surnames' ? (
         <div className="space-y-3">
           <div className="bg-gradient-to-r from-amber-950/40 via-slate-900 to-slate-900 border border-amber-500/40 rounded-2xl p-3 flex items-center justify-between">
             <div>
@@ -2057,6 +2141,19 @@ _దయచేసి మీ ఓటు హక్కును వినియోగ
                       {t.houseNo}: <strong className="text-amber-300 font-mono">{v.hn || '-'}</strong>
                     </span>
                   </div>
+
+                  {/* User's Custom Input / Search Alias Display */}
+                  {prof.customAlias && (
+                    <div className="mt-1 flex items-center gap-1.5 flex-wrap">
+                      <span className="inline-flex items-center gap-1 bg-emerald-950/80 border border-emerald-500/50 px-2 py-0.5 rounded-lg text-[10px] font-bold text-emerald-300">
+                        <Edit3 className="w-3 h-3 text-amber-400" />
+                        <span>నా ఇన్పుట్: <strong className="text-white font-mono">{prof.customAlias}</strong></span>
+                      </span>
+                      <span className="text-[9px] text-slate-500 italic">
+                        ({prof.customAlias} లేదా {v.n} తో సెర్చ్ చేయవచ్చు)
+                      </span>
+                    </div>
+                  )}
                 </div>
               </div>
 

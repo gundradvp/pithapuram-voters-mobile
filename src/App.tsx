@@ -881,6 +881,26 @@ export function App() {
     }
   };
 
+  // Update Custom Input / Alias (e.g. kanniaha when parsed is kannayya)
+  const handleUpdateCustomAlias = (serialNo: number, alias: string) => {
+    saveVoterProfile(currentPartNo, serialNo, { customAlias: alias.trim() || undefined });
+    setProfiles(getVoterProfiles(currentPartNo));
+    if (alias.trim()) {
+      triggerScoreNotice(lang === 'te' ? `✏️ #${serialNo} కు మీ ఇన్పుట్ "${alias.trim()}" సేవ్ అయ్యింది` : `✏️ Custom alias saved for #${serialNo}`);
+    }
+  };
+
+  const handleUpdateCustomPhone = (serialNo: number, phone: string) => {
+    saveVoterProfile(currentPartNo, serialNo, { customPhone: phone.trim() || undefined });
+    setProfiles(getVoterProfiles(currentPartNo));
+  };
+
+  const handleUpdateSupportPct = (serialNo: number, pct: number) => {
+    const newStatus = pct === 100 ? 'supporter' : pct === 0 ? 'opponent' : null;
+    saveVoterProfile(currentPartNo, serialNo, { supportPct: pct, survey_status: newStatus });
+    setProfiles(getVoterProfiles(currentPartNo));
+  };
+
   // Handle Custom JSON file import
   const handleImportCustomJson = (customData: BoothData) => {
     setBoothData(customData);
@@ -1083,6 +1103,9 @@ export function App() {
                 onOpenGroupPrint={handleOpenGroupPrint}
                 onOpenSurnameLeaning={clanId => setSurnameLeaningState({ open: true, initialClanId: clanId })}
                 onOpenBulkAssign={snos => setBulkAssignState({ open: true, initialSelectedSnos: snos })}
+                onUpdateCustomAlias={handleUpdateCustomAlias}
+                onUpdateCustomPhone={handleUpdateCustomPhone}
+                onUpdateSupportPct={handleUpdateSupportPct}
               />
             )}
 

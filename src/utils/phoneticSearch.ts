@@ -105,12 +105,13 @@ export function matchesPhoneticSearch(
   query: string,
   voter: MobileVoter,
   phone?: string,
-  influencerName?: string
+  influencerName?: string,
+  customAlias?: string
 ): boolean {
   const q = query.toLowerCase().trim();
   if (!q) return true;
 
-  // 1. Instant Direct Substring Match
+  // 1. Instant Direct Substring Match (Parsed Name, Relative, EPIC, H.No, Phone, Custom Alias)
   if (
     voter.n.toLowerCase().includes(q) ||
     voter.r.toLowerCase().includes(q) ||
@@ -118,7 +119,8 @@ export function matchesPhoneticSearch(
     voter.hn.toLowerCase().includes(q) ||
     (voter.sec && voter.sec.toLowerCase().includes(q)) ||
     (phone && phone.includes(q)) ||
-    (influencerName && influencerName.toLowerCase().includes(q))
+    (influencerName && influencerName.toLowerCase().includes(q)) ||
+    (customAlias && customAlias.toLowerCase().includes(q))
   ) {
     return true;
   }
@@ -128,15 +130,17 @@ export function matchesPhoneticSearch(
     return false;
   }
 
-  // 2. Phonetic Sound-Alike Match
+  // 2. Phonetic Sound-Alike Match (Across both parsed text AND user's custom input alias)
   const qTokens = extractPhoneticTokens(query);
   if (qTokens.length === 0) return false;
 
   const vTokens = getVoterPhoneticTokens(voter);
+  const aliasTokens = customAlias ? extractPhoneticTokens(customAlias) : [];
+  const allTokens = aliasTokens.length > 0 ? [...vTokens, ...aliasTokens] : vTokens;
 
-  // Every token in the query should find a matching sound in voter's tokens
+  // Every token in the query should find a matching sound in voter's tokens or custom alias
   return qTokens.every(qKey => {
-    return vTokens.some(vKey => {
+    return allTokens.some(vKey => {
       return vKey === qKey || vKey.startsWith(qKey) || qKey.startsWith(vKey);
     });
   });
