@@ -7,6 +7,9 @@ const COMMIT_SHA = 'main';
 const filesToSync = [
   'sync.js',
   'sync.cjs',
+  'netlify.toml',
+  'vercel.json',
+  'public/_redirects',
   'index.html',
   'package.json',
   'vite.config.ts',
