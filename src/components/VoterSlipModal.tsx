@@ -43,7 +43,10 @@ export const VoterSlipModal: React.FC<VoterSlipModalProps> = ({
 
   const formatBoothLabel = (partNo: string | number) => {
     const s = String(partNo);
-    if (s === 'mptc_durgada_1') return 'MPTC 1';
+    if (s === 'mptc_durgada_1' || s.startsWith('mptc_durgada_1_b')) {
+      const bno = (voter as any).booth_no || (voter.s <= 1060 ? 45 : voter.s <= 2120 ? 46 : 47);
+      return `MPTC 1 (#${bno})`;
+    }
     if (s === 'mptc_durgada_2') return 'MPTC 2';
     if (s === 'mptc_durgada_3') return 'MPTC 3';
     if (s === 'gp_durgada') return 'GP DURGADA';
@@ -58,6 +61,7 @@ export const VoterSlipModal: React.FC<VoterSlipModalProps> = ({
 
   const handleShareWhatsApp = () => {
     const isMunicipal = boothInfo.election_type === 'municipal';
+    const psLocation = voter.polling_station_name || boothInfo.ps_address;
     const text = isMunicipal
       ? `*🗳️ ${boothInfo.local_body || 'పురపాలక సంఘం'} (${boothInfo.ward_no ? `${boothInfo.ward_no}వ వార్డు` : ''})*
 *ఓటరు సమాచార స్లిప్పు (VOTER SLIP)*
@@ -70,7 +74,7 @@ export const VoterSlipModal: React.FC<VoterSlipModalProps> = ({
 *ఇంటి నెంబర్:* ${voter.hn}
 *వీధి / ప్రాంతం:* ${voter.sec || ''}
 *వయస్సు / లింగం:* ${voter.a} Yrs / ${voter.g === 'M' ? 'Male' : 'Female'}
-*పోలింగ్ కేంద్రం:* ${boothInfo.ps_address}
+*పోలింగ్ కేంద్రం:* ${psLocation}
 
 _దయచేసి మీ ఓటు హక్కును వినియోగించుకోండి! ప్రతి ఓటూ అమూల్యం._ 🗳️`
       : `*🗳️ పిఠాపురం నియోజకవర్గం (AC #37)*
@@ -83,7 +87,7 @@ _దయచేసి మీ ఓటు హక్కును వినియోగ
 *పోలింగ్ బూత్:* Part #${boothInfo.part_no} - ${boothInfo.clean_village}
 *ఇంటి నెంబర్:* ${voter.hn}
 *వయస్సు / లింగం:* ${voter.a} Yrs / ${voter.g === 'M' ? 'Male' : 'Female'}
-*పోలింగ్ కేంద్రం:* ${boothInfo.ps_address}
+*పోలింగ్ కేంద్రం:* ${psLocation}
 
 _దయచేసి మీ ఓటు హక్కును వినియోగించుకోండి! ప్రతి ఓటూ అమూల్యం._ 🗳️`;
 
@@ -225,7 +229,7 @@ _దయచేసి మీ ఓటు హక్కును వినియోగ
               <MapPin className="w-3 h-3 text-red-400" /> Polling Station Location
             </span>
             <span className="text-slate-300 text-[11px] block mt-0.5 leading-snug">
-              {boothInfo.ps_address}
+              {voter.polling_station_name || boothInfo.ps_address}
             </span>
           </div>
         </div>

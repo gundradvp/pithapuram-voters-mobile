@@ -153,6 +153,10 @@ export interface MobileVoter {
   ward_no?: number;
   ac_part?: number;
   ac_sno?: number;
+  booth_no?: number;
+  ps_no?: number;
+  polling_station_name?: string;
+  polling_station_en?: string;
 }
 
 export interface BoothData {
