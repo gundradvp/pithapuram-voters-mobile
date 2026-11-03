@@ -42,7 +42,7 @@ export const KriyaTabMobile: React.FC<KriyaTabMobileProps> = ({
             type="text"
             value={memberSearch}
             onChange={e => setMemberSearch(e.target.value)}
-            placeholder="Search Kriya Member Name, Mobile, ID..."
+            placeholder="Search Member Name, Mobile, ID..."
             className={`w-full bg-slate-900 border border-slate-800 rounded-xl pl-9 ${memberSearch ? 'pr-9' : 'pr-3'} py-2 text-xs text-white placeholder-slate-500 focus:outline-none focus:border-amber-400 shadow-md transition-all`}
           />
           {memberSearch && (
@@ -224,7 +224,7 @@ export const KriyaTabMobile: React.FC<KriyaTabMobileProps> = ({
 
         {filteredMembers.length === 0 && (
           <div className="py-12 text-center text-slate-500 text-xs">
-            No Kriya members found matching "{memberSearch}".
+            No members found matching "{memberSearch}".
           </div>
         )}
       </div>

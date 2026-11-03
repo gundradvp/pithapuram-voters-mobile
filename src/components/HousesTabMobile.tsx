@@ -197,7 +197,7 @@ export const HousesTabMobile: React.FC<HousesTabMobileProps> = ({
                             <span className="font-extrabold text-white text-xs">{m.n}</span>
                             {m.kriya && (
                               <span className="px-1.5 py-0.2 bg-gradient-to-r from-red-600 to-amber-600 text-white rounded text-[8px] font-black">
-                                {m.k_type === 'exact' ? '⭐ Kriya' : '⚡ Similar'}
+                                {m.k_type === 'exact' ? '⭐ Member' : '⚡ Similar'}
                               </span>
                             )}
                           </div>

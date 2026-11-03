@@ -150,6 +150,22 @@ export function App() {
 
   const [boothData, setBoothData] = useState<BoothData | null>(null);
   const [activeTab, setActiveTab] = useState<TabType>('voters');
+  const [votersViewMode, setVotersViewMode] = useState<'list' | 'surnames' | 'excel'>(() => {
+    try {
+      const saved = localStorage.getItem('jsp_voter_view_mode') as 'list' | 'surnames' | 'excel';
+      if (saved && ['list', 'surnames', 'excel'].includes(saved)) return saved;
+      return typeof window !== 'undefined' && window.innerWidth >= 1024 ? 'excel' : 'list';
+    } catch {
+      return 'list';
+    }
+  });
+
+  const handleVotersViewModeChange = (mode: 'list' | 'surnames' | 'excel') => {
+    setVotersViewMode(mode);
+    try {
+      localStorage.setItem('jsp_voter_view_mode', mode);
+    } catch {}
+  };
   const [isLocked, setIsLocked] = useState<boolean>(() => isBoothLocked());
   const [isCached, setIsCached] = useState<boolean>(false);
   const [isLoading, setIsLoading] = useState<boolean>(true);
@@ -987,8 +1003,12 @@ export function App() {
         </div>
       )}
 
-      {/* Main Content Area */}
-      <main className="flex-1 max-w-lg w-full mx-auto p-3">
+      {/* Main Content Area: Expands to 100% Fullscreen Width when in Excel Grid Mode */}
+      <main className={`flex-1 w-full mx-auto transition-all duration-150 ${
+        activeTab === 'voters' && votersViewMode === 'excel'
+          ? 'max-w-none w-full px-2 sm:px-4 lg:px-6 py-2'
+          : 'max-w-lg p-3'
+      }`}>
         {/* Unassigned Volunteer Notice Banner */}
         {session && session.role === 'volunteer' && assignedAssemblyBooths.length === 0 && assignedMunicipalWards.length === 0 && (
           <div className="bg-amber-950/40 border border-amber-500/50 rounded-2xl p-4 text-center space-y-2 mb-4 animate-in fade-in">
@@ -1033,8 +1053,8 @@ export function App() {
 
         {boothData && (
           <>
-            {/* Top Winning Score Banner (Hidden by default on Voters tab) */}
-            {activeTab === 'voters' && winningScore && (
+            {/* Top Winning Score Banner (Hidden in Excel view so grid takes full height) */}
+            {activeTab === 'voters' && votersViewMode !== 'excel' && winningScore && (
               showVictoryPredictor ? (
                 <WinningScoreBanner
                   calc={winningScore}
@@ -1106,6 +1126,8 @@ export function App() {
                 onUpdateCustomAlias={handleUpdateCustomAlias}
                 onUpdateCustomPhone={handleUpdateCustomPhone}
                 onUpdateSupportPct={handleUpdateSupportPct}
+                controlledViewMode={votersViewMode}
+                onViewModeChange={handleVotersViewModeChange}
               />
             )}
 

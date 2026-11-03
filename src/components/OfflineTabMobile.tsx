@@ -167,8 +167,8 @@ export const OfflineTabMobile: React.FC<OfflineTabMobileProps> = ({
 
         <p className="text-slate-300 leading-relaxed text-[11px]">
           {language === 'te'
-            ? `బూత్ #${info.part_no} డేటాను మీ మొబైల్‌లో ఆఫ్‌లైన్ కోసం భద్రపరచుకోండి. ఇంటర్నెట్ లేకపోయినా ఓటర్ల శోధన, క్రియా వివరాలు, సర్వే అన్నీ పనిచేస్తాయి!`
-            : `Download Booth #${info.part_no} to your mobile device. Once saved, you can search electors, view Kriya members, and do field surveys with zero internet connection!`}
+            ? `బూత్ #${info.part_no} డేటాను మీ మొబైల్‌లో ఆఫ్‌లైన్ కోసం భద్రపరచుకోండి. ఇంటర్నెట్ లేకపోయినా ఓటర్ల శోధన, సభ్యుల వివరాలు, సర్వే అన్నీ పనిచేస్తాయి!`
+            : `Download Booth #${info.part_no} to your mobile device. Once saved, you can search electors, view enrolled members, and do field surveys with zero internet connection!`}
         </p>
 
         {/* Action 1: Cache in Local Device Storage */}

@@ -105,7 +105,7 @@ export const PhoneEditorModal: React.FC<PhoneEditorModalProps> = ({
               <a
                 href={`tel:${voter.k_m}`}
                 className="p-2 bg-slate-800 hover:bg-slate-700 text-emerald-400 rounded-lg text-xs"
-                title="Call Kriya Phone"
+                title="Call Phone"
               >
                 <PhoneCall className="w-3.5 h-3.5" />
               </a>
@@ -113,7 +113,7 @@ export const PhoneEditorModal: React.FC<PhoneEditorModalProps> = ({
                 type="button"
                 onClick={() => handleCopyKriya(voter.k_m!)}
                 className="p-2 bg-slate-800 hover:bg-slate-700 text-slate-300 hover:text-white rounded-lg text-xs flex items-center gap-1"
-                title="Copy Kriya Phone Number"
+                title="Copy Phone Number"
               >
                 {copiedKriya ? (
                   <CheckCircle2 className="w-3.5 h-3.5 text-emerald-400" />
@@ -122,11 +122,11 @@ export const PhoneEditorModal: React.FC<PhoneEditorModalProps> = ({
                 )}
               </button>
               <a
-                href={`https://wa.me/91${voter.k_m}?text=${encodeURIComponent(`నమస్కారం ${voter.n} గారు, పిఠాపురం ఓటర్ సమాచార కేంద్రం నుండి సంప్రదిస్తున్నాము.`)}`}
+                href={`https://wa.me/91${voter.k_m}?text=${encodeURIComponent(`నమస్కారం ${voter.n} గారు, ఓటర్ సమాచార కేంద్రం నుండి సంప్రదిస్తున్నాము.`)}`}
                 target="_blank"
                 rel="noreferrer"
                 className="p-2 bg-emerald-600 hover:bg-emerald-500 text-white rounded-lg text-xs shadow-sm"
-                title="WhatsApp Kriya Phone"
+                title="WhatsApp Phone"
               >
                 <MessageSquare className="w-3.5 h-3.5" />
               </a>

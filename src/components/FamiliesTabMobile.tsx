@@ -607,7 +607,7 @@ export const FamiliesTabMobile: React.FC<FamiliesTabMobileProps> = ({
                                           type="button"
                                           onClick={() => handleCopyPhone(e.k_m!, `eld_km_${e.s}`)}
                                           className="text-slate-400 hover:text-white"
-                                          title="Copy Kriya"
+                                          title="Copy Phone"
                                         >
                                           {copiedPhoneId === `eld_km_${e.s}` ? (
                                             <span className="text-[8px] text-emerald-400 font-bold">✓</span>
@@ -727,7 +727,7 @@ export const FamiliesTabMobile: React.FC<FamiliesTabMobileProps> = ({
                                   })()}
                                   {voter.kriya && (
                                     <span className="px-1 py-0.2 bg-red-600/30 text-amber-300 border border-red-500/30 rounded text-[8px] font-bold">
-                                      🚩 Kriya
+                                      ⭐ Member
                                     </span>
                                   )}
                                 </div>
@@ -746,20 +746,20 @@ export const FamiliesTabMobile: React.FC<FamiliesTabMobileProps> = ({
                                 {getLeaningBadge(support)}
                               </div>
 
-                              {/* Kriya & Phone Pill */}
+                              {/* Member & Phone Pill */}
                               {(voter.k_m || prof.customPhone) && (
                                 <div className="flex items-center gap-1.5 flex-wrap text-[9.5px] pt-0.5">
                                   {voter.k_m && (
                                     <span className="inline-flex items-center gap-1 bg-red-950/60 border border-red-500/40 px-1.5 py-0.2 rounded">
-                                      <span className="text-red-300 font-bold">🚩 క్రియ:</span>
-                                      <a href={`tel:${voter.k_m}`} className="font-mono text-amber-300 font-bold hover:underline" title="Call Kriya">
+                                      <span className="text-red-300 font-bold">📱 ఫోన్:</span>
+                                      <a href={`tel:${voter.k_m}`} className="font-mono text-amber-300 font-bold hover:underline" title="Call Member">
                                         {voter.k_m}
                                       </a>
                                       <button
                                         type="button"
                                         onClick={() => handleCopyPhone(voter.k_m!, `fam_km_${voter.s}`)}
                                         className="text-slate-400 hover:text-white p-0.5"
-                                        title="Copy Kriya Number"
+                                        title="Copy Phone Number"
                                       >
                                         {copiedPhoneId === `fam_km_${voter.s}` ? (
                                           <span className="text-[8px] text-emerald-400 font-bold">✓</span>
@@ -1148,7 +1148,7 @@ export const FamiliesTabMobile: React.FC<FamiliesTabMobileProps> = ({
                                   <span className="font-black text-white text-xs">{m.n}</span>
                                   {m.kriya && (
                                     <span className="px-1 py-0.2 bg-red-600/30 text-amber-300 border border-red-500/30 rounded text-[8px] font-bold">
-                                      🚩 Kriya
+                                      ⭐ Member
                                     </span>
                                   )}
                                 </div>
@@ -1171,19 +1171,19 @@ export const FamiliesTabMobile: React.FC<FamiliesTabMobileProps> = ({
                                 )}
                               </div>
 
-                              {/* Kriya Phone Pill */}
+                              {/* Member Phone Pill */}
                               {m.k_m && (
                                 <div className="flex items-center gap-1.5 flex-wrap text-[9.5px] pt-0.5">
                                   <span className="inline-flex items-center gap-1 bg-red-950/60 border border-red-500/40 px-1.5 py-0.2 rounded">
-                                    <span className="text-red-300 font-bold">🚩 క్రియ:</span>
-                                    <a href={`tel:${m.k_m}`} className="font-mono text-amber-300 font-bold hover:underline" title="Call Kriya">
+                                    <span className="text-red-300 font-bold">📱 ఫోన్:</span>
+                                    <a href={`tel:${m.k_m}`} className="font-mono text-amber-300 font-bold hover:underline" title="Call Member">
                                       {m.k_m}
                                     </a>
                                     <button
                                       type="button"
                                       onClick={() => handleCopyPhone(m.k_m!, `fam_m_km_${m.s}`)}
                                       className="text-slate-400 hover:text-white p-0.5"
-                                      title="Copy Kriya Number"
+                                      title="Copy Phone Number"
                                     >
                                       {copiedPhoneId === `fam_m_km_${m.s}` ? (
                                         <span className="text-[8px] text-emerald-400 font-bold">✓</span>

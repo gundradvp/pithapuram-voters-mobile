@@ -44,6 +44,7 @@ interface VotersExcelGridProps {
   onOpenSupportPicker: (title: string, currentPct: number, currentNotes?: string, voterSno?: number) => void;
   onOpenLogVisit: (voter: MobileVoter) => void;
   onOpenGroupPrint?: (title: string, subtitle: string, voters: MobileVoter[], initialLayout?: 'slips' | 'table') => void;
+  onSwitchToMobileView?: () => void;
 }
 
 type SortField = 'sno' | 'name' | 'hno' | 'alias' | 'support' | 'voted';
@@ -65,9 +66,27 @@ export const VotersExcelGrid: React.FC<VotersExcelGridProps> = ({
   onOpenPhoneEditor,
   onOpenSupportPicker,
   onOpenLogVisit,
-  onOpenGroupPrint
+  onOpenGroupPrint,
+  onSwitchToMobileView
 }) => {
   const t = translations[language];
+
+  // Fullscreen state
+  const [isFullscreen, setIsFullscreen] = useState(false);
+
+  useEffect(() => {
+    const handler = () => setIsFullscreen(!!document.fullscreenElement);
+    document.addEventListener('fullscreenchange', handler);
+    return () => document.removeEventListener('fullscreenchange', handler);
+  }, []);
+
+  const toggleFullscreen = () => {
+    if (!document.fullscreenElement) {
+      document.documentElement.requestFullscreen().then(() => setIsFullscreen(true)).catch(() => {});
+    } else {
+      document.exitFullscreen().then(() => setIsFullscreen(false)).catch(() => {});
+    }
+  };
 
   // Search & Filter State
   const [searchQuery, setSearchQuery] = useState('');
@@ -359,6 +378,30 @@ _దయచేసి వెంటనే మీ ఓటు హక్కును �
           </div>
 
           <div className="flex items-center gap-2 flex-wrap">
+            {/* Switch to Mobile View button */}
+            {onSwitchToMobileView && (
+              <button
+                type="button"
+                onClick={onSwitchToMobileView}
+                className="px-2.5 py-1.5 rounded-xl bg-slate-800 hover:bg-slate-700 text-slate-200 border border-slate-700 font-bold text-xs flex items-center gap-1.5 shadow-sm active:scale-95 transition-all cursor-pointer"
+                title={language === 'te' ? 'సాధారణ మొబైల్ కార్డుల వ్యూకు మారండి' : 'Switch back to Mobile View'}
+              >
+                <span>📱</span>
+                <span>{language === 'te' ? 'మొబైల్ వ్యూ' : 'Mobile View'}</span>
+              </button>
+            )}
+
+            {/* Toggle Fullscreen button */}
+            <button
+              type="button"
+              onClick={toggleFullscreen}
+              className="px-2.5 py-1.5 rounded-xl bg-slate-800 hover:bg-slate-700 text-cyan-300 border border-slate-700 font-bold text-xs flex items-center gap-1.5 shadow-sm active:scale-95 transition-all cursor-pointer"
+              title={isFullscreen ? 'Exit Fullscreen' : 'Enter Fullscreen'}
+            >
+              <Maximize2 className="w-3.5 h-3.5 text-cyan-400" />
+              <span>{isFullscreen ? (language === 'te' ? 'సాధారణ స్క్రీన్' : 'Exit Fullscreen') : (language === 'te' ? 'ఫుల్‌స్క్రీన్' : 'Fullscreen')}</span>
+            </button>
+
             {/* Export CSV Button */}
             <button
               onClick={handleExportExcelCSV}
@@ -366,7 +409,7 @@ _దయచేసి వెంటనే మీ ఓటు హక్కును �
               title="Download full data as Microsoft Excel CSV format"
             >
               <Download className="w-3.5 h-3.5" />
-              <span>ఎక్సెల్ CSV డౌన్‌లోడ్</span>
+              <span>ఎక్సెల్ CSV</span>
             </button>
 
             {onOpenGroupPrint && (
@@ -569,7 +612,7 @@ _దయచేసి వెంటనే మీ ఓటు హక్కును �
       {/* =========================================================================
           THE EXCEL DATA SPREADSHEET TABLE
           ========================================================================= */}
-      <div className="overflow-x-auto overflow-y-auto max-h-[75vh] scrollbar-thin scrollbar-thumb-slate-700 select-text">
+      <div className="overflow-x-auto overflow-y-auto max-h-[calc(100vh-210px)] min-h-[500px] scrollbar-thin scrollbar-thumb-slate-700 select-text">
         <table className="w-full border-collapse text-left font-sans text-xs min-w-[1100px]">
           {/* Sticky Excel Table Headers */}
           <thead className="sticky top-0 z-20 bg-slate-900 border-b-2 border-emerald-500/60 shadow-md">

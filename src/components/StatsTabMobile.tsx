@@ -194,7 +194,7 @@ export const StatsTabMobile: React.FC<StatsTabMobileProps> = ({
             {stats.hasPhone} <span className="text-xs text-slate-400">({stats.phonePct}%)</span>
           </span>
           <span className="text-[10px] text-slate-500 block mt-0.5">
-            Kriya & Custom mobile numbers
+            Enrolled & Custom mobile numbers
           </span>
         </div>
 

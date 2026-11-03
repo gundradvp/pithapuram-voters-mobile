@@ -2,6 +2,545 @@
   "1": {
     "influencerId": "inf_1",
     "support": "leaning_jsp",
-    "updatedAt": "2026-11-03T10:00:00.000Z"
+    "updatedAt": "2026-11-03T10:00:00.000Z",
+    "supportPct": 50,
+    "survey_status": null,
+    "customAlias": "SatyaNarayana Desineedi"
+  },
+  "2": {
+    "supportPct": 50,
+    "survey_status": null,
+    "customAlias": "Manikyalamma Desineedi"
+  },
+  "3": {
+    "customAlias": "Venkata Ramana Gopisetty"
+  },
+  "4": {
+    "customAlias": "Veera Lakshmi Gopisetty"
+  },
+  "5": {
+    "customAlias": "Lakshmi parvathi Gopisetty"
+  },
+  "6": {
+    "customAlias": "Durga Venkata Nageswara Rao Gopisetty"
+  },
+  "8": {
+    "customAlias": "gowri parvathi Gopisetty"
+  },
+  "9": {
+    "customAlias": "Manikyam Gopisetty"
+  },
+  "10": {
+    "customAlias": "Naganna Inti"
+  },
+  "11": {
+    "customAlias": "Satya Narayana Inti"
+  },
+  "12": {
+    "customAlias": "Venkata Rayudu Inti"
+  },
+  "13": {
+    "customAlias": "Suryavathi Inti"
+  },
+  "14": {
+    "customAlias": "Venkata Ramana Inti"
+  },
+  "15": {
+    "customAlias": "Padma Inti"
+  },
+  "16": {
+    "customAlias": "Arju veni Inti"
+  },
+  "17": {
+    "customAlias": "Veera venkata sarvarayudu Inti"
+  },
+  "18": {
+    "customAlias": "Srinivas Pasagadugula"
+  },
+  "19": {
+    "customAlias": "Srinivas Pasagadugula"
+  },
+  "21": {
+    "customAlias": "Ganga Raju Nemala"
+  },
+  "151": {
+    "supportPct": 75
+  },
+  "154": {
+    "supportPct": 75
+  },
+  "155": {
+    "supportPct": 75
+  },
+  "156": {
+    "supportPct": 75
+  },
+  "157": {
+    "supportPct": 75
+  },
+  "158": {
+    "supportPct": 75
+  },
+  "168": {
+    "supportPct": 75
+  },
+  "169": {
+    "supportPct": 75
+  },
+  "170": {
+    "supportPct": 75
+  },
+  "189": {
+    "supportPct": 75
+  },
+  "190": {
+    "supportPct": 75
+  },
+  "224": {
+    "influencerId": "inf_1793694265008",
+    "influencerName": "yaadala srinu",
+    "influencerMobile": "9701453592"
+  },
+  "261": {
+    "influencerId": "inf_1793718619377",
+    "influencerName": "inti surya durga veeramanikanta",
+    "influencerMobile": "8247353716"
+  },
+  "275": {
+    "supportPct": 75
+  },
+  "320": {
+    "supportPct": 50,
+    "survey_status": null
+  },
+  "409": {
+    "survey_status": "out_of_city"
+  },
+  "417": {
+    "supportPct": 75
+  },
+  "418": {
+    "supportPct": 75
+  },
+  "423": {
+    "supportPct": 75
+  },
+  "476": {
+    "supportPct": 75
+  },
+  "478": {
+    "supportPct": 75
+  },
+  "667": {
+    "influencerId": "inf_1793694265008",
+    "influencerName": "yaadala srinu",
+    "influencerMobile": "9701453592"
+  },
+  "754": {
+    "customPhone": "9553613392",
+    "altPhone": ""
+  },
+  "800": {
+    "supportPct": 75
+  },
+  "801": {
+    "supportPct": 75
+  },
+  "802": {
+    "supportPct": 75
+  },
+  "803": {
+    "supportPct": 75
+  },
+  "804": {
+    "supportPct": 75
+  },
+  "805": {
+    "supportPct": 75
+  },
+  "806": {
+    "supportPct": 75
+  },
+  "808": {
+    "supportPct": 75
+  },
+  "817": {
+    "supportPct": 75
+  },
+  "1365": {
+    "supportPct": 75
+  },
+  "1472": {
+    "influencerId": "inf_1793694265008",
+    "influencerName": "yaadala srinu",
+    "influencerMobile": "9701453592"
+  },
+  "1550": {
+    "supportPct": 75
+  },
+  "1558": {
+    "influencerId": "inf_1793696044209",
+    "influencerName": "satyanarayana chesetti",
+    "influencerMobile": "7569169892"
+  },
+  "1559": {
+    "influencerId": "inf_1793696044209",
+    "influencerName": "satyanarayana chesetti",
+    "influencerMobile": "7569169892"
+  },
+  "1638": {
+    "influencerId": "inf_1793694265008",
+    "influencerName": "yaadala srinu",
+    "influencerMobile": "9701453592"
+  },
+  "1811": {
+    "influencerId": "inf_1793694265008",
+    "influencerName": "yaadala srinu",
+    "influencerMobile": "9701453592"
+  },
+  "1812": {
+    "influencerId": "inf_1793694265008",
+    "influencerName": "yaadala srinu",
+    "influencerMobile": "9701453592"
+  },
+  "1814": {
+    "supportPct": 75
+  },
+  "1823": {
+    "supportPct": 75
+  },
+  "1848": {
+    "supportPct": 75
+  },
+  "1877": {
+    "supportPct": 75
+  },
+  "1878": {
+    "supportPct": 75
+  },
+  "1908": {
+    "supportPct": 75
+  },
+  "1909": {
+    "supportPct": 75
+  },
+  "1910": {
+    "supportPct": 75
+  },
+  "1911": {
+    "supportPct": 75
+  },
+  "1912": {
+    "supportPct": 75
+  },
+  "1913": {
+    "supportPct": 75
+  },
+  "1914": {
+    "supportPct": 75
+  },
+  "1915": {
+    "supportPct": 75
+  },
+  "1916": {
+    "supportPct": 75
+  },
+  "1917": {
+    "supportPct": 75
+  },
+  "1933": {
+    "supportPct": 75
+  },
+  "1934": {
+    "supportPct": 75
+  },
+  "1986": {
+    "supportPct": 75
+  },
+  "2019": {
+    "supportPct": 75
+  },
+  "2020": {
+    "supportPct": 75
+  },
+  "2037": {
+    "supportPct": 75
+  },
+  "2038": {
+    "supportPct": 75
+  },
+  "2060": {
+    "supportPct": 75
+  },
+  "2061": {
+    "supportPct": 75
+  },
+  "2080": {
+    "supportPct": 75
+  },
+  "2081": {
+    "supportPct": 75
+  },
+  "2103": {
+    "customPhone": "9848928064",
+    "altPhone": "7569169892",
+    "influencerId": "inf_1793696044209",
+    "influencerName": "satyanarayana chesetti",
+    "influencerMobile": "7569169892"
+  },
+  "2104": {
+    "customPhone": "9848928064",
+    "altPhone": "",
+    "influencerId": "inf_1793696044209",
+    "influencerName": "satyanarayana chesetti",
+    "influencerMobile": "7569169892"
+  },
+  "2105": {
+    "influencerId": "inf_1793696044209",
+    "influencerName": "satyanarayana chesetti",
+    "influencerMobile": "7569169892"
+  },
+  "2110": {
+    "supportPct": 75
+  },
+  "2111": {
+    "supportPct": 75
+  },
+  "2112": {
+    "supportPct": 75
+  },
+  "2113": {
+    "supportPct": 75
+  },
+  "2114": {
+    "supportPct": 75
+  },
+  "2116": {
+    "supportPct": 75
+  },
+  "2117": {
+    "supportPct": 75
+  },
+  "2126": {
+    "supportPct": 75
+  },
+  "2130": {
+    "supportPct": 75
+  },
+  "2136": {
+    "supportPct": 75
+  },
+  "2137": {
+    "supportPct": 75
+  },
+  "2139": {
+    "supportPct": 75
+  },
+  "2140": {
+    "supportPct": 75
+  },
+  "2142": {
+    "supportPct": 75
+  },
+  "2143": {
+    "supportPct": 75
+  },
+  "2144": {
+    "supportPct": 75
+  },
+  "2145": {
+    "supportPct": 75
+  },
+  "2146": {
+    "supportPct": 75
+  },
+  "2147": {
+    "supportPct": 75
+  },
+  "2148": {
+    "supportPct": 75
+  },
+  "2149": {
+    "supportPct": 75
+  },
+  "2150": {
+    "supportPct": 75
+  },
+  "2186": {
+    "supportPct": 75
+  },
+  "2187": {
+    "supportPct": 75
+  },
+  "2188": {
+    "supportPct": 75
+  },
+  "2189": {
+    "supportPct": 75
+  },
+  "2190": {
+    "supportPct": 75
+  },
+  "2191": {
+    "supportPct": 75
+  },
+  "2192": {
+    "supportPct": 75
+  },
+  "2193": {
+    "supportPct": 75
+  },
+  "2194": {
+    "supportPct": 75
+  },
+  "2195": {
+    "supportPct": 75
+  },
+  "2196": {
+    "supportPct": 75
+  },
+  "2197": {
+    "supportPct": 75
+  },
+  "2198": {
+    "supportPct": 75
+  },
+  "2257": {
+    "influencerId": "inf_1793696044209",
+    "influencerName": "satyanarayana chesetti",
+    "influencerMobile": "7569169892"
+  },
+  "2258": {
+    "influencerId": "inf_1793696044209",
+    "influencerName": "satyanarayana chesetti",
+    "influencerMobile": "7569169892"
+  },
+  "2259": {
+    "influencerId": "inf_1793696044209",
+    "influencerName": "satyanarayana chesetti",
+    "influencerMobile": "7569169892"
+  },
+  "2275": {
+    "influencerId": "inf_1793696044209",
+    "influencerName": "satyanarayana chesetti",
+    "influencerMobile": "7569169892"
+  },
+  "2300": {
+    "influencerId": "inf_1793696044209",
+    "influencerName": "satyanarayana chesetti",
+    "influencerMobile": "7569169892"
+  },
+  "2301": {
+    "influencerId": "inf_1793696044209",
+    "influencerName": "satyanarayana chesetti",
+    "influencerMobile": "7569169892"
+  },
+  "2302": {
+    "influencerId": "inf_1793696044209",
+    "influencerName": "satyanarayana chesetti",
+    "influencerMobile": "7569169892"
+  },
+  "2303": {
+    "influencerId": "inf_1793696044209",
+    "influencerName": "satyanarayana chesetti",
+    "influencerMobile": "7569169892"
+  },
+  "2306": {
+    "supportPct": 75
+  },
+  "2307": {
+    "supportPct": 75
+  },
+  "2308": {
+    "influencerId": "inf_1793696044209",
+    "influencerName": "satyanarayana chesetti",
+    "influencerMobile": "7569169892"
+  },
+  "2309": {
+    "influencerId": "inf_1793696044209",
+    "influencerName": "satyanarayana chesetti",
+    "influencerMobile": "7569169892"
+  },
+  "2310": {
+    "influencerId": "inf_1793696044209",
+    "influencerName": "satyanarayana chesetti",
+    "influencerMobile": "7569169892"
+  },
+  "2312": {
+    "supportPct": 75
+  },
+  "2354": {
+    "supportPct": 75
+  },
+  "2355": {
+    "supportPct": 75
+  },
+  "2384": {
+    "influencerId": "inf_1793696044209",
+    "influencerName": "satyanarayana chesetti",
+    "influencerMobile": "7569169892"
+  },
+  "2395": {
+    "influencerId": "inf_1793696044209",
+    "influencerName": "satyanarayana chesetti",
+    "influencerMobile": "7569169892"
+  },
+  "2400": {
+    "influencerId": "inf_1793696044209",
+    "influencerName": "satyanarayana chesetti",
+    "influencerMobile": "7569169892"
+  },
+  "2441": {
+    "supportPct": 75
+  },
+  "2478": {
+    "influencerId": "inf_1793694265008",
+    "influencerName": "yaadala srinu",
+    "influencerMobile": "9701453592"
+  },
+  "2532": {
+    "influencerId": "inf_1793696044209",
+    "influencerName": "satyanarayana chesetti",
+    "influencerMobile": "7569169892"
+  },
+  "2533": {
+    "influencerId": "inf_1793694265008",
+    "influencerName": "yaadala srinu",
+    "influencerMobile": "9701453592"
+  },
+  "2535": {
+    "influencerId": "inf_1793694265008",
+    "influencerName": "yaadala srinu",
+    "influencerMobile": "9701453592"
+  },
+  "2548": {
+    "influencerId": "inf_1793694265008",
+    "influencerName": "yaadala srinu",
+    "influencerMobile": "9701453592"
+  },
+  "2550": {
+    "influencerId": "inf_1793694265008",
+    "influencerName": "yaadala srinu",
+    "influencerMobile": "9701453592"
+  },
+  "2587": {
+    "influencerId": "inf_1793696044209",
+    "influencerName": "satyanarayana chesetti",
+    "influencerMobile": "7569169892"
+  },
+  "2588": {
+    "influencerId": "inf_1793696044209",
+    "influencerName": "satyanarayana chesetti",
+    "influencerMobile": "7569169892"
+  },
+  "2589": {
+    "influencerId": "inf_1793696044209",
+    "influencerName": "satyanarayana chesetti",
+    "influencerMobile": "7569169892"
+  },
+  "2617": {
+    "influencerId": "inf_1793694265008",
+    "influencerName": "yaadala srinu",
+    "influencerMobile": "9701453592"
   }
 }

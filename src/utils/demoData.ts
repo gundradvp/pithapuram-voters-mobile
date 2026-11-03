@@ -96,7 +96,7 @@ export const DEMO_PROFILES: Record<number, VoterCampaignProfile> = {
   4: { supportPct: 100, survey_status: 'supporter' },
   5: { supportPct: 100, survey_status: 'supporter' },
 
-  6: { supportPct: 100, survey_status: 'supporter', notes: 'పార్టీ క్రియాశీల వాలంటీర్' },
+  6: { supportPct: 100, survey_status: 'supporter', notes: 'పార్టీ యాక్టివ్ వాలంటీర్' },
   7: { supportPct: 100, survey_status: 'supporter' },
   8: { supportPct: 100, survey_status: 'supporter' },
   9: { supportPct: 75 },

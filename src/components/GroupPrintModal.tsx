@@ -1126,7 +1126,7 @@ export const GroupPrintModal: React.FC<GroupPrintModalProps> = ({
                   </span>
                 </div>
                 <div className="px-1">
-                  <span className="text-[9.5px] text-slate-500 block uppercase font-bold">క్రియా వాలంటీర్లు</span>
+                  <span className="text-[9.5px] text-slate-500 block uppercase font-bold">నమోదిత సభ్యులు</span>
                   <span className="font-mono font-black text-sm text-red-700">⭐ {stats.kriya}</span>
                 </div>
               </div>
@@ -1147,7 +1147,7 @@ export const GroupPrintModal: React.FC<GroupPrintModalProps> = ({
                     <th className="py-1.5 px-1.5 text-center w-12 border-r border-slate-300">వయస్సు/లిం</th>
                     <th className="py-1.5 px-1.5 text-center w-14 border-r border-slate-300">ఇంటి నెం</th>
                     {showPhone && (
-                      <th className="py-1.5 px-1.5 w-24 border-r border-slate-300">ఫోన్ / క్రియా</th>
+                      <th className="py-1.5 px-1.5 w-24 border-r border-slate-300">ఫోన్ / మొబైల్</th>
                     )}
                     {showLeaning && (
                       <th className="py-1.5 px-1.5 text-center w-20 border-r border-slate-300">మొగ్గు</th>

@@ -474,7 +474,7 @@ export const BoothAssignmentModal: React.FC<BoothAssignmentModalProps> = ({
                               <div className="flex items-center gap-3 text-[10px] pt-1 text-slate-300 font-mono">
                                 <span>పురుషులు: <strong className="text-white">{u.male_count}</strong></span>
                                 <span>మహిళలు: <strong className="text-white">{u.female_count}</strong></span>
-                                <span>క్రియా: <strong className="text-amber-400">{u.exact_kriya_count}</strong></span>
+                                <span>సభ్యులు: <strong className="text-amber-400">{u.exact_kriya_count}</strong></span>
                               </div>
                             )}
                           </div>

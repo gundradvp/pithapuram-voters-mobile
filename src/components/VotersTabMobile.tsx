@@ -30,6 +30,8 @@ interface VotersTabMobileProps {
   onUpdateCustomAlias?: (serialNo: number, alias: string) => void;
   onUpdateCustomPhone?: (serialNo: number, phone: string) => void;
   onUpdateSupportPct?: (serialNo: number, pct: number) => void;
+  controlledViewMode?: 'list' | 'surnames' | 'excel';
+  onViewModeChange?: (mode: 'list' | 'surnames' | 'excel') => void;
 }
 
 const INITIAL_VISIBLE_COUNT = 50;
@@ -85,14 +87,16 @@ export const VotersTabMobile: React.FC<VotersTabMobileProps> = ({
   onOpenBulkAssign,
   onUpdateCustomAlias,
   onUpdateCustomPhone,
-  onUpdateSupportPct
+  onUpdateSupportPct,
+  controlledViewMode,
+  onViewModeChange
 }) => {
   const [searchQuery, setSearchQuery] = useState('');
   const [snoQuery, setSnoQuery] = useState('');
   const [isSnoFilterOpen, setIsSnoFilterOpen] = useState(false);
   const [selectedStreet, setSelectedStreet] = useState<string>('all');
   const [selectedSurname, setSelectedSurname] = useState<string>('all');
-  const [viewMode, setViewMode] = useState<'list' | 'surnames' | 'excel'>(() => {
+  const [internalViewMode, setInternalViewMode] = useState<'list' | 'surnames' | 'excel'>(() => {
     try {
       const saved = localStorage.getItem('jsp_voter_view_mode') as 'list' | 'surnames' | 'excel';
       if (saved && ['list', 'surnames', 'excel'].includes(saved)) return saved;
@@ -102,8 +106,14 @@ export const VotersTabMobile: React.FC<VotersTabMobileProps> = ({
     }
   });
 
+  const viewMode = controlledViewMode !== undefined ? controlledViewMode : internalViewMode;
+
   const handleSetViewMode = (mode: 'list' | 'surnames' | 'excel') => {
-    setViewMode(mode);
+    if (onViewModeChange) {
+      onViewModeChange(mode);
+    } else {
+      setInternalViewMode(mode);
+    }
     try {
       localStorage.setItem('jsp_voter_view_mode', mode);
     } catch {}
@@ -1565,6 +1575,7 @@ _దయచేసి మీ ఓటు హక్కును వినియోగ
           onOpenSupportPicker={onOpenSupportPicker}
           onOpenLogVisit={onOpenLogVisit}
           onOpenGroupPrint={onOpenGroupPrint}
+          onSwitchToMobileView={() => handleSetViewMode('list')}
         />
       ) : viewMode === 'surnames' ? (
         <div className="space-y-3">
@@ -1615,7 +1626,7 @@ _దయచేసి మీ ఓటు హక్కును వినియోగ
                         )}
                         {clan.kriyaCount > 0 && (
                           <span className="px-1.5 py-0.2 bg-gradient-to-r from-red-600 to-amber-600 text-white rounded text-[9px] font-black flex items-center gap-0.5">
-                            ⭐ {clan.kriyaCount} క్రియా
+                            ⭐ {clan.kriyaCount} {language === 'te' ? 'నమోదిత సభ్యులు' : 'Members'}
                           </span>
                         )}
                         {clan.duplicateCount !== undefined && clan.duplicateCount > 0 && (
@@ -1908,7 +1919,7 @@ _దయచేసి మీ ఓటు హక్కును వినియోగ
                                           handleCopyPhone(m.k_m!, `clan_km_${m.s}`);
                                         }}
                                         className="text-slate-400 hover:text-white p-0.5"
-                                        title="Copy Kriya Phone"
+                                        title="Copy Phone"
                                       >
                                         {copiedPhoneId === `clan_km_${m.s}` ? (
                                           <span className="text-[8px] text-emerald-400 font-bold">✓</span>
@@ -2121,7 +2132,7 @@ _దయచేసి మీ ఓటు హక్కును వినియోగ
                             : 'bg-gradient-to-r from-amber-500 to-yellow-500 text-slate-950'
                         }`}
                       >
-                        {v.k_type === 'exact' ? (language === 'te' ? '⭐ పక్కా క్రియా' : '⭐ Kriya Exact') : (language === 'te' ? '⚡ క్రియా మ్యాచింగ్' : '⚡ Kriya Similar')}
+                        {v.k_type === 'exact' ? (language === 'te' ? '⭐ నమోదిత సభ్యుడు' : '⭐ Registered Member') : (language === 'te' ? '⚡ ధృవీకరించిన సభ్యుడు' : '⚡ Verified Member')}
                       </span>
                     )}
                   </div>
@@ -2199,7 +2210,7 @@ _దయచేసి మీ ఓటు హక్కును వినియోగ
                             handleCopyPhone(v.k_m!, `km_${v.s}`);
                           }}
                           className="p-1 hover:bg-red-900/80 rounded text-slate-300 hover:text-white transition-colors flex items-center gap-0.5"
-                          title={language === 'te' ? 'క్రియా నంబర్ కాపీ చేయండి (Click to Copy)' : 'Copy Kriya Number'}
+                          title={language === 'te' ? 'నంబర్ కాపీ చేయండి (Click to Copy)' : 'Copy Phone Number'}
                         >
                           {copiedPhoneId === `km_${v.s}` ? (
                             <span className="text-[9px] text-emerald-400 font-bold">✓ కాపీ</span>

@@ -709,8 +709,8 @@ export const WarRoomTabMobile: React.FC<WarRoomTabMobileProps> = ({
                   <div className="flex items-center gap-1.5 flex-wrap text-[9.5px] mt-1">
                     {v.k_m && (
                       <span className="inline-flex items-center gap-1 bg-red-950/60 border border-red-500/40 px-1.5 py-0.2 rounded">
-                        <span className="text-red-300 font-bold">🚩 క్రియ:</span>
-                        <a href={`tel:${v.k_m}`} className="font-mono text-amber-300 font-bold hover:underline flex items-center gap-0.5" title="Call Kriya">
+                        <span className="text-red-300 font-bold">📱 ఫోన్:</span>
+                        <a href={`tel:${v.k_m}`} className="font-mono text-amber-300 font-bold hover:underline flex items-center gap-0.5" title="Call Member">
                           <Phone className="w-2 h-2 text-emerald-400" />
                           <span>{v.k_m}</span>
                         </a>
@@ -718,7 +718,7 @@ export const WarRoomTabMobile: React.FC<WarRoomTabMobileProps> = ({
                           type="button"
                           onClick={() => handleCopyPhone(v.k_m!, `wr_km_${v.s}`)}
                           className="text-slate-400 hover:text-white p-0.5"
-                          title="Copy Kriya Phone"
+                          title="Copy Phone Number"
                         >
                           {copiedPhoneId === `wr_km_${v.s}` ? (
                             <span className="text-[8px] text-emerald-400 font-bold">✓</span>
