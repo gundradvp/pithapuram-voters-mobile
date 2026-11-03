@@ -1625,8 +1625,10 @@ _దయచేసి మీ ఓటు హక్కును వినియోగ
                           </span>
                         )}
                         {clan.kriyaCount > 0 && (
-                          <span className="px-1.5 py-0.2 bg-gradient-to-r from-red-600 to-amber-600 text-white rounded text-[9px] font-black flex items-center gap-0.5">
-                            ⭐ {clan.kriyaCount} {language === 'te' ? 'నమోదిత సభ్యులు' : 'Members'}
+                          <span className="px-1.5 py-0.2 bg-blue-950 text-cyan-300 border border-blue-500/50 rounded text-[9px] font-black flex items-center gap-0.5">
+                            <span>A</span>
+                            <Phone className="w-2.5 h-2.5 text-cyan-400" />
+                            <span>{clan.kriyaCount}</span>
                           </span>
                         )}
                         {clan.duplicateCount !== undefined && clan.duplicateCount > 0 && (
@@ -2124,17 +2126,23 @@ _దయచేసి మీ ఓటు హక్కును వినియోగ
                         </button>
                       );
                     })()}
-                    {v.kriya && (
+                    {prof.customPhone ? (
                       <span 
-                        className={`px-1.5 py-0.2 rounded text-[8px] font-extrabold uppercase tracking-wide flex items-center gap-0.5 ${
-                          v.k_type === 'exact'
-                            ? 'bg-gradient-to-r from-red-600 to-amber-600 text-white'
-                            : 'bg-gradient-to-r from-amber-500 to-yellow-500 text-slate-950'
-                        }`}
+                        className="px-1.5 py-0.2 rounded text-[8.5px] font-black tracking-wide flex items-center gap-0.5 bg-emerald-500/20 text-emerald-300 border border-emerald-500/50 shrink-0"
+                        title={language === 'te' ? 'మాన్యువల్‌గా చేర్చిన ఫోన్ (M 📞)' : 'Manually added phone (M 📞)'}
                       >
-                        {v.k_type === 'exact' ? (language === 'te' ? '⭐ నమోదిత సభ్యుడు' : '⭐ Registered Member') : (language === 'te' ? '⚡ ధృవీకరించిన సభ్యుడు' : '⚡ Verified Member')}
+                        <span className="font-mono font-black">M</span>
+                        <Phone className="w-2.5 h-2.5 text-emerald-400" />
                       </span>
-                    )}
+                    ) : v.k_m ? (
+                      <span 
+                        className="px-1.5 py-0.2 rounded text-[8.5px] font-black tracking-wide flex items-center gap-0.5 bg-blue-500/20 text-cyan-300 border border-blue-500/50 shrink-0"
+                        title={language === 'te' ? 'జాబితా నుండి వచ్చిన ఫోన్ (A 📞)' : 'Auto list phone (A 📞)'}
+                      >
+                        <span className="font-mono font-black">A</span>
+                        <Phone className="w-2.5 h-2.5 text-cyan-400" />
+                      </span>
+                    ) : null}
                   </div>
 
                   <div className="text-[11px] text-slate-400 mt-0.5 flex items-center gap-2 flex-wrap">
@@ -2193,14 +2201,16 @@ _దయచేసి మీ ఓటు హక్కును వినియోగ
                 <div className="mt-2 pt-1.5 border-t border-slate-800/80 flex items-center justify-between text-[11px] flex-wrap gap-1.5">
                   <div className="flex items-center gap-2 flex-wrap">
                     {v.k_m && (
-                      <div className="inline-flex items-center gap-1.5 bg-amber-950/40 border border-amber-500/40 px-2 py-0.5 rounded-lg text-[10.5px]">
-                        <span className="text-amber-300 font-bold">📱 రిజిస్టర్డ్:</span>
+                      <div className="inline-flex items-center gap-1.5 bg-blue-950/40 border border-blue-500/40 px-2 py-0.5 rounded-lg text-[10.5px]">
+                        <span className="px-1 py-0.2 rounded bg-blue-900/60 border border-blue-500/50 text-cyan-300 text-[9px] font-mono font-black flex items-center gap-0.5" title="Auto List Mobile">
+                          <span>A</span>
+                          <Phone className="w-2 h-2 text-cyan-400" />
+                        </span>
                         <a
                           href={`tel:${v.k_m}`}
-                          className="font-mono font-black text-amber-300 hover:text-white hover:underline flex items-center gap-1"
+                          className="font-mono font-black text-cyan-200 hover:text-white hover:underline flex items-center gap-1"
                           title={language === 'te' ? 'కాల్ చేయండి (Click to Call)' : 'Click to Call'}
                         >
-                          <Phone className="w-2.5 h-2.5 text-emerald-400" />
                           <span>{v.k_m}</span>
                         </a>
                         <button
@@ -2209,13 +2219,13 @@ _దయచేసి మీ ఓటు హక్కును వినియోగ
                             e.stopPropagation();
                             handleCopyPhone(v.k_m!, `km_${v.s}`);
                           }}
-                          className="p-1 hover:bg-red-900/80 rounded text-slate-300 hover:text-white transition-colors flex items-center gap-0.5"
+                          className="p-1 hover:bg-blue-900/80 rounded text-slate-300 hover:text-white transition-colors flex items-center gap-0.5"
                           title={language === 'te' ? 'నంబర్ కాపీ చేయండి (Click to Copy)' : 'Copy Phone Number'}
                         >
                           {copiedPhoneId === `km_${v.s}` ? (
                             <span className="text-[9px] text-emerald-400 font-bold">✓ కాపీ</span>
                           ) : (
-                            <Copy className="w-2.5 h-2.5 text-amber-400" />
+                            <Copy className="w-2.5 h-2.5 text-cyan-400" />
                           )}
                         </button>
                       </div>
@@ -2223,13 +2233,15 @@ _దయచేసి మీ ఓటు హక్కును వినియోగ
 
                     {prof.customPhone && prof.customPhone !== v.k_m && (
                       <div className="inline-flex items-center gap-1.5 bg-emerald-950/60 border border-emerald-500/40 px-2 py-0.5 rounded-lg text-[10.5px]">
-                        <span className="text-emerald-300 font-bold">📱 ఫోన్:</span>
+                        <span className="px-1 py-0.2 rounded bg-emerald-900/60 border border-emerald-500/50 text-emerald-300 text-[9px] font-mono font-black flex items-center gap-0.5" title="Manually Added Mobile">
+                          <span>M</span>
+                          <Phone className="w-2 h-2 text-emerald-400" />
+                        </span>
                         <a
                           href={`tel:${prof.customPhone}`}
                           className="font-mono font-black text-emerald-200 hover:text-white hover:underline flex items-center gap-1"
                           title={language === 'te' ? 'కాల్ చేయండి (Click to Call)' : 'Click to Call'}
                         >
-                          <Phone className="w-2.5 h-2.5 text-emerald-400" />
                           <span>{prof.customPhone}</span>
                         </a>
                         <button

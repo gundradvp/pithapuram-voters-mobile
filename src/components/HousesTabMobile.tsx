@@ -195,9 +195,10 @@ export const HousesTabMobile: React.FC<HousesTabMobileProps> = ({
                           <div className="flex items-center gap-1.5">
                             <span className="text-amber-400 font-mono font-bold text-xs">#{m.s}</span>
                             <span className="font-extrabold text-white text-xs">{m.n}</span>
-                            {m.kriya && (
-                              <span className="px-1.5 py-0.2 bg-gradient-to-r from-red-600 to-amber-600 text-white rounded text-[8px] font-black">
-                                {m.k_type === 'exact' ? '⭐ Member' : '⚡ Similar'}
+                            {m.k_m && (
+                              <span className="px-1.5 py-0.2 bg-blue-950 text-cyan-300 border border-blue-500/50 rounded text-[8px] font-mono font-black flex items-center gap-0.5" title="Auto List Mobile (A 📞)">
+                                <span>A</span>
+                                <Phone className="w-2 h-2 text-cyan-400" />
                               </span>
                             )}
                           </div>

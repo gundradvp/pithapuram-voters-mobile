@@ -704,14 +704,16 @@ export const WarRoomTabMobile: React.FC<WarRoomTabMobileProps> = ({
                   <span>{t.houseNo}: <strong className="text-amber-300 font-mono">{v.hn || '-'}</strong></span>
                 </div>
 
-                {/* Kriya & Phone Pill */}
+                {/* Phone Pill */}
                 {(v.k_m || prof.customPhone) && (
                   <div className="flex items-center gap-1.5 flex-wrap text-[9.5px] mt-1">
                     {v.k_m && (
-                      <span className="inline-flex items-center gap-1 bg-red-950/60 border border-red-500/40 px-1.5 py-0.2 rounded">
-                        <span className="text-red-300 font-bold">📱 ఫోన్:</span>
-                        <a href={`tel:${v.k_m}`} className="font-mono text-amber-300 font-bold hover:underline flex items-center gap-0.5" title="Call Member">
-                          <Phone className="w-2 h-2 text-emerald-400" />
+                      <span className="inline-flex items-center gap-1 bg-blue-950/60 border border-blue-500/40 px-1.5 py-0.2 rounded">
+                        <span className="px-1 py-0.2 bg-blue-900/60 text-cyan-300 rounded font-mono font-black text-[8px] flex items-center gap-0.5" title="Auto List Mobile">
+                          <span>A</span>
+                          <Phone className="w-2 h-2 text-cyan-400" />
+                        </span>
+                        <a href={`tel:${v.k_m}`} className="font-mono text-cyan-300 font-bold hover:underline flex items-center gap-0.5" title="Call">
                           <span>{v.k_m}</span>
                         </a>
                         <button
@@ -723,15 +725,18 @@ export const WarRoomTabMobile: React.FC<WarRoomTabMobileProps> = ({
                           {copiedPhoneId === `wr_km_${v.s}` ? (
                             <span className="text-[8px] text-emerald-400 font-bold">✓</span>
                           ) : (
-                            <Copy className="w-2.5 h-2.5 text-amber-400" />
+                            <Copy className="w-2.5 h-2.5 text-cyan-400" />
                           )}
                         </button>
                       </span>
                     )}
                     {prof.customPhone && prof.customPhone !== v.k_m && (
                       <span className="inline-flex items-center gap-1 bg-emerald-950/60 border border-emerald-500/40 px-1.5 py-0.2 rounded">
-                        <span className="text-emerald-300 font-bold">📱:</span>
-                        <a href={`tel:${prof.customPhone}`} className="font-mono text-emerald-300 font-bold hover:underline flex items-center gap-0.5">
+                        <span className="px-1 py-0.2 bg-emerald-900/60 text-emerald-300 rounded font-mono font-black text-[8px] flex items-center gap-0.5" title="Manually Added Mobile">
+                          <span>M</span>
+                          <Phone className="w-2 h-2 text-emerald-400" />
+                        </span>
+                        <a href={`tel:${prof.customPhone}`} className="font-mono text-emerald-300 font-bold hover:underline flex items-center gap-0.5" title="Call">
                           <Phone className="w-2 h-2 text-emerald-400" />
                           <span>{prof.customPhone}</span>
                         </a>

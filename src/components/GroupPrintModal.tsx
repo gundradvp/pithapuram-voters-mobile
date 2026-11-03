@@ -1126,8 +1126,8 @@ export const GroupPrintModal: React.FC<GroupPrintModalProps> = ({
                   </span>
                 </div>
                 <div className="px-1">
-                  <span className="text-[9.5px] text-slate-500 block uppercase font-bold">నమోదిత సభ్యులు</span>
-                  <span className="font-mono font-black text-sm text-red-700">⭐ {stats.kriya}</span>
+                  <span className="text-[9.5px] text-slate-500 block uppercase font-bold">ఫోన్ ఉన్నవారు</span>
+                  <span className="font-mono font-black text-sm text-blue-900">📞 {stats.kriya}</span>
                 </div>
               </div>
             </div>
@@ -1163,6 +1163,8 @@ export const GroupPrintModal: React.FC<GroupPrintModalProps> = ({
                     const voterSno = v.s ?? (v as any).sno;
                     const phone = getVoterPhone(v);
                     const prof = voterSno ? profiles[voterSno] || {} : {};
+                    const isManualPhone = Boolean(prof.customPhone && prof.customPhone.trim());
+                    const isAutoPhone = Boolean(!isManualPhone && (v.k_m || (v as any).phone || (v as any).mobile));
                     const pct = prof.supportPct;
 
                     const voterId = v.id || (v as any).epic || '';
@@ -1220,13 +1222,19 @@ export const GroupPrintModal: React.FC<GroupPrintModalProps> = ({
                           {voterId}
                         </td>
                         <td className="py-1 px-2 font-bold text-slate-950 border-r border-slate-200">
-                          <div className="leading-tight">
+                          <div className="leading-tight flex items-center justify-between gap-1">
                             <span>{voterName}</span>
-                            {v.kriya && (
-                              <span className="ml-1 text-[8.5px] bg-red-100 text-red-800 px-1 py-0.2 rounded font-black border border-red-300">
-                                ⭐ క్రియ
+                            {isManualPhone ? (
+                              <span className="ml-1 text-[8px] bg-emerald-100 text-emerald-800 px-1 py-0.2 rounded font-black border border-emerald-300 shrink-0 inline-flex items-center gap-0.5" title="Manually Added Phone">
+                                <span>M</span>
+                                <span>📞</span>
                               </span>
-                            )}
+                            ) : isAutoPhone ? (
+                              <span className="ml-1 text-[8px] bg-blue-100 text-blue-800 px-1 py-0.2 rounded font-black border border-blue-300 shrink-0 inline-flex items-center gap-0.5" title="Auto List Phone">
+                                <span>A</span>
+                                <span>📞</span>
+                              </span>
+                            ) : null}
                           </div>
                         </td>
                         {showRelation && (
@@ -1243,8 +1251,19 @@ export const GroupPrintModal: React.FC<GroupPrintModalProps> = ({
                         {showPhone && (
                           <td className="py-1 px-1.5 font-mono text-[9.5px] border-r border-slate-200">
                             {phone ? (
-                              <span className={v.k_m ? 'text-red-700 font-bold' : 'text-slate-800'}>
-                                {phone}
+                              <span className="inline-flex items-center gap-1 font-bold">
+                                {isManualPhone ? (
+                                  <span className="px-1 py-0.2 bg-emerald-100 text-emerald-800 border border-emerald-300 rounded text-[7.5px] font-black shrink-0">
+                                    M 📞
+                                  </span>
+                                ) : (
+                                  <span className="px-1 py-0.2 bg-blue-100 text-blue-800 border border-blue-300 rounded text-[7.5px] font-black shrink-0">
+                                    A 📞
+                                  </span>
+                                )}
+                                <span className={isManualPhone ? 'text-emerald-800 font-bold' : 'text-blue-900 font-bold'}>
+                                  {phone}
+                                </span>
                               </span>
                             ) : (
                               <span className="text-slate-300 font-mono">__________</span>

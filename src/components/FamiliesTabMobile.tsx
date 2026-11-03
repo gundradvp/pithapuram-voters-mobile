@@ -543,8 +543,10 @@ export const FamiliesTabMobile: React.FC<FamiliesTabMobileProps> = ({
                         🎯 {clan.topYouth.length} {language === 'te' ? 'యువత (18-25)' : 'Youth'}
                       </span>
                       {clan.kriyaCount > 0 && (
-                        <span className="px-2 py-0.5 bg-red-950/60 border border-red-500/30 rounded-md text-red-300 font-bold">
-                          🚩 {clan.kriyaCount} {language === 'te' ? 'క్రియ వాలంటీర్లు' : 'Kriya'}
+                        <span className="px-2 py-0.5 bg-blue-950/60 border border-blue-500/30 rounded-md text-cyan-300 font-bold flex items-center gap-1">
+                          <span className="font-mono">A</span>
+                          <Phone className="w-2.5 h-2.5 text-cyan-400" />
+                          <span>{clan.kriyaCount} {language === 'te' ? 'ఫోన్లు' : 'Phones'}</span>
                         </span>
                       )}
                       {clan.duplicateCount !== undefined && clan.duplicateCount > 0 && (
@@ -598,9 +600,12 @@ export const FamiliesTabMobile: React.FC<FamiliesTabMobileProps> = ({
                                     {e.r && <span>{e.r} • </span>}
                                     <span className="font-mono">H: {e.hn}</span>
                                     {e.k_m && (
-                                      <span className="inline-flex items-center gap-1 bg-red-950/60 border border-red-500/30 px-1.5 py-0.2 rounded text-[9px]">
-                                        <span className="text-red-300 font-bold">🚩 క్రియ:</span>
-                                        <a href={`tel:${e.k_m}`} className="font-mono text-amber-300 font-bold hover:underline">
+                                      <span className="inline-flex items-center gap-1 bg-blue-950/60 border border-blue-500/30 px-1.5 py-0.2 rounded text-[9px]">
+                                        <span className="px-1 py-0.2 bg-blue-900/60 text-cyan-300 rounded font-mono font-black text-[8px] flex items-center gap-0.5">
+                                          <span>A</span>
+                                          <Phone className="w-2 h-2 text-cyan-400" />
+                                        </span>
+                                        <a href={`tel:${e.k_m}`} className="font-mono text-cyan-300 font-bold hover:underline">
                                           {e.k_m}
                                         </a>
                                         <button
@@ -725,11 +730,17 @@ export const FamiliesTabMobile: React.FC<FamiliesTabMobileProps> = ({
                                       </button>
                                     );
                                   })()}
-                                  {voter.kriya && (
-                                    <span className="px-1 py-0.2 bg-red-600/30 text-amber-300 border border-red-500/30 rounded text-[8px] font-bold">
-                                      ⭐ Member
+                                  {prof.customPhone ? (
+                                    <span className="px-1 py-0.2 bg-emerald-950 text-emerald-300 border border-emerald-500/40 rounded text-[8px] font-mono font-black flex items-center gap-0.5" title="Manually Added Phone (M 📞)">
+                                      <span>M</span>
+                                      <Phone className="w-2 h-2 text-emerald-400" />
                                     </span>
-                                  )}
+                                  ) : voter.k_m ? (
+                                    <span className="px-1 py-0.2 bg-blue-950 text-cyan-300 border border-blue-500/40 rounded text-[8px] font-mono font-black flex items-center gap-0.5" title="Auto List Phone (A 📞)">
+                                      <span>A</span>
+                                      <Phone className="w-2 h-2 text-cyan-400" />
+                                    </span>
+                                  ) : null}
                                 </div>
                                 <div className="flex items-center gap-1.5">
                                   <span className="text-[10px] text-slate-400">
@@ -750,9 +761,12 @@ export const FamiliesTabMobile: React.FC<FamiliesTabMobileProps> = ({
                               {(voter.k_m || prof.customPhone) && (
                                 <div className="flex items-center gap-1.5 flex-wrap text-[9.5px] pt-0.5">
                                   {voter.k_m && (
-                                    <span className="inline-flex items-center gap-1 bg-red-950/60 border border-red-500/40 px-1.5 py-0.2 rounded">
-                                      <span className="text-red-300 font-bold">📱 ఫోన్:</span>
-                                      <a href={`tel:${voter.k_m}`} className="font-mono text-amber-300 font-bold hover:underline" title="Call Member">
+                                    <span className="inline-flex items-center gap-1 bg-blue-950/60 border border-blue-500/40 px-1.5 py-0.2 rounded">
+                                      <span className="px-1 py-0.2 bg-blue-900/60 text-cyan-300 rounded font-mono font-black text-[8px] flex items-center gap-0.5">
+                                        <span>A</span>
+                                        <Phone className="w-2 h-2 text-cyan-400" />
+                                      </span>
+                                      <a href={`tel:${voter.k_m}`} className="font-mono text-cyan-300 font-bold hover:underline" title="Call">
                                         {voter.k_m}
                                       </a>
                                       <button
@@ -1146,11 +1160,17 @@ export const FamiliesTabMobile: React.FC<FamiliesTabMobileProps> = ({
                                 <div className="flex items-center gap-1.5 flex-wrap">
                                   <span className="font-mono text-amber-400 font-bold text-xs">#{m.s}</span>
                                   <span className="font-black text-white text-xs">{m.n}</span>
-                                  {m.kriya && (
-                                    <span className="px-1 py-0.2 bg-red-600/30 text-amber-300 border border-red-500/30 rounded text-[8px] font-bold">
-                                      ⭐ Member
+                                  {prof.customPhone ? (
+                                    <span className="px-1 py-0.2 bg-emerald-950 text-emerald-300 border border-emerald-500/40 rounded text-[8px] font-mono font-black flex items-center gap-0.5" title="Manually Added Phone (M 📞)">
+                                      <span>M</span>
+                                      <Phone className="w-2 h-2 text-emerald-400" />
                                     </span>
-                                  )}
+                                  ) : m.k_m ? (
+                                    <span className="px-1 py-0.2 bg-blue-950 text-cyan-300 border border-blue-500/40 rounded text-[8px] font-mono font-black flex items-center gap-0.5" title="Auto List Phone (A 📞)">
+                                      <span>A</span>
+                                      <Phone className="w-2 h-2 text-cyan-400" />
+                                    </span>
+                                  ) : null}
                                 </div>
                                 <span className="text-[10px] text-slate-400">
                                   {m.a}y • {m.g === 'M' ? 'M' : 'F'}
@@ -1174,9 +1194,12 @@ export const FamiliesTabMobile: React.FC<FamiliesTabMobileProps> = ({
                               {/* Member Phone Pill */}
                               {m.k_m && (
                                 <div className="flex items-center gap-1.5 flex-wrap text-[9.5px] pt-0.5">
-                                  <span className="inline-flex items-center gap-1 bg-red-950/60 border border-red-500/40 px-1.5 py-0.2 rounded">
-                                    <span className="text-red-300 font-bold">📱 ఫోన్:</span>
-                                    <a href={`tel:${m.k_m}`} className="font-mono text-amber-300 font-bold hover:underline" title="Call Member">
+                                  <span className="inline-flex items-center gap-1 bg-blue-950/60 border border-blue-500/40 px-1.5 py-0.2 rounded">
+                                    <span className="px-1 py-0.2 bg-blue-900/60 text-cyan-300 rounded font-mono font-black text-[8px] flex items-center gap-0.5">
+                                      <span>A</span>
+                                      <Phone className="w-2 h-2 text-cyan-400" />
+                                    </span>
+                                    <a href={`tel:${m.k_m}`} className="font-mono text-cyan-300 font-bold hover:underline" title="Call">
                                       {m.k_m}
                                     </a>
                                     <button

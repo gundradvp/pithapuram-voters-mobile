@@ -911,17 +911,35 @@ _దయచేసి వెంటనే మీ ఓటు హక్కును �
                     <td className="py-2 px-3 border-r border-slate-800 align-middle">
                       {phone ? (
                         <div className="flex items-center justify-between gap-1">
-                          <a
-                            href={`tel:${phone}`}
-                            className="font-mono text-emerald-300 font-bold hover:underline flex items-center gap-1 text-xs"
-                            title="Call Voter"
-                          >
-                            <Phone className="w-3 h-3 text-emerald-400" />
-                            <span>{phone}</span>
-                          </a>
+                          <div className="flex items-center gap-1.5 min-w-0">
+                            {prof.customPhone ? (
+                              <span
+                                className="px-1.5 py-0.5 rounded bg-emerald-950 border border-emerald-500/50 text-[9px] font-mono font-black text-emerald-300 flex items-center gap-0.5 shrink-0"
+                                title="Manually Added Mobile (M 📞)"
+                              >
+                                <span>M</span>
+                                <Phone className="w-2.5 h-2.5 text-emerald-400" />
+                              </span>
+                            ) : voter.k_m ? (
+                              <span
+                                className="px-1.5 py-0.5 rounded bg-blue-950 border border-blue-500/50 text-[9px] font-mono font-black text-cyan-300 flex items-center gap-0.5 shrink-0"
+                                title="Auto List Mobile (A 📞)"
+                              >
+                                <span>A</span>
+                                <Phone className="w-2.5 h-2.5 text-cyan-400" />
+                              </span>
+                            ) : null}
+                            <a
+                              href={`tel:${phone}`}
+                              className="font-mono text-emerald-300 font-bold hover:underline flex items-center gap-1 text-xs truncate"
+                              title="Call Voter"
+                            >
+                              <span>{phone}</span>
+                            </a>
+                          </div>
                           <button
                             onClick={() => onOpenPhoneEditor(voter)}
-                            className="text-slate-500 hover:text-amber-400 p-0.5"
+                            className="text-slate-500 hover:text-amber-400 p-0.5 shrink-0"
                             title="Edit Phone"
                           >
                             <Edit3 className="w-2.5 h-2.5" />

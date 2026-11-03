@@ -87,14 +87,17 @@ export const PhoneEditorModal: React.FC<PhoneEditorModalProps> = ({
           </div>
         </div>
 
-        {/* Existing Kriya Number if available */}
+        {/* Existing Auto/Roll Number if available */}
         {voter.k_m && (
-          <div className="bg-red-950/30 border border-red-500/40 rounded-xl p-2.5 flex items-center justify-between">
+          <div className="bg-blue-950/30 border border-blue-500/40 rounded-xl p-2.5 flex items-center justify-between">
             <div>
-              <span className="text-[10px] uppercase font-bold text-amber-300 block">📱 Registered Mobile</span>
+              <span className="text-[10px] uppercase font-mono font-bold text-cyan-300 block flex items-center gap-1">
+                <span className="bg-blue-900/60 text-cyan-200 px-1 py-0.2 rounded font-black">A 📞</span>
+                <span>Auto List Mobile (జాబితా నంబర్)</span>
+              </span>
               <a
                 href={`tel:${voter.k_m}`}
-                className="text-sm font-mono font-black text-amber-300 hover:text-white hover:underline flex items-center gap-1 mt-0.5"
+                className="text-sm font-mono font-black text-cyan-200 hover:text-white hover:underline flex items-center gap-1 mt-0.5"
                 title="Click to Call"
               >
                 <PhoneCall className="w-3.5 h-3.5 text-emerald-400" />
@@ -137,8 +140,9 @@ export const PhoneEditorModal: React.FC<PhoneEditorModalProps> = ({
         {/* Form to Add / Edit Custom Phone Number */}
         <form onSubmit={handleSave} className="space-y-3">
           <div>
-            <label className="text-[10px] uppercase font-bold text-slate-400 block mb-1">
-              📱 Primary Contact Mobile Number
+            <label className="text-[10px] uppercase font-bold text-slate-400 block mb-1 flex items-center gap-1">
+              <span className="bg-emerald-950 text-emerald-300 border border-emerald-500/50 px-1 py-0.2 rounded font-mono font-black text-[9px]">M 📞</span>
+              <span>Manual Primary Contact Mobile Number (మీరు చేర్చే నంబర్)</span>
             </label>
             <input
               type="tel"
