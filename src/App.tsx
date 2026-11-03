@@ -20,6 +20,7 @@ import { AdminAssignmentModal } from './components/AdminAssignmentModal';
 import { GroupPrintModal } from './components/GroupPrintModal';
 import { SurnameLeaningModal } from './components/SurnameLeaningModal';
 import { SyncBackupModal } from './components/SyncBackupModal';
+import { BulkAssignModal } from './components/BulkAssignModal';
 import { DEMO_BOOTH_DATA, DEMO_PROFILES } from './utils/demoData';
 import {
   BoothData,
@@ -64,7 +65,8 @@ import {
   getUserSession,
   logoutUser,
   getVolunteerAssignment,
-  getWhatsAppShareUrl
+  getWhatsAppShareUrl,
+  fetchFreshAssignments
 } from './utils/auth';
 import { useI18n } from './utils/i18n';
 import { ThemeId, getSavedTheme, setSavedTheme, applyThemeToDom } from './utils/theme';
@@ -81,6 +83,14 @@ export function App() {
   const [session, setSession] = useState<UserSession | null>(() => getUserSession());
   const [isLoginModalOpen, setIsLoginModalOpen] = useState<boolean>(() => !getUserSession());
   const [isAdminModalOpen, setIsAdminModalOpen] = useState<boolean>(false);
+  const [assignmentVersion, setAssignmentVersion] = useState(0);
+
+  // Sync latest volunteer assignments across devices on startup
+  useEffect(() => {
+    fetchFreshAssignments().then(() => {
+      setAssignmentVersion(v => v + 1);
+    }).catch(() => {});
+  }, []);
 
   useEffect(() => {
     applyThemeToDom(theme);
@@ -98,7 +108,7 @@ export function App() {
   const currentAssignment = useMemo(() => {
     if (!session || session.role === 'admin') return null;
     return getVolunteerAssignment(session.phone);
-  }, [session]);
+  }, [session, assignmentVersion]);
 
   const assignedAssemblyBooths = useMemo(() => {
     if (session?.role === 'admin') return boothsIndex.map(b => Number(b.part_no));
@@ -245,6 +255,31 @@ export function App() {
       subtitle,
       voters: votersList
     });
+  };
+
+  // Electors Bulk Assignment Modal State & Handlers
+  const [bulkAssignState, setBulkAssignState] = useState<{
+    open: boolean;
+    initialSelectedSnos?: number[];
+    initialInfluencerId?: string;
+  }>({
+    open: false
+  });
+
+  const handleBulkAssignInfluencer = (voterSnos: number[], influencer: Influencer | null) => {
+    if (!boothData) return;
+    const updates: Partial<VoterCampaignProfile> = {
+      influencerId: influencer?.id || undefined,
+      influencerName: influencer?.name || undefined,
+      influencerMobile: influencer?.mobile || undefined
+    };
+    const updated = saveBatchVoterProfiles(currentPartNo, voterSnos, updates);
+    setProfiles({ ...updated });
+  };
+
+  const handleAddNewInfluencerFromBulk = (newInf: Influencer) => {
+    saveInfluencer(currentPartNo, newInf);
+    setInfluencers(getInfluencers(currentPartNo));
   };
 
   const [isRefreshing, setIsRefreshing] = useState<boolean>(false);
@@ -952,6 +987,7 @@ export function App() {
                 onOpenSlip={v => setSelectedVoterForSlip(v)}
                 onOpenGroupPrint={handleOpenGroupPrint}
                 onOpenSurnameLeaning={clanId => setSurnameLeaningState({ open: true, initialClanId: clanId })}
+                onOpenBulkAssign={snos => setBulkAssignState({ open: true, initialSelectedSnos: snos })}
               />
             )}
 
@@ -1013,6 +1049,7 @@ export function App() {
                     currentInfId
                   });
                 }}
+                onOpenBulkAssign={infId => setBulkAssignState({ open: true, initialInfluencerId: infId })}
               />
             )}
 
@@ -1220,6 +1257,23 @@ export function App() {
           language={lang}
           onApply={handleApplySurnameLeaning}
           onClose={() => setSurnameLeaningState({ open: false })}
+        />
+      )}
+
+      {/* Electors Bulk Assign Modal */}
+      {bulkAssignState.open && boothData && (
+        <BulkAssignModal
+          isOpen={bulkAssignState.open}
+          onClose={() => setBulkAssignState({ open: false })}
+          voters={boothData.voters}
+          profiles={profiles}
+          influencers={influencers}
+          initialSelectedSnos={bulkAssignState.initialSelectedSnos}
+          initialInfluencerId={bulkAssignState.initialInfluencerId}
+          boothInfo={boothData.booth_info}
+          onBulkAssignInfluencer={handleBulkAssignInfluencer}
+          onAddNewInfluencer={handleAddNewInfluencerFromBulk}
+          language={lang}
         />
       )}
 

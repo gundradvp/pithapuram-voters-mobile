@@ -1,6 +1,6 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { ShieldCheck, Phone, Lock, ArrowRight, UserCheck, KeyRound, Sparkles, AlertCircle } from 'lucide-react';
-import { UserSession, verifyAdminPassword, getVolunteerAssignment, setUserSession, cleanPhoneNumber, setDemoSession } from '../utils/auth';
+import { UserSession, verifyAdminPassword, getVolunteerAssignment, setUserSession, cleanPhoneNumber, setDemoSession, fetchFreshAssignments } from '../utils/auth';
 import { Language } from '../utils/i18n';
 
 interface LoginModalProps {
@@ -21,9 +21,13 @@ export const LoginModal: React.FC<LoginModalProps> = ({
   const [adminPasswordInput, setAdminPasswordInput] = useState('');
   const [errorMsg, setErrorMsg] = useState<string | null>(null);
 
+  useEffect(() => {
+    fetchFreshAssignments().catch(() => {});
+  }, []);
+
   if (!isOpen) return null;
 
-  const handleVolunteerLogin = (phoneToUse?: string) => {
+  const handleVolunteerLogin = async (phoneToUse?: string) => {
     const raw = phoneToUse || phoneInput;
     const clean = cleanPhoneNumber(raw);
     if (!clean || clean.length < 10) {
@@ -31,7 +35,14 @@ export const LoginModal: React.FC<LoginModalProps> = ({
       return;
     }
 
-    const assignment = getVolunteerAssignment(clean);
+    let assignment = getVolunteerAssignment(clean);
+    if (!assignment) {
+      try {
+        const fresh = await fetchFreshAssignments();
+        assignment = fresh.find(a => cleanPhoneNumber(a.phone) === clean) || null;
+      } catch {}
+    }
+
     const session: UserSession = {
       role: 'volunteer',
       phone: clean,

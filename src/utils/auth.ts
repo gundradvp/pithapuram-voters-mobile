@@ -100,19 +100,83 @@ export function getAssignments(): VolunteerAssignment[] {
 
 export function saveAssignment(assignment: VolunteerAssignment): void {
   const current = getAssignments();
-  const index = current.findIndex(a => a.id === assignment.id || a.phone === assignment.phone);
+  const cleanP = cleanPhoneNumber(assignment.phone);
+  const index = current.findIndex(a => a.id === assignment.id || cleanPhoneNumber(a.phone) === cleanP);
   if (index >= 0) {
     current[index] = assignment;
   } else {
     current.push(assignment);
   }
   safeStorage.setItem(ASSIGNMENTS_STORAGE_KEY, JSON.stringify(current));
+  persistAssignmentsToDisk(current).catch(() => {});
 }
 
 export function deleteAssignment(idOrPhone: string): void {
   const current = getAssignments();
-  const filtered = current.filter(a => a.id !== idOrPhone && a.phone !== idOrPhone);
+  const cleanP = cleanPhoneNumber(idOrPhone);
+  const filtered = current.filter(a => a.id !== idOrPhone && cleanPhoneNumber(a.phone) !== cleanP);
   safeStorage.setItem(ASSIGNMENTS_STORAGE_KEY, JSON.stringify(filtered));
+  persistAssignmentsToDisk(filtered).catch(() => {});
+}
+
+/**
+ * Persist assignments directly to public/assignments.json via Vite dev server API
+ * Ensures other devices on the LAN or synced via Git get all assigned phone numbers!
+ */
+export async function persistAssignmentsToDisk(assignments: VolunteerAssignment[]): Promise<boolean> {
+  try {
+    const res = await fetch('/api/save-assignments', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ assignments })
+    });
+    return res.ok;
+  } catch (err) {
+    console.warn('Could not persist assignments to server disk:', err);
+    return false;
+  }
+}
+
+/**
+ * Fetch fresh assignments from public/assignments.json (dev server or cloud)
+ * and merge with local storage.
+ * Critical for multi-device sync (e.g. PC to mobile or Bolt).
+ */
+export async function fetchFreshAssignments(): Promise<VolunteerAssignment[]> {
+  const ts = Date.now();
+  const urls = [
+    `/assignments.json?v=${ts}`,
+    `https://raw.githubusercontent.com/gundradvp/pithapuram-voters-mobile/main/public/assignments.json?v=${ts}`,
+    `https://cdn.jsdelivr.net/gh/gundradvp/pithapuram-voters-mobile@main/public/assignments.json`
+  ];
+
+  for (const url of urls) {
+    try {
+      const res = await fetch(url, {
+        cache: 'no-store',
+        headers: {
+          'Cache-Control': 'no-cache, no-store, must-revalidate',
+          'Pragma': 'no-cache'
+        }
+      });
+      if (res.ok) {
+        const diskList: VolunteerAssignment[] = await res.json();
+        if (Array.isArray(diskList) && diskList.length > 0) {
+          const localList = getAssignments();
+          const map = new Map<string, VolunteerAssignment>();
+          // Disk takes priority, but keep any unpersisted local entries as well
+          localList.forEach(a => map.set(cleanPhoneNumber(a.phone), a));
+          diskList.forEach(a => map.set(cleanPhoneNumber(a.phone), a));
+          const merged = Array.from(map.values());
+          safeStorage.setItem(ASSIGNMENTS_STORAGE_KEY, JSON.stringify(merged));
+          return merged;
+        }
+      }
+    } catch {
+      // try next url
+    }
+  }
+  return getAssignments();
 }
 
 export function getVolunteerAssignment(phone: string): VolunteerAssignment | null {

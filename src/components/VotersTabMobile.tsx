@@ -25,6 +25,7 @@ interface VotersTabMobileProps {
   onOpenSlip: (voter: MobileVoter) => void;
   onOpenGroupPrint?: (title: string, subtitle: string, voters: MobileVoter[]) => void;
   onOpenSurnameLeaning?: (clanId?: string) => void;
+  onOpenBulkAssign?: (snos?: number[]) => void;
 }
 
 const INITIAL_VISIBLE_COUNT = 50;
@@ -76,7 +77,8 @@ export const VotersTabMobile: React.FC<VotersTabMobileProps> = ({
   onQuickToggleVoted,
   onOpenSlip,
   onOpenGroupPrint,
-  onOpenSurnameLeaning
+  onOpenSurnameLeaning,
+  onOpenBulkAssign
 }) => {
   const [searchQuery, setSearchQuery] = useState('');
   const [snoQuery, setSnoQuery] = useState('');
@@ -1296,7 +1298,7 @@ _మీ అమూల్యమైన ఓటును గాజు గ్లాస
                 <span>{language === 'te' ? `🖨️ అన్నీ ప్రింట్ (${filteredVoters.length})` : `🖨️ Print All (${filteredVoters.length})`}</span>
               </button>
 
-              {/* Select Specific Voters for Printing (Requirement 5) */}
+              {/* Select Specific Voters for Printing */}
               <button
                 type="button"
                 onClick={() => {
@@ -1317,6 +1319,26 @@ _మీ అమూల్యమైన ఓటును గాజు గ్లాస
                     : (language === 'te' ? '☑️ ఎంపిక ప్రింట్' : '☑️ Select Print')}
                 </span>
               </button>
+
+              {/* Bulk Assign Voters */}
+              {onOpenBulkAssign && (
+                <button
+                  type="button"
+                  onClick={() => {
+                    const snos = selectedVoterSnos.size > 0 ? Array.from(selectedVoterSnos) : undefined;
+                    onOpenBulkAssign(snos);
+                  }}
+                  className="px-2 py-0.5 bg-slate-900 hover:bg-slate-800 text-teal-300 border border-teal-500/30 rounded-lg text-[10.5px] font-bold flex items-center gap-1 shadow-sm active:scale-95 transition-all cursor-pointer"
+                  title={language === 'te' ? 'ఓటర్లను ఇన్ఫ్లుయెన్సర్ లేదా నాయకుడికి బల్క్ కేటాయించండి' : 'Bulk Assign Electors to In-Charge'}
+                >
+                  <Users className="w-3 h-3 text-teal-400" />
+                  <span>
+                    {selectedVoterSnos.size > 0
+                      ? (language === 'te' ? `👥 బల్క్ కేటాయింపు (${selectedVoterSnos.size})` : `👥 Bulk Assign (${selectedVoterSnos.size})`)
+                      : (language === 'te' ? '👥 బల్క్ కేటాయింపు' : '👥 Bulk Assign')}
+                  </span>
+                </button>
+              )}
             </>
           )}
 
@@ -2509,6 +2531,18 @@ _మీ అమూల్యమైన ఓటును గాజు గ్లాస
               <Printer className="w-3.5 h-3.5" />
               <span>{language === 'te' ? `ప్రింట్ (${selectedVoterSnos.size})` : `Print (${selectedVoterSnos.size})`}</span>
             </button>
+            {onOpenBulkAssign && (
+              <button
+                type="button"
+                onClick={() => onOpenBulkAssign(Array.from(selectedVoterSnos))}
+                disabled={selectedVoterSnos.size === 0}
+                className="px-2.5 py-1.5 rounded-xl bg-teal-600 hover:bg-teal-500 text-white font-black text-[11px] flex items-center gap-1 shadow-md disabled:opacity-40 disabled:cursor-not-allowed active:scale-95 transition-all cursor-pointer"
+                title="ఎంపిక చేసిన ఓటర్లను నాయకుడికి కేటాయించండి"
+              >
+                <Users className="w-3.5 h-3.5" />
+                <span>{language === 'te' ? `కేటాయింపు (${selectedVoterSnos.size})` : `Assign (${selectedVoterSnos.size})`}</span>
+              </button>
+            )}
             <button
               type="button"
               onClick={() => {

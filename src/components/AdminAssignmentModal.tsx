@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect, useMemo } from 'react';
 import { 
   X, 
   UserPlus, 
@@ -16,7 +16,13 @@ import {
   Copy,
   CheckCircle2,
   Trees,
-  MapPin
+  MapPin,
+  RefreshCw,
+  Search,
+  CheckSquare,
+  Square,
+  ChevronDown,
+  ChevronUp
 } from 'lucide-react';
 import { 
   VolunteerAssignment, 
@@ -25,7 +31,8 @@ import {
   deleteAssignment, 
   generateAssignmentWhatsAppMessage, 
   getWhatsAppShareUrl, 
-  cleanPhoneNumber 
+  cleanPhoneNumber,
+  fetchFreshAssignments 
 } from '../utils/auth';
 import { BoothIndexItem, LocalElectionUnit } from '../types';
 import { Language } from '../utils/i18n';
@@ -48,6 +55,9 @@ export const AdminAssignmentModal: React.FC<AdminAssignmentModalProps> = ({
   const [assignments, setAssignments] = useState<VolunteerAssignment[]>(() => getAssignments());
   const [isAddingNew, setIsAddingNew] = useState(false);
   const [editingId, setEditingId] = useState<string | null>(null);
+  const [isSyncing, setIsSyncing] = useState(false);
+  const [isBoothSelectorOpen, setIsBoothSelectorOpen] = useState(false);
+  const [boothFilterQuery, setBoothFilterQuery] = useState('');
 
   // Form State
   const [name, setName] = useState('');
@@ -56,6 +66,27 @@ export const AdminAssignmentModal: React.FC<AdminAssignmentModalProps> = ({
   const [selectedWards, setSelectedWards] = useState<string[]>([]);
   const [notes, setNotes] = useState('');
   const [copiedId, setCopiedId] = useState<string | null>(null);
+
+  // Sync latest assignments on mount
+  useEffect(() => {
+    fetchFreshAssignments().then(fresh => {
+      if (fresh && fresh.length > 0) {
+        setAssignments(fresh);
+      }
+    }).catch(() => {});
+  }, []);
+
+  const handleManualSync = async () => {
+    setIsSyncing(true);
+    try {
+      const fresh = await fetchFreshAssignments();
+      if (fresh && fresh.length > 0) {
+        setAssignments(fresh);
+      }
+    } finally {
+      setIsSyncing(false);
+    }
+  };
 
   if (!isOpen) return null;
 
@@ -191,12 +222,24 @@ export const AdminAssignmentModal: React.FC<AdminAssignmentModalProps> = ({
                 : 'Assign assembly booths or municipal wards to incharge phone numbers and message them on WhatsApp.'}
             </p>
           </div>
-          <button
-            onClick={onClose}
-            className="text-slate-400 hover:text-white bg-slate-800 p-1.5 rounded-full flex-shrink-0"
-          >
-            <X className="w-4 h-4" />
-          </button>
+          <div className="flex items-center gap-1.5 flex-shrink-0">
+            <button
+              type="button"
+              onClick={handleManualSync}
+              disabled={isSyncing}
+              className="px-2.5 py-1 bg-slate-800 hover:bg-slate-700 text-amber-300 rounded-xl text-[11px] font-bold border border-slate-700 flex items-center gap-1.5 transition-all cursor-pointer shadow-sm active:scale-95"
+              title="సర్వర్ & క్లౌడ్ నుండి తాజా కేటాయింపులను సమకాలీకరించండి"
+            >
+              <RefreshCw className={`w-3.5 h-3.5 text-amber-400 ${isSyncing ? 'animate-spin' : ''}`} />
+              <span className="hidden sm:inline">{isSyncing ? 'సింక్...' : 'సమకాలీకరణ (Sync)'}</span>
+            </button>
+            <button
+              onClick={onClose}
+              className="text-slate-400 hover:text-white bg-slate-800 p-1.5 rounded-full"
+            >
+              <X className="w-4 h-4" />
+            </button>
+          </div>
         </div>
 
         {/* Content Body (Scrollable) */}
@@ -262,11 +305,21 @@ export const AdminAssignmentModal: React.FC<AdminAssignmentModalProps> = ({
                 </div>
               </div>
 
-              {/* Assembly Booths Multi-Input */}
+              {/* Assembly Booths Multi-Input & Selector */}
               <div>
-                <label className="block text-[10px] font-bold text-slate-300 mb-1">
-                  {language === 'te' ? 'అసెంబ్లీ బూతులు (కామా లేదా స్పేస్‌తో ఇవ్వండి):' : 'Assembly Booths (comma or space separated):'}
-                </label>
+                <div className="flex items-center justify-between mb-1">
+                  <label className="text-[10px] font-bold text-slate-300">
+                    {language === 'te' ? 'అసెంబ్లీ బూతులు (Assembly Booths):' : 'Assembly Booths:'}
+                  </label>
+                  <button
+                    type="button"
+                    onClick={() => setIsBoothSelectorOpen(!isBoothSelectorOpen)}
+                    className="text-[10px] text-amber-400 hover:underline flex items-center gap-0.5 font-bold cursor-pointer"
+                  >
+                    <span>{isBoothSelectorOpen ? 'లిస్ట్ దాచు' : '📋 బూత్‌ల లిస్ట్ / ఎంపిక'}</span>
+                    {isBoothSelectorOpen ? <ChevronUp className="w-3 h-3" /> : <ChevronDown className="w-3 h-3" />}
+                  </button>
+                </div>
                 <input
                   type="text"
                   value={assemblyBoothsInput}
@@ -274,24 +327,113 @@ export const AdminAssignmentModal: React.FC<AdminAssignmentModalProps> = ({
                   placeholder="e.g. 11, 12, 13"
                   className="w-full px-2.5 py-1.5 bg-slate-900 border border-slate-700 rounded-lg text-xs font-mono text-white focus:outline-none focus:border-amber-400"
                 />
-                <div className="flex flex-wrap gap-1 mt-1.5">
-                  <span className="text-[9px] text-slate-500 mr-1">త్వరిత బటన్లు:</span>
-                  {[11, 12, 13, 14, 15, 100, 150].map(bn => (
+
+                {/* Quick action buttons: Select All / Unselect All */}
+                <div className="flex items-center justify-between gap-1 mt-1.5 flex-wrap">
+                  <div className="flex items-center gap-1 flex-wrap">
                     <button
-                      key={bn}
                       type="button"
                       onClick={() => {
-                        const currentArr = assemblyBoothsInput.split(/[, ]+/).filter(Boolean);
-                        if (!currentArr.includes(bn.toString())) {
-                          setAssemblyBoothsInput([...currentArr, bn].join(', '));
-                        }
+                        const allNums = boothsIndex.map(b => Number(b.part_no)).filter(n => !isNaN(n) && n > 0);
+                        const numsToUse = allNums.length > 0 ? allNums : Array.from({ length: 290 }, (_, i) => i + 1);
+                        setAssemblyBoothsInput(numsToUse.join(', '));
                       }}
-                      className="px-1.5 py-0.5 rounded bg-slate-800 hover:bg-slate-700 text-[9px] font-mono text-slate-300"
+                      className="px-2 py-0.5 bg-amber-500/20 hover:bg-amber-500 hover:text-slate-950 text-amber-300 rounded text-[9.5px] font-bold border border-amber-500/30 transition-all flex items-center gap-1 cursor-pointer"
                     >
-                      +{bn}
+                      <CheckSquare className="w-3 h-3" />
+                      <span>అన్నీ ఎంచుకోండి (Select All)</span>
                     </button>
-                  ))}
+                    <button
+                      type="button"
+                      onClick={() => setAssemblyBoothsInput('')}
+                      className="px-2 py-0.5 bg-slate-800 hover:bg-slate-700 text-slate-300 hover:text-white rounded text-[9.5px] font-bold border border-slate-700 transition-all flex items-center gap-1 cursor-pointer"
+                    >
+                      <Square className="w-3 h-3" />
+                      <span>ఎంపిక తీసివేయండి (Unselect All)</span>
+                    </button>
+                  </div>
+                  <span className="text-[9.5px] text-amber-400 font-mono font-bold">
+                    {assemblyBoothsInput.split(/[, ]+/).filter(Boolean).length} బూతులు ఎంపికయ్యాయి
+                  </span>
                 </div>
+
+                {/* Expandable Booth Selector Grid */}
+                {isBoothSelectorOpen && (
+                  <div className="mt-2 p-2.5 bg-slate-950 rounded-xl border border-slate-800 space-y-2 max-h-52 overflow-y-auto">
+                    {/* Search Filter */}
+                    <div className="relative">
+                      <Search className="w-3.5 h-3.5 absolute left-2.5 top-1/2 -translate-y-1/2 text-slate-400" />
+                      <input
+                        type="text"
+                        value={boothFilterQuery}
+                        onChange={e => setBoothFilterQuery(e.target.value)}
+                        placeholder="బూత్ నెం లేదా గ్రామం ద్వారా వెతకండి..."
+                        className="w-full bg-slate-900 border border-slate-700 rounded-lg pl-8 pr-2 py-1 text-[11px] text-white"
+                      />
+                    </div>
+
+                    {/* Range quick buttons */}
+                    <div className="flex flex-wrap gap-1 text-[9px]">
+                      <span className="text-slate-500 self-center">శ్రేణి:</span>
+                      {[
+                        { label: '1-50', min: 1, max: 50 },
+                        { label: '51-100', min: 51, max: 100 },
+                        { label: '101-150', min: 101, max: 150 },
+                        { label: '151-200', min: 151, max: 200 },
+                        { label: '201-250', min: 201, max: 250 },
+                        { label: '251-290', min: 251, max: 290 },
+                      ].map(r => (
+                        <button
+                          key={r.label}
+                          type="button"
+                          onClick={() => {
+                            const current = new Set(assemblyBoothsInput.split(/[, ]+/).map(Number).filter(Boolean));
+                            for (let i = r.min; i <= r.max; i++) current.add(i);
+                            setAssemblyBoothsInput(Array.from(current).sort((a, b) => a - b).join(', '));
+                          }}
+                          className="px-1.5 py-0.5 rounded bg-slate-800 hover:bg-slate-700 text-slate-300 font-mono cursor-pointer"
+                        >
+                          +{r.label}
+                        </button>
+                      ))}
+                    </div>
+
+                    {/* Booths Badges Grid */}
+                    <div className="flex flex-wrap gap-1">
+                      {(boothsIndex.length > 0 ? boothsIndex : Array.from({ length: 290 }, (_, i) => ({ part_no: i + 1, clean_village: '' })))
+                        .filter(b => {
+                          if (!boothFilterQuery.trim()) return true;
+                          const q = boothFilterQuery.toLowerCase();
+                          return String(b.part_no).includes(q) || (b.clean_village && b.clean_village.toLowerCase().includes(q));
+                        })
+                        .map(b => {
+                          const bNum = Number(b.part_no);
+                          const currentSet = new Set(assemblyBoothsInput.split(/[, ]+/).map(Number).filter(Boolean));
+                          const isSel = currentSet.has(bNum);
+                          return (
+                            <button
+                              key={bNum}
+                              type="button"
+                              onClick={() => {
+                                const next = new Set(currentSet);
+                                if (isSel) next.delete(bNum);
+                                else next.add(bNum);
+                                setAssemblyBoothsInput(Array.from(next).sort((a, b) => a - b).join(', '));
+                              }}
+                              className={`px-1.5 py-0.5 rounded text-[10px] font-mono font-bold transition-all cursor-pointer ${
+                                isSel
+                                  ? 'bg-amber-500 text-slate-950 font-black ring-1 ring-amber-400'
+                                  : 'bg-slate-900 border border-slate-700 text-slate-400 hover:text-white'
+                              }`}
+                              title={b.clean_village || `Booth #${bNum}`}
+                            >
+                              #{bNum}
+                            </button>
+                          );
+                        })}
+                    </div>
+                  </div>
+                )}
               </div>
 
               {/* Municipality / Local Wards Picker */}
@@ -304,9 +446,26 @@ export const AdminAssignmentModal: React.FC<AdminAssignmentModalProps> = ({
                     <button
                       type="button"
                       onClick={() => {
+                        const allW = ['ward_14', 'gollaprolu_ward_11', 'mptc_durgada_1', 'mptc_durgada_3', 'gp_durgada', 'gp_vannepudi'];
+                        setSelectedWards(allW);
+                      }}
+                      className="px-2 py-0.5 bg-amber-500/20 hover:bg-amber-500 hover:text-slate-950 text-amber-300 rounded text-[9.5px] font-bold border border-amber-500/30 transition-colors cursor-pointer"
+                    >
+                      అన్నీ (Select All)
+                    </button>
+                    <button
+                      type="button"
+                      onClick={() => setSelectedWards([])}
+                      className="px-1.5 py-0.5 bg-slate-800 text-slate-400 hover:text-white rounded text-[9.5px] cursor-pointer"
+                    >
+                      తీసివేయండి (Unselect)
+                    </button>
+                    <button
+                      type="button"
+                      onClick={() => {
                         setSelectedWards(prev => Array.from(new Set([...prev, 'mptc_durgada_1', 'mptc_durgada_3'])));
                       }}
-                      className="px-2 py-0.5 bg-teal-500/20 hover:bg-teal-500 hover:text-slate-950 text-teal-300 rounded text-[9.5px] font-bold border border-teal-500/30 transition-colors"
+                      className="px-2 py-0.5 bg-teal-500/20 hover:bg-teal-500 hover:text-slate-950 text-teal-300 rounded text-[9.5px] font-bold border border-teal-500/30 transition-colors cursor-pointer"
                       title="దుర్గడ 2 MPTCలు (MPTC 1 & 3) ఒకేసారి ఎంచుకోండి"
                     >
                       + దుర్గడ 2 MPTCలు
@@ -316,20 +475,11 @@ export const AdminAssignmentModal: React.FC<AdminAssignmentModalProps> = ({
                       onClick={() => {
                         setSelectedWards(prev => Array.from(new Set([...prev, 'gp_durgada', 'gp_vannepudi'])));
                       }}
-                      className="px-2 py-0.5 bg-amber-500/20 hover:bg-amber-500 hover:text-slate-950 text-amber-300 rounded text-[9.5px] font-bold border border-amber-500/30 transition-colors"
+                      className="px-2 py-0.5 bg-amber-500/20 hover:bg-amber-500 hover:text-slate-950 text-amber-300 rounded text-[9.5px] font-bold border border-amber-500/30 transition-colors cursor-pointer"
                       title="దుర్గడ & వన్నెపూడి GPలు రెండూ ఒకేసారి ఎంచుకోండి"
                     >
                       + దుర్గడ & వన్నెపూడి GP
                     </button>
-                    {selectedWards.length > 0 && (
-                      <button
-                        type="button"
-                        onClick={() => setSelectedWards([])}
-                        className="px-1.5 py-0.5 bg-slate-800 text-slate-400 hover:text-white rounded text-[9.5px]"
-                      >
-                        క్లియర్ ✕
-                      </button>
-                    )}
                   </div>
                 </div>
 

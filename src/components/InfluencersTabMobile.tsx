@@ -11,6 +11,7 @@ interface InfluencersTabMobileProps {
   boothInfo: BoothInfo;
   onAddNewInfluencer: () => void;
   onOpenInfluencerAssign: (targetName: string, currentInfId?: string) => void;
+  onOpenBulkAssign?: (infId?: string) => void;
 }
 
 export const InfluencersTabMobile: React.FC<InfluencersTabMobileProps> = ({
@@ -19,7 +20,8 @@ export const InfluencersTabMobile: React.FC<InfluencersTabMobileProps> = ({
   families,
   profiles,
   boothInfo,
-  onAddNewInfluencer
+  onAddNewInfluencer,
+  onOpenBulkAssign
 }) => {
   const [searchQuery, setSearchQuery] = useState('');
   const [expandedInfId, setExpandedInfId] = useState<string | null>(null);
@@ -122,13 +124,25 @@ export const InfluencersTabMobile: React.FC<InfluencersTabMobileProps> = ({
             )}
           </div>
 
-          <button
-            onClick={onAddNewInfluencer}
-            className="px-3 py-2 bg-gradient-to-r from-amber-500 to-amber-600 hover:from-amber-400 hover:to-amber-500 text-slate-950 font-black rounded-xl text-xs flex items-center gap-1 shadow-md shadow-amber-950/40 whitespace-nowrap"
-          >
-            <Plus className="w-4 h-4" />
-            <span>Add Leader</span>
-          </button>
+          <div className="flex items-center gap-1.5 shrink-0">
+            {onOpenBulkAssign && (
+              <button
+                onClick={() => onOpenBulkAssign()}
+                className="px-2.5 py-2 bg-teal-600 hover:bg-teal-500 text-white font-black rounded-xl text-xs flex items-center gap-1 shadow-md whitespace-nowrap cursor-pointer active:scale-95"
+                title="ఓటర్లను ఇన్ఫ్లుయెన్సర్లకు బల్క్ కేటాయించండి"
+              >
+                <Users className="w-3.5 h-3.5" />
+                <span>బల్క్ కేటాయింపు</span>
+              </button>
+            )}
+            <button
+              onClick={onAddNewInfluencer}
+              className="px-3 py-2 bg-gradient-to-r from-amber-500 to-amber-600 hover:from-amber-400 hover:to-amber-500 text-slate-950 font-black rounded-xl text-xs flex items-center gap-1 shadow-md shadow-amber-950/40 whitespace-nowrap active:scale-95 cursor-pointer"
+            >
+              <Plus className="w-4 h-4" />
+              <span>Add Leader</span>
+            </button>
+          </div>
         </div>
       </div>
 
@@ -199,8 +213,8 @@ export const InfluencersTabMobile: React.FC<InfluencersTabMobileProps> = ({
                 </div>
               </div>
 
-              {/* Action Buttons: 1-Click WhatsApp Dispatch */}
-              <div className="grid grid-cols-3 gap-1.5 pt-1 border-t border-slate-800">
+              {/* Action Buttons: 1-Click WhatsApp Dispatch & Bulk Assign */}
+              <div className="grid grid-cols-4 gap-1.5 pt-1 border-t border-slate-800">
                 <a
                   href={`tel:${inf.mobile}`}
                   className="py-2 bg-slate-800 hover:bg-slate-700 text-emerald-400 rounded-xl text-xs font-bold flex items-center justify-center gap-1 border border-slate-700"
@@ -218,6 +232,17 @@ export const InfluencersTabMobile: React.FC<InfluencersTabMobileProps> = ({
                   <MessageSquare className="w-3.5 h-3.5 text-emerald-400" />
                   <span>Chat</span>
                 </a>
+
+                {onOpenBulkAssign && (
+                  <button
+                    onClick={() => onOpenBulkAssign(inf.id)}
+                    className="py-2 bg-amber-500 hover:bg-amber-400 text-slate-950 font-black rounded-xl text-xs flex items-center justify-center gap-1 shadow-sm cursor-pointer"
+                    title="ఈ నాయకుడికి ఓటర్లను బల్క్ కేటాయించండి"
+                  >
+                    <Users className="w-3.5 h-3.5" />
+                    <span>+ఓటర్లు</span>
+                  </button>
+                )}
 
                 <button
                   onClick={() => handleDispatchWhatsApp(inf)}
