@@ -2,16 +2,12 @@ import React, { useState, useMemo } from 'react';
 import {
   Printer,
   X,
-  CheckSquare,
-  Square,
   ArrowUpDown,
-  Phone,
   Users,
-  Building,
+  Layers,
+  ShieldCheck,
   Flag,
-  CheckCircle2,
-  Calendar,
-  Layers
+  FileText
 } from 'lucide-react';
 import { MobileVoter, BoothInfo, VoterCampaignProfile } from '../types';
 import { Language } from '../utils/i18n';
@@ -29,6 +25,8 @@ interface GroupPrintModalProps {
 
 type SortField = 'sno' | 'hn' | 'age_desc' | 'name';
 type PrintLayout = 'slips' | 'table';
+type SlipsPerPage = 4 | 6;
+type BrandingMode = 'neutral' | 'party';
 
 export const GroupPrintModal: React.FC<GroupPrintModalProps> = ({
   isOpen,
@@ -41,6 +39,9 @@ export const GroupPrintModal: React.FC<GroupPrintModalProps> = ({
   language = 'te'
 }) => {
   const [printLayout, setPrintLayout] = useState<PrintLayout>('slips');
+  const [slipsPerPage, setSlipsPerPage] = useState<SlipsPerPage>(4);
+  // Default to 'neutral' (No party symbols or party names in print) as requested
+  const [brandingMode, setBrandingMode] = useState<BrandingMode>('neutral');
   const [sortBy, setSortBy] = useState<SortField>('sno');
   const [showPhone, setShowPhone] = useState<boolean>(true);
   const [showRelation, setShowRelation] = useState<boolean>(true);
@@ -83,7 +84,16 @@ export const GroupPrintModal: React.FC<GroupPrintModalProps> = ({
     return list;
   }, [voters, sortBy, genderFilter]);
 
-  // Statistics calculation
+  // Paginated Voter Chunks for Slip Print (Exact A4 Fit: 4 or 6 slips per page)
+  const slipPages = useMemo(() => {
+    const pages: MobileVoter[][] = [];
+    for (let i = 0; i < sortedVoters.length; i += slipsPerPage) {
+      pages.push(sortedVoters.slice(i, i + slipsPerPage));
+    }
+    return pages;
+  }, [sortedVoters, slipsPerPage]);
+
+  // Statistics calculation for table view
   const stats = useMemo(() => {
     const total = sortedVoters.length;
     let male = 0;
@@ -126,6 +136,9 @@ export const GroupPrintModal: React.FC<GroupPrintModalProps> = ({
   if (!isOpen) return null;
 
   const handlePrint = () => {
+    if (document.activeElement instanceof HTMLElement) {
+      document.activeElement.blur();
+    }
     window.print();
   };
 
@@ -141,39 +154,85 @@ export const GroupPrintModal: React.FC<GroupPrintModalProps> = ({
   });
 
   return (
-    <div className="fixed inset-0 z-50 bg-black/80 backdrop-blur-sm flex flex-col items-center justify-start overflow-y-auto p-2 sm:p-4">
-      {/* Print Specific CSS injected directly */}
+    <div className="group-print-modal-overlay fixed inset-0 z-50 bg-black/80 backdrop-blur-sm flex flex-col items-center justify-start overflow-y-auto p-2 sm:p-4">
+      {/* Comprehensive Print CSS for Exact A4 Fit & Proper Multi-Page Pagination */}
       <style>{`
         @media print {
           @page {
             size: A4 portrait;
-            margin: 6mm 6mm 6mm 6mm;
+            margin: 8mm 6mm;
           }
-          body * {
-            visibility: hidden !important;
-          }
-          #group-printable-content, #group-printable-content * {
-            visibility: visible !important;
-          }
-          #group-printable-content {
-            position: absolute !important;
-            left: 0 !important;
-            top: 0 !important;
-            width: 100% !important;
+
+          html, body {
             margin: 0 !important;
             padding: 0 !important;
             background: #ffffff !important;
             color: #000000 !important;
-            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif !important;
+            height: auto !important;
+            min-height: 0 !important;
+            overflow: visible !important;
+            -webkit-print-color-adjust: exact !important;
+            print-color-adjust: exact !important;
           }
-          .no-print {
+
+          /* Hide everything in app outside our printable content */
+          header, nav, main, footer, .no-print, [role="navigation"] {
             display: none !important;
           }
-          .print-slips-grid {
-            display: grid !important;
-            grid-template-columns: 1fr 1fr !important;
-            gap: 6mm !important;
+
+          /* Unfix modal overlay to standard block flow so all pages paginate properly */
+          .group-print-modal-overlay {
+            position: static !important;
+            inset: auto !important;
+            display: block !important;
+            width: 100% !important;
+            height: auto !important;
+            padding: 0 !important;
+            margin: 0 !important;
+            background: transparent !important;
+            overflow: visible !important;
+            backdrop-filter: none !important;
           }
+
+          #group-printable-content {
+            position: static !important;
+            display: block !important;
+            width: 100% !important;
+            max-width: 100% !important;
+            margin: 0 !important;
+            padding: 0 !important;
+            background: #ffffff !important;
+            border: none !important;
+            box-shadow: none !important;
+          }
+
+          /* Each A4 Page is an isolated print sheet that breaks cleanly */
+          .a4-print-page {
+            width: 196mm !important;
+            max-width: 196mm !important;
+            min-height: 275mm !important;
+            height: 275mm !important;
+            box-sizing: border-box !important;
+            margin: 0 auto !important;
+            padding: 2mm 0 !important;
+            border: none !important;
+            box-shadow: none !important;
+            display: flex !important;
+            flex-direction: column !important;
+            justify-content: space-between !important;
+            page-break-after: always !important;
+            break-after: page !important;
+            page-break-inside: avoid !important;
+            break-inside: avoid !important;
+            overflow: hidden !important;
+            background: #ffffff !important;
+          }
+
+          .a4-print-page:last-child {
+            page-break-after: auto !important;
+            break-after: auto !important;
+          }
+
           .voter-slip-card {
             page-break-inside: avoid !important;
             break-inside: avoid !important;
@@ -181,21 +240,34 @@ export const GroupPrintModal: React.FC<GroupPrintModalProps> = ({
             background: #ffffff !important;
             box-shadow: none !important;
           }
+
           .print-border {
             border: 1px solid #334155 !important;
           }
+
           .print-header-bg {
             background-color: #f1f5f9 !important;
             -webkit-print-color-adjust: exact !important;
             print-color-adjust: exact !important;
           }
+
           .print-zebra:nth-child(even) {
             background-color: #f8fafc !important;
             -webkit-print-color-adjust: exact !important;
             print-color-adjust: exact !important;
           }
+
+          table {
+            page-break-inside: auto !important;
+          }
+
+          thead {
+            display: table-header-group !important;
+          }
+
           tr {
             page-break-inside: avoid !important;
+            break-inside: avoid !important;
           }
         }
       `}</style>
@@ -210,10 +282,10 @@ export const GroupPrintModal: React.FC<GroupPrintModalProps> = ({
             <div>
               <h2 className="text-sm font-black text-white flex items-center gap-1.5">
                 <span>{title}</span>
-                <span className="text-amber-400 font-mono text-xs">({sortedVoters.length} మంది)</span>
+                <span className="text-amber-400 font-mono text-xs">({sortedVoters.length} మంది ఓటర్లు)</span>
               </h2>
               <p className="text-[11px] text-slate-400">
-                {subtitle || `${boothHeaderLabel} • A4 ప్రింట్ రెడీ`}
+                {subtitle || `${boothHeaderLabel} • A4 ప్రింట్ సిద్ధం`}
               </p>
             </div>
           </div>
@@ -221,7 +293,7 @@ export const GroupPrintModal: React.FC<GroupPrintModalProps> = ({
           <div className="flex items-center gap-2">
             <button
               onClick={handlePrint}
-              className="px-4 py-2 bg-gradient-to-r from-red-600 to-amber-600 hover:from-red-500 hover:to-amber-500 text-white font-black rounded-xl text-xs flex items-center gap-1.5 shadow-lg shadow-red-950/40 hover:scale-105 active:scale-95 transition-all"
+              className="px-4 py-2 bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-500 hover:to-indigo-500 text-white font-black rounded-xl text-xs flex items-center gap-1.5 shadow-lg shadow-blue-950/40 hover:scale-105 active:scale-95 transition-all"
             >
               <Printer className="w-4 h-4" />
               <span>🖨️ A4 పేపర్‌పై ప్రింట్ చేయండి</span>
@@ -236,71 +308,91 @@ export const GroupPrintModal: React.FC<GroupPrintModalProps> = ({
           </div>
         </div>
 
-        {/* Layout Switcher Bar */}
-        <div className="flex items-center justify-between gap-2 flex-wrap pt-2 border-t border-slate-800">
+        {/* Toolbar Row 1: Layout & Branding Toggles */}
+        <div className="flex items-center justify-between gap-2 flex-wrap pt-2 border-t border-slate-800 text-[11px]">
+          {/* Layout switcher */}
           <div className="flex items-center gap-1 bg-slate-800/80 p-1 rounded-xl border border-slate-700">
             <button
               type="button"
-              onClick={() => setPrintLayout('slips')}
-              className={`px-3 py-1.5 rounded-lg text-xs font-black flex items-center gap-1.5 transition-all ${
-                printLayout === 'slips'
+              onClick={() => {
+                setPrintLayout('slips');
+                setSlipsPerPage(4);
+              }}
+              className={`px-2.5 py-1.5 rounded-lg text-xs font-black flex items-center gap-1 transition-all ${
+                printLayout === 'slips' && slipsPerPage === 4
                   ? 'bg-amber-500 text-slate-950 shadow-md'
                   : 'text-slate-300 hover:text-white'
               }`}
+              title="పేజీకి 4 ఓటర్ స్లిప్పులు (సిఫార్సు చేయబడిన సైజు - కత్తిరించుకోవడానికి అనువు)"
             >
               <Layers className="w-3.5 h-3.5" />
-              <span>🗳️ ఓటర్ స్లిప్పులు (Voter Slips - 4/A4)</span>
+              <span>🗳️ 4 స్లిప్పులు / A4</span>
+            </button>
+            <button
+              type="button"
+              onClick={() => {
+                setPrintLayout('slips');
+                setSlipsPerPage(6);
+              }}
+              className={`px-2.5 py-1.5 rounded-lg text-xs font-black flex items-center gap-1 transition-all ${
+                printLayout === 'slips' && slipsPerPage === 6
+                  ? 'bg-amber-500 text-slate-950 shadow-md'
+                  : 'text-slate-300 hover:text-white'
+              }`}
+              title="పేజీకి 6 ఓటర్ స్లిప్పులు (పేపర్ పొదుపు కాంపాక్ట్ సైజు)"
+            >
+              <Layers className="w-3.5 h-3.5" />
+              <span>🗳️ 6 స్లిప్పులు / A4</span>
             </button>
             <button
               type="button"
               onClick={() => setPrintLayout('table')}
-              className={`px-3 py-1.5 rounded-lg text-xs font-black flex items-center gap-1.5 transition-all ${
+              className={`px-2.5 py-1.5 rounded-lg text-xs font-black flex items-center gap-1 transition-all ${
                 printLayout === 'table'
                   ? 'bg-amber-500 text-slate-950 shadow-md'
                   : 'text-slate-300 hover:text-white'
               }`}
             >
               <Users className="w-3.5 h-3.5" />
-              <span>📋 ఓటర్ల జాబితా (Roster Table)</span>
+              <span>📋 ఓటర్ల జాబితా (Table)</span>
             </button>
           </div>
 
-          {/* Gender Filter Buttons */}
-          <div className="flex items-center gap-1 text-[11px]">
-            <span className="text-slate-400 font-bold mr-1">లింగం:</span>
+          {/* Branding Toggle: Neutral (Official / No Party Symbols) vs Party */}
+          <div className="flex items-center gap-1 bg-slate-800/80 p-1 rounded-xl border border-slate-700">
+            <span className="text-slate-400 font-bold px-1 text-[10px]">ఫార్మాట్:</span>
             <button
               type="button"
-              onClick={() => setGenderFilter('all')}
-              className={`px-2 py-1 rounded-lg text-[10px] font-bold transition-all ${
-                genderFilter === 'all' ? 'bg-amber-500 text-slate-950 font-black' : 'bg-slate-800 text-slate-300'
+              onClick={() => setBrandingMode('neutral')}
+              className={`px-2.5 py-1 rounded-lg text-xs font-bold flex items-center gap-1 transition-all ${
+                brandingMode === 'neutral'
+                  ? 'bg-emerald-500 text-slate-950 font-black shadow-md'
+                  : 'text-slate-300 hover:text-white'
               }`}
+              title="పార్టీ గుర్తులు మరియు పేర్లు లేకుండా స్వచ్ఛమైన అధికారిక ఓటరు చీటీ ఫార్మాట్"
             >
-              అందరూ
+              <ShieldCheck className="w-3.5 h-3.5" />
+              <span>🏛️ అధికారిక ఓటరు చీటీ (పార్టీ గుర్తులు లేవు)</span>
             </button>
             <button
               type="button"
-              onClick={() => setGenderFilter('M')}
-              className={`px-2 py-1 rounded-lg text-[10px] font-bold transition-all ${
-                genderFilter === 'M' ? 'bg-amber-500 text-slate-950 font-black' : 'bg-slate-800 text-slate-300'
+              onClick={() => setBrandingMode('party')}
+              className={`px-2.5 py-1 rounded-lg text-xs font-bold flex items-center gap-1 transition-all ${
+                brandingMode === 'party'
+                  ? 'bg-red-600 text-white font-black shadow-md'
+                  : 'text-slate-300 hover:text-white'
               }`}
+              title="జనసేన పార్టీ పేరు, జెండా మరియు గాజు గ్లాసు గుర్తుతో"
             >
-              👨 పురుషులు
-            </button>
-            <button
-              type="button"
-              onClick={() => setGenderFilter('F')}
-              className={`px-2 py-1 rounded-lg text-[10px] font-bold transition-all ${
-                genderFilter === 'F' ? 'bg-amber-500 text-slate-950 font-black' : 'bg-slate-800 text-slate-300'
-              }`}
-            >
-              👩 మహిళలు
+              <Flag className="w-3.5 h-3.5" />
+              <span>🚩 జనసేన బ్రాండింగ్</span>
             </button>
           </div>
         </div>
 
-        {/* Options & Sorting Toolbar */}
+        {/* Toolbar Row 2: Sorting, Filters & Options */}
         <div className="flex items-center justify-between gap-2 flex-wrap pt-2 border-t border-slate-800 text-[11px]">
-          {/* Sorting buttons */}
+          {/* Sorting */}
           <div className="flex items-center gap-1 flex-wrap">
             <span className="text-slate-400 font-bold flex items-center gap-1 mr-1">
               <ArrowUpDown className="w-3 h-3 text-amber-400" /> అమరిక:
@@ -339,7 +431,39 @@ export const GroupPrintModal: React.FC<GroupPrintModalProps> = ({
             </button>
           </div>
 
-          {/* Column toggles (Only for Table Mode) */}
+          {/* Gender Filter */}
+          <div className="flex items-center gap-1 text-[11px]">
+            <span className="text-slate-400 font-bold mr-1">లింగం:</span>
+            <button
+              type="button"
+              onClick={() => setGenderFilter('all')}
+              className={`px-2 py-1 rounded-lg text-[10px] font-bold transition-all ${
+                genderFilter === 'all' ? 'bg-amber-500 text-slate-950 font-black' : 'bg-slate-800 text-slate-300'
+              }`}
+            >
+              అందరూ ({voters.length})
+            </button>
+            <button
+              type="button"
+              onClick={() => setGenderFilter('M')}
+              className={`px-2 py-1 rounded-lg text-[10px] font-bold transition-all ${
+                genderFilter === 'M' ? 'bg-amber-500 text-slate-950 font-black' : 'bg-slate-800 text-slate-300'
+              }`}
+            >
+              👨 పురుషులు
+            </button>
+            <button
+              type="button"
+              onClick={() => setGenderFilter('F')}
+              className={`px-2 py-1 rounded-lg text-[10px] font-bold transition-all ${
+                genderFilter === 'F' ? 'bg-amber-500 text-slate-950 font-black' : 'bg-slate-800 text-slate-300'
+              }`}
+            >
+              👩 మహిళలు
+            </button>
+          </div>
+
+          {/* Table Mode Specific Columns */}
           {printLayout === 'table' && (
             <div className="flex items-center gap-2 flex-wrap">
               <label className="flex items-center gap-1 cursor-pointer select-none text-slate-300 hover:text-white">
@@ -384,186 +508,314 @@ export const GroupPrintModal: React.FC<GroupPrintModalProps> = ({
       </div>
 
       {/* =========================================================================
-          PRINTABLE CONTAINER (Previewed on screen as crisp A4 paper, printed 1:1)
+          PRINTABLE CONTAINER
+          Multi-page discrete A4 sheets: Each sheet is exactly 1 A4 page.
           ========================================================================= */}
-      <div
-        id="group-printable-content"
-        className="w-full max-w-4xl bg-white text-slate-900 rounded-xl shadow-2xl p-4 sm:p-7 border border-slate-200"
-      >
-        {/* Header Section */}
-        <div className="border-b-2 border-slate-900 pb-3 mb-3">
-          <div className="flex items-start justify-between gap-4">
-            {/* Left: Party Title & Slogan */}
-            <div className="space-y-0.5">
-              <div className="flex items-center gap-2">
-                <span className="text-xl">🚩</span>
-                <div>
-                  <h1 className="text-base sm:text-lg font-black tracking-tight text-red-700 uppercase">
-                    జనసేన పార్టీ • JANASENA PARTY
-                  </h1>
-                  <p className="text-[11px] font-bold text-slate-700">
-                    {boothHeaderLabel}
-                  </p>
-                </div>
-              </div>
-            </div>
-
-            {/* Right: Glass Symbol & Date */}
-            <div className="text-right flex flex-col items-end">
-              <div className="inline-flex items-center gap-1 bg-amber-50 border border-amber-500 px-2.5 py-0.5 rounded-full text-amber-900 font-black text-xs">
-                <span>🥛 గాజు గ్లాసు గుర్తుకే మన ఓటు</span>
-              </div>
-              <span className="text-[10px] text-slate-500 font-mono mt-1">
-                ముద్రణ తేదీ: {todayDate}
-              </span>
-            </div>
-          </div>
-
-          {/* Group Title Banner */}
-          <div className="mt-2.5 pt-2 border-t border-slate-200 flex items-center justify-between flex-wrap gap-2">
-            <div>
-              <span className="text-[10px] font-bold text-slate-500 uppercase tracking-wider block">
-                {printLayout === 'slips' ? 'అధికారిక ఓటర్ సమాచార చీటీలు (Voter Slips)' : 'గ్రూప్ / వంశ ఓటర్ల జాబితా (Voter Roster)'}
-              </span>
-              <h2 className="text-base sm:text-lg font-black text-slate-900">
-                {title}
-              </h2>
-            </div>
-            <div className="text-right text-[11px] text-slate-700 font-medium">
-              <span>పోలింగ్ కేంద్రం: </span>
-              <strong className="font-bold text-slate-900">{boothInfo.ps_address}</strong>
-            </div>
-          </div>
-        </div>
-
+      <div id="group-printable-content" className="w-full max-w-4xl space-y-4">
         {printLayout === 'slips' ? (
-          /* ==========================================
-             VOTER SLIPS VIEW (4 SLIPS PER A4 PAGE)
-             ========================================== */
-          <div className="print-slips-grid grid grid-cols-1 sm:grid-cols-2 gap-4">
-            {sortedVoters.map((v, index) => {
-              const voterSno = v.s ?? (v as any).sno;
-              const prof = voterSno ? profiles[voterSno] || {} : {};
-              const phone = prof.customPhone || v.k_m;
-              const voterId = v.id || (v as any).epic || '';
-              const voterName = v.n || ((v as any).name_en && (v as any).name_te ? `${(v as any).name_en} (${(v as any).name_te})` : (v as any).name_te || (v as any).name_en || '');
-              const voterRel = v.r || ((v as any).rel_name_en && (v as any).rel_name_te ? `${(v as any).rel_name_en} (${(v as any).rel_name_te})` : (v as any).rel_name_te || (v as any).rel_name_en || '');
-              const voterAge = v.a || (v as any).age || '';
-              const isMale = v.g === 'M' || (v as any).gender_en === 'Male' || (v as any).gender_te === 'పురుషుడు';
-              const voterHn = v.hn || (v as any).house_no || '';
-
-              return (
-                <div
-                  key={voterSno || index}
-                  className="voter-slip-card border-2 border-dashed border-slate-700 rounded-xl p-3 bg-white text-slate-900 break-inside-avoid flex flex-col justify-between shadow-sm relative"
-                >
-                  {/* Slip Header */}
-                  <div className="flex items-center justify-between border-b-2 border-slate-900 pb-1.5 mb-2">
-                    <div className="flex items-center gap-1.5">
-                      <span className="text-xl">🚩</span>
-                      <div>
-                        <div className="text-[13px] font-black tracking-tight text-red-700 uppercase leading-none">
-                          జనసేన పార్టీ • JANASENA
-                        </div>
-                        <div className="text-[9px] font-bold text-slate-600 mt-0.5">
-                          పిఠాపురం శాసనసభ (AC #37)
-                        </div>
-                      </div>
-                    </div>
-
-                    <div className="text-right flex items-center gap-1 bg-amber-100 border border-amber-400 px-2 py-0.5 rounded-full text-amber-950 font-black text-[11px]">
-                      <span>🥛 గాజు గ్లాసు</span>
-                    </div>
-                  </div>
-
-                  {/* Serial & Booth Numbers Bar */}
-                  <div className="grid grid-cols-3 gap-1 bg-slate-100 border border-slate-300 rounded-lg p-1.5 mb-2 text-center print-header-bg">
-                    <div>
-                      <div className="text-[8.5px] uppercase font-bold text-slate-600">క్రమ సంఖ్య</div>
-                      <div className="font-mono font-black text-lg text-red-700 leading-tight">#{voterSno}</div>
-                    </div>
-                    <div className="border-x border-slate-300">
-                      <div className="text-[8.5px] uppercase font-bold text-slate-600">పోలింగ్ బూత్</div>
-                      <div className="font-mono font-black text-sm text-slate-900 leading-tight">
-                        Part #{boothInfo.part_no || boothInfo.ward_no}
-                      </div>
-                    </div>
-                    <div>
-                      <div className="text-[8.5px] uppercase font-bold text-slate-600">వార్డు / గ్రామం</div>
-                      <div className="font-bold text-[11px] text-slate-900 leading-tight truncate">
-                        {boothInfo.ward_no ? `${boothInfo.ward_no}వ వార్డు` : boothInfo.clean_village || 'పిఠాపురం'}
-                      </div>
+          /* =======================================================================
+             VOTER SLIPS VIEW: Discrete A4 Pages (4 or 6 slips per page, NO OVERFLOW)
+             ======================================================================= */
+          slipPages.map((pageVoters, pageIndex) => (
+            <div
+              key={pageIndex}
+              className="a4-print-page w-full bg-white text-slate-900 rounded-xl shadow-2xl p-4 sm:p-6 border border-slate-300 mx-auto"
+            >
+              {/* Page Header */}
+              <div className="border-b-2 border-slate-900 pb-2 mb-2">
+                <div className="flex items-start justify-between gap-3">
+                  <div className="space-y-0.5">
+                    <div className="flex items-center gap-2">
+                      {brandingMode === 'party' ? (
+                        <>
+                          <span className="text-xl">🚩</span>
+                          <div>
+                            <h1 className="text-sm sm:text-base font-black tracking-tight text-red-700 uppercase leading-tight">
+                              జనసేన పార్టీ • JANASENA PARTY
+                            </h1>
+                            <p className="text-[10px] font-bold text-slate-700 leading-tight">
+                              {boothHeaderLabel}
+                            </p>
+                          </div>
+                        </>
+                      ) : (
+                        <>
+                          <div className="w-7 h-7 bg-slate-900 text-white font-black text-[11px] rounded flex items-center justify-center shrink-0 tracking-wider">
+                            ECI
+                          </div>
+                          <div>
+                            <h1 className="text-sm sm:text-base font-black tracking-tight text-slate-900 uppercase leading-tight">
+                              ఓటరు సమాచార చీటీలు • VOTER INFORMATION SLIPS
+                            </h1>
+                            <p className="text-[10px] font-bold text-slate-700 leading-tight">
+                              {boothHeaderLabel}
+                            </p>
+                          </div>
+                        </>
+                      )}
                     </div>
                   </div>
 
-                  {/* Voter Details */}
-                  <div className="space-y-1.5 mb-2 text-xs">
-                    <div className="flex items-start justify-between border-b border-slate-200 pb-1 gap-2">
-                      <span className="text-slate-500 text-[10px] font-bold shrink-0">ఓటరు పేరు:</span>
-                      <span className="font-black text-slate-950 text-sm text-right leading-tight break-words">{voterName}</span>
+                  <div className="text-right flex flex-col items-end shrink-0">
+                    <div className="inline-flex items-center gap-1 bg-slate-100 border border-slate-300 px-2.5 py-0.5 rounded-full text-slate-900 font-bold text-[10.5px]">
+                      {brandingMode === 'party' ? (
+                        <span>🥛 గాజు గ్లాసు గుర్తుకే మన ఓటు</span>
+                      ) : (
+                        <span>అధికారిక ఓటరు చీటీ</span>
+                      )}
                     </div>
-
-                    <div className="flex items-center justify-between border-b border-slate-200 pb-1 gap-2">
-                      <span className="text-slate-500 text-[10px] font-bold shrink-0">సంబంధీకుడు:</span>
-                      <span className="font-bold text-slate-800 text-xs text-right truncate">{voterRel || '—'}</span>
-                    </div>
-
-                    <div className="flex items-center justify-between border-b border-slate-200 pb-1">
-                      <span className="text-slate-500 text-[10px] font-bold">ఓటరు ID (EPIC):</span>
-                      <span className="font-mono font-black text-xs text-slate-950 tracking-wider bg-slate-100 px-2 py-0.5 rounded border border-slate-300">
-                        {voterId}
-                      </span>
-                    </div>
-
-                    <div className="grid grid-cols-2 gap-2 pt-0.5 text-[11px]">
-                      <div>
-                        <span className="text-slate-500 text-[9.5px] font-bold block">ఇంటి నెంబర్:</span>
-                        <span className="font-mono font-black text-xs text-slate-900">{voterHn || '—'}</span>
-                      </div>
-                      <div>
-                        <span className="text-slate-500 text-[9.5px] font-bold block">వయస్సు / లింగం:</span>
-                        <span className="font-bold text-xs text-slate-900">
-                          {voterAge} సం॥ • {isMale ? 'పురుషుడు' : 'స్త్రీ'}
-                        </span>
-                      </div>
-                    </div>
-
-                    {phone && (
-                      <div className="flex items-center justify-between border-t border-dashed border-slate-200 pt-1 text-[10.5px]">
-                        <span className="text-slate-500 font-bold">ఫోన్:</span>
-                        <span className="font-mono font-bold text-slate-900">{phone}</span>
-                      </div>
-                    )}
-                  </div>
-
-                  {/* Polling Station Address */}
-                  <div className="bg-amber-50/60 border border-amber-300 rounded-lg p-1.5 mb-2 text-[10px] text-slate-800 leading-tight">
-                    <div>
-                      <strong>📍 పోలింగ్ కేంద్రం:</strong> {boothInfo.ps_address || 'స్థానిక పోలింగ్ కేంద్రం'}
-                    </div>
-                    <div className="text-[9px] text-slate-600 mt-1 flex justify-between">
-                      <span>⏰ సమయం: ఉ॥ 7:00 – సా॥ 6:00</span>
-                      <span className="font-bold text-red-700">గుర్తింపు కార్డు వెంట తీసుకురండి</span>
-                    </div>
-                  </div>
-
-                  {/* Slogan & Perforation Cut Line */}
-                  <div className="border-t border-dashed border-slate-400 pt-1 flex items-center justify-between text-[9px] text-slate-600">
-                    <span className="flex items-center gap-1 font-black text-red-700">
-                      <span>✂️ కట్ చేసుకోండి</span>
-                      <span>• గాజు గ్లాసు గుర్తుకే మన ఓటు 🥛</span>
+                    <span className="text-[9.5px] text-slate-500 font-mono mt-0.5">
+                      పేజీ {pageIndex + 1} / {slipPages.length} • ముద్రణ తేదీ: {todayDate}
                     </span>
-                    <span className="font-mono text-[8px] text-slate-400">JSP IT Cell</span>
                   </div>
                 </div>
-              );
-            })}
-          </div>
+
+                {/* Sub-header: Group Title & Polling Station */}
+                <div className="mt-1.5 pt-1.5 border-t border-slate-200 flex items-center justify-between text-[10.5px] leading-tight">
+                  <div className="font-bold text-slate-900 flex items-center gap-1.5">
+                    <span>{title}</span>
+                    <span className="text-slate-500 text-[10px] font-normal">
+                      (మొత్తం {sortedVoters.length} ఓటర్లు • ఈ పేజీలో {pageVoters.length})
+                    </span>
+                  </div>
+                  <div className="text-right text-[10px] text-slate-700 truncate max-w-[280px]">
+                    <strong>కేంద్రం:</strong> {boothInfo.clean_village || boothInfo.ps_address}
+                  </div>
+                </div>
+              </div>
+
+              {/* Slips Grid (2 columns; 2 rows for 4/page, 3 rows for 6/page) */}
+              <div
+                className={`grid grid-cols-2 gap-3 flex-1 ${
+                  slipsPerPage === 6 ? 'grid-rows-3' : 'grid-rows-2'
+                }`}
+              >
+                {pageVoters.map((v, idx) => {
+                  const voterSno = v.s ?? (v as any).sno;
+                  const prof = voterSno ? profiles[voterSno] || {} : {};
+                  const phone = prof.customPhone || v.k_m;
+                  const voterId = v.id || (v as any).epic || '';
+                  const voterName =
+                    v.n ||
+                    ((v as any).name_en && (v as any).name_te
+                      ? `${(v as any).name_en} (${(v as any).name_te})`
+                      : (v as any).name_te || (v as any).name_en || '');
+                  const voterRel =
+                    v.r ||
+                    ((v as any).rel_name_en && (v as any).rel_name_te
+                      ? `${(v as any).rel_name_en} (${(v as any).rel_name_te})`
+                      : (v as any).rel_name_te || (v as any).rel_name_en || '');
+                  const voterAge = v.a || (v as any).age || '';
+                  const isMale =
+                    v.g === 'M' || (v as any).gender_en === 'Male' || (v as any).gender_te === 'పురుషుడు';
+                  const voterHn = v.hn || (v as any).house_no || '';
+
+                  return (
+                    <div
+                      key={voterSno || idx}
+                      className={`voter-slip-card border-2 border-dashed border-slate-700 rounded-xl bg-white text-slate-900 break-inside-avoid flex flex-col justify-between shadow-sm relative min-w-0 ${
+                        slipsPerPage === 6 ? 'p-2' : 'p-2.5'
+                      }`}
+                    >
+                      {/* Slip Card Top Header */}
+                      <div className="flex items-center justify-between border-b-2 border-slate-900 pb-1 mb-1.5">
+                        {brandingMode === 'party' ? (
+                          <>
+                            <div className="flex items-center gap-1.5 min-w-0">
+                              <span className="text-base shrink-0">🚩</span>
+                              <div className="min-w-0">
+                                <div className="text-[11.5px] font-black tracking-tight text-red-700 uppercase leading-none truncate">
+                                  జనసేన పార్టీ • JANASENA
+                                </div>
+                                <div className="text-[8.5px] font-bold text-slate-600 mt-0.5 truncate">
+                                  పిఠాపురం శాసనసభ (AC #37)
+                                </div>
+                              </div>
+                            </div>
+                            <div className="text-right flex items-center gap-1 bg-amber-100 border border-amber-400 px-1.5 py-0.5 rounded-full text-amber-950 font-black text-[9.5px] shrink-0">
+                              <span>🥛 గాజు గ్లాసు</span>
+                            </div>
+                          </>
+                        ) : (
+                          <>
+                            <div className="min-w-0">
+                              <div className="text-[11.5px] font-black tracking-tight text-slate-900 uppercase leading-none truncate">
+                                ఓటరు సమాచార చీటీ • VOTER SLIP
+                              </div>
+                              <div className="text-[8.5px] font-bold text-slate-600 mt-0.5 truncate">
+                                పిఠాపురం శాసనసభ నియోజకవర్గం (AC #37)
+                              </div>
+                            </div>
+                            <div className="text-right bg-slate-100 border border-slate-400 px-1.5 py-0.5 rounded font-black text-[9.5px] text-slate-800 shrink-0">
+                              Part #{boothInfo.part_no || boothInfo.ward_no}
+                            </div>
+                          </>
+                        )}
+                      </div>
+
+                      {/* Serial Number & Booth Bar */}
+                      <div className="grid grid-cols-3 gap-1 bg-slate-100 border border-slate-300 rounded-lg p-1 mb-1.5 text-center print-header-bg">
+                        <div>
+                          <div className="text-[7.5px] uppercase font-bold text-slate-600">క్రమ సంఖ్య</div>
+                          <div className="font-mono font-black text-base text-red-700 leading-tight">
+                            #{voterSno}
+                          </div>
+                        </div>
+                        <div className="border-x border-slate-300">
+                          <div className="text-[7.5px] uppercase font-bold text-slate-600">పోలింగ్ బూత్</div>
+                          <div className="font-mono font-black text-xs text-slate-900 leading-tight truncate">
+                            Part #{boothInfo.part_no || boothInfo.ward_no}
+                          </div>
+                        </div>
+                        <div>
+                          <div className="text-[7.5px] uppercase font-bold text-slate-600">వార్డు / గ్రామం</div>
+                          <div className="font-bold text-[10px] text-slate-900 leading-tight truncate">
+                            {boothInfo.ward_no
+                              ? `${boothInfo.ward_no}వ వార్డు`
+                              : boothInfo.clean_village || 'పిఠాపురం'}
+                          </div>
+                        </div>
+                      </div>
+
+                      {/* Voter Details (Word-wrapping enabled, no truncation) */}
+                      <div
+                        className={`space-y-1 mb-1 text-xs ${
+                          slipsPerPage === 6 ? 'leading-tight text-[10px]' : ''
+                        }`}
+                      >
+                        {/* Voter Name */}
+                        <div className="flex items-start justify-between border-b border-slate-200 pb-0.5 gap-1.5">
+                          <span className="text-slate-500 text-[9.5px] font-bold shrink-0">ఓటరు పేరు:</span>
+                          <span className="font-black text-slate-950 text-xs sm:text-[12.5px] text-right leading-snug break-words min-w-0">
+                            {voterName}
+                          </span>
+                        </div>
+
+                        {/* Relative Name */}
+                        <div className="flex items-start justify-between border-b border-slate-200 pb-0.5 gap-1.5">
+                          <span className="text-slate-500 text-[9.5px] font-bold shrink-0">సంబంధీకుడు:</span>
+                          <span className="font-bold text-slate-800 text-[11px] text-right leading-snug break-words min-w-0">
+                            {voterRel || '—'}
+                          </span>
+                        </div>
+
+                        {/* EPIC ID */}
+                        <div className="flex items-center justify-between border-b border-slate-200 pb-0.5 gap-1.5">
+                          <span className="text-slate-500 text-[9.5px] font-bold shrink-0">ఓటరు ID (EPIC):</span>
+                          <span className="font-mono font-black text-[11.5px] text-slate-950 tracking-wider bg-slate-100 px-1.5 py-0.2 rounded border border-slate-300 shrink-0">
+                            {voterId || '—'}
+                          </span>
+                        </div>
+
+                        {/* House No & Age / Gender */}
+                        <div className="grid grid-cols-2 gap-2 pt-0.5 text-[10.5px]">
+                          <div className="min-w-0">
+                            <span className="text-slate-500 text-[8.5px] font-bold block">ఇంటి నెంబర్:</span>
+                            <span className="font-mono font-black text-xs text-slate-900 truncate block">
+                              {voterHn || '—'}
+                            </span>
+                          </div>
+                          <div className="min-w-0 text-right">
+                            <span className="text-slate-500 text-[8.5px] font-bold block">వయస్సు / లింగం:</span>
+                            <span className="font-bold text-xs text-slate-900">
+                              {voterAge} సం॥ • {isMale ? 'పురుషుడు' : 'స్త్రీ'}
+                            </span>
+                          </div>
+                        </div>
+
+                        {/* Phone if available */}
+                        {phone && (
+                          <div className="flex items-center justify-between border-t border-dashed border-slate-200 pt-0.5 text-[10px]">
+                            <span className="text-slate-500 font-bold">ఫోన్:</span>
+                            <span className="font-mono font-bold text-slate-900">{phone}</span>
+                          </div>
+                        )}
+                      </div>
+
+                      {/* Polling Station Address */}
+                      <div className="bg-slate-50 border border-slate-300 rounded-lg p-1.5 mb-1 text-[9px] text-slate-800 leading-tight">
+                        <div className="break-words">
+                          <strong>📍 పోలింగ్ కేంద్రం:</strong> {boothInfo.ps_address || 'స్థానిక పోలింగ్ కేంద్రం'}
+                        </div>
+                        <div className="text-[8px] text-slate-600 mt-0.5 flex justify-between gap-1 flex-wrap">
+                          <span>⏰ సమయం: ఉ॥ 7:00 – సా॥ 6:00</span>
+                          <span className="font-bold text-slate-900">గుర్తింపు కార్డు తప్పనిసరి</span>
+                        </div>
+                      </div>
+
+                      {/* Bottom Cut Line */}
+                      <div className="border-t border-dashed border-slate-400 pt-1 flex items-center justify-between text-[8px] text-slate-600">
+                        {brandingMode === 'party' ? (
+                          <>
+                            <span className="flex items-center gap-1 font-black text-red-700">
+                              <span>✂️ కట్ చేసుకోండి</span>
+                              <span>• గాజు గ్లాసు గుర్తుకే మన ఓటు 🥛</span>
+                            </span>
+                            <span className="font-mono text-[7.5px] text-slate-400">JSP IT Cell</span>
+                          </>
+                        ) : (
+                          <>
+                            <span className="font-bold text-slate-700">
+                              ✂️ కట్ చేసుకోండి • పోలింగ్ రోజున గుర్తింపు కార్డు వెంట తీసుకురండి
+                            </span>
+                            <span className="font-mono text-[7.5px] text-slate-500 font-bold uppercase">
+                              Voter Slip
+                            </span>
+                          </>
+                        )}
+                      </div>
+                    </div>
+                  );
+                })}
+              </div>
+
+              {/* Page Footer */}
+              <div className="mt-2 pt-1 border-t border-slate-300 flex items-center justify-between text-[8.5px] text-slate-500 leading-none">
+                {brandingMode === 'party' ? (
+                  <>
+                    <p className="font-bold text-slate-700">
+                      జనసేన పార్టీ పిఠాపురం నియోజకవర్గ కేంద్ర సమన్వయ కార్యాలయం
+                    </p>
+                    <div className="text-right font-mono font-bold text-slate-700">
+                      <span>గాజు గ్లాసు గుర్తు • గెలుపే మన లక్ష్యం 🚩</span>
+                    </div>
+                  </>
+                ) : (
+                  <>
+                    <p className="font-bold text-slate-700">
+                      భారత ఎన్నికల సంఘం సూచనల మేరకు ఓటరు సమాచార చీటీలు • పిఠాపురం నియోజకవర్గం (AC #37)
+                    </p>
+                    <div className="text-right font-mono font-bold text-slate-600">
+                      పేజీ {pageIndex + 1} / {slipPages.length}
+                    </div>
+                  </>
+                )}
+              </div>
+            </div>
+          ))
         ) : (
-          /* ==========================================
+          /* =======================================================================
              TABLE / ROSTER VIEW
-             ========================================== */
-          <div>
+             ======================================================================= */
+          <div className="w-full bg-white text-slate-900 rounded-xl shadow-2xl p-4 sm:p-6 border border-slate-300">
+            {/* Header */}
+            <div className="border-b-2 border-slate-900 pb-2 mb-3 flex items-start justify-between gap-3">
+              <div>
+                <h1 className="text-base sm:text-lg font-black tracking-tight text-slate-900 uppercase">
+                  ఓటర్ల జాబితా • VOTER ROSTER
+                </h1>
+                <p className="text-[11px] font-bold text-slate-700">{boothHeaderLabel}</p>
+                <p className="text-[10px] text-slate-500 mt-0.5">
+                  {title} • కేంద్రం: {boothInfo.clean_village || boothInfo.ps_address}
+                </p>
+              </div>
+              <div className="text-right">
+                <span className="text-[10px] text-slate-500 font-mono">
+                  ముద్రణ తేదీ: {todayDate}
+                </span>
+              </div>
+            </div>
+
             {/* Statistical Summary Box */}
             <div className="bg-slate-50 border border-slate-300 rounded-lg p-2.5 mb-3 text-[11px] print-header-bg">
               <div className="grid grid-cols-2 sm:grid-cols-6 gap-2 text-center divide-x divide-slate-200">
@@ -586,9 +838,9 @@ export const GroupPrintModal: React.FC<GroupPrintModalProps> = ({
                   <span className="font-mono font-black text-sm text-blue-800">🎯 {stats.youth}</span>
                 </div>
                 <div className="px-1">
-                  <span className="text-[9.5px] text-slate-500 block uppercase font-bold">జనసేన మద్దతు / స్వింగ్</span>
+                  <span className="text-[9.5px] text-slate-500 block uppercase font-bold">పార్టీ మద్దతు / స్వింగ్</span>
                   <span className="font-mono font-black text-sm text-emerald-800">
-                    🚩 {stats.jsp} / ⚡ {stats.swing}
+                    🟢 {stats.jsp} / ⚡ {stats.swing}
                   </span>
                 </div>
                 <div className="px-1">
@@ -629,21 +881,30 @@ export const GroupPrintModal: React.FC<GroupPrintModalProps> = ({
                     const voterSno = v.s ?? (v as any).sno;
                     const prof = voterSno ? profiles[voterSno] || {} : {};
                     const phone = prof.customPhone || v.k_m;
-                    const pct = prof.supportPct; // undefined in pure entry mode if un-entered
+                    const pct = prof.supportPct;
 
                     const voterId = v.id || (v as any).epic || '';
-                    const voterName = v.n || ((v as any).name_en && (v as any).name_te ? `${(v as any).name_en} (${(v as any).name_te})` : (v as any).name_te || (v as any).name_en || '');
-                    const voterRel = v.r || ((v as any).rel_name_en && (v as any).rel_name_te ? `${(v as any).rel_name_en} (${(v as any).rel_name_te})` : (v as any).rel_name_te || (v as any).rel_name_en || '');
+                    const voterName =
+                      v.n ||
+                      ((v as any).name_en && (v as any).name_te
+                        ? `${(v as any).name_en} (${(v as any).name_te})`
+                        : (v as any).name_te || (v as any).name_en || '');
+                    const voterRel =
+                      v.r ||
+                      ((v as any).rel_name_en && (v as any).rel_name_te
+                        ? `${(v as any).rel_name_en} (${(v as any).rel_name_te})`
+                        : (v as any).rel_name_te || (v as any).rel_name_en || '');
                     const voterAge = v.a || (v as any).age || '';
-                    const isMale = v.g === 'M' || (v as any).gender_en === 'Male' || (v as any).gender_te === 'పురుషుడు';
+                    const isMale =
+                      v.g === 'M' || (v as any).gender_en === 'Male' || (v as any).gender_te === 'పురుషుడు';
                     const voterHn = v.hn || (v as any).house_no || '';
 
                     let leaningText = '⚪ సర్వే కాలేదు';
                     let leaningColor = 'text-slate-500 font-medium';
                     if (pct !== undefined) {
                       if (pct === 100) {
-                        leaningText = '🚩 100% JSP';
-                        leaningColor = 'text-red-700 font-black';
+                        leaningText = '🟢 100% మద్దతు';
+                        leaningColor = 'text-emerald-800 font-black';
                       } else if (pct >= 75) {
                         leaningText = '🟢 75% అనుకూలం';
                         leaningColor = 'text-emerald-800 font-bold';
@@ -667,51 +928,36 @@ export const GroupPrintModal: React.FC<GroupPrintModalProps> = ({
                         key={voterSno || index}
                         className="hover:bg-slate-50 transition-colors print-zebra"
                       >
-                        {/* Index */}
                         <td className="py-1 px-1 text-center font-mono text-slate-500 border-r border-slate-200">
                           {index + 1}
                         </td>
-
-                        {/* Booth Serial No */}
                         <td className="py-1 px-1.5 text-center font-mono font-black text-slate-900 border-r border-slate-200">
                           #{voterSno}
                         </td>
-
-                        {/* EPIC */}
                         <td className="py-1 px-1.5 font-mono text-[9.5px] font-bold text-slate-800 border-r border-slate-200">
                           {voterId}
                         </td>
-
-                        {/* Voter Name */}
                         <td className="py-1 px-2 font-bold text-slate-950 border-r border-slate-200">
                           <div className="leading-tight">
                             <span>{voterName}</span>
                             {v.kriya && (
                               <span className="ml-1 text-[8.5px] bg-red-100 text-red-800 px-1 py-0.2 rounded font-black border border-red-300">
-                                🚩 క్రియ
+                                ⭐ క్రియ
                               </span>
                             )}
                           </div>
                         </td>
-
-                        {/* Relation */}
                         {showRelation && (
                           <td className="py-1 px-1.5 text-slate-700 truncate max-w-[120px] border-r border-slate-200">
                             {voterRel || '—'}
                           </td>
                         )}
-
-                        {/* Age / Gender */}
                         <td className="py-1 px-1.5 text-center font-mono text-slate-800 border-r border-slate-200">
                           {voterAge} / {isMale ? 'పు' : 'మ'}
                         </td>
-
-                        {/* House No */}
                         <td className="py-1 px-1.5 text-center font-mono font-bold text-slate-900 border-r border-slate-200">
                           {voterHn || '—'}
                         </td>
-
-                        {/* Phone / Kriya Mobile */}
                         {showPhone && (
                           <td className="py-1 px-1.5 font-mono text-[9.5px] border-r border-slate-200">
                             {phone ? (
@@ -723,15 +969,11 @@ export const GroupPrintModal: React.FC<GroupPrintModalProps> = ({
                             )}
                           </td>
                         )}
-
-                        {/* Leaning */}
                         {showLeaning && (
                           <td className={`py-1 px-1.5 text-center text-[9px] border-r border-slate-200 ${leaningColor}`}>
                             {leaningText}
                           </td>
                         )}
-
-                        {/* Polling Checkbox */}
                         {showPollCheckbox && (
                           <td className="py-1 px-1 text-center border-r border-slate-200">
                             <div className="inline-flex items-center gap-1 border border-slate-400 rounded px-1.5 py-0.5">
@@ -740,8 +982,6 @@ export const GroupPrintModal: React.FC<GroupPrintModalProps> = ({
                             </div>
                           </td>
                         )}
-
-                        {/* Notes */}
                         <td className="py-1 px-2 text-slate-400">
                           <div className="border-b border-dashed border-slate-300 w-full h-3">
                             {prof.notes && <span className="text-[9px] text-slate-700 truncate block">{prof.notes}</span>}
@@ -753,23 +993,18 @@ export const GroupPrintModal: React.FC<GroupPrintModalProps> = ({
                 </tbody>
               </table>
             </div>
+
+            {/* Table Footer */}
+            <div className="mt-4 pt-2 border-t-2 border-slate-900 flex items-center justify-between text-[9px] text-slate-600">
+              <p className="font-bold text-slate-800">
+                ఓటర్ల జాబితా • పిఠాపురం నియోజకవర్గం (AC #37) — పోలింగ్ ఏజెంట్లు & బూత్ నిర్వహణ కొరకు
+              </p>
+              <div className="text-right font-mono font-bold text-slate-800">
+                మొత్తం: {sortedVoters.length} ఓటర్లు
+              </div>
+            </div>
           </div>
         )}
-
-        {/* Official Footer Section */}
-        <div className="mt-4 pt-3 border-t-2 border-slate-900 flex items-center justify-between text-[9.5px] text-slate-600">
-          <div>
-            <p className="font-bold text-slate-800">
-              జనసేన పార్టీ పిఠాపురం నియోజకవర్గ కేంద్ర సమన్వయ కార్యాలయం • పవన్ కళ్యాణ్ గారి నాయకత్వం
-            </p>
-            <p className="text-[8.5px] text-slate-500">
-              ఈ జాబితా పోలింగ్ ఏజెంట్లు మరియు బూత్ కార్యకర్తల క్షేత్రస్థాయి వినియోగానికి మాత్రమే ఉద్దేశించబడింది.
-            </p>
-          </div>
-          <div className="text-right font-mono font-bold text-slate-800">
-            <span>గాజు గ్లాసు గుర్తు • గెలుపే మన లక్ష్యం 🚩</span>
-          </div>
-        </div>
       </div>
     </div>
   );
