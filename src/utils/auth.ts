@@ -296,10 +296,6 @@ export function generateAssignmentWhatsAppMessage(
       }).join('\n')
     : '• కేటాయించలేదు';
 
-  const timerText = assignment.expiryMinutes && assignment.expiryMinutes > 0
-    ? `\n⏱️ *జాబితా కాలపరిమితి (Timer to Access):* ${assignment.expiryMinutes} నిమిషాలు\n(ఈ సమయం ముగియగానే ఓటర్ల జాబితా మొబైల్ స్క్రీన్ నుండి ఆటోమేటిక్‌గా అన్‌లోడ్ అవుతుంది)\n`
-    : '';
-
   return `🗳️ *పిఠాపురం నియోజకవర్గం (AC #37)*
 *ఎన్నికల బూత్ ఇంచార్జ్ / సమన్వయకర్త బాధ్యతల కేటాయింపు*
 
@@ -311,7 +307,7 @@ ${assemblyList}
 
 🏢 *స్థానిక / మున్సిపాలిటీ వార్డులు (Local Wards):*
 ${municipalList}
-${timerText}
+
 📲 *మొబైల్ యాప్‌లో లాగిన్ విధానం:*
 1. క్రింది లింక్ ద్వారా మొబైల్ యాప్ ఓపెన్ చేయండి.
 2. మీ నమోదిత మొబైల్ నంబర్ *${assignment.phone}* ఎంటర్ చేసి లాగిన్ అవ్వండి.

@@ -1167,37 +1167,28 @@ export function App() {
                 </span>
               </div>
 
-              {/* Timer / Expiry Info Box (Requirement 5) */}
-              <div className={`p-3 rounded-2xl border text-xs text-left space-y-1 ${
-                remainingTime.hasTimer && remainingTime.isExpired
-                  ? 'bg-red-950/70 border-red-500/60 text-red-200'
-                  : remainingTime.hasTimer
-                    ? 'bg-amber-950/40 border-amber-500/50 text-amber-200'
-                    : 'bg-slate-950/60 border-slate-800 text-slate-300'
-              }`}>
-                <div className="flex items-center justify-between font-bold">
-                  <span className="flex items-center gap-1.5">
-                    <Clock className="w-3.5 h-3.5" />
-                    <span>{lang === 'te' ? 'జాబితా వీక్షణ కాలపరిమితి:' : 'List Access Timer:'}</span>
-                  </span>
-                  <span className="font-mono font-black text-sm">
-                    {remainingTime.formatted}
-                  </span>
+              {/* If Expired, show alert; if Admin, show timer; for volunteer, keep silent */}
+              {remainingTime.hasTimer && remainingTime.isExpired ? (
+                <div className="p-3 rounded-2xl border text-xs text-left bg-red-950/70 border-red-500/60 text-red-200 space-y-1">
+                  <div className="flex items-center gap-1.5 font-bold text-red-300">
+                    <AlertTriangle className="w-4 h-4 text-red-400" />
+                    <span>{lang === 'te' ? 'జాబితా అందుబాటులో లేదు (Access Expired)' : 'List Access Expired'}</span>
+                  </div>
+                  <p className="text-[11px] text-red-300 pt-0.5 leading-snug">
+                    {lang === 'te'
+                      ? 'ఈ ఓటర్ల జాబితాకు కేటాయించిన సమయం ముగిసింది. దయచేసి అడ్మిన్‌ను సంప్రదించండి.'
+                      : 'Access to this voter list has expired. Please contact Admin.'}
+                  </p>
                 </div>
-                {remainingTime.hasTimer && remainingTime.isExpired ? (
-                  <p className="text-[11px] text-red-300 pt-1 leading-snug">
-                    ⚠️ ఈ ఓటర్ల జాబితాకు కేటాయించిన కాలపరిమితి ముగిసింది. దయచేసి అడ్మిన్‌ను సంప్రదించి సమయం పొడిగించమని కోరండి.
-                  </p>
-                ) : remainingTime.hasTimer ? (
-                  <p className="text-[10px] text-amber-300/80 pt-0.5">
-                    ⏱️ సమయం ముగియగానే ఓటర్ల జాబితా స్క్రీన్ నుండి ఆటోమేటిక్‌గా అన్‌లోడ్ అవుతుంది.
-                  </p>
-                ) : (
-                  <p className="text-[10px] text-slate-400 pt-0.5">
-                    ♾️ ఈ అకౌంట్‌కు ఎటువంటి కాలపరిమితి పరిమితి లేదు.
-                  </p>
-                )}
-              </div>
+              ) : session?.role === 'admin' && remainingTime.hasTimer ? (
+                <div className="p-2.5 rounded-2xl border text-xs text-left bg-amber-950/30 border-amber-500/40 text-amber-200 flex items-center justify-between">
+                  <span className="text-[10px] font-bold text-amber-400 flex items-center gap-1">
+                    <Clock className="w-3 h-3" />
+                    <span>[Admin Only] మిగిలిన సమయం:</span>
+                  </span>
+                  <span className="font-mono font-bold text-xs">{remainingTime.formatted}</span>
+                </div>
+              ) : null}
 
               {/* Big Load List Button (Requirement 3) */}
               <div className="pt-2">
@@ -1214,7 +1205,7 @@ export function App() {
                   <DownloadCloud className="w-4 h-4 group-hover:translate-y-0.5 transition-transform" />
                   <span>
                     {remainingTime.hasTimer && remainingTime.isExpired
-                      ? (lang === 'te' ? '🔒 కాలపరిమితి ముగిసింది (Access Expired)' : '🔒 Access Expired')
+                      ? (lang === 'te' ? '🔒 జాబితా అందుబాటులో లేదు (Access Expired)' : '🔒 Access Expired')
                       : (lang === 'te' ? '📥 ఓటర్ల జాబితా లోడ్ చేయండి (Click to Load)' : '📥 Click to Load Voter List')}
                   </span>
                 </button>
@@ -1228,21 +1219,17 @@ export function App() {
 
         {boothData && (
           <>
-            {/* Active Loaded List Top Bar with Live Timer & Unload Button (Requirement 3 & 5) */}
+            {/* Active Loaded List Top Bar with Unload Button (Requirement 3 & 5) */}
             <div className="flex items-center justify-between gap-2 p-2 px-3 rounded-2xl bg-slate-900/90 border border-slate-800 shadow-md mb-2 flex-wrap">
               <div className="flex items-center gap-2">
                 <span className="w-2.5 h-2.5 rounded-full bg-emerald-500 animate-pulse"></span>
                 <span className="text-xs font-bold text-white">
                   {boothData.voters.length} {lang === 'te' ? 'ఓటర్లు లోడ్ అయ్యారు' : 'Voters Loaded'}
                 </span>
-                {remainingTime.hasTimer && (
-                  <span className={`px-2 py-0.5 rounded-full text-[10px] font-mono font-bold flex items-center gap-1 ${
-                    remainingTime.minutes < 5
-                      ? 'bg-red-950 border border-red-500 text-red-300 animate-pulse'
-                      : 'bg-amber-950/80 border border-amber-500/40 text-amber-300'
-                  }`}>
+                {session?.role === 'admin' && remainingTime.hasTimer && (
+                  <span className="px-2 py-0.5 rounded-full text-[10px] font-mono font-bold flex items-center gap-1 bg-amber-950/80 border border-amber-500/40 text-amber-300">
                     <Clock className="w-3 h-3" />
-                    <span>మిగిలిన సమయం: {remainingTime.formatted}</span>
+                    <span>[Admin] {remainingTime.formatted}</span>
                   </span>
                 )}
               </div>

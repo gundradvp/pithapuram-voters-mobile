@@ -85,16 +85,10 @@ export const HeaderMobile: React.FC<HeaderMobileProps> = ({
                 🎮 DEMO
               </span>
             )}
-            {remainingTime?.hasTimer && (
+            {session?.role === 'admin' && remainingTime?.hasTimer && (
               <span
-                className={`px-1.5 py-0.2 rounded text-[9px] font-mono font-bold flex items-center gap-1 border ${
-                  remainingTime.isExpired
-                    ? 'bg-red-950/80 border-red-500 text-red-300 animate-pulse'
-                    : remainingTime.minutes < 5
-                      ? 'bg-amber-950/80 border-amber-500 text-amber-300 animate-pulse'
-                      : 'bg-slate-800 border-slate-700 text-amber-400'
-                }`}
-                title={remainingTime.isExpired ? 'కాలపరిమితి ముగిసింది' : `మిగిలిన సమయం: ${remainingTime.formatted}`}
+                className="px-1.5 py-0.2 rounded text-[9px] font-mono font-bold flex items-center gap-1 border bg-slate-800 border-slate-700 text-amber-400"
+                title={`[Admin Only] మిగిలిన సమయం: ${remainingTime.formatted}`}
               >
                 <Clock className="w-2.5 h-2.5" />
                 <span>{remainingTime.formatted}</span>
