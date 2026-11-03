@@ -4,6 +4,7 @@ import { BoothInfo } from '../types';
 import { Language } from '../utils/i18n';
 import { ThemeId, THEMES } from '../utils/theme';
 import { UserSession } from '../utils/auth';
+import { SyncState } from '../utils/supabaseSync';
 
 interface HeaderMobileProps {
   boothInfo: BoothInfo | null;
@@ -13,6 +14,7 @@ interface HeaderMobileProps {
   theme: ThemeId;
   session: UserSession | null;
   isRefreshing?: boolean;
+  cloudSyncState?: SyncState;
   onRefreshData?: () => void;
   onOpenSyncModal?: () => void;
   onToggleLanguage: () => void;
@@ -30,6 +32,7 @@ export const HeaderMobile: React.FC<HeaderMobileProps> = ({
   theme,
   session,
   isRefreshing,
+  cloudSyncState = 'idle',
   onRefreshData,
   onOpenSyncModal,
   onToggleLanguage,
@@ -127,15 +130,31 @@ export const HeaderMobile: React.FC<HeaderMobileProps> = ({
           </button>
         )}
 
-        {/* Cloud & Bolt Sync Modal Button */}
+        {/* Supabase Cloud Live Auto-Sync Pill */}
         {onOpenSyncModal && (
           <button
             onClick={onOpenSyncModal}
-            className="flex items-center gap-1 px-2 py-1 rounded-lg text-[10px] font-black border transition-all bg-gradient-to-r from-amber-500 to-amber-600 hover:from-amber-400 hover:to-amber-500 text-slate-950 border-amber-400 shadow-md shadow-amber-950/40 active:scale-95"
-            title={language === 'te' ? 'లోకల్ & బోల్ట్ క్లౌడ్ డేటా సింక్ (Sync Data between Local & Bolt)' : 'Sync Data between Local & Bolt'}
+            className={`flex items-center gap-1.5 px-2 py-1 rounded-lg text-[10px] font-black border transition-all shadow-sm ${
+              cloudSyncState === 'syncing'
+                ? 'bg-amber-500/20 text-amber-300 border-amber-500/60 animate-pulse'
+                : cloudSyncState === 'error'
+                  ? 'bg-red-500/20 text-red-300 border-red-500/60'
+                  : 'bg-emerald-950/80 text-emerald-300 border-emerald-500/50 hover:bg-emerald-900/90 active:scale-95'
+            }`}
+            title={language === 'te' ? 'Supabase క్లౌడ్ ఆటో-సింక్ (Realtime Auto-Sync across all devices)' : 'Supabase Cloud Realtime Auto-Sync'}
           >
-            <ArrowRightLeft className="w-3.5 h-3.5 text-slate-950 stroke-[2.5]" />
-            <span className="font-black">{language === 'te' ? 'సింక్' : 'Sync'}</span>
+            <span
+              className={`w-2 h-2 rounded-full ${
+                cloudSyncState === 'syncing'
+                  ? 'bg-amber-400 animate-ping'
+                  : 'bg-emerald-400 animate-pulse'
+              }`}
+            />
+            <span className="font-extrabold whitespace-nowrap">
+              {cloudSyncState === 'syncing' 
+                ? (language === 'te' ? 'సింక్...' : 'Syncing...') 
+                : (language === 'te' ? 'ఆటో-సింక్' : 'Auto-Sync')}
+            </span>
           </button>
         )}
 

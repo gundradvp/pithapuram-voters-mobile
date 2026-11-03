@@ -59,6 +59,12 @@ import {
   savePreloadedProfiles,
   CampaignSyncBundle
 } from './utils/storage';
+import {
+  pullBoothFromSupabase,
+  pushBoothToSupabaseDebounced,
+  mergeRemoteProfiles,
+  SyncState
+} from './utils/supabaseSync';
 import { classifyBoothSurnames } from './utils/surnameClassifier';
 import {
   UserSession,
@@ -158,6 +164,7 @@ export function App() {
   // Modals State
   const [isBoothSelectorOpen, setIsBoothSelectorOpen] = useState<boolean>(false);
   const [isSyncModalOpen, setIsSyncModalOpen] = useState<boolean>(false);
+  const [cloudSyncState, setCloudSyncState] = useState<SyncState>('idle');
   const [selectedVoterForSlip, setSelectedVoterForSlip] = useState<MobileVoter | null>(null);
   const [selectedVoterForPhone, setSelectedVoterForPhone] = useState<MobileVoter | null>(null);
   const [selectedVoterForVisit, setSelectedVoterForVisit] = useState<MobileVoter | null>(null);
@@ -431,6 +438,24 @@ export function App() {
       }
     }).catch(() => {});
 
+    // Step A.2: Pull live updates from Supabase Cloud Auto-Sync
+    pullBoothFromSupabase(partNo).then(remoteBundle => {
+      if (remoteBundle && remoteBundle.profiles) {
+        setProfiles(prevLocal => {
+          const { merged, hasChanges } = mergeRemoteProfiles(prevLocal, remoteBundle.profiles);
+          if (hasChanges) {
+            savePreloadedProfiles(partNo, merged);
+            return merged;
+          }
+          return prevLocal;
+        });
+
+        if (remoteBundle.influencers && Object.keys(remoteBundle.influencers).length > 0) {
+          setInfluencers(prevInf => ({ ...prevInf, ...remoteBundle.influencers }));
+        }
+      }
+    }).catch(() => {});
+
     // Step B: Check local cache first (Instant load)
     const cached = getCachedBoothData(partNo);
     if (cached && Array.isArray(cached.voters) && cached.voters.length > 0) {
@@ -527,6 +552,67 @@ export function App() {
     setIsLocked(isBoothLocked());
     setIsCached(isBoothCached(currentPartNo));
   }, [currentPartNo, loadBooth]);
+
+  // 6. Supabase Cloud Auto-Push (Debounced Background Save)
+  useEffect(() => {
+    if (isLoading || session?.role === 'demo' || !currentPartNo) return;
+    if (Object.keys(profiles).length === 0 && Object.keys(influencers).length === 0) return;
+
+    pushBoothToSupabaseDebounced(
+      currentPartNo,
+      profiles,
+      influencers,
+      families,
+      setCloudSyncState
+    );
+  }, [profiles, influencers, families, currentPartNo, isLoading, session]);
+
+  // 7. Supabase Cloud Auto-Pull (Realtime background sync across all devices)
+  useEffect(() => {
+    if (isLoading || session?.role === 'demo' || !currentPartNo) return;
+
+    let isSubscribed = true;
+
+    const syncWithSupabase = async () => {
+      try {
+        const remote = await pullBoothFromSupabase(currentPartNo);
+        if (!isSubscribed || !remote || !remote.profiles) return;
+
+        setProfiles(local => {
+          const { merged, hasChanges } = mergeRemoteProfiles(local, remote.profiles);
+          if (hasChanges) {
+            savePreloadedProfiles(currentPartNo, merged);
+            return merged;
+          }
+          return local;
+        });
+
+        if (remote.influencers && Object.keys(remote.influencers).length > 0) {
+          setInfluencers(localInf => {
+            let changed = false;
+            const next = { ...localInf };
+            Object.entries(remote.influencers!).forEach(([id, inf]) => {
+              if (!next[id] || JSON.stringify(next[id]) !== JSON.stringify(inf)) {
+                next[id] = inf;
+                changed = true;
+              }
+            });
+            return changed ? next : localInf;
+          });
+        }
+      } catch {}
+    };
+
+    const interval = setInterval(syncWithSupabase, 8000);
+    const handleFocus = () => syncWithSupabase();
+    window.addEventListener('focus', handleFocus);
+
+    return () => {
+      isSubscribed = false;
+      clearInterval(interval);
+      window.removeEventListener('focus', handleFocus);
+    };
+  }, [currentPartNo, isLoading, session]);
 
   // Compute Winning Score dynamically
   const winningScore: WinningScoreCalculation | null = useMemo(() => {
@@ -839,6 +925,7 @@ export function App() {
         theme={theme}
         session={session}
         isRefreshing={isRefreshing}
+        cloudSyncState={cloudSyncState}
         onRefreshData={() => handleRefreshData(true)}
         onOpenSyncModal={() => setIsSyncModalOpen(true)}
         onToggleLanguage={toggleLanguage}

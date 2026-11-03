@@ -23,6 +23,7 @@ import {
   fetchFreshProfiles,
   CampaignSyncBundle
 } from '../utils/storage';
+import { pullBoothFromSupabase, pushBoothToSupabaseImmediate } from '../utils/supabaseSync';
 import { VoterCampaignProfile } from '../types';
 
 interface SyncBackupModalProps {
@@ -44,9 +45,10 @@ export const SyncBackupModal: React.FC<SyncBackupModalProps> = ({
 }) => {
   const [pasteCode, setPasteCode] = useState('');
   const [isCopied, setIsCopied] = useState(false);
+  const [isCloudSyncing, setIsCloudSyncing] = useState(false);
   const [saveStatus, setSaveStatus] = useState<string | null>(null);
   const [errorMsg, setErrorMsg] = useState<string | null>(null);
-  const [activeTab, setActiveTab] = useState<'token' | 'disk' | 'file'>('token');
+  const [activeTab, setActiveTab] = useState<'cloud' | 'token' | 'disk' | 'file'>('cloud');
 
   if (!isOpen) return null;
 
@@ -200,21 +202,46 @@ export const SyncBackupModal: React.FC<SyncBackupModalProps> = ({
     reader.readAsText(file);
   };
 
+  // Cloud Sync Now Action
+  const handleCloudSyncNow = async () => {
+    setIsCloudSyncing(true);
+    setErrorMsg(null);
+    try {
+      // 1. Push local changes
+      await pushBoothToSupabaseImmediate(partNo, profiles);
+      // 2. Pull remote changes
+      const remote = await pullBoothFromSupabase(partNo);
+      if (remote) {
+        onSyncApplied(remote as any);
+      }
+      setSaveStatus(
+        language === 'te'
+          ? '🎉 Supabase క్లౌడ్‌తో విజయవంతంగా సింక్ అయ్యింది!'
+          : '🎉 Successfully synced with Supabase Cloud!'
+      );
+      setTimeout(() => setSaveStatus(null), 3500);
+    } catch (err: any) {
+      setErrorMsg(err?.message || 'Cloud sync failed');
+    } finally {
+      setIsCloudSyncing(false);
+    }
+  };
+
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center p-3 bg-slate-950/80 backdrop-blur-sm animate-in fade-in duration-150">
       <div className="bg-slate-900 border border-amber-500/40 rounded-3xl max-w-md w-full p-4 space-y-3.5 shadow-2xl overflow-hidden text-slate-200">
         {/* Modal Header */}
         <div className="flex items-center justify-between border-b border-slate-800 pb-2.5">
           <div className="flex items-center gap-2">
-            <div className="p-2 rounded-xl bg-amber-500/20 text-amber-400 border border-amber-500/40">
-              <ArrowRightLeft className="w-4 h-4" />
+            <div className="p-2 rounded-xl bg-emerald-500/20 text-emerald-400 border border-emerald-500/40">
+              <RefreshCw className="w-4 h-4 text-emerald-400" />
             </div>
             <div>
               <h3 className="text-sm font-black text-white flex items-center gap-1.5">
-                {language === 'te' ? 'లోకల్ ⇄ బోల్ట్ క్లౌడ్ డేటా సింక్' : 'Local ⇄ Bolt Cloud Data Sync'}
+                {language === 'te' ? 'Supabase క్లౌడ్ ఆటో-సింక్' : 'Supabase Cloud Auto-Sync'}
               </h3>
               <p className="text-[10px] text-slate-400">
-                {language === 'te' ? `బూత్ / వార్డు: #${partNo} సమాచారం బదిలీ` : `Sync marked electors for Unit #${partNo}`}
+                {language === 'te' ? `బూత్ / వార్డు: #${partNo} రియల్‌టైమ్ సింక్` : `Realtime auto-sync for Unit #${partNo}`}
               </p>
             </div>
           </div>
@@ -253,6 +280,17 @@ export const SyncBackupModal: React.FC<SyncBackupModalProps> = ({
         {/* Tab Selector */}
         <div className="flex items-center gap-1 bg-slate-950 p-1 rounded-xl border border-slate-800 text-[11px]">
           <button
+            onClick={() => setActiveTab('cloud')}
+            className={`flex-1 py-1 rounded-lg font-bold transition-all flex items-center justify-center gap-1 ${
+              activeTab === 'cloud'
+                ? 'bg-gradient-to-r from-emerald-600 to-teal-600 text-white font-black shadow-sm'
+                : 'text-slate-400 hover:text-white'
+            }`}
+          >
+            <span className="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse" />
+            <span>{language === 'te' ? 'ఆటో-సింక్' : 'Auto-Sync'}</span>
+          </button>
+          <button
             onClick={() => setActiveTab('token')}
             className={`flex-1 py-1 rounded-lg font-bold transition-all flex items-center justify-center gap-1 ${
               activeTab === 'token'
@@ -261,7 +299,7 @@ export const SyncBackupModal: React.FC<SyncBackupModalProps> = ({
             }`}
           >
             <Sparkles className="w-3 h-3" />
-            <span>{language === 'te' ? 'సింక్ కోడ్ (వేగవంతం)' : 'Sync Code'}</span>
+            <span>{language === 'te' ? 'సింక్ కోడ్' : 'Sync Code'}</span>
           </button>
           <button
             onClick={() => setActiveTab('disk')}
@@ -272,18 +310,7 @@ export const SyncBackupModal: React.FC<SyncBackupModalProps> = ({
             }`}
           >
             <Save className="w-3 h-3" />
-            <span>{language === 'te' ? 'ప్రాజెక్ట్ ఫైల్' : 'Project File'}</span>
-          </button>
-          <button
-            onClick={() => setActiveTab('file')}
-            className={`flex-1 py-1 rounded-lg font-bold transition-all flex items-center justify-center gap-1 ${
-              activeTab === 'file'
-                ? 'bg-amber-500 text-slate-950 font-black shadow-sm'
-                : 'text-slate-400 hover:text-white'
-            }`}
-          >
-            <FileText className="w-3 h-3" />
-            <span>{language === 'te' ? 'ఫైల్ బ్యాకప్' : 'JSON File'}</span>
+            <span>{language === 'te' ? 'ప్రాజెక్ట్ ఫైల్' : 'File'}</span>
           </button>
         </div>
 
@@ -298,6 +325,59 @@ export const SyncBackupModal: React.FC<SyncBackupModalProps> = ({
           <div className="p-2.5 rounded-xl bg-red-950/60 border border-red-500/50 text-red-300 text-xs font-bold animate-in fade-in flex items-center gap-2">
             <AlertCircle className="w-4 h-4 flex-shrink-0 text-red-400" />
             <span>{errorMsg}</span>
+          </div>
+        )}
+
+        {/* TAB 0: Supabase Cloud Live Auto-Sync */}
+        {activeTab === 'cloud' && (
+          <div className="space-y-3 animate-in fade-in text-xs">
+            <div className="bg-gradient-to-br from-emerald-950/60 to-slate-950 p-3.5 rounded-2xl border border-emerald-500/40 space-y-2.5">
+              <div className="flex items-center justify-between">
+                <span className="font-black text-emerald-300 flex items-center gap-1.5 text-xs">
+                  <span className="w-2.5 h-2.5 rounded-full bg-emerald-400 animate-pulse" />
+                  Supabase Cloud Live Sync
+                </span>
+                <span className="text-[10px] bg-emerald-900/60 text-emerald-200 font-mono px-2 py-0.5 rounded-full border border-emerald-500/40">
+                  Auto-Active 🟢
+                </span>
+              </div>
+              <p className="text-[11px] text-slate-300 leading-relaxed">
+                {language === 'te'
+                  ? 'మీ సోలార్ CRM క్లౌడ్ డేటాబేస్ తో అనుసంధానించబడింది! ఏ ఫోన్ లో నాయకుడికి ఓటర్లను కేటాయించినా లేదా సర్వే చేసినా బ్యాక్‌గ్రౌండ్‌లో ఆటోమేటిక్‌గా అన్ని డివైస్‌లలో సింక్ అవుతుంది.'
+                  : 'Connected to your Solar CRM Supabase Database! Voter assignments, survey markings, and leader lists automatically sync across all devices in real-time.'}
+              </p>
+
+              <div className="pt-1">
+                <button
+                  type="button"
+                  onClick={handleCloudSyncNow}
+                  disabled={isCloudSyncing}
+                  className="w-full py-2.5 bg-gradient-to-r from-emerald-600 to-teal-600 hover:from-emerald-500 hover:to-teal-500 text-white font-black rounded-xl flex items-center justify-center gap-2 shadow-lg shadow-emerald-950/50 active:scale-95 transition-all cursor-pointer"
+                >
+                  <RefreshCw className={`w-4 h-4 ${isCloudSyncing ? 'animate-spin' : ''}`} />
+                  <span>
+                    {isCloudSyncing
+                      ? (language === 'te' ? 'క్లౌడ్‌తో సింక్ అవుతోంది...' : 'Syncing with Cloud...')
+                      : (language === 'te' ? 'ఇప్పుడే క్లౌడ్‌తో సింక్ చేయండి (Sync Now)' : 'Sync with Supabase Now')}
+                  </span>
+                </button>
+              </div>
+            </div>
+
+            <div className="p-2.5 rounded-xl bg-slate-950/60 border border-slate-800 text-[10px] text-slate-400 space-y-1 font-mono">
+              <div className="flex justify-between">
+                <span>Database:</span>
+                <span className="text-slate-300">rlwcqmlspvddfscyngfw.supabase.co</span>
+              </div>
+              <div className="flex justify-between">
+                <span>Account:</span>
+                <span className="text-slate-300">durga@tejobharat.com</span>
+              </div>
+              <div className="flex justify-between">
+                <span>Auto-Interval:</span>
+                <span className="text-emerald-400 font-bold">Realtime + 8s Background Poll</span>
+              </div>
+            </div>
           </div>
         )}
 

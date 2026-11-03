@@ -124,6 +124,7 @@ export interface VoterCampaignProfile {
   visits?: VoterVisit[];
   moneyStatus?: MoneyInfluenceStatus;
   moneyNotes?: string;
+  updatedAt?: string;
 }
 
 export interface MobileVoter {

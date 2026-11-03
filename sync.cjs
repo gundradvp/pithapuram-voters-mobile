@@ -46,6 +46,7 @@ const filesToSync = [
   'src/components/SurnameLeaningModal.tsx',
   'src/components/DuplicateCompareModal.tsx',
   'src/components/SyncBackupModal.tsx',
+  'src/utils/supabaseSync.ts',
   'src/utils/demoData.ts',
   'src/components/HousesTabMobile.tsx',
   'src/components/HourlyTurnoutModal.tsx',
