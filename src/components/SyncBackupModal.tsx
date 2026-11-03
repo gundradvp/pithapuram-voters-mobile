@@ -73,6 +73,18 @@ export const SyncBackupModal: React.FC<SyncBackupModalProps> = ({
     }
   };
 
+  // 1.1 Share Sync Code via WhatsApp
+  const handleShareSyncCodeWhatsApp = () => {
+    try {
+      const code = generateSyncToken(partNo);
+      const msg = `🚩 *జనసేన పార్టీ - పిఠాపురం నియోజకవర్గం*\n*బూత్ #${partNo} కేటాయించిన ఓటర్ల సింక్ కోడ్*\n\nఈ కోడ్‌ను కాపీ చేసి మీ యాప్‌లో 'సింక్ (Sync)' మెనూలో పేస్ట్ చేయండి:\n\n${code}`;
+      const url = `https://wa.me/?text=${encodeURIComponent(msg)}`;
+      window.open(url, '_blank');
+    } catch (e: any) {
+      setErrorMsg(e?.message || 'Failed to share sync code');
+    }
+  };
+
   // 2. Apply Pasted Sync Code
   const handleApplySyncCode = () => {
     if (!pasteCode.trim()) {
@@ -302,25 +314,37 @@ export const SyncBackupModal: React.FC<SyncBackupModalProps> = ({
               </div>
               <p className="text-[10.5px] text-slate-400 leading-relaxed">
                 {language === 'te'
-                  ? 'మీ లోకల్ సిస్టమ్‌లో గుర్తించిన మనవాళ్లు, ఓటేశారు, ఫోన్ నంబర్ల సమాచారాన్ని క్లిప్‌బోర్డ్‌కు కాపీ చేస్తుంది.'
-                  : 'Copies all marked voters, leanings, and phones from your local browser.'}
+                  ? 'ఈ డివైస్‌లో కేటాయించిన ఓటర్లు, నాయకులు, ఫోన్ నంబర్ల డేటాను కోడ్‌గా మారుస్తుంది. దీన్ని ఇతర ఫోన్లు లేదా బోల్ట్ లో పేస్ట్ చేసి సింక్ చేయవచ్చు.'
+                  : 'Generates a 1-click sync token of all assigned electors, leaders, and custom phones to sync to other devices.'}
               </p>
-              <button
-                onClick={handleCopySyncCode}
-                className="w-full py-2 bg-gradient-to-r from-amber-500 to-amber-600 hover:from-amber-400 hover:to-amber-500 text-slate-950 font-black rounded-xl text-xs flex items-center justify-center gap-1.5 shadow-md active:scale-95 transition-all"
-              >
-                {isCopied ? (
-                  <>
-                    <CheckCircle2 className="w-4 h-4 text-slate-950" />
-                    <span>{language === 'te' ? '✅ కోడ్ కాపీ అయ్యింది!' : '✅ Code Copied to Clipboard!'}</span>
-                  </>
-                ) : (
-                  <>
-                    <Copy className="w-4 h-4 text-slate-950" />
-                    <span>{language === 'te' ? '📋 సింక్ కోడ్ కాపీ చేయండి (Copy Sync Code)' : '📋 Copy Sync Code'}</span>
-                  </>
-                )}
-              </button>
+              <div className="flex items-center gap-1.5 pt-0.5">
+                <button
+                  type="button"
+                  onClick={handleCopySyncCode}
+                  className="flex-1 py-2 bg-gradient-to-r from-amber-500 to-amber-600 hover:from-amber-400 hover:to-amber-500 text-slate-950 font-black rounded-xl text-xs flex items-center justify-center gap-1.5 shadow-md active:scale-95 transition-all cursor-pointer"
+                >
+                  {isCopied ? (
+                    <>
+                      <CheckCircle2 className="w-4 h-4 text-slate-950" />
+                      <span>{language === 'te' ? '✅ కోడ్ కాపీ అయ్యింది!' : '✅ Code Copied!'}</span>
+                    </>
+                  ) : (
+                    <>
+                      <Copy className="w-4 h-4 text-slate-950" />
+                      <span>{language === 'te' ? '📋 సింక్ కోడ్ కాపీ చేయండి' : '📋 Copy Sync Code'}</span>
+                    </>
+                  )}
+                </button>
+                <button
+                  type="button"
+                  onClick={handleShareSyncCodeWhatsApp}
+                  className="py-2 px-3 bg-emerald-600 hover:bg-emerald-500 text-white font-bold rounded-xl text-xs flex items-center justify-center gap-1 shadow-md active:scale-95 transition-all cursor-pointer"
+                  title="వాట్సాప్ ద్వారా కోడ్‌ను ఇతర ఫోన్‌కు పంపండి"
+                >
+                  <Share2 className="w-3.5 h-3.5" />
+                  <span>వాట్సాప్</span>
+                </button>
+              </div>
             </div>
 
             {/* Step 2: Paste in Bolt */}
