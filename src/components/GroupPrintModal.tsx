@@ -10,7 +10,8 @@ import {
   Palette,
   Check,
   MapPin,
-  Sparkles
+  Sparkles,
+  Phone
 } from 'lucide-react';
 import { MobileVoter, BoothInfo, VoterCampaignProfile } from '../types';
 import { Language } from '../utils/i18n';
@@ -31,6 +32,7 @@ type PrintLayout = 'slips' | 'table';
 export type SlipsPerPage = 2 | 4 | 6 | 8 | 10;
 export type ColorTheme = 'blue' | 'tricolor' | 'emerald' | 'crimson' | 'bw';
 type BrandingMode = 'neutral' | 'party';
+type PhoneFilter = 'all' | 'with_phone' | 'without_phone';
 
 interface ThemeDefinition {
   id: ColorTheme;
@@ -173,33 +175,60 @@ export const GroupPrintModal: React.FC<GroupPrintModalProps> = ({
   language = 'te'
 }) => {
   const [printLayout, setPrintLayout] = useState<PrintLayout>('slips');
-  // Default to 4 per page, with full support for 2, 4, 6, 8, 10
   const [slipsPerPage, setSlipsPerPage] = useState<SlipsPerPage>(4);
-  // Default to vibrant Royal Blue & Gold theme
   const [colorTheme, setColorTheme] = useState<ColorTheme>('blue');
-  // Default to 'neutral' (No party symbols/names in print)
   const [brandingMode, setBrandingMode] = useState<BrandingMode>('neutral');
   const [sortBy, setSortBy] = useState<SortField>('sno');
-  const [showPhone, setShowPhone] = useState<boolean>(true);
+  // Default to FALSE (print WITHOUT phone number by default, print phone number when checked)
+  const [showPhone, setShowPhone] = useState<boolean>(false);
   const [showRelation, setShowRelation] = useState<boolean>(true);
   const [showLeaning, setShowLeaning] = useState<boolean>(true);
   const [showPollCheckbox, setShowPollCheckbox] = useState<boolean>(true);
   const [genderFilter, setGenderFilter] = useState<'all' | 'M' | 'F'>('all');
+  // Filter by Phone Number availability ('all' | 'with_phone' | 'without_phone')
+  const [phoneFilter, setPhoneFilter] = useState<PhoneFilter>('all');
 
   const activeTheme = useMemo(() => {
     return COLOR_THEMES.find(t => t.id === colorTheme) || COLOR_THEMES[0];
   }, [colorTheme]);
 
+  // Helper to extract phone number from voter or campaign profile
+  const getVoterPhone = (v: MobileVoter): string => {
+    const voterSno = v.s ?? (v as any).sno;
+    const prof = voterSno ? profiles[voterSno] : undefined;
+    return String(prof?.customPhone || v.k_m || (v as any).phone || (v as any).mobile || '').trim();
+  };
+
+  // Pre-calculate phone stats for the filter badges
+  const phoneStats = useMemo(() => {
+    let withPhone = 0;
+    let withoutPhone = 0;
+    voters.forEach(v => {
+      if (getVoterPhone(v)) withPhone++;
+      else withoutPhone++;
+    });
+    return { withPhone, withoutPhone };
+  }, [voters, profiles]);
+
   // Filtered & Sorted Voters
   const sortedVoters = useMemo(() => {
     let list = [...voters];
 
+    // 1. Gender Filter
     if (genderFilter === 'M') {
       list = list.filter(v => v.g === 'M' || (v as any).gender_en === 'Male' || (v as any).gender_te === 'పురుషుడు');
     } else if (genderFilter === 'F') {
       list = list.filter(v => v.g === 'F' || v.g === 'W' || (v as any).gender_en === 'Female' || (v as any).gender_te === 'స్త్రీ');
     }
 
+    // 2. Phone Number Filter
+    if (phoneFilter === 'with_phone') {
+      list = list.filter(v => Boolean(getVoterPhone(v)));
+    } else if (phoneFilter === 'without_phone') {
+      list = list.filter(v => !Boolean(getVoterPhone(v)));
+    }
+
+    // 3. Sorting
     list.sort((a, b) => {
       const snoA = a.s ?? (a as any).sno ?? 0;
       const snoB = b.s ?? (b as any).sno ?? 0;
@@ -223,7 +252,7 @@ export const GroupPrintModal: React.FC<GroupPrintModalProps> = ({
     });
 
     return list;
-  }, [voters, sortBy, genderFilter]);
+  }, [voters, sortBy, genderFilter, phoneFilter, profiles]);
 
   // Paginated Voter Chunks for Slip Print (Exact A4 Fit: 2, 4, 6, 8, 10 slips per page)
   const slipPages = useMemo(() => {
@@ -413,6 +442,7 @@ export const GroupPrintModal: React.FC<GroupPrintModalProps> = ({
 
       {/* Top Modal Floating Controls (Screen Only) */}
       <div className="no-print bg-slate-900 border border-amber-500/50 rounded-2xl w-full max-w-4xl p-3.5 mb-3 shadow-2xl text-white space-y-3 sticky top-2 z-20">
+        {/* Header Bar */}
         <div className="flex items-center justify-between gap-2 flex-wrap">
           <div className="flex items-center gap-2">
             <span className="p-2 bg-amber-500/20 text-amber-400 rounded-xl">
@@ -447,7 +477,7 @@ export const GroupPrintModal: React.FC<GroupPrintModalProps> = ({
           </div>
         </div>
 
-        {/* Toolbar Row 1: Number of Items Per Page & Layout */}
+        {/* Toolbar Row 1: Number of Items Per Page & Color Themes */}
         <div className="flex items-center justify-between gap-2 flex-wrap pt-2 border-t border-slate-800 text-[11px]">
           {/* Slips per page options (2, 4, 6, 8, 10 items) */}
           <div className="flex items-center gap-1 bg-slate-800/90 p-1 rounded-xl border border-slate-700 flex-wrap">
@@ -511,11 +541,68 @@ export const GroupPrintModal: React.FC<GroupPrintModalProps> = ({
           </div>
         </div>
 
-        {/* Toolbar Row 2: Format & Sorting */}
+        {/* Toolbar Row 2: Phone Filters, Phone Print Checkbox & Branding */}
         <div className="flex items-center justify-between gap-2 flex-wrap pt-2 border-t border-slate-800 text-[11px]">
+          {/* Phone Number Filter (All / With Phone / Without Phone) */}
+          <div className="flex items-center gap-1 bg-slate-800/90 p-1 rounded-xl border border-slate-700 flex-wrap">
+            <span className="text-emerald-400 font-bold px-1 text-[10.5px] flex items-center gap-1">
+              <Phone className="w-3.5 h-3.5" /> ఓటర్ల ఫిల్టర్:
+            </span>
+            <button
+              type="button"
+              onClick={() => setPhoneFilter('all')}
+              className={`px-2 py-1 rounded-lg text-[10.5px] font-bold transition-all cursor-pointer ${
+                phoneFilter === 'all'
+                  ? 'bg-amber-500 text-slate-950 font-black shadow-md'
+                  : 'text-slate-300 hover:text-white'
+              }`}
+            >
+              అందరూ ({voters.length})
+            </button>
+            <button
+              type="button"
+              onClick={() => setPhoneFilter('with_phone')}
+              className={`px-2 py-1 rounded-lg text-[10.5px] font-bold transition-all cursor-pointer flex items-center gap-1 ${
+                phoneFilter === 'with_phone'
+                  ? 'bg-emerald-500 text-slate-950 font-black shadow-md'
+                  : 'text-slate-300 hover:text-white'
+              }`}
+              title="మొబైల్ / ఫోన్ నెంబర్ అందుబాటులో ఉన్న ఓటర్లు మాత్రమే"
+            >
+              <span>📱 ఫోన్ ఉన్నవారు ({phoneStats.withPhone})</span>
+            </button>
+            <button
+              type="button"
+              onClick={() => setPhoneFilter('without_phone')}
+              className={`px-2 py-1 rounded-lg text-[10.5px] font-bold transition-all cursor-pointer ${
+                phoneFilter === 'without_phone'
+                  ? 'bg-amber-500 text-slate-950 font-black shadow-md'
+                  : 'text-slate-300 hover:text-white'
+              }`}
+              title="ఫోన్ నెంబర్ లేని ఓటర్లు మాత్రమే"
+            >
+              ఫోన్ లేనివారు ({phoneStats.withoutPhone})
+            </button>
+          </div>
+
+          {/* Print Phone Number Toggle Checkbox (Default unchecked = Print WITHOUT phone number) */}
+          <label className={`flex items-center gap-1.5 px-3 py-1.5 rounded-xl border text-xs font-bold cursor-pointer transition-all select-none shadow-sm ${
+            showPhone 
+              ? 'bg-emerald-950/80 text-emerald-300 border-emerald-500 ring-1 ring-emerald-500/50' 
+              : 'bg-slate-800/80 text-slate-400 border-slate-700 hover:text-slate-200'
+          }`}>
+            <input
+              type="checkbox"
+              checked={showPhone}
+              onChange={e => setShowPhone(e.target.checked)}
+              className="w-3.5 h-3.5 rounded accent-emerald-500 cursor-pointer"
+            />
+            <Phone className={`w-3.5 h-3.5 ${showPhone ? 'text-emerald-400' : 'text-slate-400'}`} />
+            <span>ఫోన్ నెంబర్ ముద్రించు</span>
+          </label>
+
           {/* Format (Neutral vs Party) */}
           <div className="flex items-center gap-1 bg-slate-800/80 p-1 rounded-xl border border-slate-700">
-            <span className="text-slate-400 font-bold px-1 text-[10px]">ఫార్మాట్:</span>
             <button
               type="button"
               onClick={() => setBrandingMode('neutral')}
@@ -527,7 +614,7 @@ export const GroupPrintModal: React.FC<GroupPrintModalProps> = ({
               title="పార్టీ గుర్తులు మరియు పేర్లు లేకుండా స్వచ్ఛమైన అధికారిక ఓటరు చీటీ ఫార్మాట్"
             >
               <ShieldCheck className="w-3.5 h-3.5" />
-              <span>🏛️ అధికారిక చీటీ (పార్టీ గుర్తులు లేవు)</span>
+              <span>🏛️ అధికారిక చీటీ</span>
             </button>
             <button
               type="button"
@@ -543,7 +630,10 @@ export const GroupPrintModal: React.FC<GroupPrintModalProps> = ({
               <span>🚩 జనసేన బ్రాండింగ్</span>
             </button>
           </div>
+        </div>
 
+        {/* Toolbar Row 3: Sorting & Gender */}
+        <div className="flex items-center justify-between gap-2 flex-wrap pt-2 border-t border-slate-800 text-[11px]">
           {/* Sorting */}
           <div className="flex items-center gap-1 flex-wrap">
             <span className="text-slate-400 font-bold flex items-center gap-1 mr-1">
@@ -593,7 +683,7 @@ export const GroupPrintModal: React.FC<GroupPrintModalProps> = ({
                 genderFilter === 'all' ? 'bg-amber-500 text-slate-950 font-black' : 'bg-slate-800 text-slate-300'
               }`}
             >
-              అందరూ ({voters.length})
+              అందరూ
             </button>
             <button
               type="button"
@@ -614,6 +704,39 @@ export const GroupPrintModal: React.FC<GroupPrintModalProps> = ({
               👩 మహిళలు
             </button>
           </div>
+
+          {/* Table Mode Specific Columns */}
+          {printLayout === 'table' && (
+            <div className="flex items-center gap-2 flex-wrap">
+              <label className="flex items-center gap-1 cursor-pointer select-none text-slate-300 hover:text-white">
+                <input
+                  type="checkbox"
+                  checked={showRelation}
+                  onChange={e => setShowRelation(e.target.checked)}
+                  className="rounded accent-amber-500"
+                />
+                <span>సంబంధీకుడు</span>
+              </label>
+              <label className="flex items-center gap-1 cursor-pointer select-none text-slate-300 hover:text-white">
+                <input
+                  type="checkbox"
+                  checked={showLeaning}
+                  onChange={e => setShowLeaning(e.target.checked)}
+                  className="rounded accent-amber-500"
+                />
+                <span>మొగ్గు</span>
+              </label>
+              <label className="flex items-center gap-1 cursor-pointer select-none text-slate-300 hover:text-white">
+                <input
+                  type="checkbox"
+                  checked={showPollCheckbox}
+                  onChange={e => setShowPollCheckbox(e.target.checked)}
+                  className="rounded accent-amber-500"
+                />
+                <span>ఓటు వేశారు ☐</span>
+              </label>
+            </div>
+          )}
         </div>
       </div>
 
@@ -627,7 +750,6 @@ export const GroupPrintModal: React.FC<GroupPrintModalProps> = ({
              VOTER SLIPS VIEW: Discrete A4 Pages (2, 4, 6, 8, 10 slips per page)
              ======================================================================= */
           slipPages.map((pageVoters, pageIndex) => {
-            // Determine grid columns & rows based on slipsPerPage
             const is8Slips = slipsPerPage === 8;
             const is10Slips = slipsPerPage === 10;
             const is6Slips = slipsPerPage === 6;
@@ -716,8 +838,7 @@ export const GroupPrintModal: React.FC<GroupPrintModalProps> = ({
                 >
                   {pageVoters.map((v, idx) => {
                     const voterSno = v.s ?? (v as any).sno;
-                    const prof = voterSno ? profiles[voterSno] || {} : {};
-                    const phone = prof.customPhone || v.k_m;
+                    const phone = getVoterPhone(v);
                     const voterId = v.id || (v as any).epic || '';
                     const voterName =
                       v.n ||
@@ -801,7 +922,7 @@ export const GroupPrintModal: React.FC<GroupPrintModalProps> = ({
                           </div>
                         </div>
 
-                        {/* Voter Details (Dynamic typography based on card height) */}
+                        {/* Voter Details */}
                         <div className={`space-y-0.5 mb-1 ${isCompact ? 'text-[9.5px]' : 'text-xs'}`}>
                           {/* Voter Name */}
                           <div className="flex items-start justify-between border-b border-slate-200 pb-0.5 gap-1.5">
@@ -819,7 +940,7 @@ export const GroupPrintModal: React.FC<GroupPrintModalProps> = ({
                             </span>
                           </div>
 
-                          {/* EPIC ID & Demographics in compact grid */}
+                          {/* EPIC ID */}
                           <div className="flex items-center justify-between border-b border-slate-200 pb-0.5 gap-1">
                             <span className="text-slate-500 text-[8.5px] font-bold shrink-0">ఓటరు ID:</span>
                             <span className={`font-mono font-black text-[10.5px] tracking-wider ${activeTheme.epicBg} ${activeTheme.epicText} px-1.5 py-0.2 rounded border ${activeTheme.epicBorder} shrink-0`}>
@@ -849,11 +970,15 @@ export const GroupPrintModal: React.FC<GroupPrintModalProps> = ({
                             </div>
                           </div>
 
-                          {/* Phone if available (only in larger card modes) */}
-                          {!isCompact && phone && (
-                            <div className="flex items-center justify-between border-t border-dashed border-slate-200 pt-0.5 text-[9.5px]">
-                              <span className="text-slate-500 font-bold">ఫోన్:</span>
-                              <span className="font-mono font-bold text-slate-900">{phone}</span>
+                          {/* Phone: ONLY PRINTED WHEN CHECKED (showPhone === true) */}
+                          {showPhone && phone && (
+                            <div className="flex items-center justify-between border-t border-dashed border-slate-300 pt-0.5 text-[8.5px]">
+                              <span className="text-slate-600 font-bold flex items-center gap-0.5">
+                                <Phone className="w-2.5 h-2.5 text-emerald-600" /> ఫోన్:
+                              </span>
+                              <span className="font-mono font-bold text-slate-950 bg-emerald-50 px-1 py-0.2 rounded border border-emerald-300">
+                                {phone}
+                              </span>
                             </div>
                           )}
                         </div>
@@ -1010,8 +1135,8 @@ export const GroupPrintModal: React.FC<GroupPrintModalProps> = ({
                 <tbody className="divide-y divide-slate-300">
                   {sortedVoters.map((v, index) => {
                     const voterSno = v.s ?? (v as any).sno;
+                    const phone = getVoterPhone(v);
                     const prof = voterSno ? profiles[voterSno] || {} : {};
-                    const phone = prof.customPhone || v.k_m;
                     const pct = prof.supportPct;
 
                     const voterId = v.id || (v as any).epic || '';
