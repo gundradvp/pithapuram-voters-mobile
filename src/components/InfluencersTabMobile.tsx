@@ -1,5 +1,5 @@
 import React, { useState, useMemo } from 'react';
-import { UserCheck, Phone, MessageSquare, Plus, Share2, Users, Home, Search, ShieldCheck, ChevronDown, ChevronUp, X } from 'lucide-react';
+import { UserCheck, Phone, MessageSquare, Plus, Share2, Users, Home, Search, ShieldCheck, ChevronDown, ChevronUp, X, Printer } from 'lucide-react';
 import { Influencer, MobileVoter, FamilyGroup, VoterCampaignProfile, BoothInfo } from '../types';
 import { generateInfluencerWhatsAppMessage } from '../utils/storage';
 
@@ -12,6 +12,7 @@ interface InfluencersTabMobileProps {
   onAddNewInfluencer: () => void;
   onOpenInfluencerAssign: (targetName: string, currentInfId?: string) => void;
   onOpenBulkAssign?: (infId?: string) => void;
+  onOpenGroupPrint?: (title: string, subtitle: string, voters: MobileVoter[], initialLayout?: 'slips' | 'table') => void;
 }
 
 export const InfluencersTabMobile: React.FC<InfluencersTabMobileProps> = ({
@@ -21,7 +22,8 @@ export const InfluencersTabMobile: React.FC<InfluencersTabMobileProps> = ({
   profiles,
   boothInfo,
   onAddNewInfluencer,
-  onOpenBulkAssign
+  onOpenBulkAssign,
+  onOpenGroupPrint
 }) => {
   const [searchQuery, setSearchQuery] = useState('');
   const [expandedInfId, setExpandedInfId] = useState<string | null>(null);
@@ -253,6 +255,57 @@ export const InfluencersTabMobile: React.FC<InfluencersTabMobileProps> = ({
                   <span>Dispatch</span>
                 </button>
               </div>
+
+              {/* Row 2: Influencer Print Slips & Normal List Print */}
+              {onOpenGroupPrint && assignedVoters.length > 0 ? (
+                <div className="grid grid-cols-2 gap-1.5 pt-1 border-t border-slate-800/80">
+                  <button
+                    type="button"
+                    onClick={() => {
+                      onOpenGroupPrint(
+                        `${inf.name} (${inf.role}) — ఓటర్ల సమాచార చీటీలు`,
+                        `ఇంచార్జ్: ${inf.name} • మొబైల్: ${inf.mobile} • బూత్ #${boothInfo.part_no || boothInfo.ward_no} • మొత్తం: ${assignedVoters.length} మంది ఓటర్లు`,
+                        assignedVoters,
+                        'slips'
+                      );
+                    }}
+                    className="py-1.5 px-2 bg-gradient-to-r from-red-950/80 to-amber-950/80 hover:from-red-900 hover:to-amber-900 text-amber-300 rounded-xl text-[11px] font-black flex items-center justify-center gap-1.5 border border-amber-500/40 shadow-sm active:scale-95 cursor-pointer transition-all"
+                    title={`${inf.name} ఓటర్ల చీటీలను (A4 Slips) ముద్రించండి`}
+                  >
+                    <Printer className="w-3.5 h-3.5 text-amber-400" />
+                    <span>🖨️ చీటీలు ప్రింట్ ({assignedVoters.length})</span>
+                  </button>
+
+                  <button
+                    type="button"
+                    onClick={() => {
+                      onOpenGroupPrint(
+                        `${inf.name} (${inf.role}) — సాధారణ ఓటర్ల జాబితా (Roster)`,
+                        `ఇంచార్జ్: ${inf.name} • మొబైల్: ${inf.mobile} • బూత్ #${boothInfo.part_no || boothInfo.ward_no} • మొత్తం: ${assignedVoters.length} మంది ఓటర్లు`,
+                        assignedVoters,
+                        'table'
+                      );
+                    }}
+                    className="py-1.5 px-2 bg-gradient-to-r from-teal-950/80 to-emerald-950/80 hover:from-teal-900 hover:to-emerald-900 text-teal-300 rounded-xl text-[11px] font-black flex items-center justify-center gap-1.5 border border-teal-500/40 shadow-sm active:scale-95 cursor-pointer transition-all"
+                    title={`${inf.name} సాధారణ ఓటర్ల లిస్ట్ (Normal List Table) ముద్రించండి`}
+                  >
+                    <Users className="w-3.5 h-3.5 text-teal-400" />
+                    <span>📋 నార్మల్ లిస్ట్ ({assignedVoters.length})</span>
+                  </button>
+                </div>
+              ) : (
+                assignedVoters.length === 0 && onOpenBulkAssign && (
+                  <div className="pt-1 border-t border-slate-800/80 text-center">
+                    <button
+                      type="button"
+                      onClick={() => onOpenBulkAssign(inf.id)}
+                      className="text-[10px] text-amber-400/90 hover:text-amber-300 hover:underline flex items-center justify-center gap-1 w-full py-0.5"
+                    >
+                      <span>⚪ ఇంకా ఓటర్లు కేటాయించలేదు — ఓటర్లను కేటాయించడానికి క్లిక్ చేయండి</span>
+                    </button>
+                  </div>
+                )
+              )}
 
               {/* Expand Assigned Voters Toggle */}
               {assignedVoters.length > 0 && (

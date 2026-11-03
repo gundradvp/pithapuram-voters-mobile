@@ -23,7 +23,7 @@ interface VotersTabMobileProps {
   onQuickToggleOurs?: (serialNo: number) => void;
   onQuickToggleVoted?: (serialNo: number) => void;
   onOpenSlip: (voter: MobileVoter) => void;
-  onOpenGroupPrint?: (title: string, subtitle: string, voters: MobileVoter[]) => void;
+  onOpenGroupPrint?: (title: string, subtitle: string, voters: MobileVoter[], initialLayout?: 'slips' | 'table') => void;
   onOpenSurnameLeaning?: (clanId?: string) => void;
   onOpenBulkAssign?: (snos?: number[]) => void;
 }
@@ -169,29 +169,34 @@ export const VotersTabMobile: React.FC<VotersTabMobileProps> = ({
     setSelectedVoterSnos(new Set(allSnos));
   };
 
-  const handlePrintSelected = () => {
+  const handlePrintSelected = (layout: 'slips' | 'table' = 'slips') => {
     if (!onOpenGroupPrint || selectedVoterSnos.size === 0) return;
     const selected = voters.filter(v => selectedVoterSnos.has(v.s));
     onOpenGroupPrint(
-      language === 'te' ? `ఎంచుకున్న ఓటర్ల స్లిప్పులు` : `Selected Voter Slips`,
+      language === 'te'
+        ? (layout === 'table' ? `ఎంచుకున్న ఓటర్ల సాధారణ జాబితా (Roster)` : `ఎంచుకున్న ఓటర్ల స్లిప్పులు`)
+        : (layout === 'table' ? `Selected Voter Roster` : `Selected Voter Slips`),
       `${boothInfo.clean_village || boothInfo.ps_address} • మొత్తం ${selected.length} మంది ఓటర్లు`,
-      selected
+      selected,
+      layout
     );
   };
 
-  const handlePrintAll = () => {
+  const handlePrintAll = (layout: 'slips' | 'table' = 'slips') => {
     if (!onOpenGroupPrint || filteredVoters.length === 0) return;
+    const isTable = layout === 'table';
     const groupTitle = selectedSurname !== 'all'
-      ? `${selectedSurname} వంశ ఓటర్ల స్లిప్పులు`
+      ? `${selectedSurname} వంశ ఓటర్ల ${isTable ? 'సాధారణ జాబితా (Roster)' : 'స్లిప్పులు'}`
       : selectedStreet !== 'all'
-        ? `${selectedStreet} వీధి ఓటర్ల స్లిప్పులు`
+        ? `${selectedStreet} వీధి ఓటర్ల ${isTable ? 'సాధారణ జాబితా (Roster)' : 'స్లిప్పులు'}`
         : filterMode !== 'all'
-          ? `${filterMode.toUpperCase()} వర్గం ఓటర్ల స్లిప్పులు`
-          : `బూత్ #${boothInfo.part_no || boothInfo.ward_no} ఓటర్ల స్లిప్పులు`;
+          ? `${filterMode.toUpperCase()} వర్గం ఓటర్ల ${isTable ? 'సాధారణ జాబితా (Roster)' : 'స్లిప్పులు'}`
+          : `బూత్ #${boothInfo.part_no || boothInfo.ward_no} ఓటర్ల ${isTable ? 'సాధారణ జాబితా (Roster)' : 'స్లిప్పులు'}`;
     onOpenGroupPrint(
       groupTitle,
       `${boothInfo.clean_village || boothInfo.ps_address} • మొత్తం ${filteredVoters.length} మంది ఓటర్లు`,
-      filteredVoters
+      filteredVoters,
+      layout
     );
   };
   const [selectedDuplicateCluster, setSelectedDuplicateCluster] = useState<{
@@ -1287,15 +1292,26 @@ _మీ అమూల్యమైన ఓటును గాజు గ్లాస
         <div className="flex items-center gap-1.5 flex-wrap">
           {filteredVoters.length > 0 && onOpenGroupPrint && (
             <>
-              {/* Print All Filtered Voters (Requirement 5) */}
+              {/* Print All Filtered Voters (Slips View) */}
               <button
                 type="button"
-                onClick={handlePrintAll}
-                className="px-2 py-0.5 bg-slate-900 hover:bg-slate-800 text-amber-300 border border-amber-500/30 rounded-lg text-[10.5px] font-bold flex items-center gap-1 shadow-sm active:scale-95 transition-all"
-                title={language === 'te' ? 'అన్ని స్లిప్పులు ఒకేసారి ప్రింట్ చేయండి' : 'Print All Filtered Voter Slips'}
+                onClick={() => handlePrintAll('slips')}
+                className="px-2 py-0.5 bg-slate-900 hover:bg-slate-800 text-amber-300 border border-amber-500/30 rounded-lg text-[10.5px] font-bold flex items-center gap-1 shadow-sm active:scale-95 transition-all cursor-pointer"
+                title={language === 'te' ? 'అన్ని స్లిప్పులు ఒకేసారి ప్రింట్ చేయండి (A4 Slips)' : 'Print All Filtered Voter Slips'}
               >
                 <Printer className="w-3 h-3 text-amber-400" />
-                <span>{language === 'te' ? `🖨️ అన్నీ ప్రింట్ (${filteredVoters.length})` : `🖨️ Print All (${filteredVoters.length})`}</span>
+                <span>{language === 'te' ? `🖨️ చీటీలు (${filteredVoters.length})` : `🖨️ Slips (${filteredVoters.length})`}</span>
+              </button>
+
+              {/* Print Normal Voter List (Table / Roster View) */}
+              <button
+                type="button"
+                onClick={() => handlePrintAll('table')}
+                className="px-2 py-0.5 bg-slate-900 hover:bg-slate-800 text-teal-300 border border-teal-500/30 rounded-lg text-[10.5px] font-bold flex items-center gap-1 shadow-sm active:scale-95 transition-all cursor-pointer"
+                title={language === 'te' ? 'సాధారణ ఓటర్ల జాబితా (Table / Roster) ప్రింట్ చేయండి' : 'Print Normal Voter List (Table / Roster)'}
+              >
+                <Users className="w-3 h-3 text-teal-400" />
+                <span>{language === 'te' ? `📋 జాబితా (${filteredVoters.length})` : `📋 Roster (${filteredVoters.length})`}</span>
               </button>
 
               {/* Select Specific Voters for Printing */}
@@ -2524,12 +2540,23 @@ _మీ అమూల్యమైన ఓటును గాజు గ్లాస
             </button>
             <button
               type="button"
-              onClick={handlePrintSelected}
+              onClick={() => handlePrintSelected('slips')}
               disabled={selectedVoterSnos.size === 0}
-              className="px-3 py-1.5 rounded-xl bg-gradient-to-r from-red-600 via-amber-600 to-red-600 hover:from-red-500 hover:to-amber-500 text-white font-black text-[11px] flex items-center gap-1.5 shadow-md disabled:opacity-40 disabled:cursor-not-allowed active:scale-95 transition-all"
+              className="px-2.5 py-1.5 rounded-xl bg-gradient-to-r from-red-600 via-amber-600 to-red-600 hover:from-red-500 hover:to-amber-500 text-white font-black text-[11px] flex items-center gap-1 shadow-md disabled:opacity-40 disabled:cursor-not-allowed active:scale-95 transition-all cursor-pointer"
+              title="ఎంపిక చేసిన ఓటర్ల చీటీలు (Slips) ప్రింట్ చేయండి"
             >
               <Printer className="w-3.5 h-3.5" />
-              <span>{language === 'te' ? `ప్రింట్ (${selectedVoterSnos.size})` : `Print (${selectedVoterSnos.size})`}</span>
+              <span>{language === 'te' ? `చీటీలు (${selectedVoterSnos.size})` : `Slips (${selectedVoterSnos.size})`}</span>
+            </button>
+            <button
+              type="button"
+              onClick={() => handlePrintSelected('table')}
+              disabled={selectedVoterSnos.size === 0}
+              className="px-2.5 py-1.5 rounded-xl bg-slate-800 hover:bg-slate-700 text-teal-300 font-black text-[11px] flex items-center gap-1 border border-teal-500/30 disabled:opacity-40 disabled:cursor-not-allowed active:scale-95 transition-all cursor-pointer"
+              title="ఎంపిక చేసిన ఓటర్ల సాధారణ జాబితా (Roster Table) ప్రింట్ చేయండి"
+            >
+              <Users className="w-3.5 h-3.5 text-teal-400" />
+              <span>{language === 'te' ? `జాబితా (${selectedVoterSnos.size})` : `Roster (${selectedVoterSnos.size})`}</span>
             </button>
             {onOpenBulkAssign && (
               <button

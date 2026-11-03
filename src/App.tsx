@@ -241,19 +241,27 @@ export function App() {
     title: string;
     subtitle?: string;
     voters: MobileVoter[];
+    initialLayout?: 'slips' | 'table';
   }>({
     open: false,
     title: '',
     subtitle: '',
-    voters: []
+    voters: [],
+    initialLayout: 'slips'
   });
 
-  const handleOpenGroupPrint = (title: string, subtitle: string, votersList: MobileVoter[]) => {
+  const handleOpenGroupPrint = (
+    title: string,
+    subtitle: string,
+    votersList: MobileVoter[],
+    initialLayout: 'slips' | 'table' = 'slips'
+  ) => {
     setGroupPrintState({
       open: true,
       title,
       subtitle,
-      voters: votersList
+      voters: votersList,
+      initialLayout
     });
   };
 
@@ -1050,6 +1058,7 @@ export function App() {
                   });
                 }}
                 onOpenBulkAssign={infId => setBulkAssignState({ open: true, initialInfluencerId: infId })}
+                onOpenGroupPrint={handleOpenGroupPrint}
               />
             )}
 
@@ -1243,6 +1252,7 @@ export function App() {
           boothInfo={boothData.booth_info}
           voters={groupPrintState.voters}
           profiles={profiles}
+          initialLayout={groupPrintState.initialLayout}
           language={lang}
           onClose={() => setGroupPrintState(prev => ({ ...prev, open: false }))}
         />

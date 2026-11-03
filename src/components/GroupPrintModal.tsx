@@ -1,4 +1,4 @@
-import React, { useState, useMemo } from 'react';
+import React, { useState, useMemo, useEffect } from 'react';
 import {
   Printer,
   X,
@@ -24,6 +24,7 @@ interface GroupPrintModalProps {
   boothInfo: BoothInfo;
   voters: MobileVoter[];
   profiles: Record<number, VoterCampaignProfile>;
+  initialLayout?: PrintLayout;
   language?: Language;
 }
 
@@ -172,9 +173,16 @@ export const GroupPrintModal: React.FC<GroupPrintModalProps> = ({
   boothInfo,
   voters,
   profiles,
+  initialLayout = 'slips',
   language = 'te'
 }) => {
-  const [printLayout, setPrintLayout] = useState<PrintLayout>('slips');
+  const [printLayout, setPrintLayout] = useState<PrintLayout>(initialLayout);
+
+  useEffect(() => {
+    if (isOpen && initialLayout) {
+      setPrintLayout(initialLayout);
+    }
+  }, [isOpen, initialLayout]);
   const [slipsPerPage, setSlipsPerPage] = useState<SlipsPerPage>(4);
   const [colorTheme, setColorTheme] = useState<ColorTheme>('blue');
   const [brandingMode, setBrandingMode] = useState<BrandingMode>('neutral');
@@ -477,45 +485,92 @@ export const GroupPrintModal: React.FC<GroupPrintModalProps> = ({
           </div>
         </div>
 
-        {/* Toolbar Row 1: Number of Items Per Page & Color Themes */}
+        {/* Toolbar Row 1: Print Layout Mode (Slips vs Normal List) & Contextual Controls */}
         <div className="flex items-center justify-between gap-2 flex-wrap pt-2 border-t border-slate-800 text-[11px]">
-          {/* Slips per page options (2, 4, 6, 8, 10 items) */}
-          <div className="flex items-center gap-1 bg-slate-800/90 p-1 rounded-xl border border-slate-700 flex-wrap">
-            <span className="text-amber-400 font-bold px-1.5 text-[10.5px] flex items-center gap-1">
-              <Layers className="w-3.5 h-3.5" /> పేజీకి స్లిప్పులు:
-            </span>
-            {([2, 4, 6, 8, 10] as SlipsPerPage[]).map(num => (
-              <button
-                key={num}
-                type="button"
-                onClick={() => {
-                  setPrintLayout('slips');
-                  setSlipsPerPage(num);
-                }}
-                className={`px-2.5 py-1 rounded-lg text-xs font-black transition-all cursor-pointer ${
-                  printLayout === 'slips' && slipsPerPage === num
-                    ? 'bg-amber-500 text-slate-950 shadow-md scale-105'
-                    : 'text-slate-300 hover:text-white hover:bg-slate-700/60'
-                }`}
-                title={`పేజీకి ${num} ఓటర్ స్లిప్పులు (A4 లో ${num} భాగాలు)`}
-              >
-                {num === 4 ? `4 (సిఫార్సు)` : num === 8 ? `8 (కాంపాక్ట్)` : `${num}`}
-              </button>
-            ))}
-            <div className="h-4 w-[1px] bg-slate-700 mx-1" />
+          {/* Main Format Tabs: Voter Slips vs Normal Voter List */}
+          <div className="flex items-center gap-1.5 p-1 bg-slate-950 rounded-xl border border-slate-700">
+            <button
+              type="button"
+              onClick={() => setPrintLayout('slips')}
+              className={`px-3 py-1.5 rounded-lg text-xs font-black flex items-center gap-1.5 transition-all cursor-pointer ${
+                printLayout === 'slips'
+                  ? 'bg-amber-500 text-slate-950 shadow-md font-black'
+                  : 'text-slate-300 hover:text-white hover:bg-slate-800'
+              }`}
+            >
+              <Printer className="w-3.5 h-3.5" />
+              <span>🖨️ ఓటర్ చీటీలు (Voter Slips)</span>
+            </button>
             <button
               type="button"
               onClick={() => setPrintLayout('table')}
-              className={`px-2.5 py-1 rounded-lg text-xs font-black flex items-center gap-1 transition-all cursor-pointer ${
+              className={`px-3 py-1.5 rounded-lg text-xs font-black flex items-center gap-1.5 transition-all cursor-pointer ${
                 printLayout === 'table'
-                  ? 'bg-amber-500 text-slate-950 shadow-md'
-                  : 'text-slate-300 hover:text-white'
+                  ? 'bg-amber-500 text-slate-950 shadow-md font-black'
+                  : 'text-slate-300 hover:text-white hover:bg-slate-800'
               }`}
             >
               <Users className="w-3.5 h-3.5" />
-              <span>📋 జాబితా (Table)</span>
+              <span>📋 సాధారణ ఓటర్ల జాబితా (Normal List)</span>
             </button>
           </div>
+
+          {/* Sub-Options based on layout */}
+          {printLayout === 'slips' ? (
+            /* Slips per page options (2, 4, 6, 8, 10 items) */
+            <div className="flex items-center gap-1 bg-slate-800/90 p-1 rounded-xl border border-slate-700 flex-wrap">
+              <span className="text-amber-400 font-bold px-1.5 text-[10.5px] flex items-center gap-1">
+                <Layers className="w-3.5 h-3.5" /> పేజీకి స్లిప్పులు:
+              </span>
+              {([2, 4, 6, 8, 10] as SlipsPerPage[]).map(num => (
+                <button
+                  key={num}
+                  type="button"
+                  onClick={() => setSlipsPerPage(num)}
+                  className={`px-2.5 py-1 rounded-lg text-xs font-black transition-all cursor-pointer ${
+                    slipsPerPage === num
+                      ? 'bg-amber-500 text-slate-950 shadow-md scale-105'
+                      : 'text-slate-300 hover:text-white hover:bg-slate-700/60'
+                  }`}
+                  title={`పేజీకి ${num} ఓటర్ స్లిప్పులు (A4 లో ${num} భాగాలు)`}
+                >
+                  {num === 4 ? `4 (సిఫార్సు)` : num === 8 ? `8 (కాంపాక్ట్)` : `${num}`}
+                </button>
+              ))}
+            </div>
+          ) : (
+            /* Table Mode Columns */
+            <div className="flex items-center gap-2 bg-slate-800/90 px-2.5 py-1 rounded-xl border border-slate-700 flex-wrap">
+              <span className="text-teal-400 font-bold text-[10.5px]">కాలమ్స్:</span>
+              <label className="flex items-center gap-1 cursor-pointer select-none text-slate-300 hover:text-white text-[10.5px]">
+                <input
+                  type="checkbox"
+                  checked={showRelation}
+                  onChange={e => setShowRelation(e.target.checked)}
+                  className="rounded accent-amber-500"
+                />
+                <span>సంబంధీకుడు</span>
+              </label>
+              <label className="flex items-center gap-1 cursor-pointer select-none text-slate-300 hover:text-white text-[10.5px]">
+                <input
+                  type="checkbox"
+                  checked={showLeaning}
+                  onChange={e => setShowLeaning(e.target.checked)}
+                  className="rounded accent-amber-500"
+                />
+                <span>మొగ్గు</span>
+              </label>
+              <label className="flex items-center gap-1 cursor-pointer select-none text-slate-300 hover:text-white text-[10.5px]">
+                <input
+                  type="checkbox"
+                  checked={showPollCheckbox}
+                  onChange={e => setShowPollCheckbox(e.target.checked)}
+                  className="rounded accent-amber-500"
+                />
+                <span>ఓటు వేశారు ☐</span>
+              </label>
+            </div>
+          )}
 
           {/* Color Themes Selector */}
           <div className="flex items-center gap-1 bg-slate-800/90 p-1 rounded-xl border border-slate-700 flex-wrap">
@@ -704,39 +759,6 @@ export const GroupPrintModal: React.FC<GroupPrintModalProps> = ({
               👩 మహిళలు
             </button>
           </div>
-
-          {/* Table Mode Specific Columns */}
-          {printLayout === 'table' && (
-            <div className="flex items-center gap-2 flex-wrap">
-              <label className="flex items-center gap-1 cursor-pointer select-none text-slate-300 hover:text-white">
-                <input
-                  type="checkbox"
-                  checked={showRelation}
-                  onChange={e => setShowRelation(e.target.checked)}
-                  className="rounded accent-amber-500"
-                />
-                <span>సంబంధీకుడు</span>
-              </label>
-              <label className="flex items-center gap-1 cursor-pointer select-none text-slate-300 hover:text-white">
-                <input
-                  type="checkbox"
-                  checked={showLeaning}
-                  onChange={e => setShowLeaning(e.target.checked)}
-                  className="rounded accent-amber-500"
-                />
-                <span>మొగ్గు</span>
-              </label>
-              <label className="flex items-center gap-1 cursor-pointer select-none text-slate-300 hover:text-white">
-                <input
-                  type="checkbox"
-                  checked={showPollCheckbox}
-                  onChange={e => setShowPollCheckbox(e.target.checked)}
-                  className="rounded accent-amber-500"
-                />
-                <span>ఓటు వేశారు ☐</span>
-              </label>
-            </div>
-          )}
         </div>
       </div>
 
@@ -812,6 +834,7 @@ export const GroupPrintModal: React.FC<GroupPrintModalProps> = ({
                   <div className={`mt-1.5 pt-1.5 border-t border-white/20 flex items-center justify-between text-[10px] leading-tight text-white/95`}>
                     <div className="font-bold flex items-center gap-1.5 truncate">
                       <span>{title}</span>
+                      {subtitle && <span className="opacity-90 font-normal text-[9.5px]"> • {subtitle}</span>}
                       <span className="opacity-80 text-[9.5px] font-normal">
                         ({sortedVoters.length} మంది • ఈ పేజీలో {pageVoters.length} స్లిప్పులు)
                       </span>
@@ -1057,11 +1080,13 @@ export const GroupPrintModal: React.FC<GroupPrintModalProps> = ({
               <div className="flex items-start justify-between gap-3 text-white">
                 <div>
                   <h1 className="text-base sm:text-lg font-black tracking-tight uppercase">
-                    ఓటర్ల జాబితా • VOTER ROSTER
+                    {brandingMode === 'party' ? '🚩 జనసేన పార్టీ • సాధారణ ఓటర్ల జాబితా (VOTER ROSTER)' : 'భారత ఎన్నికల సంఘం • అధికారిక ఓటర్ల జాబితా (ECI VOTER ROSTER)'}
                   </h1>
                   <p className="text-[11px] font-bold opacity-90">{boothHeaderLabel}</p>
-                  <p className="text-[10px] opacity-80 mt-0.5">
-                    {title} • కేంద్రం: {boothInfo.clean_village || boothInfo.ps_address}
+                  <p className="text-[10.5px] opacity-90 mt-0.5">
+                    <strong className="text-amber-300 font-bold">{title}</strong>
+                    {subtitle && <span> • {subtitle}</span>}
+                    <span> • కేంద్రం: {boothInfo.clean_village || boothInfo.ps_address}</span>
                   </p>
                 </div>
                 <div className="text-right">
