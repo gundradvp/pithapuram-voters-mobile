@@ -1,11 +1,12 @@
-import fs from 'fs';
-import path from 'path';
-import https from 'https';
+const fs = require('fs');
+const path = require('path');
+const https = require('https');
 
 const COMMIT_SHA = 'main';
 
 const filesToSync = [
   'sync.js',
+  'sync.cjs',
   'index.html',
   'package.json',
   'vite.config.ts',

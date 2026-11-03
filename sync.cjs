@@ -6,6 +6,7 @@ const COMMIT_SHA = 'main';
 
 const filesToSync = [
   'sync.js',
+  'sync.cjs',
   'index.html',
   'package.json',
   'vite.config.ts',
