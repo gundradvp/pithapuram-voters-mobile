@@ -71,6 +71,20 @@ export const InfluencersTabMobile: React.FC<InfluencersTabMobileProps> = ({
     return { voterMap, familyMap };
   }, [influencerList, families, profiles, voters]);
 
+  const allAssignedVoters = useMemo(() => {
+    const seen = new Set<number>();
+    const list: MobileVoter[] = [];
+    Object.values(influencerStats.voterMap).forEach(votersList => {
+      votersList.forEach(v => {
+        if (!seen.has(v.s)) {
+          seen.add(v.s);
+          list.push(v);
+        }
+      });
+    });
+    return list.sort((a, b) => a.s - b.s);
+  }, [influencerStats.voterMap]);
+
   const filteredInfluencers = influencerList.filter(inf => {
     const q = searchQuery.toLowerCase().trim();
     if (!q) return true;
@@ -149,7 +163,7 @@ export const InfluencersTabMobile: React.FC<InfluencersTabMobileProps> = ({
       </div>
 
       {/* Influencers Hub Guide Banner */}
-      <div className="bg-gradient-to-r from-slate-900 via-amber-950/30 to-slate-900 border border-amber-500/30 p-3.5 rounded-2xl space-y-1 shadow-md">
+      <div className="bg-gradient-to-r from-slate-900 via-amber-950/30 to-slate-900 border border-amber-500/30 p-3.5 rounded-2xl space-y-2 shadow-md">
         <div className="flex items-center justify-between">
           <span className="text-[11px] font-black text-amber-400 uppercase tracking-wider flex items-center gap-1.5">
             <UserCheck className="w-4 h-4 text-emerald-400" />
@@ -162,6 +176,43 @@ export const InfluencersTabMobile: React.FC<InfluencersTabMobileProps> = ({
         <p className="text-[11px] text-slate-300 leading-relaxed">
           Assign electors and families to Ward Members, Caste Elders, or Youth Leaders. Tap <strong>"Dispatch to WhatsApp"</strong> to send their assigned voter list directly into their WhatsApp chat!
         </p>
+
+        {/* Global Print Options across all leaders if any electors are assigned */}
+        {allAssignedVoters.length > 0 && onOpenGroupPrint && (
+          <div className="flex flex-wrap items-center gap-2 pt-2 border-t border-amber-500/20">
+            <span className="text-[10px] text-amber-300 font-bold uppercase tracking-wider flex items-center gap-1">
+              <Printer className="w-3 h-3 text-amber-400" /> ప్రింట్ ఆప్షన్లు:
+            </span>
+            <button
+              type="button"
+              onClick={() => {
+                onOpenGroupPrint(
+                  `పిఠాపురం బూత్ #${boothInfo.part_no || boothInfo.ward_no} — నాయకులకు కేటాయించిన ఓటర్ల చీటీలు`,
+                  `మొత్తం కేటాయించిన ఓటర్లు: ${allAssignedVoters.length} మంది • బూత్ #${boothInfo.part_no || boothInfo.ward_no}`,
+                  allAssignedVoters,
+                  'slips'
+                );
+              }}
+              className="py-1 px-2.5 bg-amber-500/20 hover:bg-amber-500/30 text-amber-300 border border-amber-500/40 rounded-lg text-[11px] font-bold flex items-center gap-1.5 transition-all cursor-pointer active:scale-95"
+            >
+              <span>🖨️ కేటాయించిన చీటీలన్నీ ({allAssignedVoters.length})</span>
+            </button>
+            <button
+              type="button"
+              onClick={() => {
+                onOpenGroupPrint(
+                  `పిఠాపురం బూత్ #${boothInfo.part_no || boothInfo.ward_no} — నాయకులకు కేటాయించిన ఓటర్ల జాబితా (Roster)`,
+                  `మొత్తం కేటాయించిన ఓటర్లు: ${allAssignedVoters.length} మంది • బూత్ #${boothInfo.part_no || boothInfo.ward_no}`,
+                  allAssignedVoters,
+                  'table'
+                );
+              }}
+              className="py-1 px-2.5 bg-teal-500/20 hover:bg-teal-500/30 text-teal-300 border border-teal-500/40 rounded-lg text-[11px] font-bold flex items-center gap-1.5 transition-all cursor-pointer active:scale-95"
+            >
+              <span>📋 మొత్తం లిస్ట్ ({allAssignedVoters.length})</span>
+            </button>
+          </div>
+        )}
       </div>
 
       {/* Influencers Cards List */}
