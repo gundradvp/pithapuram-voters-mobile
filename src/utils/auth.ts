@@ -28,6 +28,8 @@ export interface VolunteerAssignment {
   municipalWards: string[]; // e.g. ["ward_14", "gollaprolu_ward_11"]
   notes?: string;
   assignedAt: string;
+  expiryMinutes?: number; // duration in minutes e.g. 15, 30, 60, 120 (0 or undefined = no expiry)
+  expiresAt?: number; // epoch timestamp in ms: when Date.now() > expiresAt, list is unloaded
 }
 
 const SESSION_STORAGE_KEY = 'jsp_user_session';
@@ -185,6 +187,52 @@ export function getVolunteerAssignment(phone: string): VolunteerAssignment | nul
   return list.find(a => cleanPhoneNumber(a.phone) === clean) || null;
 }
 
+export function isAssignmentExpired(assignment: VolunteerAssignment | null | undefined): boolean {
+  if (!assignment) return false;
+  if (!assignment.expiresAt) return false;
+  return Date.now() > assignment.expiresAt;
+}
+
+export function getRemainingTime(assignment: VolunteerAssignment | null | undefined): {
+  isExpired: boolean;
+  hasTimer: boolean;
+  minutes: number;
+  seconds: number;
+  formatted: string;
+} {
+  if (!assignment || !assignment.expiresAt) {
+    return { isExpired: false, hasTimer: false, minutes: 999999, seconds: 0, formatted: 'అపరిమితం (No Expiry)' };
+  }
+  const diffMs = assignment.expiresAt - Date.now();
+  if (diffMs <= 0) {
+    return { isExpired: true, hasTimer: true, minutes: 0, seconds: 0, formatted: '0ని. 0సె. (సమయం ముగిసింది / Expired)' };
+  }
+  const totalSeconds = Math.floor(diffMs / 1000);
+  const minutes = Math.floor(totalSeconds / 60);
+  const seconds = totalSeconds % 60;
+  return {
+    isExpired: false,
+    hasTimer: true,
+    minutes,
+    seconds,
+    formatted: `${minutes}ని. ${seconds < 10 ? '0' : ''}${seconds}సె.`
+  };
+}
+
+export function extendAssignmentTime(idOrPhone: string, additionalMinutes: number): VolunteerAssignment | null {
+  const current = getAssignments();
+  const cleanP = cleanPhoneNumber(idOrPhone);
+  const target = current.find(a => a.id === idOrPhone || cleanPhoneNumber(a.phone) === cleanP);
+  if (!target) return null;
+  
+  const baseTime = (target.expiresAt && target.expiresAt > Date.now()) ? target.expiresAt : Date.now();
+  target.expiresAt = baseTime + additionalMinutes * 60 * 1000;
+  target.expiryMinutes = (target.expiryMinutes || 0) + additionalMinutes;
+  
+  saveAssignment(target);
+  return target;
+}
+
 export function getUserSession(): UserSession | null {
   try {
     const raw = safeStorage.getItem(SESSION_STORAGE_KEY);
@@ -248,6 +296,10 @@ export function generateAssignmentWhatsAppMessage(
       }).join('\n')
     : '• కేటాయించలేదు';
 
+  const timerText = assignment.expiryMinutes && assignment.expiryMinutes > 0
+    ? `\n⏱️ *జాబితా కాలపరిమితి (Timer to Access):* ${assignment.expiryMinutes} నిమిషాలు\n(ఈ సమయం ముగియగానే ఓటర్ల జాబితా మొబైల్ స్క్రీన్ నుండి ఆటోమేటిక్‌గా అన్‌లోడ్ అవుతుంది)\n`
+    : '';
+
   return `🗳️ *పిఠాపురం నియోజకవర్గం (AC #37)*
 *ఎన్నికల బూత్ ఇంచార్జ్ / సమన్వయకర్త బాధ్యతల కేటాయింపు*
 
@@ -259,11 +311,12 @@ ${assemblyList}
 
 🏢 *స్థానిక / మున్సిపాలిటీ వార్డులు (Local Wards):*
 ${municipalList}
-
+${timerText}
 📲 *మొబైల్ యాప్‌లో లాగిన్ విధానం:*
 1. క్రింది లింక్ ద్వారా మొబైల్ యాప్ ఓపెన్ చేయండి.
 2. మీ నమోదిత మొబైల్ నంబర్ *${assignment.phone}* ఎంటర్ చేసి లాగిన్ అవ్వండి.
 3. మీకు కేటాయించిన బూతులు/వార్డుల ఓటర్ల లిస్ట్ మాత్రమే మీకు ప్రత్యక్షంగా కనిపిస్తుంది.
+4. "ఓటర్ల జాబితా లోడ్ చేయండి" పై క్లిక్ చేయగానే లిస్ట్ ఓపెన్ అవుతుంది.
 
 🔗 *యాప్ లింక్ (App Link):*
 ${currentUrl}

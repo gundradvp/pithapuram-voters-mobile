@@ -72,11 +72,13 @@ import {
   logoutUser,
   getVolunteerAssignment,
   getWhatsAppShareUrl,
-  fetchFreshAssignments
+  fetchFreshAssignments,
+  isAssignmentExpired,
+  getRemainingTime
 } from './utils/auth';
 import { useI18n } from './utils/i18n';
 import { ThemeId, getSavedTheme, setSavedTheme, applyThemeToDom } from './utils/theme';
-import { Loader2, AlertCircle, Sparkles, Trophy, MessageSquare } from 'lucide-react';
+import { Loader2, AlertCircle, Sparkles, Trophy, MessageSquare, Clock, DownloadCloud, AlertTriangle, RefreshCw, Layers } from 'lucide-react';
 
 export function App() {
   const { lang, toggleLanguage, t } = useI18n();
@@ -130,6 +132,24 @@ export function App() {
     return getAssignedBooth() || 'ward_14';
   });
 
+  // State: load list only when click load (Requirement 3)
+  const [isListLoaded, setIsListLoaded] = useState<boolean>(false);
+  const [now, setNow] = useState<number>(Date.now());
+
+  // 1-second interval to drive real-time countdown timer (Requirement 5)
+  useEffect(() => {
+    const timer = setInterval(() => setNow(Date.now()), 1000);
+    return () => clearInterval(timer);
+  }, []);
+
+  // Compute remaining time for volunteer assignment
+  const remainingTime = useMemo(() => {
+    if (session?.role === 'admin') {
+      return { isExpired: false, hasTimer: false, minutes: 999999, seconds: 0, formatted: 'అపరిమితం' };
+    }
+    return getRemainingTime(currentAssignment);
+  }, [currentAssignment, now, session]);
+
   // Auto-switch to assigned unit on volunteer login if currentPartNo is not in their assigned list
   useEffect(() => {
     if (!session || session.role === 'admin') return;
@@ -149,6 +169,16 @@ export function App() {
   }, [session, currentAssignment, assignedAssemblyBooths, assignedMunicipalWards, currentPartNo]);
 
   const [boothData, setBoothData] = useState<BoothData | null>(null);
+
+  // STRICTLY AUTO-UNLOAD WHEN TIME EXPIRES (Requirement 5)
+  useEffect(() => {
+    if (session?.role === 'volunteer' && currentAssignment?.expiresAt && now >= currentAssignment.expiresAt) {
+      if (isListLoaded || boothData) {
+        setIsListLoaded(false);
+        setBoothData(null);
+      }
+    }
+  }, [now, session, currentAssignment, isListLoaded, boothData]);
   const [activeTab, setActiveTab] = useState<TabType>('voters');
   const [votersViewMode, setVotersViewMode] = useState<'list' | 'surnames' | 'excel'>(() => {
     try {
@@ -564,10 +594,41 @@ export function App() {
   }, [handleRefreshData]);
 
   useEffect(() => {
-    loadBooth(currentPartNo);
-    setIsLocked(isBoothLocked());
-    setIsCached(isBoothCached(currentPartNo));
-  }, [currentPartNo, loadBooth]);
+    // Strictly auto-load only in demo mode. For real data, load list only when click load (Requirement 3)
+    if (session?.role === 'demo') {
+      loadBooth(currentPartNo);
+      setIsListLoaded(true);
+    } else {
+      setIsLocked(isBoothLocked());
+      setIsCached(isBoothCached(currentPartNo));
+    }
+  }, [currentPartNo, loadBooth, session?.role]);
+
+  // Handle Load List on explicit user click (Requirement 3)
+  const handleLoadList = async () => {
+    if (session?.role === 'volunteer') {
+      if (currentAssignment && isAssignmentExpired(currentAssignment)) {
+        alert(lang === 'te' ? '⚠️ ఈ కేటాయింపు కాలపరిమితి ముగిసింది. దయచేసి అడ్మిన్‌ను సంప్రదించండి.' : '⚠️ This assignment has expired. Please contact Admin.');
+        return;
+      }
+      const isCurrentValid =
+        (typeof currentPartNo === 'number' && assignedAssemblyBooths.includes(currentPartNo)) ||
+        (typeof currentPartNo === 'string' && assignedMunicipalWards.includes(currentPartNo));
+      if (!isCurrentValid) {
+        alert(lang === 'te' ? 'ఈ బూత్ మీకు కేటాయించబడలేదు.' : 'This booth is not assigned to you.');
+        return;
+      }
+    }
+    setIsListLoaded(true);
+    await loadBooth(currentPartNo);
+  };
+
+  // Handle Unload List (Requirement 5)
+  const handleUnloadList = () => {
+    setIsListLoaded(false);
+    setBoothData(null);
+    triggerScoreNotice(lang === 'te' ? '📤 ఓటర్ల జాబితా అన్‌లోడ్ చేయబడింది' : '📤 Voter list unloaded');
+  };
 
   // 6. Supabase Cloud Auto-Push (Debounced Background Save)
   useEffect(() => {
@@ -644,12 +705,23 @@ export function App() {
     }, 3500);
   };
 
-  // Handle Booth / Ward Assignment
+  // Handle Booth / Ward Assignment (Strictly checks volunteer assignment)
   const handleSelectBooth = (partNo: number | string, lock: boolean) => {
+    if (session?.role === 'volunteer') {
+      const isValid =
+        (typeof partNo === 'number' && assignedAssemblyBooths.includes(partNo)) ||
+        (typeof partNo === 'string' && assignedMunicipalWards.includes(partNo));
+      if (!isValid) {
+        alert(lang === 'te' ? 'ఈ బూత్ మీకు కేటాయించబడలేదు.' : 'This booth is not assigned to you.');
+        return;
+      }
+    }
+    // Always unload list when switching units; load only when clicked
+    setIsListLoaded(false);
+    setBoothData(null);
     setCurrentPartNo(partNo);
     setAssignedBooth(partNo, lock);
     setIsLocked(lock);
-    loadBooth(partNo);
   };
 
   // Handle Phone Number Save
@@ -960,6 +1032,7 @@ export function App() {
         language={lang}
         theme={theme}
         session={session}
+        remainingTime={remainingTime}
         isRefreshing={isRefreshing}
         cloudSyncState={cloudSyncState}
         onRefreshData={() => handleRefreshData(true)}
@@ -1051,8 +1124,137 @@ export function App() {
           </div>
         )}
 
+        {/* REQUIREMENT 3 & 5: Load List Only When Clicked, and Timer Expiry Display */}
+        {(!isListLoaded || !boothData) && !isLoading && (
+          <div className="py-8 max-w-md mx-auto space-y-4 animate-in fade-in">
+            {/* Unit Header Card */}
+            <div className="p-5 rounded-3xl bg-slate-900/90 border border-amber-500/40 shadow-2xl space-y-3.5 text-center relative overflow-hidden">
+              <div className="inline-flex w-14 h-14 rounded-2xl bg-gradient-to-tr from-indigo-700 via-blue-600 to-amber-500 items-center justify-center text-white text-3xl shadow-xl shadow-indigo-950/60 border border-amber-400/50">
+                🗳️
+              </div>
+              
+              <div>
+                <span className="text-[10px] uppercase font-bold text-amber-400 tracking-wider">
+                  {lang === 'te' ? 'కేటాయించిన బూత్ / వార్డు' : 'Assigned Voting Unit'}
+                </span>
+                <h2 className="text-lg font-black text-white mt-1">
+                  {(() => {
+                    if (typeof currentPartNo === 'number') {
+                      const b = boothsIndex.find(x => Number(x.part_no) === currentPartNo);
+                      return `బూత్ #${currentPartNo}: ${b?.clean_village || b?.village || ''}`;
+                    }
+                    const u = localUnits.find(x => x.id === currentPartNo);
+                    return u ? `${u.clean_village || u.village || u.id}` : `వార్డు / పంచాయతీ #${currentPartNo}`;
+                  })()}
+                </h2>
+                <p className="text-xs text-slate-400 mt-1">
+                  {(() => {
+                    if (typeof currentPartNo === 'number') {
+                      const b = boothsIndex.find(x => Number(x.part_no) === currentPartNo);
+                      return b?.total_voters ? `మొత్తం ఓటర్లు: ~${b.total_voters} మంది` : 'పిఠాపురం అసెంబ్లీ నియోజకవర్గం';
+                    }
+                    const u = localUnits.find(x => x.id === currentPartNo);
+                    return u?.total_voters ? `మొత్తం ఓటర్లు: ~${u.total_voters} మంది` : 'స్థానిక ఎన్నికల విభాగం';
+                  })()}
+                </p>
+              </div>
+
+              {/* Incharge / Volunteer Mobile Badge */}
+              <div className="p-2.5 rounded-xl bg-slate-950/80 border border-slate-800 text-xs flex items-center justify-between">
+                <span className="text-slate-400 text-[11px] font-bold">నమోదిత మొబైల్:</span>
+                <span className="font-mono font-bold text-amber-400">
+                  {session?.phone ? `+91 ${session.phone}` : 'లాగిన్ కాలేదు'}
+                </span>
+              </div>
+
+              {/* Timer / Expiry Info Box (Requirement 5) */}
+              <div className={`p-3 rounded-2xl border text-xs text-left space-y-1 ${
+                remainingTime.hasTimer && remainingTime.isExpired
+                  ? 'bg-red-950/70 border-red-500/60 text-red-200'
+                  : remainingTime.hasTimer
+                    ? 'bg-amber-950/40 border-amber-500/50 text-amber-200'
+                    : 'bg-slate-950/60 border-slate-800 text-slate-300'
+              }`}>
+                <div className="flex items-center justify-between font-bold">
+                  <span className="flex items-center gap-1.5">
+                    <Clock className="w-3.5 h-3.5" />
+                    <span>{lang === 'te' ? 'జాబితా వీక్షణ కాలపరిమితి:' : 'List Access Timer:'}</span>
+                  </span>
+                  <span className="font-mono font-black text-sm">
+                    {remainingTime.formatted}
+                  </span>
+                </div>
+                {remainingTime.hasTimer && remainingTime.isExpired ? (
+                  <p className="text-[11px] text-red-300 pt-1 leading-snug">
+                    ⚠️ ఈ ఓటర్ల జాబితాకు కేటాయించిన కాలపరిమితి ముగిసింది. దయచేసి అడ్మిన్‌ను సంప్రదించి సమయం పొడిగించమని కోరండి.
+                  </p>
+                ) : remainingTime.hasTimer ? (
+                  <p className="text-[10px] text-amber-300/80 pt-0.5">
+                    ⏱️ సమయం ముగియగానే ఓటర్ల జాబితా స్క్రీన్ నుండి ఆటోమేటిక్‌గా అన్‌లోడ్ అవుతుంది.
+                  </p>
+                ) : (
+                  <p className="text-[10px] text-slate-400 pt-0.5">
+                    ♾️ ఈ అకౌంట్‌కు ఎటువంటి కాలపరిమితి పరిమితి లేదు.
+                  </p>
+                )}
+              </div>
+
+              {/* Big Load List Button (Requirement 3) */}
+              <div className="pt-2">
+                <button
+                  type="button"
+                  onClick={handleLoadList}
+                  disabled={remainingTime.hasTimer && remainingTime.isExpired}
+                  className={`w-full py-3.5 px-4 font-black rounded-2xl text-xs sm:text-sm flex items-center justify-center gap-2.5 shadow-xl transition-all active:scale-98 cursor-pointer ${
+                    remainingTime.hasTimer && remainingTime.isExpired
+                      ? 'bg-slate-800 text-slate-500 border border-slate-700 cursor-not-allowed opacity-60'
+                      : 'bg-gradient-to-r from-amber-500 via-amber-400 to-amber-500 hover:from-amber-400 hover:to-amber-300 text-slate-950 border border-amber-300 shadow-amber-950/50 group'
+                  }`}
+                >
+                  <DownloadCloud className="w-4 h-4 group-hover:translate-y-0.5 transition-transform" />
+                  <span>
+                    {remainingTime.hasTimer && remainingTime.isExpired
+                      ? (lang === 'te' ? '🔒 కాలపరిమితి ముగిసింది (Access Expired)' : '🔒 Access Expired')
+                      : (lang === 'te' ? '📥 ఓటర్ల జాబితా లోడ్ చేయండి (Click to Load)' : '📥 Click to Load Voter List')}
+                  </span>
+                </button>
+                <p className="text-[10px] text-slate-400 mt-2 text-center">
+                  {lang === 'te' ? 'క్లిక్ చేసినప్పుడు మాత్రమే ఓటర్ల వివరాలు లోడ్ అవుతాయి.' : 'Voter data strictly loads only when you click load.'}
+                </p>
+              </div>
+            </div>
+          </div>
+        )}
+
         {boothData && (
           <>
+            {/* Active Loaded List Top Bar with Live Timer & Unload Button (Requirement 3 & 5) */}
+            <div className="flex items-center justify-between gap-2 p-2 px-3 rounded-2xl bg-slate-900/90 border border-slate-800 shadow-md mb-2 flex-wrap">
+              <div className="flex items-center gap-2">
+                <span className="w-2.5 h-2.5 rounded-full bg-emerald-500 animate-pulse"></span>
+                <span className="text-xs font-bold text-white">
+                  {boothData.voters.length} {lang === 'te' ? 'ఓటర్లు లోడ్ అయ్యారు' : 'Voters Loaded'}
+                </span>
+                {remainingTime.hasTimer && (
+                  <span className={`px-2 py-0.5 rounded-full text-[10px] font-mono font-bold flex items-center gap-1 ${
+                    remainingTime.minutes < 5
+                      ? 'bg-red-950 border border-red-500 text-red-300 animate-pulse'
+                      : 'bg-amber-950/80 border border-amber-500/40 text-amber-300'
+                  }`}>
+                    <Clock className="w-3 h-3" />
+                    <span>మిగిలిన సమయం: {remainingTime.formatted}</span>
+                  </span>
+                )}
+              </div>
+              <button
+                type="button"
+                onClick={handleUnloadList}
+                className="px-2.5 py-1 rounded-xl bg-slate-800 hover:bg-red-950 text-slate-300 hover:text-red-300 border border-slate-700 hover:border-red-500/50 text-xs font-bold flex items-center gap-1 transition-all cursor-pointer shadow-sm active:scale-95"
+                title="ఓటర్ల జాబితాను మెమరీ నుండి అన్‌లోడ్ చేయండి"
+              >
+                <span>📤 {lang === 'te' ? 'అన్‌లోడ్ చేయండి' : 'Unload List'}</span>
+              </button>
+            </div>
             {/* Top Winning Score Banner (Hidden in Excel view so grid takes full height) */}
             {activeTab === 'voters' && votersViewMode !== 'excel' && winningScore && (
               showVictoryPredictor ? (

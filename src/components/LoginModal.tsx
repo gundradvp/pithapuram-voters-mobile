@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { ShieldCheck, Phone, Lock, ArrowRight, UserCheck, KeyRound, Sparkles, AlertCircle } from 'lucide-react';
-import { UserSession, verifyAdminPassword, getVolunteerAssignment, setUserSession, cleanPhoneNumber, setDemoSession, fetchFreshAssignments } from '../utils/auth';
+import { UserSession, verifyAdminPassword, getVolunteerAssignment, setUserSession, cleanPhoneNumber, setDemoSession, fetchFreshAssignments, isAssignmentExpired } from '../utils/auth';
 import { Language } from '../utils/i18n';
 
 interface LoginModalProps {
@@ -41,6 +41,16 @@ export const LoginModal: React.FC<LoginModalProps> = ({
         const fresh = await fetchFreshAssignments();
         assignment = fresh.find(a => cleanPhoneNumber(a.phone) === clean) || null;
       } catch {}
+    }
+
+    // Check if the assignment has expired
+    if (assignment && isAssignmentExpired(assignment)) {
+      setErrorMsg(
+        language === 'te'
+          ? `⚠️ ఈ మొబైల్ నంబర్ కేటాయింపు కాలపరిమితి (${assignment.expiryMinutes || 0} నిమిషాలు) ముగిసింది. దయచేసి అడ్మిన్‌ను సంప్రదించండి.`
+          : `⚠️ Assignment for this mobile number has expired. Please contact Admin.`
+      );
+      return;
     }
 
     const session: UserSession = {
@@ -152,46 +162,9 @@ export const LoginModal: React.FC<LoginModalProps> = ({
               </div>
               <p className="text-[10px] text-slate-400 mt-1">
                 {language === 'te' 
-                  ? 'మీ మొబైల్ నంబర్‌కు కేటాయించిన బూత్‌లు/వార్డులు మాత్రమే కనిపిస్తాయి.' 
-                  : 'Only booths/wards assigned to your number will be accessible.'}
+                  ? 'మీ మొబైల్ నంబర్‌కు అడ్మిన్ కేటాయించిన బూత్‌లు/వార్డులు మాత్రమే ఖచ్చితంగా లోడ్ అవుతాయి.' 
+                  : 'Only booths/wards assigned to your number will strictly load.'}
               </p>
-            </div>
-
-            {/* Quick 1-Click Access for Tested Incharges */}
-            <div className="space-y-1.5 pt-1">
-              <span className="text-[10px] uppercase font-bold text-slate-400">
-                {language === 'te' ? 'త్వరిత లాగిన్ (నమూనా నంబర్లు):' : 'Quick Access (Pre-assigned):'}
-              </span>
-              <div className="grid grid-cols-1 gap-1.5">
-                <button
-                  type="button"
-                  onClick={() => {
-                    setPhoneInput('9000273028');
-                    handleVolunteerLogin('9000273028');
-                  }}
-                  className="w-full px-2.5 py-1.5 rounded-lg bg-slate-950/80 border border-slate-800 hover:border-amber-500/50 text-left flex items-center justify-between text-xs text-slate-300 hover:text-white transition-all group"
-                >
-                  <div className="truncate">
-                    <span className="font-bold text-amber-400">9000273028</span>
-                    <span className="text-[10px] text-slate-400 ml-1.5">(దుర్గా ప్రసాద్ - బూత్ 11-13, వార్డు 14, 11)</span>
-                  </div>
-                  <ArrowRight className="w-3.5 h-3.5 text-slate-500 group-hover:text-amber-400" />
-                </button>
-                <button
-                  type="button"
-                  onClick={() => {
-                    setPhoneInput('9479797947');
-                    handleVolunteerLogin('9479797947');
-                  }}
-                  className="w-full px-2.5 py-1.5 rounded-lg bg-slate-950/80 border border-slate-800 hover:border-amber-500/50 text-left flex items-center justify-between text-xs text-slate-300 hover:text-white transition-all group"
-                >
-                  <div className="truncate">
-                    <span className="font-bold text-amber-400">9479797947</span>
-                    <span className="text-[10px] text-slate-400 ml-1.5">(గొల్లప్రోలు ఇంచార్జ్ - వార్డు 11)</span>
-                  </div>
-                  <ArrowRight className="w-3.5 h-3.5 text-slate-500 group-hover:text-amber-400" />
-                </button>
-              </div>
             </div>
 
             <button

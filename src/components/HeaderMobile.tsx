@@ -1,5 +1,5 @@
 import React from 'react';
-import { Lock, Unlock, Wifi, WifiOff, Languages, Palette, LogOut, Crown, UserCheck, RefreshCw, ArrowRightLeft, ChevronDown } from 'lucide-react';
+import { Lock, Unlock, Wifi, WifiOff, Languages, Palette, LogOut, Crown, UserCheck, RefreshCw, ArrowRightLeft, ChevronDown, Clock } from 'lucide-react';
 import { BoothInfo } from '../types';
 import { Language } from '../utils/i18n';
 import { ThemeId, THEMES } from '../utils/theme';
@@ -13,6 +13,7 @@ interface HeaderMobileProps {
   language: Language;
   theme: ThemeId;
   session: UserSession | null;
+  remainingTime?: { isExpired: boolean; hasTimer: boolean; formatted: string; minutes: number };
   isRefreshing?: boolean;
   cloudSyncState?: SyncState;
   onRefreshData?: () => void;
@@ -31,6 +32,7 @@ export const HeaderMobile: React.FC<HeaderMobileProps> = ({
   language,
   theme,
   session,
+  remainingTime,
   isRefreshing,
   cloudSyncState = 'idle',
   onRefreshData,
@@ -81,6 +83,21 @@ export const HeaderMobile: React.FC<HeaderMobileProps> = ({
             {session?.role === 'demo' && (
               <span className="px-1.5 py-0.2 rounded bg-amber-500 text-slate-950 text-[9px] font-black uppercase tracking-wider flex items-center gap-0.5 shadow-sm">
                 🎮 DEMO
+              </span>
+            )}
+            {remainingTime?.hasTimer && (
+              <span
+                className={`px-1.5 py-0.2 rounded text-[9px] font-mono font-bold flex items-center gap-1 border ${
+                  remainingTime.isExpired
+                    ? 'bg-red-950/80 border-red-500 text-red-300 animate-pulse'
+                    : remainingTime.minutes < 5
+                      ? 'bg-amber-950/80 border-amber-500 text-amber-300 animate-pulse'
+                      : 'bg-slate-800 border-slate-700 text-amber-400'
+                }`}
+                title={remainingTime.isExpired ? 'కాలపరిమితి ముగిసింది' : `మిగిలిన సమయం: ${remainingTime.formatted}`}
+              >
+                <Clock className="w-2.5 h-2.5" />
+                <span>{remainingTime.formatted}</span>
               </span>
             )}
           </div>

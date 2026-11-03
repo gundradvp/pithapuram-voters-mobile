@@ -22,7 +22,9 @@ import {
   CheckSquare,
   Square,
   ChevronDown,
-  ChevronUp
+  ChevronUp,
+  Clock,
+  AlertTriangle
 } from 'lucide-react';
 import { 
   VolunteerAssignment, 
@@ -32,7 +34,10 @@ import {
   generateAssignmentWhatsAppMessage, 
   getWhatsAppShareUrl, 
   cleanPhoneNumber,
-  fetchFreshAssignments 
+  fetchFreshAssignments,
+  isAssignmentExpired,
+  getRemainingTime,
+  extendAssignmentTime
 } from '../utils/auth';
 import { BoothIndexItem, LocalElectionUnit } from '../types';
 import { Language } from '../utils/i18n';
@@ -65,6 +70,7 @@ export const AdminAssignmentModal: React.FC<AdminAssignmentModalProps> = ({
   const [assemblyBoothsInput, setAssemblyBoothsInput] = useState('');
   const [selectedWards, setSelectedWards] = useState<string[]>([]);
   const [notes, setNotes] = useState('');
+  const [expiryMinutes, setExpiryMinutes] = useState<number>(60);
   const [copiedId, setCopiedId] = useState<string | null>(null);
 
   // Sync latest assignments on mount
@@ -112,12 +118,22 @@ export const AdminAssignmentModal: React.FC<AdminAssignmentModalProps> = ({
         return { label: '🏡 గొల్లప్రోలు వార్డు 11 (991)', cls: 'bg-emerald-950/60 border-emerald-500/40 text-emerald-300' };
       case 'mptc_durgada_1':
         return { label: '🌾 దుర్గడ MPTC 1 (2,650)', cls: 'bg-teal-950/60 border-teal-500/40 text-teal-300' };
+      case 'mptc_durgada_1_b45':
+        return { label: '🌾 దుర్గడ #45 (1,060 - ఇంటి కాసుల స్కూల్)', cls: 'bg-teal-950/80 border-teal-400 text-teal-200' };
+      case 'mptc_durgada_1_b46':
+        return { label: '🌾 దుర్గడ #46 (1,060 - వేగులమ్మ గుడి)', cls: 'bg-teal-950/80 border-teal-400 text-teal-200' };
+      case 'mptc_durgada_1_b47':
+        return { label: '🌾 దుర్గడ #47 (530 - EBC కాలనీ)', cls: 'bg-teal-950/80 border-teal-400 text-teal-200' };
       case 'mptc_durgada_3':
         return { label: '🌾 దుర్గడ MPTC 3 (1,874)', cls: 'bg-sky-950/60 border-sky-500/40 text-sky-300' };
       case 'gp_durgada':
         return { label: '🌾 దుర్గడ సమగ్ర పంచాయతీ (4,524)', cls: 'bg-amber-950/60 border-amber-500/40 text-amber-300' };
       case 'gp_vannepudi':
         return { label: '🌴 వన్నెపూడి పంచాయతీ (3,201)', cls: 'bg-purple-950/60 border-purple-500/40 text-purple-300' };
+      case 'mptc_chebrolu_4':
+        return { label: '🌾 చేబ్రోలు MPTC 4 (2,979)', cls: 'bg-indigo-950/60 border-indigo-500/40 text-indigo-300' };
+      case 'mptc_tatiparthy_2':
+        return { label: '🌾 తాటిపర్తి MPTC 2 (3,501)', cls: 'bg-rose-950/60 border-rose-500/40 text-rose-300' };
       default:
         return { label: `📍 ${wardLabels[w] || w}`, cls: 'bg-slate-800 border-slate-700 text-slate-300' };
     }
@@ -129,6 +145,7 @@ export const AdminAssignmentModal: React.FC<AdminAssignmentModalProps> = ({
     setAssemblyBoothsInput('');
     setSelectedWards([]);
     setNotes('');
+    setExpiryMinutes(60);
     setEditingId(null);
     setIsAddingNew(false);
   };
@@ -140,7 +157,24 @@ export const AdminAssignmentModal: React.FC<AdminAssignmentModalProps> = ({
     setAssemblyBoothsInput(a.assemblyBooths.join(', '));
     setSelectedWards(a.municipalWards);
     setNotes(a.notes || '');
+    setExpiryMinutes(a.expiryMinutes !== undefined ? a.expiryMinutes : 60);
     setIsAddingNew(true);
+  };
+
+  const handleExtend = (id: string, mins: number) => {
+    extendAssignmentTime(id, mins);
+    setAssignments(getAssignments());
+  };
+
+  const handleMakeUnlimited = (id: string) => {
+    const current = getAssignments();
+    const target = current.find(a => a.id === id);
+    if (target) {
+      target.expiryMinutes = 0;
+      target.expiresAt = undefined;
+      saveAssignment(target);
+      setAssignments(getAssignments());
+    }
   };
 
   const handleSave = (e: React.FormEvent) => {
@@ -168,7 +202,9 @@ export const AdminAssignmentModal: React.FC<AdminAssignmentModalProps> = ({
       assemblyBooths: booths,
       municipalWards: selectedWards,
       notes: notes.trim(),
-      assignedAt: new Date().toISOString()
+      assignedAt: new Date().toISOString(),
+      expiryMinutes: expiryMinutes,
+      expiresAt: expiryMinutes > 0 ? Date.now() + expiryMinutes * 60 * 1000 : undefined
     };
 
     saveAssignment(assignment);
@@ -603,7 +639,165 @@ export const AdminAssignmentModal: React.FC<AdminAssignmentModalProps> = ({
                     </div>
                     {selectedWards.includes('gp_vannepudi') && <Check className="w-3.5 h-3.5 text-purple-400" />}
                   </button>
+
+                  {/* Durgada Booth 45 */}
+                  <button
+                    type="button"
+                    onClick={() => toggleWardSelection('mptc_durgada_1_b45')}
+                    className={`p-2 rounded-xl border text-left flex items-center justify-between text-xs transition-all ${
+                      selectedWards.includes('mptc_durgada_1_b45')
+                        ? 'bg-teal-950/80 border-teal-400 text-teal-200 shadow-sm'
+                        : 'bg-slate-900 border-slate-800 text-slate-400 hover:border-slate-700'
+                    }`}
+                  >
+                    <div>
+                      <div className="font-bold flex items-center gap-1">
+                        <MapPin className="w-3.5 h-3.5 text-teal-400" />
+                        <span>దుర్గడ బూత్ #45</span>
+                      </div>
+                      <span className="text-[10px] text-slate-400">1,060 ఓటర్లు (ఇంటి కాసుల వారి స్కూల్)</span>
+                    </div>
+                    {selectedWards.includes('mptc_durgada_1_b45') && <Check className="w-3.5 h-3.5 text-teal-400" />}
+                  </button>
+
+                  {/* Durgada Booth 46 */}
+                  <button
+                    type="button"
+                    onClick={() => toggleWardSelection('mptc_durgada_1_b46')}
+                    className={`p-2 rounded-xl border text-left flex items-center justify-between text-xs transition-all ${
+                      selectedWards.includes('mptc_durgada_1_b46')
+                        ? 'bg-teal-950/80 border-teal-400 text-teal-200 shadow-sm'
+                        : 'bg-slate-900 border-slate-800 text-slate-400 hover:border-slate-700'
+                    }`}
+                  >
+                    <div>
+                      <div className="font-bold flex items-center gap-1">
+                        <MapPin className="w-3.5 h-3.5 text-teal-400" />
+                        <span>దుర్గడ బూత్ #46</span>
+                      </div>
+                      <span className="text-[10px] text-slate-400">1,060 ఓటర్లు (స్వర్ణ గ్రామం, వేగులమ్మ గుడి)</span>
+                    </div>
+                    {selectedWards.includes('mptc_durgada_1_b46') && <Check className="w-3.5 h-3.5 text-teal-400" />}
+                  </button>
+
+                  {/* Durgada Booth 47 */}
+                  <button
+                    type="button"
+                    onClick={() => toggleWardSelection('mptc_durgada_1_b47')}
+                    className={`p-2 rounded-xl border text-left flex items-center justify-between text-xs transition-all ${
+                      selectedWards.includes('mptc_durgada_1_b47')
+                        ? 'bg-teal-950/80 border-teal-400 text-teal-200 shadow-sm'
+                        : 'bg-slate-900 border-slate-800 text-slate-400 hover:border-slate-700'
+                    }`}
+                  >
+                    <div>
+                      <div className="font-bold flex items-center gap-1">
+                        <MapPin className="w-3.5 h-3.5 text-teal-400" />
+                        <span>దుర్గడ బూత్ #47</span>
+                      </div>
+                      <span className="text-[10px] text-slate-400">530 ఓటర్లు (EBC కాలనీ)</span>
+                    </div>
+                    {selectedWards.includes('mptc_durgada_1_b47') && <Check className="w-3.5 h-3.5 text-teal-400" />}
+                  </button>
+
+                  {/* Chebrolu MPTC 4 */}
+                  <button
+                    type="button"
+                    onClick={() => toggleWardSelection('mptc_chebrolu_4')}
+                    className={`p-2 rounded-xl border text-left flex items-center justify-between text-xs transition-all ${
+                      selectedWards.includes('mptc_chebrolu_4')
+                        ? 'bg-indigo-950/80 border-indigo-400 text-indigo-200 shadow-sm'
+                        : 'bg-slate-900 border-slate-800 text-slate-400 hover:border-slate-700'
+                    }`}
+                  >
+                    <div>
+                      <div className="font-bold flex items-center gap-1">
+                        <MapPin className="w-3.5 h-3.5 text-indigo-400" />
+                        <span>చేబ్రోలు MPTC 4</span>
+                      </div>
+                      <span className="text-[10px] text-slate-400">2,979 ఓటర్లు (వార్డులు 13-16)</span>
+                    </div>
+                    {selectedWards.includes('mptc_chebrolu_4') && <Check className="w-3.5 h-3.5 text-indigo-400" />}
+                  </button>
+
+                  {/* Tatiparthy MPTC 2 */}
+                  <button
+                    type="button"
+                    onClick={() => toggleWardSelection('mptc_tatiparthy_2')}
+                    className={`p-2 rounded-xl border text-left flex items-center justify-between text-xs transition-all ${
+                      selectedWards.includes('mptc_tatiparthy_2')
+                        ? 'bg-rose-950/80 border-rose-400 text-rose-200 shadow-sm'
+                        : 'bg-slate-900 border-slate-800 text-slate-400 hover:border-slate-700'
+                    }`}
+                  >
+                    <div>
+                      <div className="font-bold flex items-center gap-1">
+                        <MapPin className="w-3.5 h-3.5 text-rose-400" />
+                        <span>తాటిపర్తి MPTC 2</span>
+                      </div>
+                      <span className="text-[10px] text-slate-400">3,501 ఓటర్లు (వార్డులు 8-14)</span>
+                    </div>
+                    {selectedWards.includes('mptc_tatiparthy_2') && <Check className="w-3.5 h-3.5 text-rose-400" />}
+                  </button>
                 </div>
+              </div>
+
+              {/* Expiry Timer (కాలపరిమితి / టైమర్) */}
+              <div className="space-y-2 p-3 rounded-xl bg-slate-900 border border-slate-800">
+                <div className="flex items-center justify-between">
+                  <label className="text-[10px] font-bold text-amber-400 flex items-center gap-1.5">
+                    <Clock className="w-3.5 h-3.5" />
+                    <span>{language === 'te' ? 'జాబితా కాలపరిమితి / టైమర్ (Timer to Unload):' : 'List Access Timer (Auto-Unload):'}</span>
+                  </label>
+                  <span className="text-[10px] text-amber-300 font-mono font-bold bg-amber-950/80 px-2 py-0.5 rounded border border-amber-500/40">
+                    {expiryMinutes === 0 ? 'అపరిమితం (No Expiry)' : `⏱️ ${expiryMinutes} నిమిషాలు`}
+                  </span>
+                </div>
+                <div className="grid grid-cols-4 gap-1.5 text-xs">
+                  {[
+                    { label: '15 నిమిషాలు', val: 15 },
+                    { label: '30 నిమిషాలు', val: 30 },
+                    { label: '1 గంట (60m)', val: 60 },
+                    { label: '2 గంటలు', val: 120 },
+                    { label: '4 గంటలు', val: 240 },
+                    { label: '8 గంటలు', val: 480 },
+                    { label: '1 రోజు (24h)', val: 1440 },
+                    { label: 'అపరిమితం (0)', val: 0 }
+                  ].map(opt => (
+                    <button
+                      key={opt.val}
+                      type="button"
+                      onClick={() => setExpiryMinutes(opt.val)}
+                      className={`py-1.5 px-1 rounded-lg text-[10px] font-bold border transition-all text-center ${
+                        expiryMinutes === opt.val
+                          ? 'bg-amber-500 text-slate-950 border-amber-400 shadow-sm font-black'
+                          : 'bg-slate-950 text-slate-300 border-slate-800 hover:border-slate-700'
+                      }`}
+                    >
+                      {opt.label}
+                    </button>
+                  ))}
+                </div>
+                <div className="flex items-center gap-2 pt-1">
+                  <span className="text-[10px] text-slate-400">కస్టమ్ నిమిషాలు:</span>
+                  <input
+                    type="number"
+                    min="1"
+                    max="10000"
+                    value={expiryMinutes > 0 && ![15, 30, 60, 120, 240, 480, 1440].includes(expiryMinutes) ? expiryMinutes : ''}
+                    onChange={(e) => {
+                      const v = parseInt(e.target.value, 10);
+                      setExpiryMinutes(isNaN(v) || v <= 0 ? 0 : v);
+                    }}
+                    placeholder="45"
+                    className="w-20 px-2 py-1 bg-slate-950 border border-slate-700 rounded text-xs text-white text-center font-mono focus:border-amber-400 focus:outline-none"
+                  />
+                  <span className="text-[10px] text-slate-400">నిమిషాలు</span>
+                </div>
+                <p className="text-[9.5px] text-slate-400 flex items-center gap-1 text-amber-200/80">
+                  <AlertTriangle className="w-3 h-3 text-amber-400 shrink-0" />
+                  <span>ఈ సమయం దాటగానే ఓటర్ల జాబితా మొబైల్ స్క్రీన్ నుండి ఆటోమేటిక్‌గా అన్‌లోడ్ అవుతుంది.</span>
+                </p>
               </div>
 
               {/* Notes */}
@@ -718,6 +912,58 @@ export const AdminAssignmentModal: React.FC<AdminAssignmentModalProps> = ({
                       ఇంకా ఏ బూతులు కేటాయించలేదు
                     </span>
                   )}
+                </div>
+
+                {/* Timer / Expiry Status Badge & Quick Actions */}
+                <div className="flex items-center justify-between gap-1 flex-wrap pt-1.5 border-t border-slate-800/60">
+                  <div className="flex items-center gap-1.5">
+                    {a.expiresAt ? (
+                      isAssignmentExpired(a) ? (
+                        <span className="px-2 py-0.5 rounded-md bg-red-950 border border-red-500/50 text-red-300 text-[10px] font-bold flex items-center gap-1">
+                          <AlertTriangle className="w-3 h-3 text-red-400" />
+                          <span>కాలపరిమితి ముగిసింది (Expired)</span>
+                        </span>
+                      ) : (
+                        <span className="px-2 py-0.5 rounded-md bg-amber-950/80 border border-amber-500/50 text-amber-300 text-[10px] font-bold font-mono flex items-center gap-1">
+                          <Clock className="w-3 h-3 text-amber-400" />
+                          <span>మిగిలిన సమయం: {getRemainingTime(a).formatted}</span>
+                        </span>
+                      )
+                    ) : (
+                      <span className="px-2 py-0.5 rounded-md bg-slate-900 border border-slate-800 text-slate-400 text-[10px] font-bold flex items-center gap-1">
+                        <Clock className="w-3 h-3 text-slate-500" />
+                        <span>అపరిమిత సమయం (No Expiry)</span>
+                      </span>
+                    )}
+                  </div>
+                  <div className="flex items-center gap-1">
+                    <button
+                      type="button"
+                      onClick={() => handleExtend(a.id, 30)}
+                      className="px-2 py-0.5 rounded bg-amber-500/20 hover:bg-amber-500 hover:text-slate-950 text-amber-300 text-[9.5px] font-bold border border-amber-500/30 transition-all cursor-pointer"
+                      title="30 నిమిషాలు పొడిగించండి"
+                    >
+                      +30ని.
+                    </button>
+                    <button
+                      type="button"
+                      onClick={() => handleExtend(a.id, 60)}
+                      className="px-2 py-0.5 rounded bg-amber-500/20 hover:bg-amber-500 hover:text-slate-950 text-amber-300 text-[9.5px] font-bold border border-amber-500/30 transition-all cursor-pointer"
+                      title="1 గంట పొడిగించండి"
+                    >
+                      +1గం.
+                    </button>
+                    {a.expiresAt && (
+                      <button
+                        type="button"
+                        onClick={() => handleMakeUnlimited(a.id)}
+                        className="px-2 py-0.5 rounded bg-slate-800 hover:bg-slate-700 text-slate-300 text-[9.5px] font-bold border border-slate-700 transition-all cursor-pointer"
+                        title="అపరిమితం చేయండి"
+                      >
+                        అపరిమితం
+                      </button>
+                    )}
+                  </div>
                 </div>
 
                 {/* WhatsApp Action Buttons */}
