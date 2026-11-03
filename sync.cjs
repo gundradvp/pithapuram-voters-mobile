@@ -30,6 +30,7 @@ const filesToSync = [
   'src/components/HeaderMobile.tsx',
   'src/components/BottomNavMobile.tsx',
   'src/components/VotersTabMobile.tsx',
+  'src/components/VotersExcelGrid.tsx',
   'src/components/FamiliesTabMobile.tsx',
   'src/components/WarRoomTabMobile.tsx',
   'src/components/InfluencersTabMobile.tsx',
