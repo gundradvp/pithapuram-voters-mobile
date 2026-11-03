@@ -7,6 +7,7 @@ import {
   Layers,
   ShieldCheck,
   Flag,
+  Vote,
   Palette,
   Check,
   MapPin,
@@ -676,13 +677,13 @@ export const GroupPrintModal: React.FC<GroupPrintModalProps> = ({
               onClick={() => setBrandingMode('party')}
               className={`px-2.5 py-1 rounded-lg text-xs font-bold flex items-center gap-1 transition-all cursor-pointer ${
                 brandingMode === 'party'
-                  ? 'bg-red-600 text-white font-black shadow-md'
+                  ? 'bg-indigo-600 text-white font-black shadow-md'
                   : 'text-slate-300 hover:text-white'
               }`}
-              title="జనసేన పార్టీ పేరు, జెండా మరియు గాజు గ్లాసు గుర్తుతో"
+              title="పిఠాపురం నియోజకవర్గం సమగ్ర బ్రాండింగ్"
             >
-              <Flag className="w-3.5 h-3.5" />
-              <span>🚩 జనసేన బ్రాండింగ్</span>
+              <Vote className="w-3.5 h-3.5" />
+              <span>🗳️ నియోజకవర్గం బ్రాండింగ్</span>
             </button>
           </div>
         </div>
@@ -789,10 +790,10 @@ export const GroupPrintModal: React.FC<GroupPrintModalProps> = ({
                     <div className="flex items-center gap-2 min-w-0">
                       {brandingMode === 'party' ? (
                         <>
-                          <span className="text-xl shrink-0">🚩</span>
+                          <span className="text-xl shrink-0">🗳️</span>
                           <div className="min-w-0">
                             <h1 className="text-sm sm:text-base font-black tracking-tight uppercase leading-tight truncate">
-                              జనసేన పార్టీ • JANASENA PARTY
+                              పిఠాపురం శాసనసభ నియోజకవర్గం • PITHAPURAM AC #37
                             </h1>
                             <p className="text-[10px] font-bold opacity-90 leading-tight truncate">
                               {boothHeaderLabel}
@@ -819,7 +820,7 @@ export const GroupPrintModal: React.FC<GroupPrintModalProps> = ({
                     <div className="text-right flex flex-col items-end shrink-0">
                       <div className="inline-flex items-center gap-1 bg-white/20 backdrop-blur-sm border border-white/40 px-2.5 py-0.5 rounded-full font-bold text-[10px] text-white">
                         {brandingMode === 'party' ? (
-                          <span>🥛 గాజు గ్లాసు గుర్తుకే మన ఓటు</span>
+                          <span>🗳️ ఓటు మన హక్కు • వినియోగించండి</span>
                         ) : (
                           <span>అధికారిక ఓటరు చీటీ</span>
                         )}
@@ -890,18 +891,18 @@ export const GroupPrintModal: React.FC<GroupPrintModalProps> = ({
                           {brandingMode === 'party' ? (
                             <>
                               <div className="flex items-center gap-1 min-w-0">
-                                <span className="text-sm shrink-0">🚩</span>
+                                <span className="text-sm shrink-0">🗳️</span>
                                 <div className="min-w-0">
-                                  <div className="text-[10.5px] font-black tracking-tight text-red-700 uppercase leading-none truncate">
-                                    జనసేన • JANASENA
+                                  <div className="text-[10.5px] font-black tracking-tight text-indigo-900 uppercase leading-none truncate">
+                                    పిఠాపురం • PITHAPURAM
                                   </div>
                                   <div className="text-[8px] font-bold text-slate-600 truncate">
-                                    పిఠాపురం (AC #37)
+                                    నియోజకవర్గం (AC #37)
                                   </div>
                                 </div>
                               </div>
-                              <div className="text-right flex items-center gap-0.5 bg-amber-100 border border-amber-400 px-1.5 py-0.2 rounded-full text-amber-950 font-black text-[9px] shrink-0">
-                                <span>🥛 గాజు గ్లాసు</span>
+                              <div className="text-right flex items-center gap-0.5 bg-indigo-50 border border-indigo-200 px-1.5 py-0.2 rounded-full text-indigo-950 font-black text-[9px] shrink-0">
+                                <span>ఓటరు చీటీ</span>
                               </div>
                             </>
                           ) : (
@@ -1023,11 +1024,11 @@ export const GroupPrintModal: React.FC<GroupPrintModalProps> = ({
                         <div className={`border-t border-dashed ${activeTheme.cutLineBorder} pt-0.5 flex items-center justify-between text-[7.5px] ${activeTheme.cutLineText}`}>
                           {brandingMode === 'party' ? (
                             <>
-                              <span className="flex items-center gap-1 font-black text-red-700">
+                              <span className="flex items-center gap-1 font-black text-indigo-800">
                                 <span>✂️ కట్ చేసుకోండి</span>
-                                <span>• గాజు గ్లాసు గుర్తుకే మన ఓటు 🥛</span>
+                                <span>• మీ ఓటు హక్కును వినియోగించుకోండి 🗳️</span>
                               </span>
-                              <span className="font-mono text-[7px] text-slate-400">JSP IT Cell</span>
+                              <span className="font-mono text-[7px] text-slate-400">Voter Slip</span>
                             </>
                           ) : (
                             <>
@@ -1050,10 +1051,10 @@ export const GroupPrintModal: React.FC<GroupPrintModalProps> = ({
                   {brandingMode === 'party' ? (
                     <>
                       <p className="font-bold text-slate-700">
-                        జనసేన పార్టీ పిఠాపురం నియోజకవర్గ సమన్వయం
+                        పిఠాపురం నియోజకవర్గ సమగ్ర ఓటర్ల సహాయ సేవలు
                       </p>
                       <div className="text-right font-mono font-bold text-slate-700">
-                        <span>గాజు గ్లాసు గుర్తు • గెలుపే మన లక్ష్యం 🚩</span>
+                        <span>ప్రజాస్వామ్యంలో మీ ఓటు అత్యంత విలువైనది 🗳️</span>
                       </div>
                     </>
                   ) : (
@@ -1080,7 +1081,7 @@ export const GroupPrintModal: React.FC<GroupPrintModalProps> = ({
               <div className="flex items-start justify-between gap-3 text-white">
                 <div>
                   <h1 className="text-base sm:text-lg font-black tracking-tight uppercase">
-                    {brandingMode === 'party' ? '🚩 జనసేన పార్టీ • సాధారణ ఓటర్ల జాబితా (VOTER ROSTER)' : 'భారత ఎన్నికల సంఘం • అధికారిక ఓటర్ల జాబితా (ECI VOTER ROSTER)'}
+                    {brandingMode === 'party' ? '🗳️ పిఠాపురం నియోజకవర్గం • సాధారణ ఓటర్ల జాబితా (VOTER ROSTER)' : 'భారత ఎన్నికల సంఘం • అధికారిక ఓటర్ల జాబితా (ECI VOTER ROSTER)'}
                   </h1>
                   <p className="text-[11px] font-bold opacity-90">{boothHeaderLabel}</p>
                   <p className="text-[10.5px] opacity-90 mt-0.5">

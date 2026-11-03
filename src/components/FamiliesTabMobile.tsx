@@ -295,10 +295,10 @@ export const FamiliesTabMobile: React.FC<FamiliesTabMobileProps> = ({
                 <span className="text-sm font-black text-white font-mono">{winningFormula.top10VoterCount}</span>
                 <span className="text-[8px] text-slate-500 block">{winningFormula.top10Percentage}%</span>
               </div>
-              <div className="bg-slate-950/80 border border-red-500/30 rounded-xl p-2">
-                <span className="text-[9px] text-red-300 block">{language === 'te' ? 'పక్కా JSP' : 'Locked JSP'}</span>
-                <span className="text-sm font-black text-red-400 font-mono">{winningFormula.top10JspSupporters}</span>
-                <span className="text-[8px] text-red-400/80 block">Supporters</span>
+              <div className="bg-slate-950/80 border border-emerald-500/30 rounded-xl p-2">
+                <span className="text-[9px] text-emerald-300 block">{language === 'te' ? 'పక్కా మద్దతు' : 'Locked Support'}</span>
+                <span className="text-sm font-black text-emerald-400 font-mono">{winningFormula.top10JspSupporters}</span>
+                <span className="text-[8px] text-emerald-400/80 block">Supporters</span>
               </div>
               <div className="bg-slate-950/80 border border-amber-500/30 rounded-xl p-2">
                 <span className="text-[9px] text-amber-300 block">{language === 'te' ? 'గెలవాల్సినవి' : 'Needed'}</span>
@@ -310,7 +310,7 @@ export const FamiliesTabMobile: React.FC<FamiliesTabMobileProps> = ({
             <p className="text-[11px] text-slate-300 bg-slate-950/70 p-2.5 rounded-xl border border-slate-800 leading-relaxed">
               💡 {language === 'te' ? (
                 <>
-                  టాప్ 10 కుల/ఇంటిపేర్ల వద్ద <strong className="text-white">{winningFormula.top10SwingVoters} స్వింగ్ ఓటర్లు</strong> ఉన్నారు. వీరిలో కేవలం <strong className="text-amber-400 font-bold">{winningFormula.votesNeededFromTop10ToWin} ఓట్లను</strong> గాజు గ్లాసు గుర్తు వైపు తిప్పితే మన గెలుపు లాక్ అవుతుంది!
+                  టాప్ 10 కుల/ఇంటిపేర్ల వద్ద <strong className="text-white">{winningFormula.top10SwingVoters} స్వింగ్ ఓటర్లు</strong> ఉన్నారు. వీరిలో కేవలం <strong className="text-amber-400 font-bold">{winningFormula.votesNeededFromTop10ToWin} ఓట్లను</strong> మన వైపు తిప్పితే మన గెలుపు లాక్ అవుతుంది!
                 </>
               ) : (
                 <>
@@ -376,7 +376,7 @@ export const FamiliesTabMobile: React.FC<FamiliesTabMobileProps> = ({
                     : 'bg-slate-900 text-emerald-300 border border-emerald-500/30'
                 }`}
               >
-                <span>🚩 {language === 'te' ? 'JSP అనుకూలం' : 'JSP Strong'}</span>
+                <span>⭐ {language === 'te' ? 'మన మద్దతు' : 'Strong Support'}</span>
               </button>
 
               <button
@@ -514,8 +514,8 @@ export const FamiliesTabMobile: React.FC<FamiliesTabMobileProps> = ({
                       </div>
 
                       <div className="flex items-center gap-1.5 flex-col items-end">
-                        <span className="px-2.5 py-1 bg-gradient-to-r from-red-600/30 to-amber-600/30 border border-amber-500/40 text-amber-300 font-mono font-black rounded-lg text-xs">
-                          {jspPercent}% JSP
+                        <span className="px-2.5 py-1 bg-gradient-to-r from-emerald-600/30 to-amber-600/30 border border-amber-500/40 text-amber-300 font-mono font-black rounded-lg text-xs">
+                          {jspPercent}% {language === 'te' ? 'మద్దతు' : 'Support'}
                         </span>
                         {onOpenGroupPrint && (
                           <button
@@ -557,7 +557,7 @@ export const FamiliesTabMobile: React.FC<FamiliesTabMobileProps> = ({
                     {/* Sentiment Bar */}
                     <div className="space-y-1">
                       <div className="flex items-center justify-between text-[10px] font-mono text-slate-400">
-                        <span className="text-emerald-400">{jspElectors} JSP ({jspPercent}%)</span>
+                        <span className="text-emerald-400">{jspElectors} {language === 'te' ? 'మద్దతు' : 'Support'} ({jspPercent}%)</span>
                         <span className="text-amber-400">{clan.neutralCount} {language === 'te' ? 'స్వింగ్' : 'Swing'} ({swingPercent}%)</span>
                         <span className="text-rose-400">{clan.opponentCount} {language === 'te' ? 'వ్యతిరేకం' : 'Opp'} ({oppPercent}%)</span>
                       </div>
@@ -584,7 +584,7 @@ export const FamiliesTabMobile: React.FC<FamiliesTabMobileProps> = ({
                           {elders.map(e => {
                             const prof = profiles[e.s] || {};
                             const phone = prof.customPhone || e.k_m;
-                            const elderMsg = `నమస్కారం ${e.n} గారు, పిఠాపురం బూత్ #${boothInfo.part_no} లోని మీ ${clan.nameTe || clan.nameEn} కుటుంబాల సంక్షేమం కోసం జనసేన పార్టీ అభ్యర్థి పవన్ కళ్యాణ్ గారికి గాజు గ్లాసు గుర్తుపై ఓటు వేసి ఆశీర్వదించాల్సిందిగా వినమ్రంగా కోరుతున్నాము. జై జనసేన! 🚩`;
+                            const elderMsg = `నమస్కారం ${e.n} గారు, పిఠాపురం బూత్ #${boothInfo.part_no} లోని మీ ${clan.nameTe || clan.nameEn} కుటుంబాల సమాచారం కొరకు ఎన్నికల సమన్వయ కార్యాలయం నుండి సంప్రదిస్తున్నాము. దయచేసి మీ కుటుంబ సభ్యులందరూ ఓటు హక్కును వినియోగించుకోవాల్సిందిగా కోరుతున్నాము. 🗳️`;
 
                             return (
                               <div key={e.s} className="bg-slate-900/90 rounded-lg p-2 border border-slate-800 flex items-center justify-between gap-2">
@@ -817,7 +817,7 @@ export const FamiliesTabMobile: React.FC<FamiliesTabMobileProps> = ({
                                         )}
                                       </button>
                                       <a
-                                        href={`https://wa.me/91${phone}?text=${encodeURIComponent(`నమస్కారం ${voter.n} గారు, జనసేన పార్టీ పిఠాపురం బూత్ #${boothInfo.part_no} నుండి సంప్రదిస్తున్నాము.`)}`}
+                                        href={`https://wa.me/91${phone}?text=${encodeURIComponent(`నమస్కారం ${voter.n} గారు, పిఠాపురం బూత్ #${boothInfo.part_no} ఓటర్ సమాచార కేంద్రం నుండి సంప్రదిస్తున్నాము.`)}`}
                                         target="_blank"
                                         rel="noreferrer"
                                         className="p-1 bg-emerald-600 hover:bg-emerald-500 text-white rounded-md text-[10px] flex items-center gap-1"
@@ -1220,7 +1220,7 @@ export const FamiliesTabMobile: React.FC<FamiliesTabMobileProps> = ({
                                         )}
                                       </button>
                                       <a
-                                        href={`https://wa.me/91${phone}?text=${encodeURIComponent(`నమస్కారం ${m.n} గారు, జనసేన పార్టీ పిఠాపురం బూత్ #${boothInfo.part_no} నుండి సంప్రదిస్తున్నాము.`)}`}
+                                        href={`https://wa.me/91${phone}?text=${encodeURIComponent(`నమస్కారం ${m.n} గారు, పిఠాపురం బూత్ #${boothInfo.part_no} ఓటర్ సమాచార కేంద్రం నుండి సంప్రదిస్తున్నాము.`)}`}
                                         target="_blank"
                                         rel="noreferrer"
                                         className="p-1 bg-emerald-600 hover:bg-emerald-500 text-white rounded-md text-[10px] flex items-center gap-1"

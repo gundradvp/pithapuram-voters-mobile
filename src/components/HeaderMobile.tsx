@@ -52,13 +52,13 @@ export const HeaderMobile: React.FC<HeaderMobileProps> = ({
         className="flex items-center gap-2 min-w-0 text-left p-1 -ml-1 rounded-xl hover:bg-slate-800/80 active:scale-98 transition-all cursor-pointer group"
         title={language === 'te' ? 'బూత్ లేదా వార్డును మార్చుకోవడానికి ట్యాప్ చేయండి' : 'Tap to switch Booth or Ward'}
       >
-        <div className="w-8 h-8 rounded-lg bg-gradient-to-tr from-red-600 via-amber-600 to-red-600 flex items-center justify-center text-white font-black text-sm shadow-md shadow-red-900/40 flex-shrink-0 border border-amber-400/30 group-hover:scale-105 transition-transform">
-          🚩
+        <div className="w-8 h-8 rounded-lg bg-gradient-to-tr from-indigo-600 via-blue-600 to-amber-500 flex items-center justify-center text-white font-black text-sm shadow-md shadow-indigo-950/40 flex-shrink-0 border border-amber-400/40 group-hover:scale-105 transition-transform">
+          🗳️
         </div>
         <div className="min-w-0">
           <div className="flex items-center gap-1.5 flex-wrap">
             <span className="text-[10px] uppercase font-bold text-amber-400 tracking-wider">
-              {language === 'te' ? 'జనసేన పిఠాపురం' : 'JSP Pithapuram'}
+              {language === 'te' ? 'పిఠాపురం ఓటర్ పోర్టల్' : 'Pithapuram Voter Portal'}
             </span>
             <span className={`text-[9px] px-1.5 py-0.2 rounded font-mono font-bold ${
               boothInfo?.election_type === 'municipal'

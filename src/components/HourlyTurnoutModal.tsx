@@ -114,7 +114,7 @@ export const HourlyTurnoutModal: React.FC<HourlyTurnoutModalProps> = ({
       ? `వార్డు #${boothInfo.ward_no || 14}: ${boothInfo.clean_village}`
       : `బూత్ #${boothInfo.part_no}: ${boothInfo.clean_village}`;
 
-    const text = `🚩 *జనసేన పార్టీ - పిఠాపురం నియోజకవర్గం*
+    const text = `🗳️ *పిఠాపురం నియోజకవర్గం (AC #37)*
 🏛️ *పోలింగ్ డే లైవ్ టర్నౌట్ రిపోర్ట్*
 ━━━━━━━━━━━━━━━━━━
 📍 *కేంద్రం:* ${boothLabel}
@@ -126,11 +126,11 @@ export const HourlyTurnoutModal: React.FC<HourlyTurnoutModalProps> = ({
 • ఇప్పటివరకు పోలైన ఓట్లు: *${liveVotedCount}* (*${livePct}%*)
 • ఇంకా పోల్ కావాల్సినవి: *${totalElectors - liveVotedCount}*
 
-🚩 *జనసేన బలం (మనవాళ్లు 100%):*
-• ఓటు వేసిన మనవాళ్లు: *${liveOursVoted}*
-• ఇంకా బూత్‌కు రావాల్సిన మనవాళ్లు: *${liveOursPending}*
+⭐ *మద్దతుదారుల బలం (100% Confirm):*
+• ఓటు వేసిన మద్దతుదారులు: *${liveOursVoted}*
+• ఇంకా బూత్‌కు రావాల్సిన వారు: *${liveOursPending}*
 ${historyText ? `\n🕒 *గంటల వారీ టర్నౌట్ రికార్డు:*${historyText}\n` : ''}
-_గాజు గ్లాసు గుర్తుకే మన ఓటు! పవన్ కళ్యాణ్ గారి భారీ మెజారిటీ కోసం పనిచేస్తున్నాం!_ 🚩`;
+_ప్రజాస్వామ్య ప్రక్రియలో ప్రతి ఓటూ నిర్ణయాత్మకం!_ 🗳️`;
 
     const url = `https://wa.me/?text=${encodeURIComponent(text)}`;
     window.open(url, '_blank');

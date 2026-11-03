@@ -109,8 +109,8 @@ export const OfflineTabMobile: React.FC<OfflineTabMobileProps> = ({
 
         <p className="text-slate-300 text-[11px] leading-relaxed">
           {language === 'te'
-            ? 'ఎండలో గ్రామాల్లో తిరిగేటప్పుడు స్పష్టంగా కనిపించే "డేలైట్ వైట్", రాత్రి ప్రచారానికి "OLED బ్లాక్", లేదా అఫీషియల్ "జనసేన రెడ్" థీమ్‌ను ఎంచుకోండి.'
-            : 'Switch to Daylight for bright outdoor sun visibility, OLED Black for battery saving at night, or Official JSP Red.'}
+            ? 'ఎండలో గ్రామాల్లో తిరిగేటప్పుడు స్పష్టంగా కనిపించే "డేలైట్ వైట్", రాత్రి ప్రచారానికి "OLED బ్లాక్", లేదా ఎలక్షన్ సిగ్నేచర్ థీమ్‌ను ఎంచుకోండి.'
+            : 'Switch to Daylight for bright outdoor sun visibility, OLED Black for battery saving at night, or Election Signature Theme.'}
         </p>
 
         <div className="grid grid-cols-2 gap-2 pt-1">

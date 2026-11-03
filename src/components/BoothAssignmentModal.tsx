@@ -381,7 +381,7 @@ export const BoothAssignmentModal: React.FC<BoothAssignmentModalProps> = ({
                             Mandal: {b.mandal} • {b.total_voters.toLocaleString()} Electors
                           </div>
                           <div className="text-[10px] text-amber-400/90 font-medium">
-                            🚩 {b.total_kriya_count} Kriya Enrolled ({b.kriya_percentage}%)
+                            ⭐ {b.total_kriya_count} Enrolled ({b.kriya_percentage}%)
                           </div>
                         </div>
 

@@ -462,7 +462,22 @@ function getInfluencersKey(partNo: number | string): string {
 export function getInfluencers(partNo: number | string): Record<string, Influencer> {
   try {
     const raw = safeStorage.getItem(getInfluencersKey(partNo));
-    if (raw) return JSON.parse(raw);
+    if (raw) {
+      const parsed = JSON.parse(raw);
+      // Clean up any legacy party names in roles/notes
+      let changed = false;
+      Object.values(parsed as Record<string, Influencer>).forEach((inf) => {
+        if (inf && inf.role && /\bJSP\b/i.test(inf.role)) {
+          inf.role = inf.role.replace(/\bActive\s+JSP\s+Volunteer\b/i, 'Active Volunteer')
+                             .replace(/\bJSP\s*/i, '').trim();
+          changed = true;
+        }
+      });
+      if (changed) {
+        safeStorage.setItem(getInfluencersKey(partNo), JSON.stringify(parsed));
+      }
+      return parsed;
+    }
 
     const defaults: Record<string, Influencer> = {
       'inf_1': {
@@ -476,7 +491,7 @@ export function getInfluencers(partNo: number | string): Record<string, Influenc
         id: 'inf_2',
         name: 'Nakka Srinu',
         mobile: '8341245339',
-        role: 'Youth Leader / Active JSP Volunteer',
+        role: 'Youth Leader / Active Volunteer',
         notes: 'Covers Temple street and Old SC Peta'
       }
     };
@@ -517,10 +532,10 @@ export function generateInfluencerWhatsAppMessage(
   assignedVoters: MobileVoter[],
   profiles: Record<number, VoterCampaignProfile>
 ): string {
-  let msg = `*🚩 జనసేన పార్టీ — పిఠాపురం నియోజకవర్గం (AC #37)*\n`;
-  msg += `*బూత్ #${boothPartNo} (${village}) — ఇన్‌ఫ్లుయెన్సర్ బాధ్యత పత్రం*\n\n`;
+  let msg = `*🗳️ పిఠాపురం నియోజకవర్గం (AC #37)*\n`;
+  msg += `*బూత్ #${boothPartNo} (${village}) — ఇన్‌ఫ్లుయెన్సర్ / సమన్వయకర్త బాధ్యత పత్రం*\n\n`;
   msg += `నమస్కారం *${influencer.name}* గారు (${influencer.role}),\n`;
-  msg += `మీ పరిధిలో పార్టీ గెలుపు కొరకు బాధ్యతగా కేటాయించిన ఓటర్ల జాబితా (${assignedVoters.length} మంది):\n\n`;
+  msg += `మీ పరిధిలో సమన్వయం కొరకు కేటాయించిన ఓటర్ల జాబితా (${assignedVoters.length} మంది):\n\n`;
 
   assignedVoters.forEach((v, idx) => {
     const prof = profiles[v.s] || {};
@@ -539,7 +554,7 @@ export function generateInfluencerWhatsAppMessage(
     msg += `\n`;
   });
 
-  msg += `దయచేసి వీరందరినీ స్వయంగా కలిసి మన గాజు గ్లాసు గుర్తుకు సంపూర్ణ మద్దతు ఇవ్వవలసిందిగా కోరగలరు. జై జనసేన! 🚩`;
+  msg += `దయచేసి వీరందరినీ స్వయంగా కలిసి ఎన్నికల సమన్వయం పూర్తి చేయవలసిందిగా కోరుతున్నాము. 🗳️`;
   return msg;
 }
 
@@ -547,7 +562,7 @@ export function generateInfluencerWhatsAppMessage(
 // Download to Mobile Local Files (JSON Export)
 // -------------------------------------------------------------
 export function downloadBoothAsJson(data: BoothData): void {
-  const fileName = `JSP_Pithapuram_Booth_${data.booth_info.part_no}_Voters.json`;
+  const fileName = `Pithapuram_Booth_${data.booth_info.part_no}_Voters.json`;
   const jsonContent = JSON.stringify(data, null, 2);
   const blob = new Blob([jsonContent], { type: 'application/json' });
   const url = URL.createObjectURL(blob);
@@ -690,7 +705,7 @@ export function downloadCampaignBackupJson(partNo: number | string): void {
     families: getFamilyGroups(partNo),
     influencers: getInfluencers(partNo)
   };
-  const fileName = `JSP_Pithapuram_Campaign_Part_${partNo}_${new Date().toISOString().slice(0, 10)}.json`;
+  const fileName = `Pithapuram_Campaign_Part_${partNo}_${new Date().toISOString().slice(0, 10)}.json`;
   const blob = new Blob([JSON.stringify(bundle, null, 2)], { type: 'application/json' });
   const url = URL.createObjectURL(blob);
   const link = document.createElement('a');

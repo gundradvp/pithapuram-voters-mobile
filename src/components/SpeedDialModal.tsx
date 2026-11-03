@@ -74,8 +74,8 @@ export const SpeedDialModal: React.FC<SpeedDialModalProps> = ({
 
   const handleSendWhatsAppSlip = (v: MobileVoter, phone: string) => {
     const cleanPhone = phone.replace(/[^0-9]/g, '');
-    const text = `🚩 *జనసేన పార్టీ - పిఠాపురం నియోజకవర్గం*
-🏛️ *గాజు గ్లాసు గుర్తుకే మన ఓటు!*
+    const text = `🗳️ *పిఠాపురం నియోజకవర్గం (AC #37)*
+*ఓటరు సమాచార స్లిప్పు (VOTER SLIP)*
 
 నమస్తే *${v.n}* గారు,
 
@@ -86,7 +86,7 @@ export const SpeedDialModal: React.FC<SpeedDialModalProps> = ({
 🏛️ *పోలింగ్ కేంద్రం:* ${boothInfo.ps_address}
 ⏰ *పోలింగ్ సమయం:* ఉదయం 7:00 నుండి సాయంత్రం 5:00 వరకు
 
-_దయచేసి వెంటనే మీ ఓటు హక్కును వినియోగించుకోండి! జై హింద్! జై జనసేన!_ 🚩`;
+_దయచేసి వెంటనే మీ ఓటు హక్కును వినియోగించుకోండి! ప్రతి ఓటూ అమూల్యం._ 🗳️`;
 
     const url = `https://wa.me/${cleanPhone.startsWith('91') ? cleanPhone : '91' + cleanPhone}?text=${encodeURIComponent(text)}`;
     window.open(url, '_blank');

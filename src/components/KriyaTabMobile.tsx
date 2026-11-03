@@ -159,7 +159,7 @@ export const KriyaTabMobile: React.FC<KriyaTabMobileProps> = ({
                       onError={(e) => { (e.target as HTMLElement).style.display = 'none'; }}
                     />
                   ) : (
-                    <span>🚩</span>
+                    <span>⭐</span>
                   )}
                 </div>
 
@@ -192,7 +192,7 @@ export const KriyaTabMobile: React.FC<KriyaTabMobileProps> = ({
                 {m.k_m && (
                   <>
                     <a
-                      href={`https://wa.me/91${m.k_m}?text=${encodeURIComponent(`నమస్కారం ${m.n} గారు, జనసేన పార్టీ పిఠాపురం బూత్ #${boothInfo.part_no} నుండి సంప్రదిస్తున్నాము.`)}`}
+                      href={`https://wa.me/91${m.k_m}?text=${encodeURIComponent(`నమస్కారం ${m.n} గారు, పిఠాపురం నియోజకవర్గం బూత్ #${boothInfo.part_no} నుండి సంప్రదిస్తున్నాము.`)}`}
                       target="_blank"
                       rel="noreferrer"
                       className="p-2 bg-emerald-600 hover:bg-emerald-500 text-white rounded-xl text-xs flex items-center shadow-md shadow-emerald-950/40"

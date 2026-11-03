@@ -79,7 +79,7 @@ export const SyncBackupModal: React.FC<SyncBackupModalProps> = ({
   const handleShareSyncCodeWhatsApp = () => {
     try {
       const code = generateSyncToken(partNo);
-      const msg = `🚩 *జనసేన పార్టీ - పిఠాపురం నియోజకవర్గం*\n*బూత్ #${partNo} కేటాయించిన ఓటర్ల సింక్ కోడ్*\n\nఈ కోడ్‌ను కాపీ చేసి మీ యాప్‌లో 'సింక్ (Sync)' మెనూలో పేస్ట్ చేయండి:\n\n${code}`;
+      const msg = `🗳️ *పిఠాపురం నియోజకవర్గం (AC #37)*\n*బూత్ #${partNo} కేటాయించిన ఓటర్ల సింక్ కోడ్*\n\nఈ కోడ్‌ను కాపీ చేసి మీ యాప్‌లో 'సింక్ (Sync)' మెనూలో పేస్ట్ చేయండి:\n\n${code}`;
       const url = `https://wa.me/?text=${encodeURIComponent(msg)}`;
       window.open(url, '_blank');
     } catch (e: any) {

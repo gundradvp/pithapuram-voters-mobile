@@ -1,5 +1,5 @@
 import React, { useState, useMemo, useEffect } from 'react';
-import { Search, Phone, PhoneCall, MessageSquare, Send, Printer, CheckCircle2, Flag, UserX, AlertCircle, Sparkles, Home, UserCheck, Sliders, Plus, Clock, User, Volume2, Users, Building, ChevronDown, ChevronUp, Copy, Hash, X, Mic, MicOff, Zap, RotateCcw, CheckSquare, Square } from 'lucide-react';
+import { Search, Phone, PhoneCall, MessageSquare, Send, Printer, CheckCircle2, Flag, Star, UserX, AlertCircle, Sparkles, Home, UserCheck, Sliders, Plus, Clock, User, Volume2, Users, Building, ChevronDown, ChevronUp, Copy, Hash, X, Mic, MicOff, Zap, RotateCcw, CheckSquare, Square } from 'lucide-react';
 import { MobileVoter, BoothInfo, VoterSurveyStatus, VoterCampaignProfile } from '../types';
 import { Language, translations } from '../utils/i18n';
 import { resolvePhotoUrl } from '../utils/photoResolver';
@@ -301,8 +301,7 @@ export const VotersTabMobile: React.FC<VotersTabMobileProps> = ({
   };
 
   const handleSendWhatsAppSlip = (v: MobileVoter, phone?: string) => {
-    const text = `🚩 *జనసేన పార్టీ - పిఠాపురం నియోజకవర్గం*
-🏛️ *గాజు గ్లాసు గుర్తుకే మన ఓటు!*
+    const text = `🗳️ *ఓటర్ సమాచార పత్రం — పిఠాపురం నియోజకవర్గం (AC #37)*
 
 నమస్తే *${v.n}* గారు,
 
@@ -313,7 +312,7 @@ export const VotersTabMobile: React.FC<VotersTabMobileProps> = ({
 🏛️ *పోలింగ్ కేంద్రం:* ${boothInfo.ps_address || '-'}
 ⏰ *పోలింగ్ సమయం:* ఉదయం 7:00 నుండి సాయంత్రం 5:00 వరకు
 
-_మీ అమూల్యమైన ఓటును గాజు గ్లాసు గుర్తుపై వేసి జనసేన అధినేత పవన్ కళ్యాణ్ గారిని భారీ మెజారిటీతో గెలిపించండి!_ 🚩`;
+_దయచేసి మీ ఓటు హక్కును వినియోగించుకోండి! ప్రతి ఓటూ అమూల్యం._ 🗳️`;
 
     if (phone) {
       const cleanPhone = phone.replace(/[^0-9]/g, '');
@@ -581,8 +580,8 @@ _మీ అమూల్యమైన ఓటును గాజు గ్లాస
     }
     if (pct === 100) {
       return (
-        <span className="px-1.5 py-0.2 bg-red-600/30 text-red-300 border border-red-500/50 rounded-md text-[9px] font-black flex items-center gap-0.5">
-          🚩 {language === 'te' ? '100% మనవాళ్లే' : '100% Support'}
+        <span className="px-1.5 py-0.2 bg-emerald-600/30 text-emerald-300 border border-emerald-500/50 rounded-md text-[9px] font-black flex items-center gap-0.5">
+          ⭐ {language === 'te' ? '100% మనవాళ్లే' : '100% Support'}
         </span>
       );
     }
@@ -626,7 +625,7 @@ _మీ అమూల్యమైన ఓటును గాజు గ్లాస
       case 'voted':
         return <span className="px-1.5 py-0.5 bg-emerald-600/30 text-emerald-300 border border-emerald-500/40 rounded text-[9px] font-bold flex items-center gap-0.5">✅ {t.markVoted}</span>;
       case 'supporter':
-        return <span className="px-1.5 py-0.5 bg-red-600/30 text-red-300 border border-red-500/40 rounded text-[9px] font-bold flex items-center gap-0.5">🚩 {language === 'te' ? 'మద్దతుదారు' : 'Supporter'}</span>;
+        return <span className="px-1.5 py-0.5 bg-emerald-600/30 text-emerald-300 border border-emerald-500/40 rounded text-[9px] font-bold flex items-center gap-0.5">⭐ {language === 'te' ? 'మద్దతుదారు' : 'Supporter'}</span>;
       case 'deceased':
         return <span className="px-1.5 py-0.5 bg-slate-800 text-slate-300 border border-slate-700 rounded text-[9px] font-black flex items-center gap-0.5 shadow-sm">💀 {language === 'te' ? 'మరణించారు' : 'Deceased'}</span>;
       case 'out_of_city':
@@ -645,7 +644,7 @@ _మీ అమూల్యమైన ఓటును గాజు గ్లాస
   const getMoneyBadge = (moneyStatus?: string) => {
     switch (moneyStatus) {
       case 'opponent_paid_safe':
-        return <span className="px-1.5 py-0.2 bg-emerald-950 text-emerald-300 border border-emerald-500/50 rounded text-[9px] font-black flex items-center gap-0.5" title="డబ్బులు తీసుకున్నా గాజు గ్లాసుకే వేస్తారు">💰 డబ్బు తీసుకున్నా గ్లాసుకే</span>;
+        return <span className="px-1.5 py-0.2 bg-emerald-950 text-emerald-300 border border-emerald-500/50 rounded text-[9px] font-black flex items-center gap-0.5" title="డబ్బులు తీసుకున్నా మనకే ఓటు వేస్తారు">💰 డబ్బు తీసుకున్నా మనకే</span>;
       case 'opponent_paid_swung':
         return <span className="px-1.5 py-0.2 bg-rose-950 text-rose-300 border border-rose-500/50 rounded text-[9px] font-black flex items-center gap-0.5" title="డబ్బు ప్రభావంతో ప్రత్యర్థి వైపు తిరిగారు">💸 డబ్బుతో మారారు</span>;
       case 'at_risk_cash':
@@ -663,15 +662,15 @@ _మీ అమూల్యమైన ఓటును గాజు గ్లాస
       ? `${boothInfo.local_body || 'పురపాలక సంఘం'} (${boothInfo.ward_no ? `${boothInfo.ward_no}వ వార్డు` : ''})`
       : `పిఠాపురం నియోజకవర్గం — ${boothInfo.clean_village || 'గ్రామం'}`;
     
-    const text = `*🚩 జై జనసేన — ${locationName}*
+    const text = `*🗳️ పిఠాపురం నియోజకవర్గం — ${locationName}*
 *గౌరవనీయులైన ${clan.nameTe} (${clan.nameEn}) కుటుంబ పెద్దలకు నమస్కారం!*
 
-మన ప్రాంత/వార్డు అభివృద్ధి కొరకు మరియు మన ప్రియతమ నాయకుడు పవన్ కళ్యాణ్ గారి నాయకత్వంలో మంచి పరిపాలన కోసం, మీ *${clan.nameTe}* వంశ కుటుంబ సభ్యులందరి ఆశీస్సులు, సంపూర్ణ మద్దతు *గాజు గ్లాసు* గుర్తుకు అందించవలసిందిగా వినమ్రంగా కోరుతున్నాము.
+మన ప్రాంత/వార్డు ఎన్నికల సమన్వయం మరియు ఓటర్ల సౌలభ్యం కొరకు, మీ *${clan.nameTe}* వంశ కుటుంబ సభ్యులందరి ఓటర్ వివరాలను అందజేస్తున్నాము.
 
 📊 *మీ కుటుంబ ఓటర్ల బలం:* ${clan.totalVoters} ఓట్లు (బూత్ #${boothInfo.part_no})
 🏛️ *పోలింగ్ కేంద్రం:* ${boothInfo.ps_address}
 
-_మీ అమూల్యమైన ఓటును గాజు గ్లాసు గుర్తుపై వేసి జనసేన పార్టీ అభ్యర్థిని భారీ మెజారిటీతో గెలిపించండి!_ 🚩`;
+_దయచేసి మీ ఓటు హక్కును వినియోగించుకోండి! ప్రతి ఓటూ అమూల్యం._ 🗳️`;
 
     const cleanPhone = clan.headPhone ? clan.headPhone.replace(/[^0-9]/g, '') : '';
     const url = `https://wa.me/${cleanPhone}?text=${encodeURIComponent(text)}`;
@@ -1021,7 +1020,7 @@ _మీ అమూల్యమైన ఓటును గాజు గ్లాస
               }`}
               title={language === 'te' ? 'మన మద్దతుదారుల్లో ఇంకా ఓటు వేయనివారిని వెంటనే బూతుకు తీసుకురండి' : 'Our supporters who have not yet voted'}
             >
-              <span className="truncate">{language === 'te' ? '🚩 మన పెండింగ్' : '🚩 Ours Pending'}</span>
+              <span className="truncate">{language === 'te' ? '⭐ మన పెండింగ్' : '⭐ Ours Pending'}</span>
               <span className="font-mono text-[11px] font-black text-red-200">
                 {counts.oursNotVoted}
               </span>
@@ -1156,7 +1155,7 @@ _మీ అమూల్యమైన ఓటును గాజు గ్లాస
                 : 'bg-slate-900 text-red-300 border border-red-500/40'
             }`}
           >
-            <span>🚩 {language === 'te' ? 'మన పెండింగ్' : 'Ours Pending'} ({counts.oursNotVoted})</span>
+            <span>⭐ {language === 'te' ? 'మన పెండింగ్' : 'Ours Pending'} ({counts.oursNotVoted})</span>
           </button>
 
           <button
@@ -1410,8 +1409,8 @@ _మీ అమూల్యమైన ఓటును గాజు గ్లాస
       {/* Active Filter Indicator: Ours Pending */}
       {filterMode === 'ours_not_voted' && (
         <div className="bg-red-500/10 border border-red-500/40 rounded-xl px-3 py-1.5 flex items-center justify-between text-[11px] animate-in fade-in">
-          <span className="text-red-300 font-bold flex items-center gap-1.5">
-            🚩 {language === 'te' ? 'మన మద్దతుదారుల్లో ఇంకా ఓటు వేయనివారు:' : 'Our supporters not yet voted:'}{' '}
+          <span className="text-amber-300 font-bold flex items-center gap-1.5">
+            ⭐ {language === 'te' ? 'మన మద్దతుదారుల్లో ఇంకా ఓటు వేయనివారు:' : 'Our supporters not yet voted:'}{' '}
             <strong className="text-white font-mono bg-red-500/20 px-1.5 py-0.5 rounded border border-red-500/30">
               {filteredVoters.length} {language === 'te' ? 'మంది' : 'electors'}
             </strong>
@@ -1751,7 +1750,7 @@ _మీ అమూల్యమైన ఓటును గాజు గ్లాస
                                   }`}
                                   title="మనవాళ్లేనా? (Toggle Ours)"
                                 >
-                                  🚩 {pct === 100 || prof.survey_status === 'supporter' ? 'మనవాళ్లే' : 'మనవాళ్లు?'}
+                                  ⭐ {pct === 100 || prof.survey_status === 'supporter' ? 'మనవాళ్లే' : 'మనవాళ్లు?'}
                                 </button>
                                 <button
                                   type="button"
@@ -1812,8 +1811,8 @@ _మీ అమూల్యమైన ఓటును గాజు గ్లాస
                               <div className="flex items-center justify-between pt-0.5 text-[10px]">
                                 <div className="flex items-center gap-1.5 flex-wrap">
                                   {m.k_m && (
-                                    <span className="inline-flex items-center gap-1 bg-red-950/60 border border-red-500/30 px-1.5 py-0.2 rounded text-[9.5px]">
-                                      <span className="text-red-300 font-bold">🚩 క్రియ:</span>
+                                    <span className="inline-flex items-center gap-1 bg-amber-950/40 border border-amber-500/30 px-1.5 py-0.2 rounded text-[9.5px]">
+                                      <span className="text-amber-300 font-bold">📱 రిజిస్టర్డ్:</span>
                                       <a href={`tel:${m.k_m}`} className="font-mono text-amber-300 font-bold hover:underline flex items-center gap-0.5" title="Call">
                                         <Phone className="w-2 h-2 text-emerald-400" />
                                         <span>{m.k_m}</span>
@@ -2086,8 +2085,8 @@ _మీ అమూల్యమైన ఓటును గాజు గ్లాస
                 <div className="mt-2 pt-1.5 border-t border-slate-800/80 flex items-center justify-between text-[11px] flex-wrap gap-1.5">
                   <div className="flex items-center gap-2 flex-wrap">
                     {v.k_m && (
-                      <div className="inline-flex items-center gap-1.5 bg-red-950/70 border border-red-500/40 px-2 py-0.5 rounded-lg text-[10.5px]">
-                        <span className="text-red-300 font-bold">🚩 క్రియ:</span>
+                      <div className="inline-flex items-center gap-1.5 bg-amber-950/40 border border-amber-500/40 px-2 py-0.5 rounded-lg text-[10.5px]">
+                        <span className="text-amber-300 font-bold">📱 రిజిస్టర్డ్:</span>
                         <a
                           href={`tel:${v.k_m}`}
                           className="font-mono font-black text-amber-300 hover:text-white hover:underline flex items-center gap-1"
@@ -2223,7 +2222,7 @@ _మీ అమూల్యమైన ఓటును గాజు గ్లాస
 
                   return (
                     <div className="space-y-1.5 pt-1 pb-0.5">
-                      {/* Row 1: 🚩 మనవాళ్లే (100%) & ✅ ఓటేశారు (Voted) */}
+                      {/* Row 1: ⭐ మనవాళ్లే (100%) & ✅ ఓటేశారు (Voted) */}
                       <div className="grid grid-cols-2 gap-2">
                         {/* 1. Quick Switch for OURS (మనవాళ్లే) */}
                         <button
@@ -2234,13 +2233,13 @@ _మీ అమూల్యమైన ఓటును గాజు గ్లాస
                           }}
                           className={`py-2 px-2.5 rounded-xl text-xs font-black flex items-center justify-center gap-1.5 transition-all active:scale-95 shadow-sm border ${
                             isOurs
-                              ? 'bg-gradient-to-r from-red-600 to-amber-600 text-white border-red-400 ring-2 ring-red-400/40 shadow-red-950/50'
+                              ? 'bg-gradient-to-r from-emerald-600 to-amber-600 text-white border-emerald-400 ring-2 ring-emerald-400/40 shadow-emerald-950/50'
                               : 'bg-slate-950 hover:bg-slate-800 text-slate-300 border-slate-700 hover:border-amber-500/60'
                           }`}
                           title={isOurs ? 'మనవాళ్లే (ట్యాప్ చేస్తే రీసెట్ అవుతుంది)' : '100% మన మద్దతుదారుడిగా నమోదు చేయడానికి ట్యాప్ చేయండి'}
                         >
-                          <Flag className={`w-3.5 h-3.5 ${isOurs ? 'text-white fill-white' : 'text-amber-400'}`} />
-                          <span className="truncate">{isOurs ? (language === 'te' ? '🚩 మనవాళ్లే (100%)' : '🚩 Ours (100%)') : (language === 'te' ? '🚩 మనవాళ్లేనా?' : '+ Mark Ours')}</span>
+                          <Star className={`w-3.5 h-3.5 ${isOurs ? 'text-white fill-white' : 'text-amber-400'}`} />
+                          <span className="truncate">{isOurs ? (language === 'te' ? '⭐ మనవాళ్లే (100%)' : '⭐ Ours (100%)') : (language === 'te' ? '⭐ మనవాళ్లేనా?' : '+ Mark Ours')}</span>
                         </button>
 
                         {/* 2. Quick Switch for VOTED (ఓటేశారు) */}
@@ -2333,8 +2332,8 @@ _మీ అమూల్యమైన ఓటును గాజు గ్లాస
                     <a
                       href={`https://wa.me/91${phone}?text=${encodeURIComponent(
                         boothInfo.election_type === 'municipal'
-                          ? `నమస్కారం ${v.n} గారు, జనసేన పార్టీ ${boothInfo.local_body || 'పురపాలక సంఘం'} ${boothInfo.ward_no ? `${boothInfo.ward_no}వ వార్డు` : ''} ఎన్నికల ప్రచారం కొరకు సంప్రదిస్తున్నాము. మీ వార్డు ఓటరు క్రమ సంఖ్య: #${v.s}, శాసనసభ బూత్: Part #${v.ac_part || ''}. మన గాజు గ్లాసు గుర్తుపై ఓటు వేసి వార్డును అభివృద్ధి చేసుకుందాం! 🚩`
-                          : `నమస్కారం ${v.n} గారు, జనసేన పార్టీ పిఠాపురం బూత్ #${boothInfo.part_no} నుండి సంప్రదిస్తున్నాము. మీ ఓటరు క్రమ సంఖ్య: #${v.s}, పోలింగ్ బూత్: ${boothInfo.clean_village}. మన గాజు గ్లాసు గుర్తుపై ఓటు వేసి పవన్ కళ్యాణ్ గారిని గెలిపించండి! 🚩`
+                          ? `నమస్కారం ${v.n} గారు, ${boothInfo.local_body || 'పురపాలక సంఘం'} ${boothInfo.ward_no ? `${boothInfo.ward_no}వ వార్డు` : ''} ఎన్నికల ఓటర్ సమాచారం కొరకు సంప్రదిస్తున్నాము. మీ వార్డు ఓటరు క్రమ సంఖ్య: #${v.s}, శాసనసభ బూత్: Part #${v.ac_part || ''}. దయచేసి మీ ఓటు హక్కును వినియోగించుకోండి! 🗳️`
+                          : `నమస్కారం ${v.n} గారు, పిఠాపురం బూత్ #${boothInfo.part_no} ఓటర్ సమాచారం కొరకు సంప్రదిస్తున్నాము. మీ ఓటరు క్రమ సంఖ్య: #${v.s}, పోలింగ్ బూత్: ${boothInfo.clean_village}. దయచేసి మీ ఓటు హక్కును వినియోగించుకోండి! 🗳️`
                       )}`}
                       target="_blank"
                       rel="noreferrer"
@@ -2349,7 +2348,7 @@ _మీ అమూల్యమైన ఓటును గాజు గ్లాస
                   {/* SMS */}
                   {phone ? (
                     <a
-                      href={`sms:${phone}?body=${encodeURIComponent(`నమస్కారం ${v.n} గారు, పిఠాపురం జనసేన అభ్యర్థి పవన్ కళ్యాణ్ గారికి గాజు గ్లాసు గుర్తుపై ఓటు వేసి గెలిపించండి.`)}`}
+                      href={`sms:${phone}?body=${encodeURIComponent(`నమస్కారం ${v.n} గారు, పిఠాపురం నియోజకవర్గం బూత్ #${boothInfo.part_no} ఓటరు క్రమ సంఖ్య #${v.s}. దయచేసి మీ ఓటు హక్కును వినియోగించుకోండి.`)}`}
                       className="p-1.5 bg-blue-600/20 hover:bg-blue-600 text-blue-300 hover:text-white rounded-lg border border-blue-500/30 transition-all text-xs flex items-center gap-1 font-bold"
                       title="Send SMS"
                     >

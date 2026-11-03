@@ -381,8 +381,8 @@ export const WarRoomTabMobile: React.FC<WarRoomTabMobileProps> = ({
             </span>
             <p className="text-[10px] text-slate-400 mt-0.5">
               {marginSim.remainingNeeded > 0
-                ? `మిగిలిన ${marginSim.uncommittedVotes} మంది స్వింగ్/న్యూట్రల్ ఓటర్లలో కనీసం ${marginSim.remainingNeeded} ఓట్లు (${marginSim.requiredShareOfRemaining}%) మనవైపు తిప్పుకుంటే పవన్ కళ్యాణ్ గారికి +${marginSim.targetLead} మెజారిటీ ఖాయం!`
-                : `ఈ బూత్‌లో మీరు నిర్దేశించిన +${marginSim.targetLead} మెజారిటీకి కావాల్సినంత బలం ఇప్పటికే జనసేన వైపు ఉంది!`}
+                ? `మిగిలిన ${marginSim.uncommittedVotes} మంది స్వింగ్/న్యూట్రల్ ఓటర్లలో కనీసం ${marginSim.remainingNeeded} ఓట్లు (${marginSim.requiredShareOfRemaining}%) మనవైపు తిప్పుకుంటే +${marginSim.targetLead} మెజారిటీ ఖాయం!`
+                : `ఈ బూత్‌లో మీరు నిర్దేశించిన +${marginSim.targetLead} మెజారిటీకి కావాల్సినంత బలం ఇప్పటికే మన వైపు ఉంది!`}
             </p>
           </div>
         </div>
@@ -416,10 +416,10 @@ export const WarRoomTabMobile: React.FC<WarRoomTabMobileProps> = ({
             <span className="text-sm font-black text-white font-mono">{winningFormula.top10VoterCount}</span>
             <span className="text-[9px] text-slate-500 block font-mono">{boothData.voters.length} లో {winningFormula.top10Percentage}%</span>
           </div>
-          <div className="bg-slate-950/80 border border-red-500/30 rounded-xl p-2">
-            <span className="text-[9px] text-red-300 block">{language === 'te' ? 'పక్కా JSP ఓట్లు' : 'Locked JSP'}</span>
-            <span className="text-sm font-black text-red-400 font-mono">{winningFormula.top10JspSupporters}</span>
-            <span className="text-[9px] text-red-400/80 block font-mono">{winningFormula.top10VoterCount > 0 ? Math.round((winningFormula.top10JspSupporters / winningFormula.top10VoterCount) * 100) : 0}% locked</span>
+          <div className="bg-slate-950/80 border border-emerald-500/30 rounded-xl p-2">
+            <span className="text-[9px] text-emerald-300 block">{language === 'te' ? 'పక్కా మద్దతు ఓట్లు' : 'Locked Support'}</span>
+            <span className="text-sm font-black text-emerald-400 font-mono">{winningFormula.top10JspSupporters}</span>
+            <span className="text-[9px] text-emerald-400/80 block font-mono">{winningFormula.top10VoterCount > 0 ? Math.round((winningFormula.top10JspSupporters / winningFormula.top10VoterCount) * 100) : 0}% locked</span>
           </div>
           <div className="bg-slate-950/80 border border-amber-500/30 rounded-xl p-2">
             <span className="text-[9px] text-amber-300 block">{language === 'te' ? 'గెలవాల్సిన స్వింగ్' : 'Needed Swing'}</span>
@@ -437,7 +437,7 @@ export const WarRoomTabMobile: React.FC<WarRoomTabMobileProps> = ({
           ) : (
             <span>
               💡 {language === 'te' ? (
-                <>ఈ బూత్ లో టాప్ 10 ఇంటిపేర్లలోని <strong className="text-white">{winningFormula.top10SwingVoters} స్వింగ్ ఓట్లలో</strong> కేవలం <strong className="text-amber-400">{winningFormula.votesNeededFromTop10ToWin} ఓట్లను ({winningFormula.top10SwingVoters > 0 ? Math.round((winningFormula.votesNeededFromTop10ToWin / winningFormula.top10SwingVoters) * 100) : 0}%)</strong> గాజు గ్లాసు వైపునకు తిప్పితే ఈ బూత్ లో తిరుగులేని గెలుపు ఖాయం!</>
+                <>ఈ బూత్ లో టాప్ 10 ఇంటిపేర్లలోని <strong className="text-white">{winningFormula.top10SwingVoters} స్వింగ్ ఓట్లలో</strong> కేవలం <strong className="text-amber-400">{winningFormula.votesNeededFromTop10ToWin} ఓట్లను ({winningFormula.top10SwingVoters > 0 ? Math.round((winningFormula.votesNeededFromTop10ToWin / winningFormula.top10SwingVoters) * 100) : 0}%)</strong> మన వైపునకు తిప్పితే ఈ బూత్ లో తిరుగులేని గెలుపు ఖాయం!</>
               ) : (
                 <>Converting just <strong className="text-amber-400">{winningFormula.votesNeededFromTop10ToWin} ({winningFormula.top10SwingVoters > 0 ? Math.round((winningFormula.votesNeededFromTop10ToWin / winningFormula.top10SwingVoters) * 100) : 0}%)</strong> of the {winningFormula.top10SwingVoters} swing voters in top 10 clans guarantees absolute victory!</>
               )}
@@ -477,7 +477,7 @@ export const WarRoomTabMobile: React.FC<WarRoomTabMobileProps> = ({
                       {clan.totalVoters} <span className="text-[9px] text-slate-400 font-normal">({clan.pctOfBooth}%)</span>
                     </div>
                     <div className="text-[9px] font-mono text-emerald-400">
-                      {clan.supportPct}% JSP ({jspElectors} పక్కా)
+                      {clan.supportPct}% {language === 'te' ? 'మద్దతు' : 'Support'} ({jspElectors} పక్కా)
                     </div>
                   </div>
                   {onOpenGroupPrint && (
@@ -571,7 +571,7 @@ export const WarRoomTabMobile: React.FC<WarRoomTabMobileProps> = ({
                       : activeFilter === 'doubtful'
                         ? 'సందేహాస్పద ఓటర్ల జాబితా'
                         : activeFilter === 'supporters'
-                          ? 'జనసేన పక్కా మద్దతుదారుల జాబితా'
+                          ? 'పక్కా మద్దతుదారుల జాబితా'
                           : activeFilter === 'opponents'
                             ? 'వ్యతిరేక ఓటర్ల జాబితా'
                             : 'మొత్తం ఓటర్ల జాబితా';

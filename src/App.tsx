@@ -687,11 +687,11 @@ export function App() {
 
       // Notification based on money status and support category
       if (moneyStatus === 'opponent_paid_safe') {
-        triggerScoreNotice(lang === 'te' ? '💰 ప్రత్యర్థి డబ్బు ఇచ్చినా గ్లాసుకే ఓటు అని నమోదు అయ్యింది!' : '💰 Took opponent cash, confirmed Glass voter!');
+        triggerScoreNotice(lang === 'te' ? '💰 ప్రత్యర్థి డబ్బు ఇచ్చినా మనకే ఓటు అని నమోదు అయ్యింది!' : '💰 Took opponent cash, confirmed our voter!');
       } else if (moneyStatus === 'opponent_paid_swung') {
         triggerScoreNotice(lang === 'te' ? '💸 డబ్బుతో మారిన ఓటుగా నమోదు చేయబడింది' : '💸 Marked as bought by opponent');
       } else if (pct === 100) {
-        triggerScoreNotice(lang === 'te' ? `🚩 100% మనవాళ్లే చేరారు! +1 మన ఓటు పెరిగింది` : `🚩 100% Supporter Added! +1 Projected JSP Vote`);
+        triggerScoreNotice(lang === 'te' ? `⭐ 100% మనవాళ్లే చేరారు! +1 మన ఓటు పెరిగింది` : `⭐ 100% Supporter Added! +1 Projected Vote`);
       } else if (pct >= 75) {
         triggerScoreNotice(lang === 'te' ? `🟢 మన మద్దతుదారుడు చేరారు! +0.75 ఓటు పెరిగింది` : `🟢 Strong Supporter Added! +0.75 Projected Vote`);
       } else if (pct === 40) {
@@ -830,7 +830,7 @@ export function App() {
     saveVoterProfile(currentPartNo, serialNo, { survey_status: status });
     setProfiles(getVoterProfiles(currentPartNo));
     if (status === 'voted') triggerScoreNotice(lang === 'te' ? `✅ ఓటు వేశారు అని మార్క్ చేశారు` : `✅ Marked Voted for S.No #${serialNo}`);
-    else if (status === 'supporter') triggerScoreNotice(lang === 'te' ? `🚩 మన మద్దతుదారుడిగా మార్క్ చేశారు` : `🚩 Marked Supporter for S.No #${serialNo}`);
+    else if (status === 'supporter') triggerScoreNotice(lang === 'te' ? `⭐ మన మద్దతుదారుడిగా మార్క్ చేశారు` : `⭐ Marked Supporter for S.No #${serialNo}`);
     else if (status === 'opponent') triggerScoreNotice(lang === 'te' ? `🔴 ప్రత్యర్థిగా మార్క్ చేశారు` : `🔴 Marked Opponent for S.No #${serialNo}`);
     else if (status === 'deceased') triggerScoreNotice(lang === 'te' ? `💀 S.No #${serialNo} మరణించినట్లుగా నమోదు చేయబడింది` : `💀 S.No #${serialNo} marked Deceased`);
     else if (status === 'out_of_city') triggerScoreNotice(lang === 'te' ? `✈️ S.No #${serialNo} ఊర్లో లేరుగా మార్క్ చేయబడింది` : `✈️ S.No #${serialNo} marked Out of City`);
@@ -859,8 +859,8 @@ export function App() {
       setProfiles(getVoterProfiles(currentPartNo));
       triggerScoreNotice(
         lang === 'te'
-          ? `🚩 #${serialNo} మనవాళ్లే (100% మద్దతుదారు) గా నమోదయ్యారు! +1 మన ఓటు`
-          : `🚩 S.No #${serialNo} marked as Ours (100% Supporter)!`
+          ? `⭐ #${serialNo} మనవాళ్లే (100% మద్దతుదారు) గా నమోదయ్యారు! +1 మన ఓటు`
+          : `⭐ S.No #${serialNo} marked as Ours (100% Supporter)!`
       );
     }
   };

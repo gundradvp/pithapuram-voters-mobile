@@ -169,8 +169,8 @@ export const WinningScoreBanner: React.FC<WinningScoreBannerProps> = ({
       <div className="space-y-1">
         <div className="flex items-center justify-between text-[10px] font-mono">
           <span className="text-slate-400">
-            {isEntryMode ? (language === 'te' ? 'నమోదైన జనసేన:' : 'Confirmed JSP:') : t.projectedJsp}{' '}
-            <strong className="text-red-400 font-bold">{calc.projectedJspVotes}</strong>
+            {isEntryMode ? (language === 'te' ? 'నమోదైన మద్దతు:' : 'Confirmed Support:') : t.projectedJsp}{' '}
+            <strong className="text-emerald-400 font-bold">{calc.projectedJspVotes}</strong>
           </span>
           <span className="text-amber-400 font-bold">
             {progressPct}% {t.victoryGoal}
@@ -261,9 +261,9 @@ export const WinningScoreBanner: React.FC<WinningScoreBannerProps> = ({
                 {isEntryMode ? (calc.unsurveyedVotes ?? (calc.totalElectors - (calc.surveyedCount || 0))) : calc.expectedPollVotes}
               </strong>
             </div>
-            <div className="bg-slate-950/80 p-2 rounded-xl border border-red-500/30">
-              <span className="text-[9px] text-red-300 block">{language === 'te' ? 'జనసేన ఓట్లు' : 'JSP Votes'}</span>
-              <strong className="text-red-400 text-xs font-mono font-black">{calc.projectedJspVotes}</strong>
+            <div className="bg-slate-950/80 p-2 rounded-xl border border-emerald-500/30">
+              <span className="text-[9px] text-emerald-300 block">{language === 'te' ? 'మద్దతు ఓట్లు' : 'Support Votes'}</span>
+              <strong className="text-emerald-400 text-xs font-mono font-black">{calc.projectedJspVotes}</strong>
             </div>
             <div className="bg-slate-950/80 p-2 rounded-xl border border-rose-500/30">
               <span className="text-[9px] text-rose-300 block">{language === 'te' ? 'ప్రత్యర్థి' : 'Opponent'}</span>

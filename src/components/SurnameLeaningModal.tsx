@@ -63,8 +63,8 @@ export const SurnameLeaningModal: React.FC<SurnameLeaningModalProps> = ({
     },
     {
       status: 'opponent_paid_safe',
-      label: language === 'te' ? '💰 ప్రత్యర్థి డబ్బు ఇచ్చారు — కానీ మనకే ఓటు' : '💰 Opponent Distributed Cash — Still Votes JSP',
-      desc: language === 'te' ? 'డబ్బులు తీసుకున్నా పవన్ కళ్యాణ్ గారికి, గాజు గ్లాసుకే వేస్తారు' : 'Voters took money, but firmly stay with Glass symbol',
+      label: language === 'te' ? '💰 ప్రత్యర్థి డబ్బు ఇచ్చారు — కానీ మనకే ఓటు' : '💰 Opponent Distributed Cash — Still Votes For Us',
+      desc: language === 'te' ? 'డబ్బులు తీసుకున్నా మన అభ్యర్థికే ఓటు వేస్తారు' : 'Voters took money, but firmly stay with our party/candidate',
       icon: ShieldCheck,
       color: 'border-emerald-500/50 text-emerald-300 bg-emerald-950/20'
     },
@@ -141,7 +141,7 @@ export const SurnameLeaningModal: React.FC<SurnameLeaningModalProps> = ({
               >
                 <div className="text-xs font-bold leading-tight truncate">{s.nameTe || s.nameEn}</div>
                 <div className="text-[9.5px] text-slate-400 font-mono mt-0.5">
-                  {s.totalVoters} ఓట్లు • {s.supportPct}% JSP
+                  {s.totalVoters} ఓట్లు • {s.supportPct}% {language === 'te' ? 'మద్దతు' : 'Support'}
                 </div>
               </button>
             ))}

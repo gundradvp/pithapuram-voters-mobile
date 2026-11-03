@@ -59,7 +59,7 @@ export const VoterSlipModal: React.FC<VoterSlipModalProps> = ({
   const handleShareWhatsApp = () => {
     const isMunicipal = boothInfo.election_type === 'municipal';
     const text = isMunicipal
-      ? `*🚩 జనసేన పార్టీ — ${boothInfo.local_body || 'పురపాలక సంఘం'} (${boothInfo.ward_no ? `${boothInfo.ward_no}వ వార్డు` : ''})*
+      ? `*🗳️ ${boothInfo.local_body || 'పురపాలక సంఘం'} (${boothInfo.ward_no ? `${boothInfo.ward_no}వ వార్డు` : ''})*
 *ఓటరు సమాచార స్లిప్పు (VOTER SLIP)*
 
 *ఓటరు పేరు:* ${voter.n}
@@ -72,8 +72,8 @@ export const VoterSlipModal: React.FC<VoterSlipModalProps> = ({
 *వయస్సు / లింగం:* ${voter.a} Yrs / ${voter.g === 'M' ? 'Male' : 'Female'}
 *పోలింగ్ కేంద్రం:* ${boothInfo.ps_address}
 
-_మీ అమూల్యమైన ఓటును గాజు గ్లాసు గుర్తుపై వేసి జనసేన పార్టీ వార్డు అభ్యర్థిని భారీ మెజారిటీతో గెలిపించండి!_ 🚩`
-      : `*🚩 జనసేన పార్టీ — పిఠాపురం నియోజకవర్గం (AC #37)*
+_దయచేసి మీ ఓటు హక్కును వినియోగించుకోండి! ప్రతి ఓటూ అమూల్యం._ 🗳️`
+      : `*🗳️ పిఠాపురం నియోజకవర్గం (AC #37)*
 *ఓటరు సమాచార స్లిప్పు (VOTER SLIP)*
 
 *ఓటరు పేరు:* ${voter.n}
@@ -85,7 +85,7 @@ _మీ అమూల్యమైన ఓటును గాజు గ్లాస
 *వయస్సు / లింగం:* ${voter.a} Yrs / ${voter.g === 'M' ? 'Male' : 'Female'}
 *పోలింగ్ కేంద్రం:* ${boothInfo.ps_address}
 
-_మీ అమూల్యమైన ఓటును గాజు గ్లాసు గుర్తుపై వేసి జనసేన పార్టీ అభ్యర్థిని భారీ మెజారిటీతో గెలిపించండి!_ 🚩`;
+_దయచేసి మీ ఓటు హక్కును వినియోగించుకోండి! ప్రతి ఓటూ అమూల్యం._ 🗳️`;
 
     const url = `https://wa.me/?text=${encodeURIComponent(text)}`;
     window.open(url, '_blank');
@@ -103,8 +103,8 @@ _మీ అమూల్యమైన ఓటును గాజు గ్లాస
 
         {/* Slip Header */}
         <div className="text-center border-b border-slate-800 pb-3">
-          <div className="inline-flex items-center gap-1.5 px-3 py-1 bg-red-600/20 border border-red-500/40 rounded-full text-red-400 text-[10px] font-black uppercase tracking-wider mb-1">
-            🚩 Janasena Party • Pithapuram
+          <div className="inline-flex items-center gap-1.5 px-3 py-1 bg-amber-500/20 border border-amber-500/40 rounded-full text-amber-300 text-[10px] font-black uppercase tracking-wider mb-1">
+            🗳️ పిఠాపురం నియోజకవర్గం • AC #37
           </div>
           <h3 className="text-base font-black text-white">Voter Information Slip</h3>
           <p className="text-[11px] text-amber-400 font-bold">2026 SIR Draft Electoral Roll</p>

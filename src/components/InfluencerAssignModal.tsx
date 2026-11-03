@@ -107,7 +107,7 @@ export const InfluencerAssignModal: React.FC<InfluencerAssignModalProps> = ({
                 <option value="SHG / DWCRA Leader">SHG / DWCRA Leader</option>
                 <option value="Sarpanch Associate">Sarpanch Associate</option>
                 <option value="Family Elder / Head">Family Elder / Head</option>
-                <option value="Active JSP Karyakartha">Active JSP Karyakartha</option>
+                <option value="Active Volunteer / Cadre">Active Volunteer / Cadre</option>
               </select>
             </div>
 

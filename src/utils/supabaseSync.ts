@@ -190,7 +190,7 @@ export async function pushBoothToSupabaseImmediate(
     tenant_id: TENANT_ID,
     category: SYNC_CATEGORY,
     value: cleanPart,
-    display_label: `JSP Booth #${cleanPart} Campaign Sync`,
+    display_label: `Pithapuram Booth #${cleanPart} Campaign Sync`,
     description: JSON.stringify(bundle),
     is_active: true
   };

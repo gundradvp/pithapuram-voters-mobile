@@ -90,18 +90,18 @@ export const DEMO_VOTERS: MobileVoter[] = [
 ];
 
 export const DEMO_PROFILES: Record<number, VoterCampaignProfile> = {
-  1: { supportPct: 100, survey_status: 'supporter', notes: 'పవన్ కళ్యాణ్ వీరాభిమాని, కుటుంబంలో 5 ఓట్లు ఉన్నాయి' },
+  1: { supportPct: 100, survey_status: 'supporter', notes: 'మన ముఖ్య మద్దతుదారుడు, కుటుంబంలో 5 ఓట్లు ఉన్నాయి' },
   2: { supportPct: 100, survey_status: 'supporter' },
   3: { supportPct: 100, survey_status: 'voted', customPhone: '9440123456', notes: 'ఉదయమే వచ్చి ఓటు వేశారు' },
   4: { supportPct: 100, survey_status: 'supporter' },
   5: { supportPct: 100, survey_status: 'supporter' },
 
-  6: { supportPct: 100, survey_status: 'supporter', notes: 'జనసేన పార్టీ క్రియాశీల సభ్యుడు' },
+  6: { supportPct: 100, survey_status: 'supporter', notes: 'పార్టీ క్రియాశీల వాలంటీర్' },
   7: { supportPct: 100, survey_status: 'supporter' },
   8: { supportPct: 100, survey_status: 'supporter' },
   9: { supportPct: 75 },
 
-  10: { supportPct: 75, notes: 'సానుకూలం, గతంలో కూటమికి వేశారు' },
+  10: { supportPct: 75, notes: 'సానుకూల ఓటరు' },
   11: { supportPct: 75 },
   12: { supportPct: 50, notes: 'స్వింగ్ ఓటరు, యువత పథకాలపై ఆసక్తి' },
   13: { supportPct: 50 },

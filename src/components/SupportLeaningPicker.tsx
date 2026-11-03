@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { X, Check, Flag, Sparkles, AlertCircle, ThumbsUp, ThumbsDown, Sliders, Banknote, ShieldCheck, ShieldAlert } from 'lucide-react';
+import { X, Check, Flag, Star, Sparkles, AlertCircle, ThumbsUp, ThumbsDown, Sliders, Banknote, ShieldCheck, ShieldAlert } from 'lucide-react';
 import { Language, translations } from '../utils/i18n';
 import { MoneyInfluenceStatus } from '../types';
 
@@ -36,9 +36,9 @@ export const SupportLeaningPicker: React.FC<SupportLeaningPickerProps> = ({
     {
       pct: 100,
       label: '100% మనవాళ్లే (పక్కా మద్దతు)',
-      desc: 'పవన్ కళ్యాణ్ గారికి, జనసేనకు కట్టుబడిన కార్యకర్తలు & పక్కా ఓటర్లు',
-      badgeClass: 'bg-red-600/30 text-red-300 border-red-500/50',
-      icon: Flag
+      desc: 'మన అభ్యర్థికి కట్టుబడిన కార్యకర్తలు & పక్కా ఓటర్లు',
+      badgeClass: 'bg-emerald-600/30 text-emerald-300 border-emerald-500/50',
+      icon: Star
     },
     {
       pct: 75,
@@ -79,14 +79,14 @@ export const SupportLeaningPicker: React.FC<SupportLeaningPickerProps> = ({
     {
       pct: 100,
       label: '100% Full Support',
-      desc: 'Confirmed JSP supporters, party cadres & committed voters',
-      badgeClass: 'bg-red-600/30 text-red-300 border-red-500/50',
-      icon: Flag
+      desc: 'Confirmed party supporters, active cadres & committed voters',
+      badgeClass: 'bg-emerald-600/30 text-emerald-300 border-emerald-500/50',
+      icon: Star
     },
     {
       pct: 75,
       label: '75% Strong Lean',
-      desc: 'Highly favorable to Pawan Kalyan & coalition, leaning heavily to us',
+      desc: 'Highly favorable to our candidate, leaning heavily to us',
       badgeClass: 'bg-emerald-600/30 text-emerald-300 border-emerald-500/50',
       icon: ThumbsUp
     },
@@ -100,7 +100,7 @@ export const SupportLeaningPicker: React.FC<SupportLeaningPickerProps> = ({
     {
       pct: 40,
       label: '40% Positive to Us',
-      desc: 'Soft incline, open to party message, needs 1-2 visits to win over',
+      desc: 'Soft incline, open to campaign message, needs 1-2 visits to win over',
       badgeClass: 'bg-amber-600/30 text-amber-300 border-amber-500/50',
       icon: ThumbsUp
     },
@@ -114,7 +114,7 @@ export const SupportLeaningPicker: React.FC<SupportLeaningPickerProps> = ({
     {
       pct: 0,
       label: '0% Opponent',
-      desc: 'Committed opposition / anti-JSP voters',
+      desc: 'Committed opposition / rival party voters',
       badgeClass: 'bg-rose-950/80 text-rose-400 border-rose-500/50',
       icon: ThumbsDown
     }
@@ -221,7 +221,7 @@ export const SupportLeaningPicker: React.FC<SupportLeaningPickerProps> = ({
               },
               {
                 status: 'opponent_paid_safe' as MoneyInfluenceStatus,
-                label: language === 'te' ? '💰 ప్రత్యర్థి డబ్బు ఇచ్చారు — కానీ మనకే ఓటు (పక్కా)' : '💰 Took Opponent Cash — Still Votes JSP',
+                label: language === 'te' ? '💰 ప్రత్యర్థి డబ్బు ఇచ్చారు — కానీ మనకే ఓటు (పక్కా)' : '💰 Took Opponent Cash — Still Votes For Us',
                 icon: ShieldCheck,
                 color: 'border-emerald-500/50 text-emerald-300 bg-emerald-950/20'
               },

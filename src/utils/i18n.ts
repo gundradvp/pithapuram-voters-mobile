@@ -18,7 +18,7 @@ export function setSavedLanguage(lang: Language): void {
 export const translations = {
   te: {
     // Header & Global
-    partyTitle: 'జనసేన పార్టీ పిఠాపురం',
+    partyTitle: 'పిఠాపురం ఓటర్ పోర్టల్',
     constituencyBadge: 'నియోజకవర్గం #37',
     selectBooth: 'పోలింగ్ బూత్ ఎంచుకోండి',
     booth: 'బూత్',
@@ -38,7 +38,7 @@ export const translations = {
     victoryPredictor: 'గెలుపు లెక్క (విన్నింగ్ స్కోర్)',
     targetToWin: 'గెలవడానికి కావాల్సిన ఓట్లు',
     atTurnout: 'అంచనా పోలింగ్ శాతంలో',
-    projectedJsp: 'మన పార్టీ ఓట్లు',
+    projectedJsp: 'మద్దతు ఓట్లు',
     projectedOpp: 'ప్రత్యర్థి ఓట్లు',
     swingPot: 'నిర్ణయించుకోని ఓట్లు (స్వింగ్)',
     lead: 'ఓట్ల ఆధిక్యం (లీడ్)',
@@ -190,14 +190,14 @@ export const translations = {
 
     // Toast notices
     phoneSavedNotice: '📱 {name} గారి ఫోన్ నంబర్ సేవ్ అయ్యింది',
-    supporterNotice: '🚩 మన మద్దతుదారుడు చేరారు! +ఓటు పెరిగింది',
+    supporterNotice: '🗳️ మన మద్దతుదారుడు చేరారు! +ఓటు పెరిగింది',
     opponentNotice: '🔴 ప్రత్యర్థిగా మార్చారు! ఓట్ల లీడ్ తగ్గింది',
     visitLoggedNotice: '📋 విజిట్ సేవ్ అయ్యింది! గెలుపు స్కోర్ అప్‌డేట్ అయ్యింది'
   },
 
   en: {
     // Header & Global
-    partyTitle: 'JSP Pithapuram',
+    partyTitle: 'Pithapuram Voter Portal',
     constituencyBadge: 'AC #37',
     selectBooth: 'Select Assigned Booth',
     booth: 'Booth',
@@ -217,7 +217,7 @@ export const translations = {
     victoryPredictor: 'Booth Victory Predictor',
     targetToWin: 'Target to Win',
     atTurnout: 'at expected turnout',
-    projectedJsp: 'Projected JSP',
+    projectedJsp: 'Projected Support',
     projectedOpp: 'Opponent Votes',
     swingPot: 'Swing Pot (Undecided)',
     lead: 'Lead Margin',
@@ -369,7 +369,7 @@ export const translations = {
 
     // Toast notices
     phoneSavedNotice: '📱 Phone updated for {name}',
-    supporterNotice: '🚩 Supporter added! Projected JSP votes +1',
+    supporterNotice: '🗳️ Supporter added! Projected support votes +1',
     opponentNotice: '🔴 Opponent marked! Opposition vote added, margin reduced',
     visitLoggedNotice: '📋 Field visit logged! Winning score refreshed'
   }

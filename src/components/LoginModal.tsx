@@ -84,11 +84,11 @@ export const LoginModal: React.FC<LoginModalProps> = ({
       <div className="bg-slate-900 border border-amber-500/40 rounded-3xl max-w-sm w-full p-5 space-y-4 shadow-2xl relative">
         {/* Header Branding */}
         <div className="text-center space-y-1">
-          <div className="inline-flex w-12 h-12 rounded-2xl bg-gradient-to-tr from-red-600 via-amber-500 to-red-600 items-center justify-center text-white text-2xl shadow-lg shadow-red-900/50 border border-amber-400/40">
-            🚩
+          <div className="inline-flex w-12 h-12 rounded-2xl bg-gradient-to-tr from-indigo-700 via-blue-600 to-amber-500 items-center justify-center text-white text-2xl shadow-lg shadow-indigo-950/50 border border-amber-400/40">
+            🗳️
           </div>
           <h2 className="text-base font-black text-white mt-2">
-            {language === 'te' ? 'జనసేన పార్టీ - పిఠాపురం' : 'JSP Pithapuram'}
+            {language === 'te' ? 'పిఠాపురం ఎన్నికల & ఓటర్ పోర్టల్' : 'Pithapuram Voter Portal'}
           </h2>
           <p className="text-[11px] text-amber-400 font-bold tracking-wide uppercase">
             {language === 'te' ? 'ఎన్నికల మొబైల్ & వార్డు పోర్టల్' : 'Election Mobile & Ward Portal'}

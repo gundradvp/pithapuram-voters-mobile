@@ -91,7 +91,7 @@ export const PhoneEditorModal: React.FC<PhoneEditorModalProps> = ({
         {voter.k_m && (
           <div className="bg-red-950/30 border border-red-500/40 rounded-xl p-2.5 flex items-center justify-between">
             <div>
-              <span className="text-[10px] uppercase font-bold text-red-300 block">🚩 JSP Kriya Registered Mobile</span>
+              <span className="text-[10px] uppercase font-bold text-amber-300 block">📱 Registered Mobile</span>
               <a
                 href={`tel:${voter.k_m}`}
                 className="text-sm font-mono font-black text-amber-300 hover:text-white hover:underline flex items-center gap-1 mt-0.5"
@@ -122,7 +122,7 @@ export const PhoneEditorModal: React.FC<PhoneEditorModalProps> = ({
                 )}
               </button>
               <a
-                href={`https://wa.me/91${voter.k_m}?text=${encodeURIComponent(`నమస్కారం ${voter.n} గారు, జనసేన పార్టీ పిఠాపురం కార్యాలయం నుండి సంప్రదిస్తున్నాము.`)}`}
+                href={`https://wa.me/91${voter.k_m}?text=${encodeURIComponent(`నమస్కారం ${voter.n} గారు, పిఠాపురం ఓటర్ సమాచార కేంద్రం నుండి సంప్రదిస్తున్నాము.`)}`}
                 target="_blank"
                 rel="noreferrer"
                 className="p-2 bg-emerald-600 hover:bg-emerald-500 text-white rounded-lg text-xs shadow-sm"
@@ -184,7 +184,7 @@ export const PhoneEditorModal: React.FC<PhoneEditorModalProps> = ({
               Call
             </a>
             <a
-              href={`https://wa.me/91${activeNumber}?text=${encodeURIComponent(`నమస్కారం ${voter.n} గారు, జనసేన పార్టీ పిఠాపురం కార్యాలయం నుండి సంప్రదిస్తున్నాము.`)}`}
+              href={`https://wa.me/91${activeNumber}?text=${encodeURIComponent(`నమస్కారం ${voter.n} గారు, పిఠాపురం ఓటర్ సమాచార కేంద్రం నుండి సంప్రదిస్తున్నాము.`)}`}
               target="_blank"
               rel="noreferrer"
               className="py-2 bg-emerald-600 hover:bg-emerald-500 text-white rounded-xl font-bold flex items-center justify-center gap-1 shadow-md shadow-emerald-950/40"
@@ -193,7 +193,7 @@ export const PhoneEditorModal: React.FC<PhoneEditorModalProps> = ({
               WhatsApp
             </a>
             <a
-              href={`sms:${activeNumber}?body=${encodeURIComponent(`నమస్కారం ${voter.n} గారు, జనసేన పార్టీ అభ్యర్థి పవన్ కళ్యాణ్ గారికి గాజు గ్లాసు గుర్తుపై ఓటు వేసి గెలిపించండి.`)}`}
+              href={`sms:${activeNumber}?body=${encodeURIComponent(`నమస్కారం ${voter.n} గారు, పిఠాపురం నియోజకవర్గం ఓటర్ క్రమ సంఖ్య #${voter.s}. దయచేసి మీ ఓటు హక్కును వినియోగించుకోండి.`)}`}
               className="py-2 bg-blue-600/30 hover:bg-blue-600/40 text-blue-300 rounded-xl font-bold flex items-center justify-center gap-1 border border-blue-500/40"
             >
               <Send className="w-3.5 h-3.5" />
