@@ -131,11 +131,11 @@ export const HeaderMobile: React.FC<HeaderMobileProps> = ({
         {onOpenSyncModal && (
           <button
             onClick={onOpenSyncModal}
-            className="flex items-center gap-1 px-1.5 py-1 rounded-lg text-[10px] font-bold border transition-all bg-gradient-to-r from-red-600/30 to-amber-600/30 text-amber-300 border-amber-500/50 hover:bg-amber-500/30 active:scale-95 shadow-sm"
+            className="flex items-center gap-1 px-2 py-1 rounded-lg text-[10px] font-black border transition-all bg-gradient-to-r from-amber-500 to-amber-600 hover:from-amber-400 hover:to-amber-500 text-slate-950 border-amber-400 shadow-md shadow-amber-950/40 active:scale-95"
             title={language === 'te' ? 'లోకల్ & బోల్ట్ క్లౌడ్ డేటా సింక్ (Sync Data between Local & Bolt)' : 'Sync Data between Local & Bolt'}
           >
-            <ArrowRightLeft className="w-3.5 h-3.5 text-amber-400" />
-            <span className="hidden xs:inline">{language === 'te' ? 'సింక్' : 'Sync'}</span>
+            <ArrowRightLeft className="w-3.5 h-3.5 text-slate-950 stroke-[2.5]" />
+            <span className="font-black">{language === 'te' ? 'సింక్' : 'Sync'}</span>
           </button>
         )}
 

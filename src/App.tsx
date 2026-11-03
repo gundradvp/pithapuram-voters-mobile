@@ -1059,6 +1059,7 @@ export function App() {
                 }}
                 onOpenBulkAssign={infId => setBulkAssignState({ open: true, initialInfluencerId: infId })}
                 onOpenGroupPrint={handleOpenGroupPrint}
+                onOpenSyncModal={() => setIsSyncModalOpen(true)}
               />
             )}
 
@@ -1108,6 +1109,7 @@ export function App() {
                 onOpenBoothSelector={() => setIsBoothSelectorOpen(true)}
                 onImportCustomJson={handleImportCustomJson}
                 onClearAndRefresh={handleClearCacheAndReload}
+                onOpenSyncModal={() => setIsSyncModalOpen(true)}
               />
             )}
           </>

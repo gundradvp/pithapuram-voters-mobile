@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { DownloadCloud, FileCode, UploadCloud, Lock, Unlock, Check, HardDrive, Smartphone, RefreshCw, KeyRound, ShieldAlert, Palette } from 'lucide-react';
+import { DownloadCloud, FileCode, UploadCloud, Lock, Unlock, Check, HardDrive, Smartphone, RefreshCw, KeyRound, ShieldAlert, Palette, ArrowRightLeft } from 'lucide-react';
 import { BoothData } from '../types';
 import { saveCachedBoothData, downloadBoothAsJson, setAdminPin, verifyAdminPin } from '../utils/storage';
 import { Language } from '../utils/i18n';
@@ -16,6 +16,7 @@ interface OfflineTabMobileProps {
   onOpenBoothSelector: () => void;
   onImportCustomJson: (data: BoothData) => void;
   onClearAndRefresh?: () => void;
+  onOpenSyncModal?: () => void;
 }
 
 export const OfflineTabMobile: React.FC<OfflineTabMobileProps> = ({
@@ -28,7 +29,8 @@ export const OfflineTabMobile: React.FC<OfflineTabMobileProps> = ({
   onRefreshCache,
   onOpenBoothSelector,
   onImportCustomJson,
-  onClearAndRefresh
+  onClearAndRefresh,
+  onOpenSyncModal
 }) => {
   const { booth_info: info } = boothData;
   const [cacheSuccess, setCacheSuccess] = useState(false);
@@ -207,6 +209,18 @@ export const OfflineTabMobile: React.FC<OfflineTabMobileProps> = ({
           >
             <RefreshCw className="w-4 h-4 text-amber-400" />
             <span>{language === 'te' ? '🧹 పాత క్యాష్ క్లియర్ చేసి తాజా డేటా డౌన్‌లోడ్ చేయండి' : 'Clear Stale Cache & Auto-Refresh Latest Data'}</span>
+          </button>
+        )}
+
+        {/* Action 5: Cross-Device Campaign Data Sync */}
+        {onOpenSyncModal && (
+          <button
+            type="button"
+            onClick={onOpenSyncModal}
+            className="w-full py-2.5 bg-gradient-to-r from-red-600/80 to-amber-600/80 hover:from-red-500 hover:to-amber-500 text-amber-200 border border-amber-500/50 rounded-xl font-bold flex items-center justify-center gap-2 shadow-md shadow-amber-950/40 transition-all text-xs cursor-pointer active:scale-95"
+          >
+            <ArrowRightLeft className="w-4 h-4 text-amber-300" />
+            <span>{language === 'te' ? '⇄ లీడర్లు & ఓటర్ల సింక్ (Sync Data Between Devices)' : '⇄ Sync Data Between Devices (Cloud & Bolt)'}</span>
           </button>
         )}
       </div>

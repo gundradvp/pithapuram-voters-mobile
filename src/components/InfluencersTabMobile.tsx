@@ -1,5 +1,5 @@
 import React, { useState, useMemo } from 'react';
-import { UserCheck, Phone, MessageSquare, Plus, Share2, Users, Home, Search, ShieldCheck, ChevronDown, ChevronUp, X, Printer } from 'lucide-react';
+import { UserCheck, Phone, MessageSquare, Plus, Share2, Users, Home, Search, ShieldCheck, ChevronDown, ChevronUp, X, Printer, ArrowRightLeft } from 'lucide-react';
 import { Influencer, MobileVoter, FamilyGroup, VoterCampaignProfile, BoothInfo } from '../types';
 import { generateInfluencerWhatsAppMessage } from '../utils/storage';
 
@@ -13,6 +13,7 @@ interface InfluencersTabMobileProps {
   onOpenInfluencerAssign: (targetName: string, currentInfId?: string) => void;
   onOpenBulkAssign?: (infId?: string) => void;
   onOpenGroupPrint?: (title: string, subtitle: string, voters: MobileVoter[], initialLayout?: 'slips' | 'table') => void;
+  onOpenSyncModal?: () => void;
 }
 
 export const InfluencersTabMobile: React.FC<InfluencersTabMobileProps> = ({
@@ -23,7 +24,8 @@ export const InfluencersTabMobile: React.FC<InfluencersTabMobileProps> = ({
   boothInfo,
   onAddNewInfluencer,
   onOpenBulkAssign,
-  onOpenGroupPrint
+  onOpenGroupPrint,
+  onOpenSyncModal
 }) => {
   const [searchQuery, setSearchQuery] = useState('');
   const [expandedInfId, setExpandedInfId] = useState<string | null>(null);
@@ -141,6 +143,18 @@ export const InfluencersTabMobile: React.FC<InfluencersTabMobileProps> = ({
           </div>
 
           <div className="flex items-center gap-1.5 shrink-0">
+            {onOpenSyncModal && (
+              <button
+                type="button"
+                onClick={onOpenSyncModal}
+                className="px-2.5 py-2 bg-gradient-to-r from-red-600/80 to-amber-600/80 hover:from-red-500 hover:to-amber-500 text-amber-200 font-black rounded-xl text-xs flex items-center gap-1 shadow-md whitespace-nowrap cursor-pointer active:scale-95 border border-amber-500/50"
+                title="ఇతర ఫోన్లు లేదా బోల్ట్‌తో లీడర్లు & కేటాయించిన ఓటర్ల డేటాను సింక్ చేయండి"
+              >
+                <ArrowRightLeft className="w-3.5 h-3.5 text-amber-300" />
+                <span>⇄ సింక్</span>
+              </button>
+            )}
+
             {onOpenBulkAssign && (
               <button
                 onClick={() => onOpenBulkAssign()}
@@ -163,7 +177,7 @@ export const InfluencersTabMobile: React.FC<InfluencersTabMobileProps> = ({
       </div>
 
       {/* Influencers Hub Guide Banner */}
-      <div className="bg-gradient-to-r from-slate-900 via-amber-950/30 to-slate-900 border border-amber-500/30 p-3.5 rounded-2xl space-y-2 shadow-md">
+      <div className="bg-gradient-to-r from-slate-900 via-amber-950/30 to-slate-900 border border-amber-500/30 p-3.5 rounded-2xl space-y-2.5 shadow-md">
         <div className="flex items-center justify-between">
           <span className="text-[11px] font-black text-amber-400 uppercase tracking-wider flex items-center gap-1.5">
             <UserCheck className="w-4 h-4 text-emerald-400" />
@@ -176,6 +190,20 @@ export const InfluencersTabMobile: React.FC<InfluencersTabMobileProps> = ({
         <p className="text-[11px] text-slate-300 leading-relaxed">
           Assign electors and families to Ward Members, Caste Elders, or Youth Leaders. Tap <strong>"Dispatch to WhatsApp"</strong> to send their assigned voter list directly into their WhatsApp chat!
         </p>
+
+        {/* Dedicated Sync Action Button in Influencer Banner */}
+        {onOpenSyncModal && (
+          <div className="pt-1 border-t border-amber-500/20">
+            <button
+              type="button"
+              onClick={onOpenSyncModal}
+              className="w-full py-2 px-3 bg-gradient-to-r from-amber-500/20 via-red-500/20 to-amber-500/20 hover:from-amber-500/30 hover:to-red-500/30 text-amber-300 border border-amber-500/50 rounded-xl text-xs font-black flex items-center justify-center gap-2 shadow-sm cursor-pointer active:scale-95 transition-all"
+            >
+              <ArrowRightLeft className="w-4 h-4 text-amber-400" />
+              <span>⇄ లీడర్లు & కేటాయించిన ఓటర్లను సింక్ చేయండి (Sync Data Across Devices)</span>
+            </button>
+          </div>
+        )}
 
         {/* Global Print Options across all leaders if any electors are assigned */}
         {allAssignedVoters.length > 0 && onOpenGroupPrint && (
