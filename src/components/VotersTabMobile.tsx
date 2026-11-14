@@ -127,6 +127,33 @@ export const VotersTabMobile: React.FC<VotersTabMobileProps> = ({
   const [isSpeedDialOpen, setIsSpeedDialOpen] = useState(false);
   const [isHourlyTurnoutOpen, setIsHourlyTurnoutOpen] = useState(false);
   const [isVoiceListening, setIsVoiceListening] = useState(false);
+  const [filterDisplayStyle, setFilterDisplayStyle] = useState<'dropdown' | 'chips' | 'hidden'>(() => {
+    try {
+      const saved = localStorage.getItem('jsp_filter_display_style');
+      if (saved === 'dropdown' || saved === 'chips' || saved === 'hidden') return saved;
+      return 'dropdown';
+    } catch {
+      return 'dropdown';
+    }
+  });
+  const [isLiveTrackerExpanded, setIsLiveTrackerExpanded] = useState<boolean>(false);
+
+  const handleSetFilterDisplayStyle = (style: 'dropdown' | 'chips' | 'hidden') => {
+    setFilterDisplayStyle(style);
+    try {
+      localStorage.setItem('jsp_filter_display_style', style);
+    } catch {}
+  };
+
+  const activeFilterCount = useMemo(() => {
+    let count = 0;
+    if (selectedWard !== 'all') count++;
+    if (selectedSurname !== 'all') count++;
+    if (selectedStreet !== 'all') count++;
+    if (filterMode !== 'all') count++;
+    if (snoQuery.trim() !== '') count++;
+    return count;
+  }, [selectedWard, selectedSurname, selectedStreet, filterMode, snoQuery]);
 
   const handleToggleOurs = (serialNo: number) => {
     if (onQuickToggleOurs) {
@@ -732,7 +759,8 @@ _దయచేసి మీ ఓటు హక్కును వినియోగ
 
   return (
     <div className="space-y-3 pb-24 text-xs">
-      {/* Laptop / Desktop Excel Grid Mode Suggestion Bar */}
+      {/* Laptop / Desktop Excel Grid Mode Suggestion Bar (Hidden when in Excel View) */}
+      {viewMode !== 'excel' && (
       <div className="hidden md:flex items-center justify-between p-2.5 bg-gradient-to-r from-emerald-950/70 via-slate-900 to-slate-900 border border-emerald-500/40 rounded-2xl text-xs shadow-md">
         <div className="flex items-center gap-2">
           <div className="w-7 h-7 rounded-lg bg-emerald-600/30 border border-emerald-500/50 flex items-center justify-center text-emerald-300">
@@ -751,17 +779,14 @@ _దయచేసి మీ ఓటు హక్కును వినియోగ
         </div>
         <button
           type="button"
-          onClick={() => handleSetViewMode(viewMode === 'excel' ? 'list' : 'excel')}
-          className={`px-3 py-1.5 rounded-xl font-bold text-xs flex items-center gap-1.5 transition-all shadow-sm cursor-pointer ${
-            viewMode === 'excel'
-              ? 'bg-slate-800 hover:bg-slate-700 text-slate-300 border border-slate-700'
-              : 'bg-emerald-600 hover:bg-emerald-500 text-white shadow-emerald-950/50'
-          }`}
+          onClick={() => handleSetViewMode('excel')}
+          className="px-3 py-1.5 rounded-xl font-bold text-xs flex items-center gap-1.5 transition-all shadow-sm cursor-pointer bg-emerald-600 hover:bg-emerald-500 text-white shadow-emerald-950/50"
         >
           <Table className="w-3.5 h-3.5" />
-          <span>{viewMode === 'excel' ? '📱 సాధారణ జాబితాకు మారండి' : '📊 ఎక్సెల్ వ్యూ ఓపెన్ చేయండి'}</span>
+          <span>{language === 'te' ? '📊 ఎక్సెల్ వ్యూ ఓపెన్ చేయండి' : '📊 Open Excel View'}</span>
         </button>
       </div>
+      )}
 
       {/* Search Input & View Mode Controls */}
       <div className="sticky top-[51px] z-30 bg-slate-950/95 backdrop-blur-md pt-2 pb-1 space-y-2">
@@ -838,6 +863,43 @@ _దయచేసి మీ ఓటు హక్కును వినియోగ
           >
             <Hash className="w-3.5 h-3.5" />
             <span className="font-mono text-[10px] font-bold">S.No</span>
+          </button>
+
+          {/* Filter Display Mode / Collapsible Toggle Button */}
+          <button
+            type="button"
+            onClick={() => handleSetFilterDisplayStyle(filterDisplayStyle === 'hidden' ? 'dropdown' : 'hidden')}
+            className={`px-2.5 py-2 rounded-xl text-[10px] font-bold border transition-all flex items-center gap-1.5 shrink-0 cursor-pointer ${
+              filterDisplayStyle !== 'hidden'
+                ? 'bg-amber-500 text-slate-950 border-amber-400 font-black shadow-md'
+                : activeFilterCount > 0
+                ? 'bg-amber-950/90 text-amber-300 border-amber-500/70 font-black ring-1 ring-amber-400/50 shadow-sm animate-pulse'
+                : 'bg-slate-900 border-slate-800 text-slate-400 hover:text-white hover:border-slate-700'
+            }`}
+            title={
+              filterDisplayStyle !== 'hidden'
+                ? (language === 'te' ? 'ఫిల్టర్లు దాచండి (స్క్రీన్ ఖాళీ చేయడానికి)' : 'Hide Filters (Maximize Screen)')
+                : (language === 'te' ? 'ఫిల్టర్లు చూపించండి' : 'Show Filters')
+            }
+          >
+            <Sliders className="w-3.5 h-3.5 text-current" />
+            <span className="font-bold">
+              {filterDisplayStyle === 'hidden'
+                ? (language === 'te' ? 'ఫిల్టర్లు' : 'Filters')
+                : (language === 'te' ? 'దాచు' : 'Hide')}
+            </span>
+            {activeFilterCount > 0 && (
+              <span className={`px-1.5 py-0.2 rounded-full font-mono text-[9px] font-black ${
+                filterDisplayStyle !== 'hidden' ? 'bg-slate-950 text-amber-400' : 'bg-amber-500 text-slate-950'
+              }`}>
+                {activeFilterCount}
+              </span>
+            )}
+            {filterDisplayStyle === 'hidden' ? (
+              <ChevronDown className="w-3 h-3 opacity-70" />
+            ) : (
+              <ChevronUp className="w-3 h-3 opacity-70" />
+            )}
           </button>
 
           {/* View Mode Toggle: List vs Surname Groups vs Excel Grid */}
@@ -943,7 +1005,341 @@ _దయచేసి మీ ఓటు హక్కును వినియోగ
           </div>
         )}
 
-        {/* Surnames Quick Chips */}
+        {/* Active Filter Summary Bar when Filters are Collapsed/Hidden */}
+        {filterDisplayStyle === 'hidden' && activeFilterCount > 0 && (
+          <div className="flex items-center gap-1.5 overflow-x-auto py-1 px-1 bg-slate-900/60 rounded-xl border border-slate-800/80 text-[10.5px] scrollbar-none animate-in fade-in duration-150">
+            <span className="text-amber-400 font-bold shrink-0 flex items-center gap-1 text-[10px]">
+              <Sliders className="w-3 h-3" />
+              <span>{language === 'te' ? 'యాక్టివ్ ఫిల్టర్లు:' : 'Active:'}</span>
+            </span>
+
+            {selectedWard !== 'all' && (
+              <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-md bg-emerald-950/80 text-emerald-300 border border-emerald-500/50 text-[10px] font-bold shrink-0">
+                <span>🏛️ {language === 'te' ? `వార్డు #${selectedWard}` : `Ward #${selectedWard}`}</span>
+                <button
+                  type="button"
+                  onClick={() => { setSelectedWard('all'); setVisibleCount(INITIAL_VISIBLE_COUNT); }}
+                  className="hover:text-white p-0.5"
+                  title="Remove Ward Filter"
+                >
+                  <X className="w-2.5 h-2.5" />
+                </button>
+              </span>
+            )}
+
+            {selectedSurname !== 'all' && (
+              <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-md bg-amber-950/80 text-amber-300 border border-amber-500/50 text-[10px] font-bold shrink-0">
+                <span>🏷️ {surnameGroups.find(g => g.id === selectedSurname)?.nameTe || surnameGroups.find(g => g.id === selectedSurname)?.nameEn || selectedSurname}</span>
+                <button
+                  type="button"
+                  onClick={() => { setSelectedSurname('all'); setVisibleCount(INITIAL_VISIBLE_COUNT); }}
+                  className="hover:text-white p-0.5"
+                  title="Remove Surname Filter"
+                >
+                  <X className="w-2.5 h-2.5" />
+                </button>
+              </span>
+            )}
+
+            {selectedStreet !== 'all' && (
+              <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-md bg-blue-950/80 text-blue-300 border border-blue-500/50 text-[10px] font-bold shrink-0">
+                <span>📍 {selectedStreet.length > 25 ? selectedStreet.slice(0, 25) + '...' : selectedStreet}</span>
+                <button
+                  type="button"
+                  onClick={() => { setSelectedStreet('all'); setVisibleCount(INITIAL_VISIBLE_COUNT); }}
+                  className="hover:text-white p-0.5"
+                  title="Remove Street Filter"
+                >
+                  <X className="w-2.5 h-2.5" />
+                </button>
+              </span>
+            )}
+
+            {filterMode !== 'all' && (
+              <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-md bg-amber-500 text-slate-950 font-black text-[10px] shrink-0">
+                <span>
+                  {filterMode === 'not_voted' ? (language === 'te' ? '⏳ ఓటు వేయనివారు' : '⏳ Not Voted')
+                   : filterMode === 'voted' ? (language === 'te' ? '✅ ఓటేశారు' : '✅ Voted')
+                   : filterMode === 'ours_not_voted' ? (language === 'te' ? '⭐ మన పెండింగ్' : '⭐ Ours Pending')
+                   : filterMode === 'full' ? (language === 'te' ? '⭐ 100% మద్దతు' : '⭐ 100% Support')
+                   : filterMode === 'has_phone' ? (language === 'te' ? '📞 ఫోన్ ఉన్నవారు' : '📞 Has Phone')
+                   : filterMode}
+                </span>
+                <button
+                  type="button"
+                  onClick={() => { setFilterMode('all'); setVisibleCount(INITIAL_VISIBLE_COUNT); }}
+                  className="hover:text-red-950 p-0.5"
+                  title="Remove Status Filter"
+                >
+                  <X className="w-2.5 h-2.5" />
+                </button>
+              </span>
+            )}
+
+            <button
+              type="button"
+              onClick={handleResetAllFilters}
+              className="text-amber-400 hover:text-white font-bold text-[10px] underline ml-1 shrink-0"
+            >
+              {language === 'te' ? 'అన్నీ క్లియర్' : 'Clear All'}
+            </button>
+
+            <button
+              type="button"
+              onClick={() => handleSetFilterDisplayStyle('dropdown')}
+              className="text-slate-400 hover:text-amber-300 font-bold text-[10px] ml-auto shrink-0 flex items-center gap-0.5"
+            >
+              <span>{language === 'te' ? 'విస్తరించు' : 'Expand'}</span>
+              <ChevronDown className="w-3 h-3" />
+            </button>
+          </div>
+        )}
+
+        {/* Filter Panels Area (Shown when filterDisplayStyle !== 'hidden') */}
+        {filterDisplayStyle !== 'hidden' && (
+          <div className="space-y-2 pt-0.5 animate-in fade-in duration-150">
+            {/* Filter View Mode Switcher Header: Dropdowns vs Chips */}
+            <div className="flex items-center justify-between text-[10.5px] px-2 py-1 bg-slate-900/90 rounded-xl border border-slate-800">
+              <div className="flex items-center gap-1.5">
+                <span className="text-slate-400 font-bold text-[10px] flex items-center gap-1">
+                  <Sliders className="w-3 h-3 text-amber-400" />
+                  <span>{language === 'te' ? 'ఫిల్టర్ల వ్యూ:' : 'Filter View:'}</span>
+                </span>
+                <div className="flex items-center bg-slate-950 rounded-lg p-0.5 border border-slate-800">
+                  <button
+                    type="button"
+                    onClick={() => handleSetFilterDisplayStyle('dropdown')}
+                    className={`px-2 py-0.5 rounded-md text-[10px] font-bold transition-all cursor-pointer ${
+                      filterDisplayStyle === 'dropdown'
+                        ? 'bg-amber-500 text-slate-950 font-black shadow-xs'
+                        : 'text-slate-400 hover:text-white'
+                    }`}
+                  >
+                    {language === 'te' ? '🔽 డ్రాప్‌డౌన్లు (స్లిమ్)' : '🔽 Dropdowns (Slim)'}
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => handleSetFilterDisplayStyle('chips')}
+                    className={`px-2 py-0.5 rounded-md text-[10px] font-bold transition-all cursor-pointer ${
+                      filterDisplayStyle === 'chips'
+                        ? 'bg-amber-500 text-slate-950 font-black shadow-xs'
+                        : 'text-slate-400 hover:text-white'
+                    }`}
+                  >
+                    {language === 'te' ? '🏷️ చిప్స్ (పూర్తి)' : '🏷️ Chips (Full)'}
+                  </button>
+                </div>
+              </div>
+
+              <div className="flex items-center gap-2">
+                {isAnyFilterActive && (
+                  <button
+                    type="button"
+                    onClick={handleResetAllFilters}
+                    className="px-2 py-0.5 rounded-md text-[10px] font-black text-amber-300 hover:text-white bg-red-950/40 border border-red-500/40 flex items-center gap-1 active:scale-95 transition-all"
+                  >
+                    <RotateCcw className="w-2.5 h-2.5 text-amber-400" />
+                    <span>{language === 'te' ? 'అన్నీ రీసెట్' : 'Reset'}</span>
+                  </button>
+                )}
+                <button
+                  type="button"
+                  onClick={() => handleSetFilterDisplayStyle('hidden')}
+                  className="px-2 py-0.5 rounded-md text-[10px] font-bold text-slate-400 hover:text-white bg-slate-800 hover:bg-slate-700 flex items-center gap-1 active:scale-95 transition-all cursor-pointer"
+                  title={language === 'te' ? 'ఫిల్టర్లు పూర్తిగా దాచు (స్క్రీన్ ఆదా)' : 'Hide Filters (Save Screen)'}
+                >
+                  <X className="w-3 h-3 text-slate-400" />
+                  <span>{language === 'te' ? 'పూర్తిగా దాచు' : 'Hide'}</span>
+                </button>
+              </div>
+            </div>
+
+            {/* 1. SLIM DROPDOWN FILTERS BAR (Occupies only ~38px height instead of 350px!) */}
+            {filterDisplayStyle === 'dropdown' && (
+              <div className="space-y-2">
+                <div className="grid grid-cols-2 sm:grid-cols-4 lg:grid-cols-5 gap-1.5 text-[11px] bg-slate-900/90 border border-slate-800 rounded-xl p-1.5 shadow-md">
+                  {/* Ward Dropdown */}
+                  {wardsList.length > 1 && (
+                    <div className="relative">
+                      <select
+                        value={selectedWard}
+                        onChange={(e) => { setSelectedWard(e.target.value); setVisibleCount(INITIAL_VISIBLE_COUNT); }}
+                        className={`w-full bg-slate-950 border text-xs font-bold rounded-lg px-2.5 py-1.5 pr-7 appearance-none focus:outline-none cursor-pointer truncate ${
+                          selectedWard !== 'all'
+                            ? 'border-emerald-500 text-emerald-300 bg-emerald-950/40 ring-1 ring-emerald-500/40'
+                            : 'border-slate-800 text-slate-300 hover:border-slate-700'
+                        }`}
+                      >
+                        <option value="all">🏛️ {language === 'te' ? 'మొత్తం గ్రామం (All Wards)' : 'All Wards'} ({counts.all})</option>
+                        {wardsList.map(([wNo, cnt]) => (
+                          <option key={wNo} value={String(wNo)}>
+                            {language === 'te' ? `వార్డు #${wNo}` : `Ward #${wNo}`} ({cnt} ఓటర్లు)
+                          </option>
+                        ))}
+                      </select>
+                      <ChevronDown className="w-3.5 h-3.5 absolute right-2 top-1/2 -translate-y-1/2 text-slate-400 pointer-events-none" />
+                    </div>
+                  )}
+
+                  {/* Surname Dropdown */}
+                  {surnameGroups.length > 0 && (
+                    <div className="relative">
+                      <select
+                        value={selectedSurname}
+                        onChange={(e) => { setSelectedSurname(e.target.value); setVisibleCount(INITIAL_VISIBLE_COUNT); }}
+                        className={`w-full bg-slate-950 border text-xs font-bold rounded-lg px-2.5 py-1.5 pr-7 appearance-none focus:outline-none cursor-pointer truncate ${
+                          selectedSurname !== 'all'
+                            ? 'border-amber-500 text-amber-300 bg-amber-950/40 ring-1 ring-amber-500/40'
+                            : 'border-slate-800 text-slate-300 hover:border-slate-700'
+                        }`}
+                      >
+                        <option value="all">🏷️ {language === 'te' ? 'అన్ని ఇంటిపేర్లు' : 'All Surnames'} ({counts.all})</option>
+                        {surnameGroups.map((g) => (
+                          <option key={g.id} value={g.id}>
+                            {g.nameTe || g.nameEn} ({g.totalVoters})
+                          </option>
+                        ))}
+                      </select>
+                      <ChevronDown className="w-3.5 h-3.5 absolute right-2 top-1/2 -translate-y-1/2 text-slate-400 pointer-events-none" />
+                    </div>
+                  )}
+
+                  {/* Street / Location Dropdown */}
+                  {streetsList.length > 1 && (
+                    <div className="relative">
+                      <select
+                        value={selectedStreet}
+                        onChange={(e) => { setSelectedStreet(e.target.value); setVisibleCount(INITIAL_VISIBLE_COUNT); }}
+                        className={`w-full bg-slate-950 border text-xs font-bold rounded-lg px-2.5 py-1.5 pr-7 appearance-none focus:outline-none cursor-pointer truncate ${
+                          selectedStreet !== 'all'
+                            ? 'border-blue-500 text-blue-300 bg-blue-950/40 ring-1 ring-blue-500/40'
+                            : 'border-slate-800 text-slate-300 hover:border-slate-700'
+                        }`}
+                      >
+                        <option value="all">📍 {language === 'te' ? 'అన్ని వీధులు / బూత్‌లు' : 'All Streets/Booths'}</option>
+                        {streetsList.map(([street, cnt]) => (
+                          <option key={street} value={street}>
+                            {street.length > 30 ? street.slice(0, 30) + '...' : street} ({cnt})
+                          </option>
+                        ))}
+                      </select>
+                      <ChevronDown className="w-3.5 h-3.5 absolute right-2 top-1/2 -translate-y-1/2 text-slate-400 pointer-events-none" />
+                    </div>
+                  )}
+
+                  {/* Status / Category Dropdown */}
+                  <div className="relative">
+                    <select
+                      value={filterMode}
+                      onChange={(e) => { setFilterMode(e.target.value as any); setVisibleCount(INITIAL_VISIBLE_COUNT); }}
+                      className={`w-full bg-slate-950 border text-xs font-bold rounded-lg px-2.5 py-1.5 pr-7 appearance-none focus:outline-none cursor-pointer truncate ${
+                        filterMode !== 'all'
+                          ? 'border-amber-500 text-amber-300 bg-amber-950/40 ring-1 ring-amber-500/40 font-black'
+                          : 'border-slate-800 text-slate-300 hover:border-slate-700'
+                      }`}
+                    >
+                      <option value="all">🎯 {language === 'te' ? 'అన్ని కేటగిరీలు' : 'All Categories'} ({counts.all})</option>
+                      <option value="not_voted">⏳ {language === 'te' ? 'ఓటు వేయనివారు' : 'Not Voted'} ({counts.notVoted})</option>
+                      <option value="ours_not_voted">⭐ {language === 'te' ? 'మన పెండింగ్' : 'Ours Pending'} ({counts.oursNotVoted})</option>
+                      <option value="voted">✅ {language === 'te' ? 'ఓటేశారు' : 'Voted'} ({counts.voted})</option>
+                      <option value="full">⭐ {t.filterFull} ({counts.full})</option>
+                      <option value="soft">🟡 {t.filterSoft} ({counts.soft})</option>
+                      <option value="strong">🟢 {t.filterStrong} ({counts.strong})</option>
+                      <option value="has_phone">📞 {t.filterPhone} ({counts.hasPhone})</option>
+                      <option value="exact">🔥 {language === 'te' ? 'నమోదిత నిప్పులు' : 'Verified Supporter'} ({counts.exact})</option>
+                      <option value="opponent">🔴 {language === 'te' ? 'ప్రత్యర్థులు' : 'Opponents'} ({counts.opponent})</option>
+                      <option value="out_of_city">✈️ {language === 'te' ? 'ఊర్లో లేరు' : 'Out of Village'} ({counts.outOfCity})</option>
+                      <option value="deceased">💀 {language === 'te' ? 'మరణించారు' : 'Deceased'} ({counts.deceased})</option>
+                      <option value="women">👩 {language === 'te' ? 'మహిళలు' : 'Women'} ({counts.women})</option>
+                      <option value="men">👨 {language === 'te' ? 'పురుషులు' : 'Men'} ({counts.men})</option>
+                      <option value="seniors">👴 {language === 'te' ? 'సీనియర్లు (60+)' : 'Seniors'} ({counts.seniors})</option>
+                    </select>
+                    <ChevronDown className="w-3.5 h-3.5 absolute right-2 top-1/2 -translate-y-1/2 text-slate-400 pointer-events-none" />
+                  </div>
+
+                  {/* Polling Tracker Quick Status Pill Button */}
+                  <button
+                    type="button"
+                    onClick={() => setIsLiveTrackerExpanded(!isLiveTrackerExpanded)}
+                    className={`col-span-2 sm:col-span-4 lg:col-span-1 px-2.5 py-1.5 rounded-lg border text-xs font-bold transition-all flex items-center justify-between gap-1.5 cursor-pointer ${
+                      isLiveTrackerExpanded
+                        ? 'bg-emerald-950/60 text-emerald-300 border-emerald-500/60 shadow-sm'
+                        : 'bg-slate-950 text-slate-300 border-slate-800 hover:border-slate-700'
+                    }`}
+                    title="పోలింగ్ డే లైవ్ టర్నౌట్ & స్పీడ్-కాల్ ట్రాకర్ వివరాలు"
+                  >
+                    <span className="flex items-center gap-1.5 truncate">
+                      <span className="w-2 h-2 rounded-full bg-emerald-400 animate-pulse shrink-0"></span>
+                      <span className="font-bold text-[10.5px]">🗳️ {counts.voted}/{counts.all}</span>
+                      <span className="text-emerald-400 font-mono text-[10px]">({Math.round((counts.voted / (counts.all || 1)) * 100)}%)</span>
+                    </span>
+                    <span className="text-[10px] text-slate-400 shrink-0">
+                      {isLiveTrackerExpanded ? '▲' : '▼'}
+                    </span>
+                  </button>
+                </div>
+
+                {/* Expanded Live Tracker Card (Shown on demand when user clicks the tracker button) */}
+                {isLiveTrackerExpanded && (
+                  <div className="bg-slate-900/95 border border-amber-500/30 rounded-2xl p-2.5 space-y-2 shadow-md animate-in fade-in slide-in-from-top-1 duration-150">
+                    <div className="flex items-center justify-between text-[11px] flex-wrap gap-1">
+                      <span className="text-slate-300 font-black flex items-center gap-1.5">
+                        <span className="w-2 h-2 rounded-full bg-emerald-400 animate-pulse"></span>
+                        {language === 'te' ? '🗳️ పోలింగ్ డే లైవ్ ట్రాకర్:' : '🗳️ Polling Day Live Tracker:'}
+                      </span>
+                      <div className="flex items-center gap-1.5 font-mono text-[10.5px]">
+                        <span className="text-emerald-400 font-bold bg-emerald-950/70 px-2 py-0.5 rounded-lg border border-emerald-500/30">
+                          {counts.voted}/{counts.all} {language === 'te' ? 'ఓటేశారు' : 'Voted'} ({Math.round((counts.voted / (counts.all || 1)) * 100)}%)
+                        </span>
+                        <span className="text-amber-400 font-bold bg-amber-950/70 px-2 py-0.5 rounded-lg border border-amber-500/30">
+                          {counts.notVoted} {language === 'te' ? 'పెండింగ్' : 'Pending'}
+                        </span>
+                      </div>
+                    </div>
+
+                    <div className="grid grid-cols-2 gap-2">
+                      <button
+                        type="button"
+                        onClick={() => setIsSpeedDialOpen(true)}
+                        className="py-1.5 px-3 bg-gradient-to-r from-amber-500 to-amber-600 hover:from-amber-400 hover:to-amber-500 text-slate-950 font-black rounded-xl text-xs flex items-center justify-center gap-1.5 shadow-md active:scale-95 transition-all cursor-pointer"
+                      >
+                        <Zap className="w-3.5 h-3.5 fill-slate-950" />
+                        <span>{language === 'te' ? '⚡ స్పీడ్-కాల్' : '⚡ Speed-Call'} ({counts.oursNotVoted})</span>
+                      </button>
+
+                      <button
+                        type="button"
+                        onClick={() => setIsHourlyTurnoutOpen(true)}
+                        className="py-1.5 px-3 bg-slate-950 hover:bg-slate-800 text-amber-300 hover:text-white border border-amber-500/40 font-bold rounded-xl text-xs flex items-center justify-center gap-1.5 shadow-sm active:scale-95 transition-all cursor-pointer"
+                      >
+                        <Clock className="w-3.5 h-3.5 text-amber-400" />
+                        <span>{language === 'te' ? '🕒 గంటల టర్నౌట్' : '🕒 Hourly Turnout'}</span>
+                      </button>
+                    </div>
+
+                    <div className="flex items-center justify-between text-[10px] text-slate-400 bg-slate-950/60 px-2 py-1 rounded-lg border border-slate-800/60">
+                      <span className="flex items-center gap-1">
+                        <span>👩 స్త్రీ:</span>
+                        <strong className="text-rose-400 font-bold">{counts.womenVoted}/{counts.women}</strong>
+                        <span className="text-slate-500">({Math.round((counts.womenVoted / Math.max(1, counts.women)) * 100)}%)</span>
+                      </span>
+                      <span>•</span>
+                      <span className="flex items-center gap-1">
+                        <span>👨 పురుషులు:</span>
+                        <strong className="text-emerald-400 font-bold">{counts.menVoted}/{counts.men}</strong>
+                        <span className="text-slate-500">({Math.round((counts.menVoted / Math.max(1, counts.men)) * 100)}%)</span>
+                      </span>
+                    </div>
+                  </div>
+                )}
+              </div>
+            )}
+
+            {/* 2. FULL CHIPS VIEW (Shown when user chooses 'chips') */}
+            {filterDisplayStyle === 'chips' && (
+              <div className="space-y-2">
+
+{/* Surnames Quick Chips */}
         {surnameGroups.length > 0 && (
           <div className="flex items-center gap-1.5 overflow-x-auto py-0.5 scrollbar-none text-[10.5px]">
             <span className="text-amber-400 font-bold flex-shrink-0 flex items-center gap-1">
@@ -1401,7 +1797,11 @@ _దయచేసి మీ ఓటు హక్కును వినియోగ
             <span>👨 {language === 'te' ? 'పురుషులు' : 'Men'} ({counts.men})</span>
           </button>
         </div>
-      </div>
+              </div>
+            )}
+          </div>
+        )}
+</div>
 
       {/* Showing Count */}
       <div className="flex items-center justify-between text-[11px] text-slate-400 px-1 gap-2 flex-wrap">
