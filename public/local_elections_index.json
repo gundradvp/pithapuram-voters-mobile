@@ -991,11 +991,11 @@
     "category_label": "గ్రామ పంచాయతీ (సమగ్ర గ్రామం)",
     "local_body": "దుర్గడ గ్రామ పంచాయతీ (Durgada Gram Panchayat)",
     "mandal": "GOLLAPROLU",
-    "village": "దుర్గడ సమగ్ర గ్రామ పంచాయతీ — సర్వ ఓటర్లు (MPTC 1 + MPTC 3)",
-    "clean_village": "దుర్గడ సమగ్ర పంచాయతీ (4,524 ఓటర్లు)",
+    "village": "దుర్గడ గ్రామ పంచాయతీ (సమగ్ర గ్రామం — వార్డులు 1-14)",
+    "clean_village": "దుర్గడ సమగ్ర పంచాయతీ (7,420 ఓటర్లు)",
     "ps_address": "దుర్గడ గ్రామ పంచాయతీ పరిధి (MPTC 1 & 3 సమగ్ర నియోజకవర్గం)",
-    "sections": "దుర్గడ MPTC-1 (2,650), MPTC-3 (1,874)",
-    "total_voters": 4524,
+    "sections": "వార్డు 1 నుండి 14 వరకు (మొత్తం గ్రామం)",
+    "total_voters": 7420,
     "male_count": 2285,
     "female_count": 2239,
     "exact_kriya_count": 204,
@@ -1005,7 +1005,9 @@
     "volunteers_count": 103,
     "is_loaded": true,
     "type": "village",
-    "view_level": "village"
+    "view_level": "village",
+    "name": "దుర్గడ సమగ్ర గ్రామ పంచాయతీ — సర్వ ఓటర్లు (వార్డులు 1-14)",
+    "voter_count": 7420
   },
   {
     "id": "gp_vannepudi",
@@ -7125,5 +7127,24 @@
     "local_body": "తాటిపర్తి గ్రామ పంచాయతీ (TATIPARTHI)",
     "sections": "తాటిపర్తి వార్డు 7 విభాగాలు (499 ఓటర్లు)",
     "view_level": "ward"
+  },
+  {
+    "id": "gp_tatiparthy",
+    "part_no": "gp_tatiparthy",
+    "ward_no": 1,
+    "election_type": "panchayat",
+    "category_label": "గ్రామ పంచాయతీ (సమగ్ర గ్రామం)",
+    "local_body": "తాటిపర్తి గ్రామ పంచాయతీ (Tatiparthy Gram Panchayat)",
+    "mandal": "GOLLAPROLU",
+    "village": "తాటిపర్తి గ్రామ పంచాయతీ (సమగ్ర గ్రామం — వార్డులు 1-7)",
+    "clean_village": "తాటిపర్తి సమగ్ర పంచాయతీ (3493 ఓటర్లు)",
+    "ps_address": "తాటిపర్తి గ్రామ పంచాయతీ పరిధి",
+    "sections": "వార్డు 1 నుండి 7 వరకు (మొత్తం గ్రామం)",
+    "total_voters": 3493,
+    "voter_count": 3493,
+    "is_loaded": true,
+    "type": "village",
+    "view_level": "village",
+    "name": "తాటిపర్తి సమగ్ర గ్రామ పంచాయతీ — సర్వ ఓటర్లు (వార్డులు 1-7)"
   }
 ]

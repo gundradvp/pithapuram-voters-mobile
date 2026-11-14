@@ -38,6 +38,8 @@ export interface BoothIndexItem {
   kriya_percentage: number;
   volunteers_count: number;
   election_type?: ElectionCategory;
+  type?: string;
+  view_level?: 'village' | 'ward' | string;
   ward_no?: number;
   local_body?: string;
   is_loaded?: boolean;
@@ -58,6 +60,8 @@ export interface BoothInfo {
   total_kriya_count: number;
   kriya_percentage: number;
   election_type?: ElectionCategory;
+  type?: string;
+  view_level?: 'village' | 'ward' | string;
   ward_no?: number;
   local_body?: string;
   is_loaded?: boolean;

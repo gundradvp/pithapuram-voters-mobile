@@ -98,9 +98,11 @@ export const HeaderMobile: React.FC<HeaderMobileProps> = ({
           <div className="flex items-center gap-1">
             <h1 className="text-xs font-black text-white truncate leading-tight group-hover:text-amber-300 transition-colors">
               {boothInfo ? (
-                boothInfo.election_type === 'municipal'
-                  ? `${language === 'te' ? 'వార్డు' : 'Ward'} #${boothInfo.ward_no || 14}: ${boothInfo.clean_village}`
-                  : `${language === 'te' ? 'బూత్' : 'Booth'} #${boothInfo.part_no}: ${boothInfo.clean_village}`
+                boothInfo.type === 'village' || boothInfo.view_level === 'village' || (typeof boothInfo.part_no === 'string' && boothInfo.part_no.startsWith('gp_') && !boothInfo.part_no.includes('_w'))
+                  ? `🏡 ${boothInfo.clean_village}`
+                  : (typeof boothInfo.part_no === 'string' && (boothInfo.part_no.includes('_w') || boothInfo.election_type === 'municipal'))
+                    ? `🏛️ ${language === 'te' ? 'వార్డు' : 'Ward'} #${boothInfo.ward_no || ''}: ${boothInfo.clean_village}`
+                    : `${language === 'te' ? 'బూత్' : 'Booth'} #${boothInfo.part_no}: ${boothInfo.clean_village}`
               ) : (language === 'te' ? 'బూత్ / వార్డు ఎంచుకోండి' : 'Select Assigned Unit')}
             </h1>
             <ChevronDown className="w-3 h-3 text-slate-400 group-hover:text-amber-400 shrink-0 transition-transform group-hover:translate-y-0.5" />

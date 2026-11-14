@@ -615,7 +615,7 @@ export const AdminAssignmentModal: React.FC<AdminAssignmentModalProps> = ({
                         <MapPin className="w-3.5 h-3.5 text-amber-400" />
                         <span>దుర్గడ సమగ్ర GP</span>
                       </div>
-                      <span className="text-[10px] text-slate-400">4,524 ఓటర్లు (MPTC 1 & 3 సమగ్ర సర్వ ఓటర్లు)</span>
+                      <span className="text-[10px] text-slate-400">7,420 ఓటర్లు (వార్డులు 1-14 సమగ్ర గ్రామం)</span>
                     </div>
                     {selectedWards.includes('gp_durgada') && <Check className="w-3.5 h-3.5 text-amber-400" />}
                   </button>

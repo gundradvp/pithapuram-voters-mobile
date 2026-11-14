@@ -52,8 +52,8 @@ export const BoothAssignmentModal: React.FC<BoothAssignmentModalProps> = ({
   const [electionCategoryTab, setElectionCategoryTab] = useState<'assembly' | 'local'>(
     isCurrentlyLocal ? 'local' : 'assembly'
   );
-  const [localSubCategory, setLocalSubCategory] = useState<'all' | 'municipal' | 'panchayat' | 'mptc' | 'zptc'>('all');
-  const [panchayatViewFilter, setPanchayatViewFilter] = useState<'all' | 'village' | 'ward'>('all');
+  const [localSubCategory, setLocalSubCategory] = useState<'all' | 'municipal' | 'panchayat'>('all');
+  const [panchayatViewFilter, setPanchayatViewFilter] = useState<'village' | 'ward' | 'all'>('village');
   const [searchTerm, setSearchTerm] = useState('');
   const [pinInput, setPinInput] = useState('');
   const [pinUnlocked, setPinUnlocked] = useState(userRole === 'admin' || !isLocked);
@@ -95,13 +95,18 @@ export const BoothAssignmentModal: React.FC<BoothAssignmentModalProps> = ({
 
   const filteredLocalUnits = availableLocalUnits
     .filter(u => {
+      // MPTC is not required — completely exclude MPTC units
+      if (u.election_type === 'mptc' || u.type === 'mptc' || (u.id && u.id.startsWith('mptc_'))) {
+        return false;
+      }
+
+      const isVillage = u.type === 'village' || u.view_level === 'village' || (!u.ward_no && !u.id.includes('_w'));
+
       // 1. By Village vs By Ward filter for Panchayat Elections
       if (panchayatViewFilter === 'village') {
-        const isVillage = u.type === 'village' || u.view_level === 'village' || (!u.ward_no && !u.id.includes('_w'));
         if (!isVillage) return false;
       } else if (panchayatViewFilter === 'ward') {
-        const isWard = u.type === 'ward' || u.view_level === 'ward' || !!u.ward_no || u.id.includes('_w') || u.election_type === 'municipal';
-        if (!isWard) return false;
+        if (isVillage) return false;
       }
 
       if (localSubCategory !== 'all' && u.election_type !== localSubCategory) {
@@ -253,68 +258,64 @@ export const BoothAssignmentModal: React.FC<BoothAssignmentModalProps> = ({
               </button>
             </div>
 
-            {/* Sub-Category & Village/Ward View Switcher for Local Elections */}
+            {/* Clean Village vs Ward View Switcher for Local Elections */}
             {electionCategoryTab === 'local' && (
-              <div className="space-y-1.5">
-                {/* Primary Panchayat Election Mode: By Village vs By Ward */}
-                <div className="grid grid-cols-3 gap-1 bg-slate-950 p-1 rounded-xl border border-emerald-500/30">
+              <div className="space-y-2">
+                {/* Primary Mode: Complete Village vs Ward Only */}
+                <div className="grid grid-cols-3 gap-1.5 p-1 bg-slate-950 border border-slate-800 rounded-2xl text-xs shadow-inner">
+                  <button
+                    type="button"
+                    onClick={() => setPanchayatViewFilter('village')}
+                    className={`py-2 px-2 rounded-xl text-xs font-bold transition-all flex items-center justify-center gap-1.5 ${
+                      panchayatViewFilter === 'village'
+                        ? 'bg-emerald-600 text-white font-black shadow-lg shadow-emerald-950/50 ring-1 ring-emerald-400/50'
+                        : 'text-emerald-400/80 hover:text-white hover:bg-slate-900'
+                    }`}
+                  >
+                    <span className="text-sm">🏡</span>
+                    <span>{language === 'te' ? 'పూర్తి గ్రామం (GP)' : 'Complete Village'}</span>
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => setPanchayatViewFilter('ward')}
+                    className={`py-2 px-2 rounded-xl text-xs font-bold transition-all flex items-center justify-center gap-1.5 ${
+                      panchayatViewFilter === 'ward'
+                        ? 'bg-blue-600 text-white font-black shadow-lg shadow-blue-950/50 ring-1 ring-blue-400/50'
+                        : 'text-blue-400/80 hover:text-white hover:bg-slate-900'
+                    }`}
+                  >
+                    <span className="text-sm">🏛️</span>
+                    <span>{language === 'te' ? 'వార్డు మాత్రమే' : 'Ward Only'}</span>
+                  </button>
                   <button
                     type="button"
                     onClick={() => setPanchayatViewFilter('all')}
-                    className={`py-1.5 px-2 rounded-lg text-[10.5px] font-bold transition-all flex items-center justify-center gap-1 ${
+                    className={`py-2 px-2 rounded-xl text-xs font-bold transition-all flex items-center justify-center gap-1.5 ${
                       panchayatViewFilter === 'all'
-                        ? 'bg-amber-500 text-slate-950 font-black shadow-sm'
-                        : 'text-slate-400 hover:text-white'
+                        ? 'bg-amber-500 text-slate-950 font-black shadow-lg shadow-amber-950/50 ring-1 ring-amber-400/50'
+                        : 'text-slate-400 hover:text-white hover:bg-slate-900'
                     }`}
                   >
-                    <span>🌐</span>
+                    <span className="text-sm">🌐</span>
                     <span>{language === 'te' ? 'అన్నీ' : 'All'}</span>
-                  </button>
-                  <button
-                    type="button"
-                    onClick={() => {
-                      setPanchayatViewFilter('village');
-                    }}
-                    className={`py-1.5 px-2 rounded-lg text-[10.5px] font-bold transition-all flex items-center justify-center gap-1 ${
-                      panchayatViewFilter === 'village'
-                        ? 'bg-emerald-600 text-white font-black shadow-sm'
-                        : 'text-emerald-400 hover:text-white'
-                    }`}
-                  >
-                    <span>🏡</span>
-                    <span>{language === 'te' ? 'గ్రామం వారీగా (గ్రామ పంచాయతీ)' : 'By Village (Full GP)'}</span>
-                  </button>
-                  <button
-                    type="button"
-                    onClick={() => {
-                      setPanchayatViewFilter('ward');
-                    }}
-                    className={`py-1.5 px-2 rounded-lg text-[10.5px] font-bold transition-all flex items-center justify-center gap-1 ${
-                      panchayatViewFilter === 'ward'
-                        ? 'bg-blue-600 text-white font-black shadow-sm'
-                        : 'text-blue-400 hover:text-white'
-                    }`}
-                  >
-                    <span>🏛️</span>
-                    <span>{language === 'te' ? 'వార్డు వారీగా' : 'By Ward'}</span>
                   </button>
                 </div>
 
-                {/* Sub-Category Pills */}
-                <div className="flex items-center gap-1 overflow-x-auto pb-1 text-[11px] scrollbar-none">
+                {/* Sub-Category Pills (Panchayat & Municipal only — MPTC removed) */}
+                <div className="flex items-center gap-1.5 overflow-x-auto pb-0.5 text-[11px] scrollbar-none">
                   <button
                     onClick={() => setLocalSubCategory('all')}
-                    className={`px-2.5 py-1 rounded-lg font-bold whitespace-nowrap transition-all ${
+                    className={`px-3 py-1 rounded-lg font-bold whitespace-nowrap transition-all ${
                       localSubCategory === 'all'
                         ? 'bg-amber-500 text-slate-950 font-black'
                         : 'bg-slate-950 text-slate-400 hover:text-white border border-slate-800'
                     }`}
                   >
-                    {language === 'te' ? 'అన్ని కేటగిరీలు' : 'All Categories'}
+                    {language === 'te' ? 'అన్నీ' : 'All'}
                   </button>
                   <button
                     onClick={() => setLocalSubCategory('panchayat')}
-                    className={`px-2.5 py-1 rounded-lg font-bold whitespace-nowrap transition-all flex items-center gap-1 ${
+                    className={`px-3 py-1 rounded-lg font-bold whitespace-nowrap transition-all flex items-center gap-1 ${
                       localSubCategory === 'panchayat'
                         ? 'bg-emerald-600 text-white font-black'
                         : 'bg-slate-950 text-emerald-300 hover:text-white border border-emerald-500/30'
@@ -324,19 +325,8 @@ export const BoothAssignmentModal: React.FC<BoothAssignmentModalProps> = ({
                     <span>{language === 'te' ? 'గ్రామ పంచాయతీ' : 'Panchayat'}</span>
                   </button>
                   <button
-                    onClick={() => setLocalSubCategory('mptc')}
-                    className={`px-2.5 py-1 rounded-lg font-bold whitespace-nowrap transition-all flex items-center gap-1 ${
-                      localSubCategory === 'mptc'
-                        ? 'bg-purple-600 text-white font-black'
-                        : 'bg-slate-950 text-purple-300 hover:text-white border border-purple-500/30'
-                    }`}
-                  >
-                    <MapPin className="w-3 h-3" />
-                    <span>{language === 'te' ? 'ఎంపీటీసీ (MPTC)' : 'MPTC Units'}</span>
-                  </button>
-                  <button
                     onClick={() => setLocalSubCategory('municipal')}
-                    className={`px-2.5 py-1 rounded-lg font-bold whitespace-nowrap transition-all flex items-center gap-1 ${
+                    className={`px-3 py-1 rounded-lg font-bold whitespace-nowrap transition-all flex items-center gap-1 ${
                       localSubCategory === 'municipal'
                         ? 'bg-blue-600 text-white font-black'
                         : 'bg-slate-950 text-blue-300 hover:text-white border border-blue-500/30'
@@ -494,14 +484,16 @@ export const BoothAssignmentModal: React.FC<BoothAssignmentModalProps> = ({
                           <div className="space-y-1 min-w-0 flex-1">
                             {/* Badges Row */}
                             <div className="flex items-center gap-1.5 flex-wrap">
-                              <span className={`px-1.5 py-0.2 rounded text-[9.5px] font-black ${
-                                u.election_type === 'municipal'
-                                  ? 'bg-blue-900/60 text-blue-300 border border-blue-500/40'
-                                  : u.election_type === 'panchayat'
-                                    ? 'bg-emerald-900/60 text-emerald-300 border border-emerald-500/40'
-                                    : 'bg-purple-900/60 text-purple-300 border border-purple-500/40'
+                              <span className={`px-2 py-0.5 rounded text-[9.5px] font-black ${
+                                u.type === 'village' || u.view_level === 'village' || (!u.ward_no && !u.id.includes('_w'))
+                                  ? 'bg-emerald-900/60 text-emerald-300 border border-emerald-500/40'
+                                  : u.election_type === 'municipal'
+                                    ? 'bg-blue-900/60 text-blue-300 border border-blue-500/40'
+                                    : 'bg-indigo-900/60 text-indigo-300 border border-indigo-500/40'
                               }`}>
-                                {(u.category_label || (u.election_type === 'municipal' ? 'మున్సిపల్' : u.election_type === 'mptc' ? 'ఎంపీటీసీ' : 'పంచాయతీ')).split(' ')[0]}
+                                {u.type === 'village' || u.view_level === 'village' || (!u.ward_no && !u.id.includes('_w'))
+                                  ? (language === 'te' ? '🏡 పూర్తి గ్రామం (GP)' : '🏡 Complete Village')
+                                  : (language === 'te' ? `🏛️ వార్డు #${u.ward_no || ''}` : `🏛️ Ward #${u.ward_no || ''}`)}
                               </span>
 
                               {u.is_loaded && (
