@@ -2022,8 +2022,8 @@ _దయచేసి మీ ఓటు హక్కును వినియోగ
           })}
         </div>
       ) : (
-        /* Voter Cards List (Standard List View) */
-        <div className="space-y-2.5">
+        /* Voter Cards List (Responsive Multi-Column on Desktop, Single Column on Mobile) */
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-2 xl:grid-cols-3 gap-2.5">
         {displayedVoters.map(v => {
           const prof = profiles[v.s] || {};
           const phone = prof.customPhone || v.k_m;

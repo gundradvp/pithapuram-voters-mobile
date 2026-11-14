@@ -9,13 +9,15 @@ interface BottomNavMobileProps {
   votersCount: number;
   kriyaCount: number;
   language?: Language;
+  layoutMode?: 'mobile' | 'desktop';
 }
 
 export const BottomNavMobile: React.FC<BottomNavMobileProps> = ({
   activeTab,
   onTabChange,
   votersCount,
-  language = 'te'
+  language = 'te',
+  layoutMode = 'mobile'
 }) => {
   const tabs = [
     {
@@ -47,7 +49,9 @@ export const BottomNavMobile: React.FC<BottomNavMobileProps> = ({
   ];
 
   return (
-    <nav className="fixed bottom-0 left-0 right-0 z-40 bg-slate-900/98 backdrop-blur-lg border-t border-slate-800 px-2 py-1 shadow-2xl safe-area-bottom">
+    <nav className={`fixed bottom-0 left-0 right-0 z-40 bg-slate-900/98 backdrop-blur-lg border-t border-slate-800 px-2 py-1 shadow-2xl safe-area-bottom ${
+      layoutMode === 'desktop' ? 'hidden md:hidden' : ''
+    }`}>
       <div className="grid grid-cols-5 gap-1 max-w-lg mx-auto">
         {tabs.map(t => {
           const Icon = t.icon;

@@ -1,6 +1,6 @@
 import React from 'react';
-import { Lock, Unlock, Wifi, WifiOff, Languages, Palette, LogOut, Crown, UserCheck, RefreshCw, ArrowRightLeft, ChevronDown, Clock } from 'lucide-react';
-import { BoothInfo } from '../types';
+import { Lock, Unlock, Wifi, WifiOff, Languages, Palette, LogOut, Crown, UserCheck, RefreshCw, ArrowRightLeft, ChevronDown, Clock, Monitor, Smartphone, Users, Home, Trophy, DownloadCloud } from 'lucide-react';
+import { BoothInfo, TabType } from '../types';
 import { Language } from '../utils/i18n';
 import { ThemeId, THEMES } from '../utils/theme';
 import { UserSession } from '../utils/auth';
@@ -16,6 +16,12 @@ interface HeaderMobileProps {
   remainingTime?: { isExpired: boolean; hasTimer: boolean; formatted: string; minutes: number };
   isRefreshing?: boolean;
   cloudSyncState?: SyncState;
+  layoutMode?: 'mobile' | 'desktop';
+  onToggleLayoutMode?: () => void;
+  activeTab?: TabType;
+  onTabChange?: (tab: TabType) => void;
+  votersCount?: number;
+  kriyaCount?: number;
   onRefreshData?: () => void;
   onOpenSyncModal?: () => void;
   onToggleLanguage: () => void;
@@ -35,6 +41,12 @@ export const HeaderMobile: React.FC<HeaderMobileProps> = ({
   remainingTime,
   isRefreshing,
   cloudSyncState = 'idle',
+  layoutMode = 'mobile',
+  onToggleLayoutMode,
+  activeTab,
+  onTabChange,
+  votersCount = 0,
+  kriyaCount = 0,
   onRefreshData,
   onOpenSyncModal,
   onToggleLanguage,
@@ -46,8 +58,9 @@ export const HeaderMobile: React.FC<HeaderMobileProps> = ({
   const currentThemeConfig = THEMES.find(t => t.id === theme) || THEMES[0];
 
   return (
-    <header className="sticky top-0 z-40 bg-slate-900/95 backdrop-blur-md border-b border-slate-800 px-3 py-2 shadow-lg flex items-center justify-between">
-      {/* Left: Emblem, Title & Part # (Clickable Instant Booth/Ward Switcher) */}
+    <header className="sticky top-0 z-40 bg-slate-900/95 backdrop-blur-md border-b border-slate-800 px-3 py-2 shadow-lg flex flex-col">
+      <div className="flex items-center justify-between w-full">
+        {/* Left: Emblem, Title & Part # (Clickable Instant Booth/Ward Switcher) */}
       <button
         type="button"
         onClick={onOpenBoothSelector}
@@ -211,6 +224,31 @@ export const HeaderMobile: React.FC<HeaderMobileProps> = ({
           </span>
         </button>
 
+        {/* Desktop / Mobile Mode Toggle (Shown on tablets and desktops) */}
+        {onToggleLayoutMode && (
+          <button
+            onClick={onToggleLayoutMode}
+            className={`hidden md:flex items-center gap-1 px-2.5 py-1 rounded-lg text-[10px] font-black border transition-all shadow-sm ${
+              layoutMode === 'desktop'
+                ? 'bg-gradient-to-r from-blue-700 to-indigo-700 text-white border-blue-400 shadow-blue-950/50'
+                : 'bg-slate-800 text-slate-300 hover:text-white border-slate-700'
+            }`}
+            title={layoutMode === 'desktop' ? 'మొబైల్ మోడ్‌కు మారండి (Switch to Mobile Mode)' : 'డెస్క్‌టాప్ మోడ్‌కు మారండి (Switch to Desktop Mode)'}
+          >
+            {layoutMode === 'desktop' ? (
+              <>
+                <Monitor className="w-3.5 h-3.5 text-blue-300" />
+                <span className="whitespace-nowrap">💻 డెస్క్‌టాప్</span>
+              </>
+            ) : (
+              <>
+                <Smartphone className="w-3.5 h-3.5 text-amber-400" />
+                <span className="whitespace-nowrap">📱 మొబైల్</span>
+              </>
+            )}
+          </button>
+        )}
+
         {/* Logout Button */}
         <button
           onClick={onLogout}
@@ -220,6 +258,86 @@ export const HeaderMobile: React.FC<HeaderMobileProps> = ({
           <LogOut className="w-3.5 h-3.5" />
         </button>
       </div>
+    </div>
+
+      {/* Desktop Tabs Header Navigation Bar (Visible in Desktop Mode on md+ screens) */}
+      {layoutMode === 'desktop' && onTabChange && (
+        <div className="hidden md:flex items-center justify-between border-t border-slate-800/80 bg-slate-950/90 px-3 py-1.5 -mx-3 -mb-2 mt-2 w-[calc(100%+1.5rem)]">
+          <div className="flex items-center gap-2">
+            <button
+              onClick={() => onTabChange('voters')}
+              className={`px-3 py-1.5 rounded-xl text-xs font-bold transition-all flex items-center gap-1.5 ${
+                activeTab === 'voters'
+                  ? 'bg-amber-500 text-slate-950 font-black shadow-md shadow-amber-950/40'
+                  : 'text-slate-300 hover:text-white hover:bg-slate-800/70'
+              }`}
+            >
+              <Users className="w-3.5 h-3.5" />
+              <span>{language === 'te' ? 'ఓటర్లు' : 'Voters'}</span>
+              {votersCount > 0 && (
+                <span className={`px-1.5 py-0.2 rounded-full text-[10px] font-mono font-bold ${
+                  activeTab === 'voters' ? 'bg-slate-950 text-amber-300' : 'bg-slate-800 text-slate-300'
+                }`}>
+                  {votersCount.toLocaleString()}
+                </span>
+              )}
+            </button>
+
+            <button
+              onClick={() => onTabChange('families')}
+              className={`px-3 py-1.5 rounded-xl text-xs font-bold transition-all flex items-center gap-1.5 ${
+                activeTab === 'families'
+                  ? 'bg-amber-500 text-slate-950 font-black shadow-md shadow-amber-950/40'
+                  : 'text-slate-300 hover:text-white hover:bg-slate-800/70'
+              }`}
+            >
+              <Home className="w-3.5 h-3.5" />
+              <span>{language === 'te' ? 'కుటుంబాలు (ఇళ్ళు)' : 'Families'}</span>
+            </button>
+
+            <button
+              onClick={() => onTabChange('influencers')}
+              className={`px-3 py-1.5 rounded-xl text-xs font-bold transition-all flex items-center gap-1.5 ${
+                activeTab === 'influencers'
+                  ? 'bg-amber-500 text-slate-950 font-black shadow-md shadow-amber-950/40'
+                  : 'text-slate-300 hover:text-white hover:bg-slate-800/70'
+              }`}
+            >
+              <UserCheck className="w-3.5 h-3.5" />
+              <span>{language === 'te' ? 'నాయకులు' : 'Leaders'}</span>
+            </button>
+
+            <button
+              onClick={() => onTabChange('warroom')}
+              className={`px-3 py-1.5 rounded-xl text-xs font-bold transition-all flex items-center gap-1.5 ${
+                activeTab === 'warroom'
+                  ? 'bg-amber-500 text-slate-950 font-black shadow-md shadow-amber-950/40'
+                  : 'text-slate-300 hover:text-white hover:bg-slate-800/70'
+              }`}
+            >
+              <Trophy className="w-3.5 h-3.5" />
+              <span>{language === 'te' ? 'వార్ రూమ్' : 'War Room'}</span>
+            </button>
+
+            <button
+              onClick={() => onTabChange('offline')}
+              className={`px-3 py-1.5 rounded-xl text-xs font-bold transition-all flex items-center gap-1.5 ${
+                activeTab === 'offline'
+                  ? 'bg-amber-500 text-slate-950 font-black shadow-md shadow-amber-950/40'
+                  : 'text-slate-300 hover:text-white hover:bg-slate-800/70'
+              }`}
+            >
+              <DownloadCloud className="w-3.5 h-3.5" />
+              <span>{language === 'te' ? 'ఆఫ్‌లైన్ & టూల్స్' : 'Offline & Tools'}</span>
+            </button>
+          </div>
+
+          <div className="flex items-center gap-3 text-xs font-mono text-slate-400 pr-2">
+            <span>ఓటర్లు: <strong className="text-white">{votersCount.toLocaleString()}</strong></span>
+            {kriyaCount > 0 && <span>క్రియాశీల: <strong className="text-amber-400">{kriyaCount.toLocaleString()}</strong></span>}
+          </div>
+        </div>
+      )}
     </header>
   );
 };

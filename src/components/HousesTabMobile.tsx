@@ -119,8 +119,8 @@ export const HousesTabMobile: React.FC<HousesTabMobileProps> = ({
         <span className="text-[11px] text-slate-400">Door-to-Door Field Survey</span>
       </div>
 
-      {/* House Cluster Cards */}
-      <div className="space-y-2.5">
+      {/* House Cluster Cards (Responsive Multi-Column on Desktop) */}
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-2 xl:grid-cols-3 gap-2.5 items-start">
         {filteredClusters.map(cluster => {
           const isExpanded = expandedHouse === cluster.houseNo || filteredClusters.length <= 5;
           return (

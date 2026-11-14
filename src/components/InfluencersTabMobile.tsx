@@ -243,8 +243,8 @@ export const InfluencersTabMobile: React.FC<InfluencersTabMobileProps> = ({
         )}
       </div>
 
-      {/* Influencers Cards List */}
-      <div className="space-y-3">
+      {/* Influencers Cards List (Responsive Multi-Column on Desktop) */}
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-2 xl:grid-cols-3 gap-3 items-start">
         {filteredInfluencers.map(inf => {
           const assignedVoters = influencerStats.voterMap[inf.id] || [];
           const assignedFamilies = influencerStats.familyMap[inf.id] || [];

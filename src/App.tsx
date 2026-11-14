@@ -36,6 +36,7 @@ import {
   WinningScoreCalculation,
   MoneyInfluenceStatus
 } from './types';
+import { safeStorage } from './utils/safeStorage';
 import {
   getAssignedBooth,
   setAssignedBooth,
@@ -131,6 +132,21 @@ export function App() {
   const [currentPartNo, setCurrentPartNo] = useState<number | string>(() => {
     return getAssignedBooth() || 'ward_14';
   });
+
+  // Desktop vs Mobile layout mode (mobile first priority; desktop mode on laptops)
+  const [layoutMode, setLayoutMode] = useState<'mobile' | 'desktop'>(() => {
+    const saved = safeStorage.getItem('jsp_layout_mode');
+    if (saved === 'desktop' || saved === 'mobile') return saved;
+    return typeof window !== 'undefined' && window.innerWidth >= 1024 ? 'desktop' : 'mobile';
+  });
+
+  const handleToggleLayoutMode = useCallback(() => {
+    setLayoutMode(prev => {
+      const next = prev === 'desktop' ? 'mobile' : 'desktop';
+      safeStorage.setItem('jsp_layout_mode', next);
+      return next;
+    });
+  }, []);
 
   // State: load list only when click load (Requirement 3)
   const [isListLoaded, setIsListLoaded] = useState<boolean>(false);
@@ -1045,7 +1061,7 @@ export function App() {
 
   return (
     <div className="min-h-screen bg-slate-950 text-slate-100 flex flex-col font-sans select-none antialiased">
-      {/* Sticky Mobile Header with Language & Theme Toggle */}
+      {/* Responsive Header with Desktop Tabs & Mobile Toggle */}
       <HeaderMobile
         boothInfo={boothData?.booth_info || null}
         isLocked={isLocked}
@@ -1056,6 +1072,12 @@ export function App() {
         remainingTime={remainingTime}
         isRefreshing={isRefreshing}
         cloudSyncState={cloudSyncState}
+        layoutMode={layoutMode}
+        onToggleLayoutMode={handleToggleLayoutMode}
+        activeTab={activeTab}
+        onTabChange={setActiveTab}
+        votersCount={boothData?.voters.length || 0}
+        kriyaCount={boothData?.booth_info.total_kriya_count || 0}
         onRefreshData={() => handleRefreshData(true)}
         onOpenSyncModal={() => setIsSyncModalOpen(true)}
         onToggleLanguage={toggleLanguage}
@@ -1097,11 +1119,13 @@ export function App() {
         </div>
       )}
 
-      {/* Main Content Area: Expands to 100% Fullscreen Width when in Excel Grid Mode */}
+      {/* Main Content Area: Expands to full screen in Excel mode or Desktop mode */}
       <main className={`flex-1 w-full mx-auto transition-all duration-150 ${
         activeTab === 'voters' && votersViewMode === 'excel'
           ? 'max-w-none w-full px-2 sm:px-4 lg:px-6 py-2'
-          : 'max-w-lg p-3'
+          : layoutMode === 'desktop'
+            ? 'max-w-7xl w-full px-3 sm:px-6 lg:px-8 py-3 pb-8'
+            : 'max-w-lg p-3 pb-24'
       }`}>
         {/* Unassigned Volunteer Notice Banner */}
         {session && session.role === 'volunteer' && assignedAssemblyBooths.length === 0 && assignedMunicipalWards.length === 0 && (
@@ -1458,13 +1482,14 @@ export function App() {
         )}
       </main>
 
-      {/* Fixed Bottom Navigation with Bilingual labels */}
+      {/* Fixed Bottom Navigation with Bilingual labels (Hidden on Desktop when in Desktop Mode) */}
       <BottomNavMobile
         activeTab={activeTab}
         onTabChange={setActiveTab}
         votersCount={boothData?.voters.length || 0}
         kriyaCount={boothData?.booth_info.total_kriya_count || 0}
         language={lang}
+        layoutMode={layoutMode}
       />
 
       {/* Booth Assignment Modal */}
