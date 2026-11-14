@@ -291,7 +291,8 @@ export function generateAssignmentWhatsAppMessage(
         if (w === 'gp_durgada') return `• దుర్గడ సమగ్ర గ్రామ పంచాయతీ (Durgada GP - 4,524 ఓటర్లు)${desc}`;
         if (w === 'gp_vannepudi') return `• వన్నెపూడి గ్రామ పంచాయతీ (Vannepudi GP - 3,201 ఓటర్లు)${desc}`;
         if (w === 'mptc_chebrolu_4') return `• చేబ్రోలు MPTC-4 (వార్డులు 13-16 - 2,979 ఓటర్లు)${desc}`;
-        if (w === 'mptc_tatiparthy_1', 'mptc_tatiparthy_2') return `• తాటిపర్తి MPTC-2 (వార్డులు 8-14 - 3,501 ఓటర్లు)${desc}`;
+        if (w === 'mptc_tatiparthy_1') return `• తాటిపర్తి MPTC-1 (వార్డులు 1-7 - 3,493 ఓటర్లు)${desc}`;
+        if (w === 'mptc_tatiparthy_2') return `• తాటిపర్తి MPTC-2 (వార్డులు 8-14 - 3,501 ఓటర్లు)${desc}`;
         return `• స్థానిక వార్డు/పంచాయతీ: ${w}${desc}`;
       }).join('\n')
     : '• కేటాయించలేదు';

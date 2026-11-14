@@ -444,7 +444,7 @@ export const BoothAssignmentModal: React.FC<BoothAssignmentModalProps> = ({
                                     ? 'bg-emerald-900/60 text-emerald-300 border border-emerald-500/40'
                                     : 'bg-purple-900/60 text-purple-300 border border-purple-500/40'
                               }`}>
-                                {u.category_label.split(' ')[0]}
+                                {(u.category_label || (u.election_type === 'municipal' ? 'మున్సిపల్' : u.election_type === 'mptc' ? 'ఎంపీటీసీ' : 'పంచాయతీ')).split(' ')[0]}
                               </span>
 
                               {u.is_loaded && (
