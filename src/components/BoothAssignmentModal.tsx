@@ -61,7 +61,7 @@ export const BoothAssignmentModal: React.FC<BoothAssignmentModalProps> = ({
   const [lockOnAssign, setLockOnAssign] = useState(true);
 
   const handleVerifyPin = () => {
-    if (verifyAdminPin(pinInput) || pinInput.trim() === '1555') {
+    if (verifyAdminPin(pinInput) || pinInput.trim() === '2222') {
       setPinUnlocked(true);
       setPinError(false);
     } else {

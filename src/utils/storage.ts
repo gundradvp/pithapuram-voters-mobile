@@ -4,7 +4,7 @@ import { safeStorage } from './safeStorage';
 const ASSIGNED_BOOTH_KEY = 'jsp_mobile_assigned_booth';
 const BOOTH_LOCKED_KEY = 'jsp_mobile_booth_locked';
 const ADMIN_PIN_KEY = 'jsp_mobile_admin_pin';
-const DEFAULT_ADMIN_PIN = '1555';
+const DEFAULT_ADMIN_PIN = '2222';
 
 export function getAssignedBooth(): number | string | null {
   const val = safeStorage.getItem(ASSIGNED_BOOTH_KEY);
