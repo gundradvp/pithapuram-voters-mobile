@@ -94,6 +94,7 @@ export const VotersTabMobile: React.FC<VotersTabMobileProps> = ({
   const [searchQuery, setSearchQuery] = useState('');
   const [snoQuery, setSnoQuery] = useState('');
   const [isSnoFilterOpen, setIsSnoFilterOpen] = useState(false);
+  const [selectedWard, setSelectedWard] = useState<string>('all');
   const [selectedStreet, setSelectedStreet] = useState<string>('all');
   const [selectedSurname, setSelectedSurname] = useState<string>('all');
   const [internalViewMode, setInternalViewMode] = useState<'list' | 'surnames' | 'excel'>(() => {
@@ -169,16 +170,18 @@ export const VotersTabMobile: React.FC<VotersTabMobileProps> = ({
     return (
       searchQuery.trim() !== '' ||
       snoQuery.trim() !== '' ||
+      selectedWard !== 'all' ||
       selectedSurname !== 'all' ||
       selectedStreet !== 'all' ||
       filterMode !== 'all'
     );
-  }, [searchQuery, snoQuery, selectedSurname, selectedStreet, filterMode]);
+  }, [searchQuery, snoQuery, selectedWard, selectedSurname, selectedStreet, filterMode]);
 
   const handleResetAllFilters = () => {
     setSearchQuery('');
     setSnoQuery('');
     setIsSnoFilterOpen(false);
+    setSelectedWard('all');
     setSelectedSurname('all');
     setSelectedStreet('all');
     setFilterMode('all');
@@ -241,6 +244,7 @@ export const VotersTabMobile: React.FC<VotersTabMobileProps> = ({
 
   // Auto-reset filters whenever the active booth/ward changes
   useEffect(() => {
+    setSelectedWard('all');
     setSelectedSurname('all');
     setSelectedStreet('all');
     setSearchQuery('');
@@ -414,6 +418,17 @@ _దయచేసి మీ ఓటు హక్కును వినియోగ
     return Array.from(sMap.entries()).sort((a, b) => b[1] - a[1]);
   }, [voters]);
 
+  // Unique wards list for chips (Panchayat Election: View by Ward inside Village)
+  const wardsList = useMemo(() => {
+    const wMap = new Map<number, number>();
+    voters.forEach(v => {
+      if (v.ward_no) {
+        wMap.set(v.ward_no, (wMap.get(v.ward_no) || 0) + 1);
+      }
+    });
+    return Array.from(wMap.entries()).sort((a, b) => a[0] - b[0]);
+  }, [voters]);
+
   // Filter Voters
   const filteredVoters = useMemo(() => {
     const q = searchQuery.toLowerCase().trim();
@@ -426,6 +441,11 @@ _దయచేసి మీ ఓటు హక్కును వినియోగ
       // Direct S.No Filter
       if (snoFilterPredicate) {
         if (!snoFilterPredicate(v.s)) return false;
+      }
+
+      // Ward Filter (Panchayat Election)
+      if (selectedWard !== 'all') {
+        if (String(v.ward_no) !== selectedWard) return false;
       }
 
       // 1. Text Search (Phonetic Sound-alike + Exact Substring / S.No)
@@ -960,6 +980,39 @@ _దయచేసి మీ ఓటు హక్కును వినియోగ
               >
                 <span>{g.nameTe || g.nameEn}</span>
                 <span className="font-mono text-[9.5px] opacity-80">({g.totalVoters})</span>
+              </button>
+            ))}
+          </div>
+        )}
+
+        {/* Ward Quick Filter Chips (Panchayat Election: View by Ward or Full Village) */}
+        {wardsList.length > 1 && (
+          <div className="flex items-center gap-1.5 overflow-x-auto py-1 scrollbar-none text-[10.5px]">
+            <span className="text-emerald-400 font-bold flex-shrink-0 flex items-center gap-1">
+              🏛️ {language === 'te' ? 'వార్డు:' : 'Ward:'}
+            </span>
+            <button
+              onClick={() => { setSelectedWard('all'); setVisibleCount(INITIAL_VISIBLE_COUNT); }}
+              className={`px-2 py-0.5 rounded-md font-bold whitespace-nowrap transition-all ${
+                selectedWard === 'all'
+                  ? 'bg-emerald-600 text-white font-black shadow-sm'
+                  : 'bg-slate-900 text-slate-400 hover:text-white border border-slate-800'
+              }`}
+            >
+              {language === 'te' ? 'మొత్తం గ్రామం (All Wards)' : 'Full Village'}
+            </button>
+            {wardsList.map(([wNo, cnt]) => (
+              <button
+                key={wNo}
+                onClick={() => { setSelectedWard(selectedWard === String(wNo) ? 'all' : String(wNo)); setVisibleCount(INITIAL_VISIBLE_COUNT); }}
+                className={`px-2 py-0.5 rounded-md font-bold whitespace-nowrap transition-all flex items-center gap-1 ${
+                  selectedWard === String(wNo)
+                    ? 'bg-emerald-500 text-slate-950 font-black shadow-sm'
+                    : 'bg-slate-900 text-emerald-300 hover:text-white border border-emerald-500/30'
+                }`}
+              >
+                <span>{language === 'te' ? `వార్డు #${wNo}` : `Ward #${wNo}`}</span>
+                <span className="font-mono text-[9.5px] opacity-80">({cnt})</span>
               </button>
             ))}
           </div>

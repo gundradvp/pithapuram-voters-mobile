@@ -19,7 +19,9 @@
     "total_kriya_count": 0,
     "kriya_percentage": 0.0,
     "volunteers_count": 0,
-    "is_loaded": false
+    "is_loaded": false,
+    "type": "ward",
+    "view_level": "ward"
   },
   {
     "id": "ward_2",
@@ -41,7 +43,9 @@
     "total_kriya_count": 0,
     "kriya_percentage": 0.0,
     "volunteers_count": 0,
-    "is_loaded": false
+    "is_loaded": false,
+    "type": "ward",
+    "view_level": "ward"
   },
   {
     "id": "ward_3",
@@ -63,7 +67,9 @@
     "total_kriya_count": 0,
     "kriya_percentage": 0.0,
     "volunteers_count": 0,
-    "is_loaded": false
+    "is_loaded": false,
+    "type": "ward",
+    "view_level": "ward"
   },
   {
     "id": "ward_4",
@@ -85,7 +91,9 @@
     "total_kriya_count": 0,
     "kriya_percentage": 0.0,
     "volunteers_count": 0,
-    "is_loaded": false
+    "is_loaded": false,
+    "type": "ward",
+    "view_level": "ward"
   },
   {
     "id": "ward_5",
@@ -107,7 +115,9 @@
     "total_kriya_count": 0,
     "kriya_percentage": 0.0,
     "volunteers_count": 0,
-    "is_loaded": false
+    "is_loaded": false,
+    "type": "ward",
+    "view_level": "ward"
   },
   {
     "id": "ward_6",
@@ -129,7 +139,9 @@
     "total_kriya_count": 0,
     "kriya_percentage": 0.0,
     "volunteers_count": 0,
-    "is_loaded": false
+    "is_loaded": false,
+    "type": "ward",
+    "view_level": "ward"
   },
   {
     "id": "ward_7",
@@ -151,7 +163,9 @@
     "total_kriya_count": 0,
     "kriya_percentage": 0.0,
     "volunteers_count": 0,
-    "is_loaded": false
+    "is_loaded": false,
+    "type": "ward",
+    "view_level": "ward"
   },
   {
     "id": "ward_8",
@@ -173,7 +187,9 @@
     "total_kriya_count": 0,
     "kriya_percentage": 0.0,
     "volunteers_count": 0,
-    "is_loaded": false
+    "is_loaded": false,
+    "type": "ward",
+    "view_level": "ward"
   },
   {
     "id": "ward_9",
@@ -195,7 +211,9 @@
     "total_kriya_count": 0,
     "kriya_percentage": 0.0,
     "volunteers_count": 0,
-    "is_loaded": false
+    "is_loaded": false,
+    "type": "ward",
+    "view_level": "ward"
   },
   {
     "id": "ward_10",
@@ -217,7 +235,9 @@
     "total_kriya_count": 0,
     "kriya_percentage": 0.0,
     "volunteers_count": 0,
-    "is_loaded": false
+    "is_loaded": false,
+    "type": "ward",
+    "view_level": "ward"
   },
   {
     "id": "ward_11",
@@ -239,7 +259,9 @@
     "total_kriya_count": 0,
     "kriya_percentage": 0.0,
     "volunteers_count": 0,
-    "is_loaded": false
+    "is_loaded": false,
+    "type": "ward",
+    "view_level": "ward"
   },
   {
     "id": "ward_12",
@@ -261,7 +283,9 @@
     "total_kriya_count": 0,
     "kriya_percentage": 0.0,
     "volunteers_count": 0,
-    "is_loaded": false
+    "is_loaded": false,
+    "type": "ward",
+    "view_level": "ward"
   },
   {
     "id": "ward_13",
@@ -283,7 +307,9 @@
     "total_kriya_count": 0,
     "kriya_percentage": 0.0,
     "volunteers_count": 0,
-    "is_loaded": false
+    "is_loaded": false,
+    "type": "ward",
+    "view_level": "ward"
   },
   {
     "id": "ward_14",
@@ -305,7 +331,9 @@
     "total_kriya_count": 239,
     "kriya_percentage": 19.0,
     "volunteers_count": 25,
-    "is_loaded": true
+    "is_loaded": true,
+    "type": "ward",
+    "view_level": "ward"
   },
   {
     "id": "ward_15",
@@ -327,7 +355,9 @@
     "total_kriya_count": 0,
     "kriya_percentage": 0.0,
     "volunteers_count": 0,
-    "is_loaded": false
+    "is_loaded": false,
+    "type": "ward",
+    "view_level": "ward"
   },
   {
     "id": "ward_16",
@@ -349,7 +379,9 @@
     "total_kriya_count": 0,
     "kriya_percentage": 0.0,
     "volunteers_count": 0,
-    "is_loaded": false
+    "is_loaded": false,
+    "type": "ward",
+    "view_level": "ward"
   },
   {
     "id": "ward_17",
@@ -371,7 +403,9 @@
     "total_kriya_count": 0,
     "kriya_percentage": 0.0,
     "volunteers_count": 0,
-    "is_loaded": false
+    "is_loaded": false,
+    "type": "ward",
+    "view_level": "ward"
   },
   {
     "id": "ward_18",
@@ -393,7 +427,9 @@
     "total_kriya_count": 0,
     "kriya_percentage": 0.0,
     "volunteers_count": 0,
-    "is_loaded": false
+    "is_loaded": false,
+    "type": "ward",
+    "view_level": "ward"
   },
   {
     "id": "ward_19",
@@ -415,7 +451,9 @@
     "total_kriya_count": 0,
     "kriya_percentage": 0.0,
     "volunteers_count": 0,
-    "is_loaded": false
+    "is_loaded": false,
+    "type": "ward",
+    "view_level": "ward"
   },
   {
     "id": "ward_20",
@@ -437,7 +475,9 @@
     "total_kriya_count": 0,
     "kriya_percentage": 0.0,
     "volunteers_count": 0,
-    "is_loaded": false
+    "is_loaded": false,
+    "type": "ward",
+    "view_level": "ward"
   },
   {
     "id": "ward_21",
@@ -459,7 +499,9 @@
     "total_kriya_count": 0,
     "kriya_percentage": 0.0,
     "volunteers_count": 0,
-    "is_loaded": false
+    "is_loaded": false,
+    "type": "ward",
+    "view_level": "ward"
   },
   {
     "id": "ward_22",
@@ -481,7 +523,9 @@
     "total_kriya_count": 0,
     "kriya_percentage": 0.0,
     "volunteers_count": 0,
-    "is_loaded": false
+    "is_loaded": false,
+    "type": "ward",
+    "view_level": "ward"
   },
   {
     "id": "ward_23",
@@ -503,7 +547,9 @@
     "total_kriya_count": 0,
     "kriya_percentage": 0.0,
     "volunteers_count": 0,
-    "is_loaded": false
+    "is_loaded": false,
+    "type": "ward",
+    "view_level": "ward"
   },
   {
     "id": "ward_24",
@@ -525,7 +571,9 @@
     "total_kriya_count": 0,
     "kriya_percentage": 0.0,
     "volunteers_count": 0,
-    "is_loaded": false
+    "is_loaded": false,
+    "type": "ward",
+    "view_level": "ward"
   },
   {
     "id": "ward_25",
@@ -547,7 +595,9 @@
     "total_kriya_count": 0,
     "kriya_percentage": 0.0,
     "volunteers_count": 0,
-    "is_loaded": false
+    "is_loaded": false,
+    "type": "ward",
+    "view_level": "ward"
   },
   {
     "id": "ward_26",
@@ -569,7 +619,9 @@
     "total_kriya_count": 0,
     "kriya_percentage": 0.0,
     "volunteers_count": 0,
-    "is_loaded": false
+    "is_loaded": false,
+    "type": "ward",
+    "view_level": "ward"
   },
   {
     "id": "ward_27",
@@ -591,7 +643,9 @@
     "total_kriya_count": 0,
     "kriya_percentage": 0.0,
     "volunteers_count": 0,
-    "is_loaded": false
+    "is_loaded": false,
+    "type": "ward",
+    "view_level": "ward"
   },
   {
     "id": "ward_28",
@@ -613,7 +667,9 @@
     "total_kriya_count": 0,
     "kriya_percentage": 0.0,
     "volunteers_count": 0,
-    "is_loaded": false
+    "is_loaded": false,
+    "type": "ward",
+    "view_level": "ward"
   },
   {
     "id": "ward_29",
@@ -635,7 +691,9 @@
     "total_kriya_count": 0,
     "kriya_percentage": 0.0,
     "volunteers_count": 0,
-    "is_loaded": false
+    "is_loaded": false,
+    "type": "ward",
+    "view_level": "ward"
   },
   {
     "id": "ward_30",
@@ -657,7 +715,9 @@
     "total_kriya_count": 0,
     "kriya_percentage": 0.0,
     "volunteers_count": 0,
-    "is_loaded": false
+    "is_loaded": false,
+    "type": "ward",
+    "view_level": "ward"
   },
   {
     "id": "gollaprolu_ward_1",
@@ -679,7 +739,9 @@
     "total_kriya_count": 0,
     "kriya_percentage": 0.0,
     "volunteers_count": 0,
-    "is_loaded": false
+    "is_loaded": false,
+    "type": "ward",
+    "view_level": "ward"
   },
   {
     "id": "gollaprolu_ward_2",
@@ -701,7 +763,9 @@
     "total_kriya_count": 0,
     "kriya_percentage": 0.0,
     "volunteers_count": 0,
-    "is_loaded": false
+    "is_loaded": false,
+    "type": "ward",
+    "view_level": "ward"
   },
   {
     "id": "gollaprolu_ward_3",
@@ -723,7 +787,9 @@
     "total_kriya_count": 0,
     "kriya_percentage": 0.0,
     "volunteers_count": 0,
-    "is_loaded": false
+    "is_loaded": false,
+    "type": "ward",
+    "view_level": "ward"
   },
   {
     "id": "gollaprolu_ward_4",
@@ -745,7 +811,9 @@
     "total_kriya_count": 0,
     "kriya_percentage": 0.0,
     "volunteers_count": 0,
-    "is_loaded": false
+    "is_loaded": false,
+    "type": "ward",
+    "view_level": "ward"
   },
   {
     "id": "gollaprolu_ward_5",
@@ -767,7 +835,9 @@
     "total_kriya_count": 0,
     "kriya_percentage": 0.0,
     "volunteers_count": 0,
-    "is_loaded": false
+    "is_loaded": false,
+    "type": "ward",
+    "view_level": "ward"
   },
   {
     "id": "gollaprolu_ward_6",
@@ -789,7 +859,9 @@
     "total_kriya_count": 0,
     "kriya_percentage": 0.0,
     "volunteers_count": 0,
-    "is_loaded": false
+    "is_loaded": false,
+    "type": "ward",
+    "view_level": "ward"
   },
   {
     "id": "gollaprolu_ward_7",
@@ -811,7 +883,9 @@
     "total_kriya_count": 0,
     "kriya_percentage": 0.0,
     "volunteers_count": 0,
-    "is_loaded": false
+    "is_loaded": false,
+    "type": "ward",
+    "view_level": "ward"
   },
   {
     "id": "gollaprolu_ward_8",
@@ -833,7 +907,9 @@
     "total_kriya_count": 0,
     "kriya_percentage": 0.0,
     "volunteers_count": 0,
-    "is_loaded": false
+    "is_loaded": false,
+    "type": "ward",
+    "view_level": "ward"
   },
   {
     "id": "gollaprolu_ward_9",
@@ -855,7 +931,9 @@
     "total_kriya_count": 0,
     "kriya_percentage": 0.0,
     "volunteers_count": 0,
-    "is_loaded": false
+    "is_loaded": false,
+    "type": "ward",
+    "view_level": "ward"
   },
   {
     "id": "gollaprolu_ward_10",
@@ -877,7 +955,9 @@
     "total_kriya_count": 0,
     "kriya_percentage": 0.0,
     "volunteers_count": 0,
-    "is_loaded": false
+    "is_loaded": false,
+    "type": "ward",
+    "view_level": "ward"
   },
   {
     "id": "gollaprolu_ward_11",
@@ -899,14 +979,16 @@
     "total_kriya_count": 168,
     "kriya_percentage": 17.0,
     "volunteers_count": 25,
-    "is_loaded": true
+    "is_loaded": true,
+    "type": "ward",
+    "view_level": "ward"
   },
   {
     "id": "gp_durgada",
     "part_no": "gp_durgada",
     "ward_no": 1,
     "election_type": "panchayat",
-    "category_label": "గ్రామ పంచాయతీ ఎన్నికలు (Gram Panchayat Polls)",
+    "category_label": "గ్రామ పంచాయతీ (సమగ్ర గ్రామం)",
     "local_body": "దుర్గడ గ్రామ పంచాయతీ (Durgada Gram Panchayat)",
     "mandal": "GOLLAPROLU",
     "village": "దుర్గడ సమగ్ర గ్రామ పంచాయతీ — సర్వ ఓటర్లు (MPTC 1 + MPTC 3)",
@@ -921,14 +1003,16 @@
     "total_kriya_count": 283,
     "kriya_percentage": 7.1,
     "volunteers_count": 103,
-    "is_loaded": true
+    "is_loaded": true,
+    "type": "village",
+    "view_level": "village"
   },
   {
     "id": "gp_vannepudi",
     "part_no": "gp_vannepudi",
     "ward_no": 1,
     "election_type": "panchayat",
-    "category_label": "గ్రామ పంచాయతీ ఎన్నికలు (Gram Panchayat Polls)",
+    "category_label": "గ్రామ పంచాయతీ (సమగ్ర గ్రామం)",
     "local_body": "వన్నెపూడి గ్రామ పంచాయతీ (Vannepudi Gram Panchayat)",
     "mandal": "GOLLAPROLU",
     "village": "వన్నెపూడి గ్రామ పంచాయతీ — సర్వ ఓటర్లు",
@@ -943,7 +1027,9 @@
     "total_kriya_count": 373,
     "kriya_percentage": 11.6,
     "volunteers_count": 48,
-    "is_loaded": true
+    "is_loaded": true,
+    "type": "village",
+    "view_level": "village"
   },
   {
     "id": "gollaprolu_ward_12",
@@ -965,7 +1051,9 @@
     "total_kriya_count": 0,
     "kriya_percentage": 0.0,
     "volunteers_count": 0,
-    "is_loaded": false
+    "is_loaded": false,
+    "type": "ward",
+    "view_level": "ward"
   },
   {
     "id": "gollaprolu_ward_13",
@@ -987,7 +1075,9 @@
     "total_kriya_count": 0,
     "kriya_percentage": 0.0,
     "volunteers_count": 0,
-    "is_loaded": false
+    "is_loaded": false,
+    "type": "ward",
+    "view_level": "ward"
   },
   {
     "id": "gollaprolu_ward_14",
@@ -1009,7 +1099,9 @@
     "total_kriya_count": 0,
     "kriya_percentage": 0.0,
     "volunteers_count": 0,
-    "is_loaded": false
+    "is_loaded": false,
+    "type": "ward",
+    "view_level": "ward"
   },
   {
     "id": "gollaprolu_ward_15",
@@ -1031,7 +1123,9 @@
     "total_kriya_count": 0,
     "kriya_percentage": 0.0,
     "volunteers_count": 0,
-    "is_loaded": false
+    "is_loaded": false,
+    "type": "ward",
+    "view_level": "ward"
   },
   {
     "id": "gollaprolu_ward_16",
@@ -1053,7 +1147,9 @@
     "total_kriya_count": 0,
     "kriya_percentage": 0.0,
     "volunteers_count": 0,
-    "is_loaded": false
+    "is_loaded": false,
+    "type": "ward",
+    "view_level": "ward"
   },
   {
     "id": "gollaprolu_ward_17",
@@ -1075,7 +1171,9 @@
     "total_kriya_count": 0,
     "kriya_percentage": 0.0,
     "volunteers_count": 0,
-    "is_loaded": false
+    "is_loaded": false,
+    "type": "ward",
+    "view_level": "ward"
   },
   {
     "id": "gollaprolu_ward_18",
@@ -1097,7 +1195,9 @@
     "total_kriya_count": 0,
     "kriya_percentage": 0.0,
     "volunteers_count": 0,
-    "is_loaded": false
+    "is_loaded": false,
+    "type": "ward",
+    "view_level": "ward"
   },
   {
     "id": "gollaprolu_ward_19",
@@ -1119,7 +1219,9 @@
     "total_kriya_count": 0,
     "kriya_percentage": 0.0,
     "volunteers_count": 0,
-    "is_loaded": false
+    "is_loaded": false,
+    "type": "ward",
+    "view_level": "ward"
   },
   {
     "id": "gollaprolu_ward_20",
@@ -1141,7 +1243,9 @@
     "total_kriya_count": 0,
     "kriya_percentage": 0.0,
     "volunteers_count": 0,
-    "is_loaded": false
+    "is_loaded": false,
+    "type": "ward",
+    "view_level": "ward"
   },
   {
     "id": "gp_chendurthi_w1",
@@ -1163,7 +1267,9 @@
     "total_kriya_count": 0,
     "kriya_percentage": 0.0,
     "volunteers_count": 0,
-    "is_loaded": false
+    "is_loaded": false,
+    "type": "ward",
+    "view_level": "ward"
   },
   {
     "id": "gp_chendurthi_w2",
@@ -1185,7 +1291,9 @@
     "total_kriya_count": 0,
     "kriya_percentage": 0.0,
     "volunteers_count": 0,
-    "is_loaded": false
+    "is_loaded": false,
+    "type": "ward",
+    "view_level": "ward"
   },
   {
     "id": "gp_chendurthi_w3",
@@ -1207,7 +1315,9 @@
     "total_kriya_count": 0,
     "kriya_percentage": 0.0,
     "volunteers_count": 0,
-    "is_loaded": false
+    "is_loaded": false,
+    "type": "ward",
+    "view_level": "ward"
   },
   {
     "id": "gp_chendurthi_w4",
@@ -1229,7 +1339,9 @@
     "total_kriya_count": 0,
     "kriya_percentage": 0.0,
     "volunteers_count": 0,
-    "is_loaded": false
+    "is_loaded": false,
+    "type": "ward",
+    "view_level": "ward"
   },
   {
     "id": "gp_chendurthi_w5",
@@ -1251,7 +1363,9 @@
     "total_kriya_count": 0,
     "kriya_percentage": 0.0,
     "volunteers_count": 0,
-    "is_loaded": false
+    "is_loaded": false,
+    "type": "ward",
+    "view_level": "ward"
   },
   {
     "id": "gp_chendurthi_w6",
@@ -1273,7 +1387,9 @@
     "total_kriya_count": 0,
     "kriya_percentage": 0.0,
     "volunteers_count": 0,
-    "is_loaded": false
+    "is_loaded": false,
+    "type": "ward",
+    "view_level": "ward"
   },
   {
     "id": "gp_chendurthi_w7",
@@ -1295,7 +1411,9 @@
     "total_kriya_count": 0,
     "kriya_percentage": 0.0,
     "volunteers_count": 0,
-    "is_loaded": false
+    "is_loaded": false,
+    "type": "ward",
+    "view_level": "ward"
   },
   {
     "id": "gp_chendurthi_w8",
@@ -1317,7 +1435,9 @@
     "total_kriya_count": 0,
     "kriya_percentage": 0.0,
     "volunteers_count": 0,
-    "is_loaded": false
+    "is_loaded": false,
+    "type": "ward",
+    "view_level": "ward"
   },
   {
     "id": "gp_chendurthi_w9",
@@ -1339,7 +1459,9 @@
     "total_kriya_count": 0,
     "kriya_percentage": 0.0,
     "volunteers_count": 0,
-    "is_loaded": false
+    "is_loaded": false,
+    "type": "ward",
+    "view_level": "ward"
   },
   {
     "id": "gp_chendurthi_w10",
@@ -1361,7 +1483,9 @@
     "total_kriya_count": 0,
     "kriya_percentage": 0.0,
     "volunteers_count": 0,
-    "is_loaded": false
+    "is_loaded": false,
+    "type": "ward",
+    "view_level": "ward"
   },
   {
     "id": "gp_chendurthi_w11",
@@ -1383,7 +1507,9 @@
     "total_kriya_count": 0,
     "kriya_percentage": 0.0,
     "volunteers_count": 0,
-    "is_loaded": false
+    "is_loaded": false,
+    "type": "ward",
+    "view_level": "ward"
   },
   {
     "id": "gp_chendurthi_w12",
@@ -1405,7 +1531,9 @@
     "total_kriya_count": 0,
     "kriya_percentage": 0.0,
     "volunteers_count": 0,
-    "is_loaded": false
+    "is_loaded": false,
+    "type": "ward",
+    "view_level": "ward"
   },
   {
     "id": "gp_kodavali_w1",
@@ -1427,7 +1555,9 @@
     "total_kriya_count": 0,
     "kriya_percentage": 0.0,
     "volunteers_count": 0,
-    "is_loaded": false
+    "is_loaded": false,
+    "type": "ward",
+    "view_level": "ward"
   },
   {
     "id": "gp_kodavali_w2",
@@ -1449,7 +1579,9 @@
     "total_kriya_count": 0,
     "kriya_percentage": 0.0,
     "volunteers_count": 0,
-    "is_loaded": false
+    "is_loaded": false,
+    "type": "ward",
+    "view_level": "ward"
   },
   {
     "id": "gp_kodavali_w3",
@@ -1471,7 +1603,9 @@
     "total_kriya_count": 0,
     "kriya_percentage": 0.0,
     "volunteers_count": 0,
-    "is_loaded": false
+    "is_loaded": false,
+    "type": "ward",
+    "view_level": "ward"
   },
   {
     "id": "gp_kodavali_w4",
@@ -1493,7 +1627,9 @@
     "total_kriya_count": 0,
     "kriya_percentage": 0.0,
     "volunteers_count": 0,
-    "is_loaded": false
+    "is_loaded": false,
+    "type": "ward",
+    "view_level": "ward"
   },
   {
     "id": "gp_kodavali_w5",
@@ -1515,7 +1651,9 @@
     "total_kriya_count": 0,
     "kriya_percentage": 0.0,
     "volunteers_count": 0,
-    "is_loaded": false
+    "is_loaded": false,
+    "type": "ward",
+    "view_level": "ward"
   },
   {
     "id": "gp_kodavali_w6",
@@ -1537,7 +1675,9 @@
     "total_kriya_count": 0,
     "kriya_percentage": 0.0,
     "volunteers_count": 0,
-    "is_loaded": false
+    "is_loaded": false,
+    "type": "ward",
+    "view_level": "ward"
   },
   {
     "id": "gp_kodavali_w7",
@@ -1559,7 +1699,9 @@
     "total_kriya_count": 0,
     "kriya_percentage": 0.0,
     "volunteers_count": 0,
-    "is_loaded": false
+    "is_loaded": false,
+    "type": "ward",
+    "view_level": "ward"
   },
   {
     "id": "gp_kodavali_w8",
@@ -1581,7 +1723,9 @@
     "total_kriya_count": 0,
     "kriya_percentage": 0.0,
     "volunteers_count": 0,
-    "is_loaded": false
+    "is_loaded": false,
+    "type": "ward",
+    "view_level": "ward"
   },
   {
     "id": "gp_kodavali_w9",
@@ -1603,7 +1747,9 @@
     "total_kriya_count": 0,
     "kriya_percentage": 0.0,
     "volunteers_count": 0,
-    "is_loaded": false
+    "is_loaded": false,
+    "type": "ward",
+    "view_level": "ward"
   },
   {
     "id": "gp_kodavali_w10",
@@ -1625,7 +1771,9 @@
     "total_kriya_count": 0,
     "kriya_percentage": 0.0,
     "volunteers_count": 0,
-    "is_loaded": false
+    "is_loaded": false,
+    "type": "ward",
+    "view_level": "ward"
   },
   {
     "id": "gp_kodavali_w11",
@@ -1647,7 +1795,9 @@
     "total_kriya_count": 0,
     "kriya_percentage": 0.0,
     "volunteers_count": 0,
-    "is_loaded": false
+    "is_loaded": false,
+    "type": "ward",
+    "view_level": "ward"
   },
   {
     "id": "gp_kodavali_w12",
@@ -1669,7 +1819,9 @@
     "total_kriya_count": 0,
     "kriya_percentage": 0.0,
     "volunteers_count": 0,
-    "is_loaded": false
+    "is_loaded": false,
+    "type": "ward",
+    "view_level": "ward"
   },
   {
     "id": "gp_kodavali_w13",
@@ -1691,7 +1843,9 @@
     "total_kriya_count": 0,
     "kriya_percentage": 0.0,
     "volunteers_count": 0,
-    "is_loaded": false
+    "is_loaded": false,
+    "type": "ward",
+    "view_level": "ward"
   },
   {
     "id": "gp_kodavali_w14",
@@ -1713,7 +1867,9 @@
     "total_kriya_count": 0,
     "kriya_percentage": 0.0,
     "volunteers_count": 0,
-    "is_loaded": false
+    "is_loaded": false,
+    "type": "ward",
+    "view_level": "ward"
   },
   {
     "id": "gp_durgada_w1",
@@ -1726,8 +1882,8 @@
     "village": "దుర్గడ — వార్డు #1",
     "clean_village": "దుర్గడ వార్డు 1",
     "ps_address": "దుర్గడ గ్రామ పంచాయతీ 1వ వార్డు",
-    "sections": "దుర్గడ వార్డు 1 వీధులు",
-    "total_voters": 0,
+    "sections": "దుర్గడ వార్డు 1 విభాగాలు (530 ఓటర్లు)",
+    "total_voters": 530,
     "male_count": 0,
     "female_count": 0,
     "exact_kriya_count": 0,
@@ -1735,7 +1891,9 @@
     "total_kriya_count": 0,
     "kriya_percentage": 0.0,
     "volunteers_count": 0,
-    "is_loaded": false
+    "is_loaded": true,
+    "type": "ward",
+    "view_level": "ward"
   },
   {
     "id": "gp_durgada_w2",
@@ -1748,8 +1906,8 @@
     "village": "దుర్గడ — వార్డు #2",
     "clean_village": "దుర్గడ వార్డు 2",
     "ps_address": "దుర్గడ గ్రామ పంచాయతీ 2వ వార్డు",
-    "sections": "దుర్గడ వార్డు 2 వీధులు",
-    "total_voters": 0,
+    "sections": "దుర్గడ వార్డు 2 విభాగాలు (530 ఓటర్లు)",
+    "total_voters": 530,
     "male_count": 0,
     "female_count": 0,
     "exact_kriya_count": 0,
@@ -1757,7 +1915,9 @@
     "total_kriya_count": 0,
     "kriya_percentage": 0.0,
     "volunteers_count": 0,
-    "is_loaded": false
+    "is_loaded": true,
+    "type": "ward",
+    "view_level": "ward"
   },
   {
     "id": "gp_durgada_w3",
@@ -1770,8 +1930,8 @@
     "village": "దుర్గడ — వార్డు #3",
     "clean_village": "దుర్గడ వార్డు 3",
     "ps_address": "దుర్గడ గ్రామ పంచాయతీ 3వ వార్డు",
-    "sections": "దుర్గడ వార్డు 3 వీధులు",
-    "total_voters": 0,
+    "sections": "దుర్గడ వార్డు 3 విభాగాలు (530 ఓటర్లు)",
+    "total_voters": 530,
     "male_count": 0,
     "female_count": 0,
     "exact_kriya_count": 0,
@@ -1779,7 +1939,9 @@
     "total_kriya_count": 0,
     "kriya_percentage": 0.0,
     "volunteers_count": 0,
-    "is_loaded": false
+    "is_loaded": true,
+    "type": "ward",
+    "view_level": "ward"
   },
   {
     "id": "gp_durgada_w4",
@@ -1792,8 +1954,8 @@
     "village": "దుర్గడ — వార్డు #4",
     "clean_village": "దుర్గడ వార్డు 4",
     "ps_address": "దుర్గడ గ్రామ పంచాయతీ 4వ వార్డు",
-    "sections": "దుర్గడ వార్డు 4 వీధులు",
-    "total_voters": 0,
+    "sections": "దుర్గడ వార్డు 4 విభాగాలు (530 ఓటర్లు)",
+    "total_voters": 530,
     "male_count": 0,
     "female_count": 0,
     "exact_kriya_count": 0,
@@ -1801,7 +1963,9 @@
     "total_kriya_count": 0,
     "kriya_percentage": 0.0,
     "volunteers_count": 0,
-    "is_loaded": false
+    "is_loaded": true,
+    "type": "ward",
+    "view_level": "ward"
   },
   {
     "id": "gp_durgada_w5",
@@ -1814,8 +1978,8 @@
     "village": "దుర్గడ — వార్డు #5",
     "clean_village": "దుర్గడ వార్డు 5",
     "ps_address": "దుర్గడ గ్రామ పంచాయతీ 5వ వార్డు",
-    "sections": "దుర్గడ వార్డు 5 వీధులు",
-    "total_voters": 0,
+    "sections": "దుర్గడ వార్డు 5 విభాగాలు (530 ఓటర్లు)",
+    "total_voters": 530,
     "male_count": 0,
     "female_count": 0,
     "exact_kriya_count": 0,
@@ -1823,7 +1987,9 @@
     "total_kriya_count": 0,
     "kriya_percentage": 0.0,
     "volunteers_count": 0,
-    "is_loaded": false
+    "is_loaded": true,
+    "type": "ward",
+    "view_level": "ward"
   },
   {
     "id": "gp_durgada_w6",
@@ -1845,7 +2011,9 @@
     "total_kriya_count": 0,
     "kriya_percentage": 0.0,
     "volunteers_count": 0,
-    "is_loaded": true
+    "is_loaded": true,
+    "type": "ward",
+    "view_level": "ward"
   },
   {
     "id": "gp_durgada_w7",
@@ -1867,7 +2035,9 @@
     "total_kriya_count": 0,
     "kriya_percentage": 0.0,
     "volunteers_count": 0,
-    "is_loaded": true
+    "is_loaded": true,
+    "type": "ward",
+    "view_level": "ward"
   },
   {
     "id": "gp_durgada_w8",
@@ -1889,7 +2059,9 @@
     "total_kriya_count": 0,
     "kriya_percentage": 0.0,
     "volunteers_count": 0,
-    "is_loaded": true
+    "is_loaded": true,
+    "type": "ward",
+    "view_level": "ward"
   },
   {
     "id": "gp_durgada_w9",
@@ -1911,7 +2083,9 @@
     "total_kriya_count": 0,
     "kriya_percentage": 0.0,
     "volunteers_count": 0,
-    "is_loaded": true
+    "is_loaded": true,
+    "type": "ward",
+    "view_level": "ward"
   },
   {
     "id": "gp_durgada_w10",
@@ -1933,7 +2107,9 @@
     "total_kriya_count": 0,
     "kriya_percentage": 0.0,
     "volunteers_count": 0,
-    "is_loaded": true
+    "is_loaded": true,
+    "type": "ward",
+    "view_level": "ward"
   },
   {
     "id": "gp_durgada_w11",
@@ -1955,7 +2131,9 @@
     "total_kriya_count": 0,
     "kriya_percentage": 0.0,
     "volunteers_count": 0,
-    "is_loaded": true
+    "is_loaded": true,
+    "type": "ward",
+    "view_level": "ward"
   },
   {
     "id": "gp_durgada_w12",
@@ -1977,7 +2155,9 @@
     "total_kriya_count": 0,
     "kriya_percentage": 0.0,
     "volunteers_count": 0,
-    "is_loaded": true
+    "is_loaded": true,
+    "type": "ward",
+    "view_level": "ward"
   },
   {
     "id": "gp_durgada_w13",
@@ -1999,7 +2179,9 @@
     "total_kriya_count": 0,
     "kriya_percentage": 0.0,
     "volunteers_count": 0,
-    "is_loaded": true
+    "is_loaded": true,
+    "type": "ward",
+    "view_level": "ward"
   },
   {
     "id": "gp_durgada_w14",
@@ -2021,7 +2203,9 @@
     "total_kriya_count": 0,
     "kriya_percentage": 0.0,
     "volunteers_count": 0,
-    "is_loaded": true
+    "is_loaded": true,
+    "type": "ward",
+    "view_level": "ward"
   },
   {
     "id": "gp_vannepudi_w1",
@@ -2043,7 +2227,9 @@
     "total_kriya_count": 0,
     "kriya_percentage": 0.0,
     "volunteers_count": 0,
-    "is_loaded": false
+    "is_loaded": false,
+    "type": "ward",
+    "view_level": "ward"
   },
   {
     "id": "gp_vannepudi_w2",
@@ -2065,7 +2251,9 @@
     "total_kriya_count": 0,
     "kriya_percentage": 0.0,
     "volunteers_count": 0,
-    "is_loaded": false
+    "is_loaded": false,
+    "type": "ward",
+    "view_level": "ward"
   },
   {
     "id": "gp_vannepudi_w3",
@@ -2087,7 +2275,9 @@
     "total_kriya_count": 0,
     "kriya_percentage": 0.0,
     "volunteers_count": 0,
-    "is_loaded": false
+    "is_loaded": false,
+    "type": "ward",
+    "view_level": "ward"
   },
   {
     "id": "gp_vannepudi_w4",
@@ -2109,7 +2299,9 @@
     "total_kriya_count": 0,
     "kriya_percentage": 0.0,
     "volunteers_count": 0,
-    "is_loaded": false
+    "is_loaded": false,
+    "type": "ward",
+    "view_level": "ward"
   },
   {
     "id": "gp_vannepudi_w5",
@@ -2131,7 +2323,9 @@
     "total_kriya_count": 0,
     "kriya_percentage": 0.0,
     "volunteers_count": 0,
-    "is_loaded": false
+    "is_loaded": false,
+    "type": "ward",
+    "view_level": "ward"
   },
   {
     "id": "gp_vannepudi_w6",
@@ -2153,7 +2347,9 @@
     "total_kriya_count": 0,
     "kriya_percentage": 0.0,
     "volunteers_count": 0,
-    "is_loaded": false
+    "is_loaded": false,
+    "type": "ward",
+    "view_level": "ward"
   },
   {
     "id": "gp_vannepudi_w7",
@@ -2175,7 +2371,9 @@
     "total_kriya_count": 0,
     "kriya_percentage": 0.0,
     "volunteers_count": 0,
-    "is_loaded": false
+    "is_loaded": false,
+    "type": "ward",
+    "view_level": "ward"
   },
   {
     "id": "gp_vannepudi_w8",
@@ -2197,7 +2395,9 @@
     "total_kriya_count": 0,
     "kriya_percentage": 0.0,
     "volunteers_count": 0,
-    "is_loaded": false
+    "is_loaded": false,
+    "type": "ward",
+    "view_level": "ward"
   },
   {
     "id": "gp_vannepudi_w9",
@@ -2219,7 +2419,9 @@
     "total_kriya_count": 0,
     "kriya_percentage": 0.0,
     "volunteers_count": 0,
-    "is_loaded": false
+    "is_loaded": false,
+    "type": "ward",
+    "view_level": "ward"
   },
   {
     "id": "gp_vannepudi_w10",
@@ -2241,7 +2443,9 @@
     "total_kriya_count": 0,
     "kriya_percentage": 0.0,
     "volunteers_count": 0,
-    "is_loaded": false
+    "is_loaded": false,
+    "type": "ward",
+    "view_level": "ward"
   },
   {
     "id": "gp_mallavaram_w1",
@@ -2263,7 +2467,9 @@
     "total_kriya_count": 0,
     "kriya_percentage": 0.0,
     "volunteers_count": 0,
-    "is_loaded": false
+    "is_loaded": false,
+    "type": "ward",
+    "view_level": "ward"
   },
   {
     "id": "gp_mallavaram_w2",
@@ -2285,7 +2491,9 @@
     "total_kriya_count": 0,
     "kriya_percentage": 0.0,
     "volunteers_count": 0,
-    "is_loaded": false
+    "is_loaded": false,
+    "type": "ward",
+    "view_level": "ward"
   },
   {
     "id": "gp_mallavaram_w3",
@@ -2307,7 +2515,9 @@
     "total_kriya_count": 0,
     "kriya_percentage": 0.0,
     "volunteers_count": 0,
-    "is_loaded": false
+    "is_loaded": false,
+    "type": "ward",
+    "view_level": "ward"
   },
   {
     "id": "gp_mallavaram_w4",
@@ -2329,7 +2539,9 @@
     "total_kriya_count": 0,
     "kriya_percentage": 0.0,
     "volunteers_count": 0,
-    "is_loaded": false
+    "is_loaded": false,
+    "type": "ward",
+    "view_level": "ward"
   },
   {
     "id": "gp_mallavaram_w5",
@@ -2351,7 +2563,9 @@
     "total_kriya_count": 0,
     "kriya_percentage": 0.0,
     "volunteers_count": 0,
-    "is_loaded": false
+    "is_loaded": false,
+    "type": "ward",
+    "view_level": "ward"
   },
   {
     "id": "gp_mallavaram_w6",
@@ -2373,7 +2587,9 @@
     "total_kriya_count": 0,
     "kriya_percentage": 0.0,
     "volunteers_count": 0,
-    "is_loaded": false
+    "is_loaded": false,
+    "type": "ward",
+    "view_level": "ward"
   },
   {
     "id": "gp_mallavaram_w7",
@@ -2395,7 +2611,9 @@
     "total_kriya_count": 0,
     "kriya_percentage": 0.0,
     "volunteers_count": 0,
-    "is_loaded": false
+    "is_loaded": false,
+    "type": "ward",
+    "view_level": "ward"
   },
   {
     "id": "gp_mallavaram_w8",
@@ -2417,7 +2635,9 @@
     "total_kriya_count": 0,
     "kriya_percentage": 0.0,
     "volunteers_count": 0,
-    "is_loaded": false
+    "is_loaded": false,
+    "type": "ward",
+    "view_level": "ward"
   },
   {
     "id": "gp_mallavaram_w9",
@@ -2439,7 +2659,9 @@
     "total_kriya_count": 0,
     "kriya_percentage": 0.0,
     "volunteers_count": 0,
-    "is_loaded": false
+    "is_loaded": false,
+    "type": "ward",
+    "view_level": "ward"
   },
   {
     "id": "gp_mallavaram_w10",
@@ -2461,7 +2683,9 @@
     "total_kriya_count": 0,
     "kriya_percentage": 0.0,
     "volunteers_count": 0,
-    "is_loaded": false
+    "is_loaded": false,
+    "type": "ward",
+    "view_level": "ward"
   },
   {
     "id": "gp_bhogapuram_w1",
@@ -2483,7 +2707,9 @@
     "total_kriya_count": 0,
     "kriya_percentage": 0.0,
     "volunteers_count": 0,
-    "is_loaded": false
+    "is_loaded": false,
+    "type": "ward",
+    "view_level": "ward"
   },
   {
     "id": "gp_bhogapuram_w2",
@@ -2505,7 +2731,9 @@
     "total_kriya_count": 0,
     "kriya_percentage": 0.0,
     "volunteers_count": 0,
-    "is_loaded": false
+    "is_loaded": false,
+    "type": "ward",
+    "view_level": "ward"
   },
   {
     "id": "gp_bhogapuram_w3",
@@ -2527,7 +2755,9 @@
     "total_kriya_count": 0,
     "kriya_percentage": 0.0,
     "volunteers_count": 0,
-    "is_loaded": false
+    "is_loaded": false,
+    "type": "ward",
+    "view_level": "ward"
   },
   {
     "id": "gp_bhogapuram_w4",
@@ -2549,7 +2779,9 @@
     "total_kriya_count": 0,
     "kriya_percentage": 0.0,
     "volunteers_count": 0,
-    "is_loaded": false
+    "is_loaded": false,
+    "type": "ward",
+    "view_level": "ward"
   },
   {
     "id": "gp_bhogapuram_w5",
@@ -2571,7 +2803,9 @@
     "total_kriya_count": 0,
     "kriya_percentage": 0.0,
     "volunteers_count": 0,
-    "is_loaded": false
+    "is_loaded": false,
+    "type": "ward",
+    "view_level": "ward"
   },
   {
     "id": "gp_bhogapuram_w6",
@@ -2593,7 +2827,9 @@
     "total_kriya_count": 0,
     "kriya_percentage": 0.0,
     "volunteers_count": 0,
-    "is_loaded": false
+    "is_loaded": false,
+    "type": "ward",
+    "view_level": "ward"
   },
   {
     "id": "gp_bhogapuram_w7",
@@ -2615,7 +2851,9 @@
     "total_kriya_count": 0,
     "kriya_percentage": 0.0,
     "volunteers_count": 0,
-    "is_loaded": false
+    "is_loaded": false,
+    "type": "ward",
+    "view_level": "ward"
   },
   {
     "id": "gp_bhogapuram_w8",
@@ -2637,7 +2875,9 @@
     "total_kriya_count": 0,
     "kriya_percentage": 0.0,
     "volunteers_count": 0,
-    "is_loaded": false
+    "is_loaded": false,
+    "type": "ward",
+    "view_level": "ward"
   },
   {
     "id": "gp_bhogapuram_w9",
@@ -2659,7 +2899,9 @@
     "total_kriya_count": 0,
     "kriya_percentage": 0.0,
     "volunteers_count": 0,
-    "is_loaded": false
+    "is_loaded": false,
+    "type": "ward",
+    "view_level": "ward"
   },
   {
     "id": "gp_bhogapuram_w10",
@@ -2681,7 +2923,9 @@
     "total_kriya_count": 0,
     "kriya_percentage": 0.0,
     "volunteers_count": 0,
-    "is_loaded": false
+    "is_loaded": false,
+    "type": "ward",
+    "view_level": "ward"
   },
   {
     "id": "gp_chitrada_w1",
@@ -2703,7 +2947,9 @@
     "total_kriya_count": 0,
     "kriya_percentage": 0.0,
     "volunteers_count": 0,
-    "is_loaded": false
+    "is_loaded": false,
+    "type": "ward",
+    "view_level": "ward"
   },
   {
     "id": "gp_chitrada_w2",
@@ -2725,7 +2971,9 @@
     "total_kriya_count": 0,
     "kriya_percentage": 0.0,
     "volunteers_count": 0,
-    "is_loaded": false
+    "is_loaded": false,
+    "type": "ward",
+    "view_level": "ward"
   },
   {
     "id": "gp_chitrada_w3",
@@ -2747,7 +2995,9 @@
     "total_kriya_count": 0,
     "kriya_percentage": 0.0,
     "volunteers_count": 0,
-    "is_loaded": false
+    "is_loaded": false,
+    "type": "ward",
+    "view_level": "ward"
   },
   {
     "id": "gp_chitrada_w4",
@@ -2769,7 +3019,9 @@
     "total_kriya_count": 0,
     "kriya_percentage": 0.0,
     "volunteers_count": 0,
-    "is_loaded": false
+    "is_loaded": false,
+    "type": "ward",
+    "view_level": "ward"
   },
   {
     "id": "gp_chitrada_w5",
@@ -2791,7 +3043,9 @@
     "total_kriya_count": 0,
     "kriya_percentage": 0.0,
     "volunteers_count": 0,
-    "is_loaded": false
+    "is_loaded": false,
+    "type": "ward",
+    "view_level": "ward"
   },
   {
     "id": "gp_chitrada_w6",
@@ -2813,7 +3067,9 @@
     "total_kriya_count": 0,
     "kriya_percentage": 0.0,
     "volunteers_count": 0,
-    "is_loaded": false
+    "is_loaded": false,
+    "type": "ward",
+    "view_level": "ward"
   },
   {
     "id": "gp_chitrada_w7",
@@ -2835,7 +3091,9 @@
     "total_kriya_count": 0,
     "kriya_percentage": 0.0,
     "volunteers_count": 0,
-    "is_loaded": false
+    "is_loaded": false,
+    "type": "ward",
+    "view_level": "ward"
   },
   {
     "id": "gp_chitrada_w8",
@@ -2857,7 +3115,9 @@
     "total_kriya_count": 0,
     "kriya_percentage": 0.0,
     "volunteers_count": 0,
-    "is_loaded": false
+    "is_loaded": false,
+    "type": "ward",
+    "view_level": "ward"
   },
   {
     "id": "gp_chitrada_w9",
@@ -2879,7 +3139,9 @@
     "total_kriya_count": 0,
     "kriya_percentage": 0.0,
     "volunteers_count": 0,
-    "is_loaded": false
+    "is_loaded": false,
+    "type": "ward",
+    "view_level": "ward"
   },
   {
     "id": "gp_chitrada_w10",
@@ -2901,7 +3163,9 @@
     "total_kriya_count": 0,
     "kriya_percentage": 0.0,
     "volunteers_count": 0,
-    "is_loaded": false
+    "is_loaded": false,
+    "type": "ward",
+    "view_level": "ward"
   },
   {
     "id": "gp_chitrada_w11",
@@ -2923,7 +3187,9 @@
     "total_kriya_count": 0,
     "kriya_percentage": 0.0,
     "volunteers_count": 0,
-    "is_loaded": false
+    "is_loaded": false,
+    "type": "ward",
+    "view_level": "ward"
   },
   {
     "id": "gp_chitrada_w12",
@@ -2945,7 +3211,9 @@
     "total_kriya_count": 0,
     "kriya_percentage": 0.0,
     "volunteers_count": 0,
-    "is_loaded": false
+    "is_loaded": false,
+    "type": "ward",
+    "view_level": "ward"
   },
   {
     "id": "gp_jamulapalli_w1",
@@ -2967,7 +3235,9 @@
     "total_kriya_count": 0,
     "kriya_percentage": 0.0,
     "volunteers_count": 0,
-    "is_loaded": false
+    "is_loaded": false,
+    "type": "ward",
+    "view_level": "ward"
   },
   {
     "id": "gp_jamulapalli_w2",
@@ -2989,7 +3259,9 @@
     "total_kriya_count": 0,
     "kriya_percentage": 0.0,
     "volunteers_count": 0,
-    "is_loaded": false
+    "is_loaded": false,
+    "type": "ward",
+    "view_level": "ward"
   },
   {
     "id": "gp_jamulapalli_w3",
@@ -3011,7 +3283,9 @@
     "total_kriya_count": 0,
     "kriya_percentage": 0.0,
     "volunteers_count": 0,
-    "is_loaded": false
+    "is_loaded": false,
+    "type": "ward",
+    "view_level": "ward"
   },
   {
     "id": "gp_jamulapalli_w4",
@@ -3033,7 +3307,9 @@
     "total_kriya_count": 0,
     "kriya_percentage": 0.0,
     "volunteers_count": 0,
-    "is_loaded": false
+    "is_loaded": false,
+    "type": "ward",
+    "view_level": "ward"
   },
   {
     "id": "gp_jamulapalli_w5",
@@ -3055,7 +3331,9 @@
     "total_kriya_count": 0,
     "kriya_percentage": 0.0,
     "volunteers_count": 0,
-    "is_loaded": false
+    "is_loaded": false,
+    "type": "ward",
+    "view_level": "ward"
   },
   {
     "id": "gp_jamulapalli_w6",
@@ -3077,7 +3355,9 @@
     "total_kriya_count": 0,
     "kriya_percentage": 0.0,
     "volunteers_count": 0,
-    "is_loaded": false
+    "is_loaded": false,
+    "type": "ward",
+    "view_level": "ward"
   },
   {
     "id": "gp_jamulapalli_w7",
@@ -3099,7 +3379,9 @@
     "total_kriya_count": 0,
     "kriya_percentage": 0.0,
     "volunteers_count": 0,
-    "is_loaded": false
+    "is_loaded": false,
+    "type": "ward",
+    "view_level": "ward"
   },
   {
     "id": "gp_jamulapalli_w8",
@@ -3121,7 +3403,9 @@
     "total_kriya_count": 0,
     "kriya_percentage": 0.0,
     "volunteers_count": 0,
-    "is_loaded": false
+    "is_loaded": false,
+    "type": "ward",
+    "view_level": "ward"
   },
   {
     "id": "gp_jamulapalli_w9",
@@ -3143,7 +3427,9 @@
     "total_kriya_count": 0,
     "kriya_percentage": 0.0,
     "volunteers_count": 0,
-    "is_loaded": false
+    "is_loaded": false,
+    "type": "ward",
+    "view_level": "ward"
   },
   {
     "id": "gp_jamulapalli_w10",
@@ -3165,7 +3451,9 @@
     "total_kriya_count": 0,
     "kriya_percentage": 0.0,
     "volunteers_count": 0,
-    "is_loaded": false
+    "is_loaded": false,
+    "type": "ward",
+    "view_level": "ward"
   },
   {
     "id": "gp_kumarapuram_w1",
@@ -3187,7 +3475,9 @@
     "total_kriya_count": 0,
     "kriya_percentage": 0.0,
     "volunteers_count": 0,
-    "is_loaded": false
+    "is_loaded": false,
+    "type": "ward",
+    "view_level": "ward"
   },
   {
     "id": "gp_kumarapuram_w2",
@@ -3209,7 +3499,9 @@
     "total_kriya_count": 0,
     "kriya_percentage": 0.0,
     "volunteers_count": 0,
-    "is_loaded": false
+    "is_loaded": false,
+    "type": "ward",
+    "view_level": "ward"
   },
   {
     "id": "gp_kumarapuram_w3",
@@ -3231,7 +3523,9 @@
     "total_kriya_count": 0,
     "kriya_percentage": 0.0,
     "volunteers_count": 0,
-    "is_loaded": false
+    "is_loaded": false,
+    "type": "ward",
+    "view_level": "ward"
   },
   {
     "id": "gp_kumarapuram_w4",
@@ -3253,7 +3547,9 @@
     "total_kriya_count": 0,
     "kriya_percentage": 0.0,
     "volunteers_count": 0,
-    "is_loaded": false
+    "is_loaded": false,
+    "type": "ward",
+    "view_level": "ward"
   },
   {
     "id": "gp_kumarapuram_w5",
@@ -3275,7 +3571,9 @@
     "total_kriya_count": 0,
     "kriya_percentage": 0.0,
     "volunteers_count": 0,
-    "is_loaded": false
+    "is_loaded": false,
+    "type": "ward",
+    "view_level": "ward"
   },
   {
     "id": "gp_kumarapuram_w6",
@@ -3297,7 +3595,9 @@
     "total_kriya_count": 0,
     "kriya_percentage": 0.0,
     "volunteers_count": 0,
-    "is_loaded": false
+    "is_loaded": false,
+    "type": "ward",
+    "view_level": "ward"
   },
   {
     "id": "gp_kumarapuram_w7",
@@ -3319,7 +3619,9 @@
     "total_kriya_count": 0,
     "kriya_percentage": 0.0,
     "volunteers_count": 0,
-    "is_loaded": false
+    "is_loaded": false,
+    "type": "ward",
+    "view_level": "ward"
   },
   {
     "id": "gp_kumarapuram_w8",
@@ -3341,7 +3643,9 @@
     "total_kriya_count": 0,
     "kriya_percentage": 0.0,
     "volunteers_count": 0,
-    "is_loaded": false
+    "is_loaded": false,
+    "type": "ward",
+    "view_level": "ward"
   },
   {
     "id": "gp_kumarapuram_w9",
@@ -3363,7 +3667,9 @@
     "total_kriya_count": 0,
     "kriya_percentage": 0.0,
     "volunteers_count": 0,
-    "is_loaded": false
+    "is_loaded": false,
+    "type": "ward",
+    "view_level": "ward"
   },
   {
     "id": "gp_kumarapuram_w10",
@@ -3385,7 +3691,9 @@
     "total_kriya_count": 0,
     "kriya_percentage": 0.0,
     "volunteers_count": 0,
-    "is_loaded": false
+    "is_loaded": false,
+    "type": "ward",
+    "view_level": "ward"
   },
   {
     "id": "gp_mallam_w1",
@@ -3407,7 +3715,9 @@
     "total_kriya_count": 0,
     "kriya_percentage": 0.0,
     "volunteers_count": 0,
-    "is_loaded": false
+    "is_loaded": false,
+    "type": "ward",
+    "view_level": "ward"
   },
   {
     "id": "gp_mallam_w2",
@@ -3429,7 +3739,9 @@
     "total_kriya_count": 0,
     "kriya_percentage": 0.0,
     "volunteers_count": 0,
-    "is_loaded": false
+    "is_loaded": false,
+    "type": "ward",
+    "view_level": "ward"
   },
   {
     "id": "gp_mallam_w3",
@@ -3451,7 +3763,9 @@
     "total_kriya_count": 0,
     "kriya_percentage": 0.0,
     "volunteers_count": 0,
-    "is_loaded": false
+    "is_loaded": false,
+    "type": "ward",
+    "view_level": "ward"
   },
   {
     "id": "gp_mallam_w4",
@@ -3473,7 +3787,9 @@
     "total_kriya_count": 0,
     "kriya_percentage": 0.0,
     "volunteers_count": 0,
-    "is_loaded": false
+    "is_loaded": false,
+    "type": "ward",
+    "view_level": "ward"
   },
   {
     "id": "gp_mallam_w5",
@@ -3495,7 +3811,9 @@
     "total_kriya_count": 0,
     "kriya_percentage": 0.0,
     "volunteers_count": 0,
-    "is_loaded": false
+    "is_loaded": false,
+    "type": "ward",
+    "view_level": "ward"
   },
   {
     "id": "gp_mallam_w6",
@@ -3517,7 +3835,9 @@
     "total_kriya_count": 0,
     "kriya_percentage": 0.0,
     "volunteers_count": 0,
-    "is_loaded": false
+    "is_loaded": false,
+    "type": "ward",
+    "view_level": "ward"
   },
   {
     "id": "gp_mallam_w7",
@@ -3539,7 +3859,9 @@
     "total_kriya_count": 0,
     "kriya_percentage": 0.0,
     "volunteers_count": 0,
-    "is_loaded": false
+    "is_loaded": false,
+    "type": "ward",
+    "view_level": "ward"
   },
   {
     "id": "gp_mallam_w8",
@@ -3561,7 +3883,9 @@
     "total_kriya_count": 0,
     "kriya_percentage": 0.0,
     "volunteers_count": 0,
-    "is_loaded": false
+    "is_loaded": false,
+    "type": "ward",
+    "view_level": "ward"
   },
   {
     "id": "gp_mallam_w9",
@@ -3583,7 +3907,9 @@
     "total_kriya_count": 0,
     "kriya_percentage": 0.0,
     "volunteers_count": 0,
-    "is_loaded": false
+    "is_loaded": false,
+    "type": "ward",
+    "view_level": "ward"
   },
   {
     "id": "gp_mallam_w10",
@@ -3605,7 +3931,9 @@
     "total_kriya_count": 0,
     "kriya_percentage": 0.0,
     "volunteers_count": 0,
-    "is_loaded": false
+    "is_loaded": false,
+    "type": "ward",
+    "view_level": "ward"
   },
   {
     "id": "gp_mallam_w11",
@@ -3627,7 +3955,9 @@
     "total_kriya_count": 0,
     "kriya_percentage": 0.0,
     "volunteers_count": 0,
-    "is_loaded": false
+    "is_loaded": false,
+    "type": "ward",
+    "view_level": "ward"
   },
   {
     "id": "gp_mallam_w12",
@@ -3649,7 +3979,9 @@
     "total_kriya_count": 0,
     "kriya_percentage": 0.0,
     "volunteers_count": 0,
-    "is_loaded": false
+    "is_loaded": false,
+    "type": "ward",
+    "view_level": "ward"
   },
   {
     "id": "gp_virava_w1",
@@ -3671,7 +4003,9 @@
     "total_kriya_count": 0,
     "kriya_percentage": 0.0,
     "volunteers_count": 0,
-    "is_loaded": false
+    "is_loaded": false,
+    "type": "ward",
+    "view_level": "ward"
   },
   {
     "id": "gp_virava_w2",
@@ -3693,7 +4027,9 @@
     "total_kriya_count": 0,
     "kriya_percentage": 0.0,
     "volunteers_count": 0,
-    "is_loaded": false
+    "is_loaded": false,
+    "type": "ward",
+    "view_level": "ward"
   },
   {
     "id": "gp_virava_w3",
@@ -3715,7 +4051,9 @@
     "total_kriya_count": 0,
     "kriya_percentage": 0.0,
     "volunteers_count": 0,
-    "is_loaded": false
+    "is_loaded": false,
+    "type": "ward",
+    "view_level": "ward"
   },
   {
     "id": "gp_virava_w4",
@@ -3737,7 +4075,9 @@
     "total_kriya_count": 0,
     "kriya_percentage": 0.0,
     "volunteers_count": 0,
-    "is_loaded": false
+    "is_loaded": false,
+    "type": "ward",
+    "view_level": "ward"
   },
   {
     "id": "gp_virava_w5",
@@ -3759,7 +4099,9 @@
     "total_kriya_count": 0,
     "kriya_percentage": 0.0,
     "volunteers_count": 0,
-    "is_loaded": false
+    "is_loaded": false,
+    "type": "ward",
+    "view_level": "ward"
   },
   {
     "id": "gp_virava_w6",
@@ -3781,7 +4123,9 @@
     "total_kriya_count": 0,
     "kriya_percentage": 0.0,
     "volunteers_count": 0,
-    "is_loaded": false
+    "is_loaded": false,
+    "type": "ward",
+    "view_level": "ward"
   },
   {
     "id": "gp_virava_w7",
@@ -3803,7 +4147,9 @@
     "total_kriya_count": 0,
     "kriya_percentage": 0.0,
     "volunteers_count": 0,
-    "is_loaded": false
+    "is_loaded": false,
+    "type": "ward",
+    "view_level": "ward"
   },
   {
     "id": "gp_virava_w8",
@@ -3825,7 +4171,9 @@
     "total_kriya_count": 0,
     "kriya_percentage": 0.0,
     "volunteers_count": 0,
-    "is_loaded": false
+    "is_loaded": false,
+    "type": "ward",
+    "view_level": "ward"
   },
   {
     "id": "gp_virava_w9",
@@ -3847,7 +4195,9 @@
     "total_kriya_count": 0,
     "kriya_percentage": 0.0,
     "volunteers_count": 0,
-    "is_loaded": false
+    "is_loaded": false,
+    "type": "ward",
+    "view_level": "ward"
   },
   {
     "id": "gp_virava_w10",
@@ -3869,7 +4219,9 @@
     "total_kriya_count": 0,
     "kriya_percentage": 0.0,
     "volunteers_count": 0,
-    "is_loaded": false
+    "is_loaded": false,
+    "type": "ward",
+    "view_level": "ward"
   },
   {
     "id": "gp_virava_w11",
@@ -3891,7 +4243,9 @@
     "total_kriya_count": 0,
     "kriya_percentage": 0.0,
     "volunteers_count": 0,
-    "is_loaded": false
+    "is_loaded": false,
+    "type": "ward",
+    "view_level": "ward"
   },
   {
     "id": "gp_virava_w12",
@@ -3913,7 +4267,9 @@
     "total_kriya_count": 0,
     "kriya_percentage": 0.0,
     "volunteers_count": 0,
-    "is_loaded": false
+    "is_loaded": false,
+    "type": "ward",
+    "view_level": "ward"
   },
   {
     "id": "gp_virava_w13",
@@ -3935,7 +4291,9 @@
     "total_kriya_count": 0,
     "kriya_percentage": 0.0,
     "volunteers_count": 0,
-    "is_loaded": false
+    "is_loaded": false,
+    "type": "ward",
+    "view_level": "ward"
   },
   {
     "id": "gp_virava_w14",
@@ -3957,7 +4315,9 @@
     "total_kriya_count": 0,
     "kriya_percentage": 0.0,
     "volunteers_count": 0,
-    "is_loaded": false
+    "is_loaded": false,
+    "type": "ward",
+    "view_level": "ward"
   },
   {
     "id": "gp_viravada_w1",
@@ -3979,7 +4339,9 @@
     "total_kriya_count": 0,
     "kriya_percentage": 0.0,
     "volunteers_count": 0,
-    "is_loaded": false
+    "is_loaded": false,
+    "type": "ward",
+    "view_level": "ward"
   },
   {
     "id": "gp_viravada_w2",
@@ -4001,7 +4363,9 @@
     "total_kriya_count": 0,
     "kriya_percentage": 0.0,
     "volunteers_count": 0,
-    "is_loaded": false
+    "is_loaded": false,
+    "type": "ward",
+    "view_level": "ward"
   },
   {
     "id": "gp_viravada_w3",
@@ -4023,7 +4387,9 @@
     "total_kriya_count": 0,
     "kriya_percentage": 0.0,
     "volunteers_count": 0,
-    "is_loaded": false
+    "is_loaded": false,
+    "type": "ward",
+    "view_level": "ward"
   },
   {
     "id": "gp_viravada_w4",
@@ -4045,7 +4411,9 @@
     "total_kriya_count": 0,
     "kriya_percentage": 0.0,
     "volunteers_count": 0,
-    "is_loaded": false
+    "is_loaded": false,
+    "type": "ward",
+    "view_level": "ward"
   },
   {
     "id": "gp_viravada_w5",
@@ -4067,7 +4435,9 @@
     "total_kriya_count": 0,
     "kriya_percentage": 0.0,
     "volunteers_count": 0,
-    "is_loaded": false
+    "is_loaded": false,
+    "type": "ward",
+    "view_level": "ward"
   },
   {
     "id": "gp_viravada_w6",
@@ -4089,7 +4459,9 @@
     "total_kriya_count": 0,
     "kriya_percentage": 0.0,
     "volunteers_count": 0,
-    "is_loaded": false
+    "is_loaded": false,
+    "type": "ward",
+    "view_level": "ward"
   },
   {
     "id": "gp_viravada_w7",
@@ -4111,7 +4483,9 @@
     "total_kriya_count": 0,
     "kriya_percentage": 0.0,
     "volunteers_count": 0,
-    "is_loaded": false
+    "is_loaded": false,
+    "type": "ward",
+    "view_level": "ward"
   },
   {
     "id": "gp_viravada_w8",
@@ -4133,7 +4507,9 @@
     "total_kriya_count": 0,
     "kriya_percentage": 0.0,
     "volunteers_count": 0,
-    "is_loaded": false
+    "is_loaded": false,
+    "type": "ward",
+    "view_level": "ward"
   },
   {
     "id": "gp_viravada_w9",
@@ -4155,7 +4531,9 @@
     "total_kriya_count": 0,
     "kriya_percentage": 0.0,
     "volunteers_count": 0,
-    "is_loaded": false
+    "is_loaded": false,
+    "type": "ward",
+    "view_level": "ward"
   },
   {
     "id": "gp_viravada_w10",
@@ -4177,7 +4555,9 @@
     "total_kriya_count": 0,
     "kriya_percentage": 0.0,
     "volunteers_count": 0,
-    "is_loaded": false
+    "is_loaded": false,
+    "type": "ward",
+    "view_level": "ward"
   },
   {
     "id": "gp_viravada_w11",
@@ -4199,7 +4579,9 @@
     "total_kriya_count": 0,
     "kriya_percentage": 0.0,
     "volunteers_count": 0,
-    "is_loaded": false
+    "is_loaded": false,
+    "type": "ward",
+    "view_level": "ward"
   },
   {
     "id": "gp_viravada_w12",
@@ -4221,7 +4603,9 @@
     "total_kriya_count": 0,
     "kriya_percentage": 0.0,
     "volunteers_count": 0,
-    "is_loaded": false
+    "is_loaded": false,
+    "type": "ward",
+    "view_level": "ward"
   },
   {
     "id": "gp_uppada_w1",
@@ -4243,7 +4627,9 @@
     "total_kriya_count": 0,
     "kriya_percentage": 0.0,
     "volunteers_count": 0,
-    "is_loaded": false
+    "is_loaded": false,
+    "type": "ward",
+    "view_level": "ward"
   },
   {
     "id": "gp_uppada_w2",
@@ -4265,7 +4651,9 @@
     "total_kriya_count": 0,
     "kriya_percentage": 0.0,
     "volunteers_count": 0,
-    "is_loaded": false
+    "is_loaded": false,
+    "type": "ward",
+    "view_level": "ward"
   },
   {
     "id": "gp_uppada_w3",
@@ -4287,7 +4675,9 @@
     "total_kriya_count": 0,
     "kriya_percentage": 0.0,
     "volunteers_count": 0,
-    "is_loaded": false
+    "is_loaded": false,
+    "type": "ward",
+    "view_level": "ward"
   },
   {
     "id": "gp_uppada_w4",
@@ -4309,7 +4699,9 @@
     "total_kriya_count": 0,
     "kriya_percentage": 0.0,
     "volunteers_count": 0,
-    "is_loaded": false
+    "is_loaded": false,
+    "type": "ward",
+    "view_level": "ward"
   },
   {
     "id": "gp_uppada_w5",
@@ -4331,7 +4723,9 @@
     "total_kriya_count": 0,
     "kriya_percentage": 0.0,
     "volunteers_count": 0,
-    "is_loaded": false
+    "is_loaded": false,
+    "type": "ward",
+    "view_level": "ward"
   },
   {
     "id": "gp_uppada_w6",
@@ -4353,7 +4747,9 @@
     "total_kriya_count": 0,
     "kriya_percentage": 0.0,
     "volunteers_count": 0,
-    "is_loaded": false
+    "is_loaded": false,
+    "type": "ward",
+    "view_level": "ward"
   },
   {
     "id": "gp_uppada_w7",
@@ -4375,7 +4771,9 @@
     "total_kriya_count": 0,
     "kriya_percentage": 0.0,
     "volunteers_count": 0,
-    "is_loaded": false
+    "is_loaded": false,
+    "type": "ward",
+    "view_level": "ward"
   },
   {
     "id": "gp_uppada_w8",
@@ -4397,7 +4795,9 @@
     "total_kriya_count": 0,
     "kriya_percentage": 0.0,
     "volunteers_count": 0,
-    "is_loaded": false
+    "is_loaded": false,
+    "type": "ward",
+    "view_level": "ward"
   },
   {
     "id": "gp_uppada_w9",
@@ -4419,7 +4819,9 @@
     "total_kriya_count": 0,
     "kriya_percentage": 0.0,
     "volunteers_count": 0,
-    "is_loaded": false
+    "is_loaded": false,
+    "type": "ward",
+    "view_level": "ward"
   },
   {
     "id": "gp_uppada_w10",
@@ -4441,7 +4843,9 @@
     "total_kriya_count": 0,
     "kriya_percentage": 0.0,
     "volunteers_count": 0,
-    "is_loaded": false
+    "is_loaded": false,
+    "type": "ward",
+    "view_level": "ward"
   },
   {
     "id": "gp_uppada_w11",
@@ -4463,7 +4867,9 @@
     "total_kriya_count": 0,
     "kriya_percentage": 0.0,
     "volunteers_count": 0,
-    "is_loaded": false
+    "is_loaded": false,
+    "type": "ward",
+    "view_level": "ward"
   },
   {
     "id": "gp_uppada_w12",
@@ -4485,7 +4891,9 @@
     "total_kriya_count": 0,
     "kriya_percentage": 0.0,
     "volunteers_count": 0,
-    "is_loaded": false
+    "is_loaded": false,
+    "type": "ward",
+    "view_level": "ward"
   },
   {
     "id": "gp_uppada_w13",
@@ -4507,7 +4915,9 @@
     "total_kriya_count": 0,
     "kriya_percentage": 0.0,
     "volunteers_count": 0,
-    "is_loaded": false
+    "is_loaded": false,
+    "type": "ward",
+    "view_level": "ward"
   },
   {
     "id": "gp_uppada_w14",
@@ -4529,7 +4939,9 @@
     "total_kriya_count": 0,
     "kriya_percentage": 0.0,
     "volunteers_count": 0,
-    "is_loaded": false
+    "is_loaded": false,
+    "type": "ward",
+    "view_level": "ward"
   },
   {
     "id": "gp_uppada_w15",
@@ -4551,7 +4963,9 @@
     "total_kriya_count": 0,
     "kriya_percentage": 0.0,
     "volunteers_count": 0,
-    "is_loaded": false
+    "is_loaded": false,
+    "type": "ward",
+    "view_level": "ward"
   },
   {
     "id": "gp_uppada_w16",
@@ -4573,7 +4987,9 @@
     "total_kriya_count": 0,
     "kriya_percentage": 0.0,
     "volunteers_count": 0,
-    "is_loaded": false
+    "is_loaded": false,
+    "type": "ward",
+    "view_level": "ward"
   },
   {
     "id": "gp_kothapalli_w1",
@@ -4595,7 +5011,9 @@
     "total_kriya_count": 0,
     "kriya_percentage": 0.0,
     "volunteers_count": 0,
-    "is_loaded": false
+    "is_loaded": false,
+    "type": "ward",
+    "view_level": "ward"
   },
   {
     "id": "gp_kothapalli_w2",
@@ -4617,7 +5035,9 @@
     "total_kriya_count": 0,
     "kriya_percentage": 0.0,
     "volunteers_count": 0,
-    "is_loaded": false
+    "is_loaded": false,
+    "type": "ward",
+    "view_level": "ward"
   },
   {
     "id": "gp_kothapalli_w3",
@@ -4639,7 +5059,9 @@
     "total_kriya_count": 0,
     "kriya_percentage": 0.0,
     "volunteers_count": 0,
-    "is_loaded": false
+    "is_loaded": false,
+    "type": "ward",
+    "view_level": "ward"
   },
   {
     "id": "gp_kothapalli_w4",
@@ -4661,7 +5083,9 @@
     "total_kriya_count": 0,
     "kriya_percentage": 0.0,
     "volunteers_count": 0,
-    "is_loaded": false
+    "is_loaded": false,
+    "type": "ward",
+    "view_level": "ward"
   },
   {
     "id": "gp_kothapalli_w5",
@@ -4683,7 +5107,9 @@
     "total_kriya_count": 0,
     "kriya_percentage": 0.0,
     "volunteers_count": 0,
-    "is_loaded": false
+    "is_loaded": false,
+    "type": "ward",
+    "view_level": "ward"
   },
   {
     "id": "gp_kothapalli_w6",
@@ -4705,7 +5131,9 @@
     "total_kriya_count": 0,
     "kriya_percentage": 0.0,
     "volunteers_count": 0,
-    "is_loaded": false
+    "is_loaded": false,
+    "type": "ward",
+    "view_level": "ward"
   },
   {
     "id": "gp_kothapalli_w7",
@@ -4727,7 +5155,9 @@
     "total_kriya_count": 0,
     "kriya_percentage": 0.0,
     "volunteers_count": 0,
-    "is_loaded": false
+    "is_loaded": false,
+    "type": "ward",
+    "view_level": "ward"
   },
   {
     "id": "gp_kothapalli_w8",
@@ -4749,7 +5179,9 @@
     "total_kriya_count": 0,
     "kriya_percentage": 0.0,
     "volunteers_count": 0,
-    "is_loaded": false
+    "is_loaded": false,
+    "type": "ward",
+    "view_level": "ward"
   },
   {
     "id": "gp_kothapalli_w9",
@@ -4771,7 +5203,9 @@
     "total_kriya_count": 0,
     "kriya_percentage": 0.0,
     "volunteers_count": 0,
-    "is_loaded": false
+    "is_loaded": false,
+    "type": "ward",
+    "view_level": "ward"
   },
   {
     "id": "gp_kothapalli_w10",
@@ -4793,7 +5227,9 @@
     "total_kriya_count": 0,
     "kriya_percentage": 0.0,
     "volunteers_count": 0,
-    "is_loaded": false
+    "is_loaded": false,
+    "type": "ward",
+    "view_level": "ward"
   },
   {
     "id": "gp_kothapalli_w11",
@@ -4815,7 +5251,9 @@
     "total_kriya_count": 0,
     "kriya_percentage": 0.0,
     "volunteers_count": 0,
-    "is_loaded": false
+    "is_loaded": false,
+    "type": "ward",
+    "view_level": "ward"
   },
   {
     "id": "gp_kothapalli_w12",
@@ -4837,7 +5275,9 @@
     "total_kriya_count": 0,
     "kriya_percentage": 0.0,
     "volunteers_count": 0,
-    "is_loaded": false
+    "is_loaded": false,
+    "type": "ward",
+    "view_level": "ward"
   },
   {
     "id": "gp_kothapalli_w13",
@@ -4859,7 +5299,9 @@
     "total_kriya_count": 0,
     "kriya_percentage": 0.0,
     "volunteers_count": 0,
-    "is_loaded": false
+    "is_loaded": false,
+    "type": "ward",
+    "view_level": "ward"
   },
   {
     "id": "gp_kothapalli_w14",
@@ -4881,7 +5323,9 @@
     "total_kriya_count": 0,
     "kriya_percentage": 0.0,
     "volunteers_count": 0,
-    "is_loaded": false
+    "is_loaded": false,
+    "type": "ward",
+    "view_level": "ward"
   },
   {
     "id": "gp_nagulapalli_w1",
@@ -4903,7 +5347,9 @@
     "total_kriya_count": 0,
     "kriya_percentage": 0.0,
     "volunteers_count": 0,
-    "is_loaded": false
+    "is_loaded": false,
+    "type": "ward",
+    "view_level": "ward"
   },
   {
     "id": "gp_nagulapalli_w2",
@@ -4925,7 +5371,9 @@
     "total_kriya_count": 0,
     "kriya_percentage": 0.0,
     "volunteers_count": 0,
-    "is_loaded": false
+    "is_loaded": false,
+    "type": "ward",
+    "view_level": "ward"
   },
   {
     "id": "gp_nagulapalli_w3",
@@ -4947,7 +5395,9 @@
     "total_kriya_count": 0,
     "kriya_percentage": 0.0,
     "volunteers_count": 0,
-    "is_loaded": false
+    "is_loaded": false,
+    "type": "ward",
+    "view_level": "ward"
   },
   {
     "id": "gp_nagulapalli_w4",
@@ -4969,7 +5419,9 @@
     "total_kriya_count": 0,
     "kriya_percentage": 0.0,
     "volunteers_count": 0,
-    "is_loaded": false
+    "is_loaded": false,
+    "type": "ward",
+    "view_level": "ward"
   },
   {
     "id": "gp_nagulapalli_w5",
@@ -4991,7 +5443,9 @@
     "total_kriya_count": 0,
     "kriya_percentage": 0.0,
     "volunteers_count": 0,
-    "is_loaded": false
+    "is_loaded": false,
+    "type": "ward",
+    "view_level": "ward"
   },
   {
     "id": "gp_nagulapalli_w6",
@@ -5013,7 +5467,9 @@
     "total_kriya_count": 0,
     "kriya_percentage": 0.0,
     "volunteers_count": 0,
-    "is_loaded": false
+    "is_loaded": false,
+    "type": "ward",
+    "view_level": "ward"
   },
   {
     "id": "gp_nagulapalli_w7",
@@ -5035,7 +5491,9 @@
     "total_kriya_count": 0,
     "kriya_percentage": 0.0,
     "volunteers_count": 0,
-    "is_loaded": false
+    "is_loaded": false,
+    "type": "ward",
+    "view_level": "ward"
   },
   {
     "id": "gp_nagulapalli_w8",
@@ -5057,7 +5515,9 @@
     "total_kriya_count": 0,
     "kriya_percentage": 0.0,
     "volunteers_count": 0,
-    "is_loaded": false
+    "is_loaded": false,
+    "type": "ward",
+    "view_level": "ward"
   },
   {
     "id": "gp_nagulapalli_w9",
@@ -5079,7 +5539,9 @@
     "total_kriya_count": 0,
     "kriya_percentage": 0.0,
     "volunteers_count": 0,
-    "is_loaded": false
+    "is_loaded": false,
+    "type": "ward",
+    "view_level": "ward"
   },
   {
     "id": "gp_nagulapalli_w10",
@@ -5101,7 +5563,9 @@
     "total_kriya_count": 0,
     "kriya_percentage": 0.0,
     "volunteers_count": 0,
-    "is_loaded": false
+    "is_loaded": false,
+    "type": "ward",
+    "view_level": "ward"
   },
   {
     "id": "gp_nagulapalli_w11",
@@ -5123,7 +5587,9 @@
     "total_kriya_count": 0,
     "kriya_percentage": 0.0,
     "volunteers_count": 0,
-    "is_loaded": false
+    "is_loaded": false,
+    "type": "ward",
+    "view_level": "ward"
   },
   {
     "id": "gp_nagulapalli_w12",
@@ -5145,7 +5611,9 @@
     "total_kriya_count": 0,
     "kriya_percentage": 0.0,
     "volunteers_count": 0,
-    "is_loaded": false
+    "is_loaded": false,
+    "type": "ward",
+    "view_level": "ward"
   },
   {
     "id": "gp_kondevaram_w1",
@@ -5167,7 +5635,9 @@
     "total_kriya_count": 0,
     "kriya_percentage": 0.0,
     "volunteers_count": 0,
-    "is_loaded": false
+    "is_loaded": false,
+    "type": "ward",
+    "view_level": "ward"
   },
   {
     "id": "gp_kondevaram_w2",
@@ -5189,7 +5659,9 @@
     "total_kriya_count": 0,
     "kriya_percentage": 0.0,
     "volunteers_count": 0,
-    "is_loaded": false
+    "is_loaded": false,
+    "type": "ward",
+    "view_level": "ward"
   },
   {
     "id": "gp_kondevaram_w3",
@@ -5211,7 +5683,9 @@
     "total_kriya_count": 0,
     "kriya_percentage": 0.0,
     "volunteers_count": 0,
-    "is_loaded": false
+    "is_loaded": false,
+    "type": "ward",
+    "view_level": "ward"
   },
   {
     "id": "gp_kondevaram_w4",
@@ -5233,7 +5707,9 @@
     "total_kriya_count": 0,
     "kriya_percentage": 0.0,
     "volunteers_count": 0,
-    "is_loaded": false
+    "is_loaded": false,
+    "type": "ward",
+    "view_level": "ward"
   },
   {
     "id": "gp_kondevaram_w5",
@@ -5255,7 +5731,9 @@
     "total_kriya_count": 0,
     "kriya_percentage": 0.0,
     "volunteers_count": 0,
-    "is_loaded": false
+    "is_loaded": false,
+    "type": "ward",
+    "view_level": "ward"
   },
   {
     "id": "gp_kondevaram_w6",
@@ -5277,7 +5755,9 @@
     "total_kriya_count": 0,
     "kriya_percentage": 0.0,
     "volunteers_count": 0,
-    "is_loaded": false
+    "is_loaded": false,
+    "type": "ward",
+    "view_level": "ward"
   },
   {
     "id": "gp_kondevaram_w7",
@@ -5299,7 +5779,9 @@
     "total_kriya_count": 0,
     "kriya_percentage": 0.0,
     "volunteers_count": 0,
-    "is_loaded": false
+    "is_loaded": false,
+    "type": "ward",
+    "view_level": "ward"
   },
   {
     "id": "gp_kondevaram_w8",
@@ -5321,7 +5803,9 @@
     "total_kriya_count": 0,
     "kriya_percentage": 0.0,
     "volunteers_count": 0,
-    "is_loaded": false
+    "is_loaded": false,
+    "type": "ward",
+    "view_level": "ward"
   },
   {
     "id": "gp_kondevaram_w9",
@@ -5343,7 +5827,9 @@
     "total_kriya_count": 0,
     "kriya_percentage": 0.0,
     "volunteers_count": 0,
-    "is_loaded": false
+    "is_loaded": false,
+    "type": "ward",
+    "view_level": "ward"
   },
   {
     "id": "gp_kondevaram_w10",
@@ -5365,7 +5851,9 @@
     "total_kriya_count": 0,
     "kriya_percentage": 0.0,
     "volunteers_count": 0,
-    "is_loaded": false
+    "is_loaded": false,
+    "type": "ward",
+    "view_level": "ward"
   },
   {
     "id": "gp_kondevaram_w11",
@@ -5387,7 +5875,9 @@
     "total_kriya_count": 0,
     "kriya_percentage": 0.0,
     "volunteers_count": 0,
-    "is_loaded": false
+    "is_loaded": false,
+    "type": "ward",
+    "view_level": "ward"
   },
   {
     "id": "gp_kondevaram_w12",
@@ -5409,7 +5899,9 @@
     "total_kriya_count": 0,
     "kriya_percentage": 0.0,
     "volunteers_count": 0,
-    "is_loaded": false
+    "is_loaded": false,
+    "type": "ward",
+    "view_level": "ward"
   },
   {
     "id": "gp_komaragiri_w1",
@@ -5431,7 +5923,9 @@
     "total_kriya_count": 0,
     "kriya_percentage": 0.0,
     "volunteers_count": 0,
-    "is_loaded": false
+    "is_loaded": false,
+    "type": "ward",
+    "view_level": "ward"
   },
   {
     "id": "gp_komaragiri_w2",
@@ -5453,7 +5947,9 @@
     "total_kriya_count": 0,
     "kriya_percentage": 0.0,
     "volunteers_count": 0,
-    "is_loaded": false
+    "is_loaded": false,
+    "type": "ward",
+    "view_level": "ward"
   },
   {
     "id": "gp_komaragiri_w3",
@@ -5475,7 +5971,9 @@
     "total_kriya_count": 0,
     "kriya_percentage": 0.0,
     "volunteers_count": 0,
-    "is_loaded": false
+    "is_loaded": false,
+    "type": "ward",
+    "view_level": "ward"
   },
   {
     "id": "gp_komaragiri_w4",
@@ -5497,7 +5995,9 @@
     "total_kriya_count": 0,
     "kriya_percentage": 0.0,
     "volunteers_count": 0,
-    "is_loaded": false
+    "is_loaded": false,
+    "type": "ward",
+    "view_level": "ward"
   },
   {
     "id": "gp_komaragiri_w5",
@@ -5519,7 +6019,9 @@
     "total_kriya_count": 0,
     "kriya_percentage": 0.0,
     "volunteers_count": 0,
-    "is_loaded": false
+    "is_loaded": false,
+    "type": "ward",
+    "view_level": "ward"
   },
   {
     "id": "gp_komaragiri_w6",
@@ -5541,7 +6043,9 @@
     "total_kriya_count": 0,
     "kriya_percentage": 0.0,
     "volunteers_count": 0,
-    "is_loaded": false
+    "is_loaded": false,
+    "type": "ward",
+    "view_level": "ward"
   },
   {
     "id": "gp_komaragiri_w7",
@@ -5563,7 +6067,9 @@
     "total_kriya_count": 0,
     "kriya_percentage": 0.0,
     "volunteers_count": 0,
-    "is_loaded": false
+    "is_loaded": false,
+    "type": "ward",
+    "view_level": "ward"
   },
   {
     "id": "gp_komaragiri_w8",
@@ -5585,7 +6091,9 @@
     "total_kriya_count": 0,
     "kriya_percentage": 0.0,
     "volunteers_count": 0,
-    "is_loaded": false
+    "is_loaded": false,
+    "type": "ward",
+    "view_level": "ward"
   },
   {
     "id": "gp_komaragiri_w9",
@@ -5607,7 +6115,9 @@
     "total_kriya_count": 0,
     "kriya_percentage": 0.0,
     "volunteers_count": 0,
-    "is_loaded": false
+    "is_loaded": false,
+    "type": "ward",
+    "view_level": "ward"
   },
   {
     "id": "gp_komaragiri_w10",
@@ -5629,7 +6139,9 @@
     "total_kriya_count": 0,
     "kriya_percentage": 0.0,
     "volunteers_count": 0,
-    "is_loaded": false
+    "is_loaded": false,
+    "type": "ward",
+    "view_level": "ward"
   },
   {
     "id": "gp_komaragiri_w11",
@@ -5651,7 +6163,9 @@
     "total_kriya_count": 0,
     "kriya_percentage": 0.0,
     "volunteers_count": 0,
-    "is_loaded": false
+    "is_loaded": false,
+    "type": "ward",
+    "view_level": "ward"
   },
   {
     "id": "gp_komaragiri_w12",
@@ -5673,7 +6187,9 @@
     "total_kriya_count": 0,
     "kriya_percentage": 0.0,
     "volunteers_count": 0,
-    "is_loaded": false
+    "is_loaded": false,
+    "type": "ward",
+    "view_level": "ward"
   },
   {
     "id": "gp_gorsa_w1",
@@ -5695,7 +6211,9 @@
     "total_kriya_count": 0,
     "kriya_percentage": 0.0,
     "volunteers_count": 0,
-    "is_loaded": false
+    "is_loaded": false,
+    "type": "ward",
+    "view_level": "ward"
   },
   {
     "id": "gp_gorsa_w2",
@@ -5717,7 +6235,9 @@
     "total_kriya_count": 0,
     "kriya_percentage": 0.0,
     "volunteers_count": 0,
-    "is_loaded": false
+    "is_loaded": false,
+    "type": "ward",
+    "view_level": "ward"
   },
   {
     "id": "gp_gorsa_w3",
@@ -5739,7 +6259,9 @@
     "total_kriya_count": 0,
     "kriya_percentage": 0.0,
     "volunteers_count": 0,
-    "is_loaded": false
+    "is_loaded": false,
+    "type": "ward",
+    "view_level": "ward"
   },
   {
     "id": "gp_gorsa_w4",
@@ -5761,7 +6283,9 @@
     "total_kriya_count": 0,
     "kriya_percentage": 0.0,
     "volunteers_count": 0,
-    "is_loaded": false
+    "is_loaded": false,
+    "type": "ward",
+    "view_level": "ward"
   },
   {
     "id": "gp_gorsa_w5",
@@ -5783,7 +6307,9 @@
     "total_kriya_count": 0,
     "kriya_percentage": 0.0,
     "volunteers_count": 0,
-    "is_loaded": false
+    "is_loaded": false,
+    "type": "ward",
+    "view_level": "ward"
   },
   {
     "id": "gp_gorsa_w6",
@@ -5805,7 +6331,9 @@
     "total_kriya_count": 0,
     "kriya_percentage": 0.0,
     "volunteers_count": 0,
-    "is_loaded": false
+    "is_loaded": false,
+    "type": "ward",
+    "view_level": "ward"
   },
   {
     "id": "gp_gorsa_w7",
@@ -5827,7 +6355,9 @@
     "total_kriya_count": 0,
     "kriya_percentage": 0.0,
     "volunteers_count": 0,
-    "is_loaded": false
+    "is_loaded": false,
+    "type": "ward",
+    "view_level": "ward"
   },
   {
     "id": "gp_gorsa_w8",
@@ -5849,7 +6379,9 @@
     "total_kriya_count": 0,
     "kriya_percentage": 0.0,
     "volunteers_count": 0,
-    "is_loaded": false
+    "is_loaded": false,
+    "type": "ward",
+    "view_level": "ward"
   },
   {
     "id": "gp_gorsa_w9",
@@ -5871,7 +6403,9 @@
     "total_kriya_count": 0,
     "kriya_percentage": 0.0,
     "volunteers_count": 0,
-    "is_loaded": false
+    "is_loaded": false,
+    "type": "ward",
+    "view_level": "ward"
   },
   {
     "id": "gp_gorsa_w10",
@@ -5893,7 +6427,9 @@
     "total_kriya_count": 0,
     "kriya_percentage": 0.0,
     "volunteers_count": 0,
-    "is_loaded": false
+    "is_loaded": false,
+    "type": "ward",
+    "view_level": "ward"
   },
   {
     "id": "mptc_pitthapuram_1",
@@ -6473,7 +7009,8 @@
     "ward_no": 1,
     "category_label": "గ్రామ పంచాయతీ వార్డులు (Gram Panchayat Wards)",
     "local_body": "తాటిపర్తి గ్రామ పంచాయతీ (TATIPARTHI)",
-    "sections": "తాటిపర్తి వార్డు 1 విభాగాలు (499 ఓటర్లు)"
+    "sections": "తాటిపర్తి వార్డు 1 విభాగాలు (499 ఓటర్లు)",
+    "view_level": "ward"
   },
   {
     "id": "gp_tatiparthy_w2",
@@ -6491,7 +7028,8 @@
     "ward_no": 2,
     "category_label": "గ్రామ పంచాయతీ వార్డులు (Gram Panchayat Wards)",
     "local_body": "తాటిపర్తి గ్రామ పంచాయతీ (TATIPARTHI)",
-    "sections": "తాటిపర్తి వార్డు 2 విభాగాలు (499 ఓటర్లు)"
+    "sections": "తాటిపర్తి వార్డు 2 విభాగాలు (499 ఓటర్లు)",
+    "view_level": "ward"
   },
   {
     "id": "gp_tatiparthy_w3",
@@ -6509,7 +7047,8 @@
     "ward_no": 3,
     "category_label": "గ్రామ పంచాయతీ వార్డులు (Gram Panchayat Wards)",
     "local_body": "తాటిపర్తి గ్రామ పంచాయతీ (TATIPARTHI)",
-    "sections": "తాటిపర్తి వార్డు 3 విభాగాలు (499 ఓటర్లు)"
+    "sections": "తాటిపర్తి వార్డు 3 విభాగాలు (499 ఓటర్లు)",
+    "view_level": "ward"
   },
   {
     "id": "gp_tatiparthy_w4",
@@ -6527,7 +7066,8 @@
     "ward_no": 4,
     "category_label": "గ్రామ పంచాయతీ వార్డులు (Gram Panchayat Wards)",
     "local_body": "తాటిపర్తి గ్రామ పంచాయతీ (TATIPARTHI)",
-    "sections": "తాటిపర్తి వార్డు 4 విభాగాలు (499 ఓటర్లు)"
+    "sections": "తాటిపర్తి వార్డు 4 విభాగాలు (499 ఓటర్లు)",
+    "view_level": "ward"
   },
   {
     "id": "gp_tatiparthy_w5",
@@ -6545,7 +7085,8 @@
     "ward_no": 5,
     "category_label": "గ్రామ పంచాయతీ వార్డులు (Gram Panchayat Wards)",
     "local_body": "తాటిపర్తి గ్రామ పంచాయతీ (TATIPARTHI)",
-    "sections": "తాటిపర్తి వార్డు 5 విభాగాలు (499 ఓటర్లు)"
+    "sections": "తాటిపర్తి వార్డు 5 విభాగాలు (499 ఓటర్లు)",
+    "view_level": "ward"
   },
   {
     "id": "gp_tatiparthy_w6",
@@ -6563,7 +7104,8 @@
     "ward_no": 6,
     "category_label": "గ్రామ పంచాయతీ వార్డులు (Gram Panchayat Wards)",
     "local_body": "తాటిపర్తి గ్రామ పంచాయతీ (TATIPARTHI)",
-    "sections": "తాటిపర్తి వార్డు 6 విభాగాలు (499 ఓటర్లు)"
+    "sections": "తాటిపర్తి వార్డు 6 విభాగాలు (499 ఓటర్లు)",
+    "view_level": "ward"
   },
   {
     "id": "gp_tatiparthy_w7",
@@ -6581,6 +7123,7 @@
     "ward_no": 7,
     "category_label": "గ్రామ పంచాయతీ వార్డులు (Gram Panchayat Wards)",
     "local_body": "తాటిపర్తి గ్రామ పంచాయతీ (TATIPARTHI)",
-    "sections": "తాటిపర్తి వార్డు 7 విభాగాలు (499 ఓటర్లు)"
+    "sections": "తాటిపర్తి వార్డు 7 విభాగాలు (499 ఓటర్లు)",
+    "view_level": "ward"
   }
 ]

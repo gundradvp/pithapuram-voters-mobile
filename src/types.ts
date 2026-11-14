@@ -4,6 +4,8 @@ export interface LocalElectionUnit {
   id: string; // e.g. "ward_14", "gp_chendurthi_w1"
   part_no: string | number;
   ward_no?: number;
+  type?: string; // 'village' | 'ward'
+  view_level?: 'village' | 'ward' | string;
   election_type: ElectionCategory;
   category_label: string;
   local_body: string;
