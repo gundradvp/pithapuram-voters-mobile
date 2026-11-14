@@ -47,7 +47,7 @@ export const DEFAULT_ASSIGNMENTS: VolunteerAssignment[] = [
       'ward_14', 'gollaprolu_ward_11', 'gp_durgada', 'gp_vannepudi', 'gp_tatiparthy',
       'gp_durgada_w1', 'gp_durgada_w2', 'gp_durgada_w3', 'gp_durgada_w4', 'gp_durgada_w5',
       'gp_durgada_w6', 'gp_durgada_w7', 'gp_durgada_w8', 'gp_durgada_w9', 'gp_durgada_w10',
-      'gp_durgada_w11', 'gp_durgada_w12', 'gp_durgada_w13', 'gp_durgada_w14',
+      'gp_durgada_w11', 'gp_durgada_w12', 'gp_durgada_w13', 'gp_durgada_w14', 'gp_durgada_w15', 'gp_durgada_w16',
       'gp_tatiparthy_w1', 'gp_tatiparthy_w2', 'gp_tatiparthy_w3', 'gp_tatiparthy_w4',
       'gp_tatiparthy_w5', 'gp_tatiparthy_w6', 'gp_tatiparthy_w7'
     ],
@@ -93,7 +93,7 @@ export function getAssignments(): VolunteerAssignment[] {
         'gp_durgada', 'gp_vannepudi', 'gp_tatiparthy',
         'gp_durgada_w1', 'gp_durgada_w2', 'gp_durgada_w3', 'gp_durgada_w4', 'gp_durgada_w5',
         'gp_durgada_w6', 'gp_durgada_w7', 'gp_durgada_w8', 'gp_durgada_w9', 'gp_durgada_w10',
-        'gp_durgada_w11', 'gp_durgada_w12', 'gp_durgada_w13', 'gp_durgada_w14',
+        'gp_durgada_w11', 'gp_durgada_w12', 'gp_durgada_w13', 'gp_durgada_w14', 'gp_durgada_w15', 'gp_durgada_w16',
         'gp_tatiparthy_w1', 'gp_tatiparthy_w2', 'gp_tatiparthy_w3', 'gp_tatiparthy_w4',
         'gp_tatiparthy_w5', 'gp_tatiparthy_w6', 'gp_tatiparthy_w7'
       ];
