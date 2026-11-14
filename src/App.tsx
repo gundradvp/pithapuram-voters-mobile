@@ -370,7 +370,28 @@ export function App() {
         const res = await fetch(url, fetchOptions);
         if (res.ok) {
           const data = await res.json();
-          if (data && data.booth_info && Array.isArray(data.voters)) {
+          if (data && Array.isArray(data.voters)) {
+            if (!data.booth_info) {
+              data.booth_info = {
+                part_no: data.part_no || partNo,
+                village: data.village || '',
+                clean_village: data.clean_village || data.village || '',
+                mandal: data.mandal || 'GOLLAPROLU',
+                ps_address: data.ps_address || data.village || '',
+                sections: data.sections || '',
+                total_voters: data.total_voters || data.voters.length,
+                male_count: data.male_count || data.voters.filter((v: any) => v.g === 'M').length,
+                female_count: data.female_count || data.voters.filter((v: any) => v.g === 'F').length,
+                exact_kriya_count: data.exact_kriya_count || 0,
+                similar_kriya_count: data.similar_kriya_count || 0,
+                total_kriya_count: data.total_kriya_count || 0,
+                kriya_percentage: data.kriya_percentage || 0,
+                election_type: data.election_type || 'panchayat',
+                type: data.type || 'village',
+                view_level: data.view_level || 'village',
+                ward_no: data.ward_no || 0
+              };
+            }
             return data as BoothData;
           }
         }
