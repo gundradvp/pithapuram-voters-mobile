@@ -2438,7 +2438,7 @@ _దయచేసి మీ ఓటు హక్కును వినియోగ
           return (
             <div
               key={v.s}
-              className={`bg-slate-900/90 border rounded-2xl p-3.5 space-y-2.5 transition-all shadow-md relative ${
+              className={`bg-slate-900/90 border rounded-2xl p-3.5 space-y-2.5 transition-all shadow-md relative overflow-hidden ${
                 isDeceased
                   ? 'border-slate-800 bg-slate-950/80 opacity-75 grayscale-[20%]'
                   : isOutOfCity
@@ -2516,18 +2516,19 @@ _దయచేసి మీ ఓటు హక్కును వినియోగ
               </div>
 
               {/* Name, Card Trigger, Kriya Badge & Details */}
-              <div className="flex items-start gap-3 mt-1">
-                {/* Large Official Voter Card Slip (Prominent & Clear, matching screenshot) */}
-                {cardPath ? (
+              {cardPath ? (
+                /* Layout A: Full official card slip on top + full width details below (No overlapping, zero white space gap!) */
+                <div className="space-y-2 mt-1">
+                  {/* Official Slip Image */}
                   <div
                     onClick={() => onOpenSlip(v)}
-                    className="w-[180px] xs:w-[220px] sm:w-[260px] md:w-[280px] shrink-0 rounded-2xl overflow-hidden border-2 border-amber-400 bg-slate-950 shadow-sm relative group cursor-pointer hover:border-amber-300 hover:shadow-md transition-all active:scale-[0.99]"
+                    className="w-full rounded-xl overflow-hidden border border-amber-400/50 bg-slate-950/90 shadow-sm relative group cursor-pointer hover:border-amber-300 hover:shadow-md transition-all active:scale-[0.99] flex items-center justify-center p-1"
                     title={language === 'te' ? 'పూర్తి కార్డును జూమ్ చేయడానికి క్లిక్ చేయండి' : 'Click to zoom complete voter card'}
                   >
                     <img
                       src={resolvePhotoUrl(cardPath)}
                       alt={`Card #${v.s}`}
-                      className="w-full h-auto object-contain block group-hover:scale-105 transition-transform duration-200"
+                      className="w-full h-auto max-h-[145px] sm:max-h-[160px] object-contain block rounded-lg group-hover:scale-[1.01] transition-transform duration-200"
                       loading="lazy"
                       onError={(e) => {
                         const target = e.currentTarget as HTMLImageElement;
@@ -2535,140 +2536,243 @@ _దయచేసి మీ ఓటు హక్కును వినియోగ
                         target.src = `https://raw.githubusercontent.com/gundradvp/pithapuram-voters-mobile/main/public${cleanPath}`;
                       }}
                     />
-                    {/* Corner S.No Tag matching screenshot */}
-                    <span className="absolute bottom-1 right-1 bg-slate-950/90 text-amber-300 font-mono font-black text-[10.5px] px-2 py-0.5 rounded-lg border border-amber-500/50 shadow">
+                    <span className="absolute bottom-2 right-2 bg-slate-950/90 text-amber-300 font-mono font-black text-[10px] px-1.5 py-0.5 rounded border border-amber-500/50 shadow">
                       #{v.s}
                     </span>
                   </div>
-                ) : photoPath ? (
-                  <div
+
+                  {/* Voter Name & Details (Full Width: Clean typography, zero text clipping or overlapping) */}
+                  <div 
+                    className="w-full min-w-0 cursor-pointer pt-0.5"
                     onClick={() => onOpenSlip(v)}
-                    className="w-[100px] h-[125px] shrink-0 rounded-2xl overflow-hidden border-2 border-amber-400 bg-slate-950 shadow-sm relative group cursor-pointer flex flex-col items-center justify-center"
-                    title={language === 'te' ? 'పూర్తి కార్డును జూమ్ చేయడానికి క్లిక్ చేయండి' : 'Click to zoom'}
-                  >
-                    <img
-                      src={resolvePhotoUrl(photoPath)}
-                      alt={v.n}
-                      className="w-full h-full object-cover"
-                      loading="lazy"
-                    />
-                    <span className="absolute bottom-1 right-1 bg-slate-950/90 text-amber-300 font-mono font-black text-[10px] px-1.5 py-0.2 rounded border border-amber-500/50">
-                      #{v.s}
-                    </span>
-                  </div>
-                ) : (
-                  <button
-                    type="button"
-                    onClick={() => onOpenSlip(v)}
-                    className="w-16 h-20 rounded-2xl bg-gradient-to-b from-slate-800 to-slate-900 border border-slate-700/80 hover:border-amber-500/80 active:scale-95 flex flex-col items-center justify-center text-slate-400 shrink-0 shadow-inner transition-all group relative cursor-pointer"
                     title={language === 'te' ? 'పూర్తి ఓటర్ కార్డు చూడటానికి ట్యాప్ చేయండి' : 'Tap to view complete official card'}
                   >
-                    <div className="w-8 h-8 rounded-lg bg-amber-500/20 text-amber-400 flex items-center justify-center group-hover:scale-110 transition-transform">
-                      <span className="text-base">📄</span>
+                    <div className="flex items-center gap-1.5 flex-wrap">
+                      <h3 className={`text-sm sm:text-[14.5px] font-black transition-colors break-words leading-snug ${isDeceased ? 'text-slate-400 line-through' : 'text-white hover:text-amber-300'}`}>
+                        {v.n}
+                      </h3>
+                      <button
+                        type="button"
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          setSelectedSurname(selectedSurname === sn.en ? 'all' : sn.en);
+                          setVisibleCount(INITIAL_VISIBLE_COUNT);
+                        }}
+                        className="px-1.5 py-0.2 rounded bg-amber-500/10 hover:bg-amber-500/20 text-amber-300 border border-amber-500/30 text-[9px] font-bold inline-flex items-center gap-0.5 shrink-0"
+                        title={language === 'te' ? 'ఈ ఇంటిపేరు ఓటర్లను మాత్రమే చూడండి' : 'Filter by this surname'}
+                      >
+                        <span>🏛️ {sn.te || sn.en}</span>
+                      </button>
+                      {dupAnalysis.voterDupMap[v.s] && (() => {
+                        const dup = dupAnalysis.voterDupMap[v.s];
+                        return (
+                          <button
+                            type="button"
+                            onClick={(e) => {
+                              e.stopPropagation();
+                              setSelectedDuplicateCluster({
+                                voters: [v, ...dup.matchingVoters],
+                                reasonTe: dup.reasonTe,
+                                reasonEn: dup.reasonEn,
+                                confidencePct: dup.confidencePct,
+                                matchLevel: dup.matchLevel
+                              });
+                            }}
+                            className={`px-1.5 py-0.5 rounded text-[9px] font-black inline-flex items-center gap-1 shadow-sm transition-all hover:scale-105 active:scale-95 shrink-0 ${
+                              dup.confidencePct >= 80
+                                ? 'bg-rose-950 text-rose-300 border border-rose-500/60'
+                                : 'bg-amber-950 text-amber-300 border border-amber-500/60'
+                            }`}
+                            title={`${dup.reasonTe} (సరిపోల్చడానికి ట్యాప్ చేయండి)`}
+                          >
+                            <span>⚠️ {dup.confidencePct >= 80 ? (language === 'te' ? '100% డూప్లికేట్' : '100% Duplicate') : (language === 'te' ? '50% డూప్లికేట్' : '50% Duplicate')}</span>
+                            <span className="font-mono font-bold underline">(#{dup.matchingSnos.join(', #')})</span>
+                          </button>
+                        );
+                      })()}
+                      {prof.customPhone ? (
+                        <span 
+                          className="px-1.5 py-0.2 rounded text-[8.5px] font-black tracking-wide flex items-center gap-0.5 bg-emerald-500/20 text-emerald-300 border border-emerald-500/50 shrink-0"
+                          title={language === 'te' ? 'మాన్యువల్‌గా చేర్చిన ఫోన్ (M 📞)' : 'Manually added phone (M 📞)'}
+                        >
+                          <span className="font-mono font-black">M</span>
+                          <Phone className="w-2.5 h-2.5 text-emerald-400" />
+                        </span>
+                      ) : v.k_m ? (
+                        <span 
+                          className="px-1.5 py-0.2 rounded text-[8.5px] font-black tracking-wide flex items-center gap-0.5 bg-blue-500/20 text-cyan-300 border border-blue-500/50 shrink-0"
+                          title={language === 'te' ? 'జాబితా నుండి వచ్చిన ఫోన్ (A 📞)' : 'Auto list phone (A 📞)'}
+                        >
+                          <span className="font-mono font-black">A</span>
+                          <Phone className="w-2.5 h-2.5 text-cyan-400" />
+                        </span>
+                      ) : null}
                     </div>
-                    <span className="text-[9px] font-black text-amber-300 mt-1 uppercase tracking-tight">
-                      స్లిప్
-                    </span>
-                  </button>
-                )}
 
-                <div 
-                  className="flex-1 min-w-0 cursor-pointer"
-                  onClick={() => onOpenSlip(v)}
-                  title={language === 'te' ? 'పూర్తి ఓటర్ కార్డు చూడటానికి ట్యాప్ చేయండి' : 'Tap to view complete official card'}
-                >
-                  <div className="flex items-center gap-1.5 flex-wrap">
-                    <h3 className={`text-sm font-black transition-colors ${isDeceased ? 'text-slate-400 line-through' : 'text-white hover:text-amber-300'}`}>{v.n}</h3>
+                    <div className="text-[11px] text-slate-400 mt-1 flex items-center gap-2 flex-wrap">
+                      <span>{t.relation}: <strong className="text-slate-300 font-medium">{v.r || '-'}</strong></span>
+                      <span>•</span>
+                      <span>{t.age}: <strong className="text-slate-300 font-medium">{v.a}Y ({v.g === 'M' ? (language === 'te' ? 'పురుషుడు' : 'M') : (language === 'te' ? 'మహిళ' : 'F')})</strong></span>
+                      {Number(v.a || 0) >= 70 && !isDeceased && (
+                        <span className="px-1.5 py-0.2 rounded bg-amber-500/20 text-amber-300 border border-amber-500/50 text-[9px] font-black inline-flex items-center gap-0.5">
+                          👴 {language === 'te' ? '70+ వృద్ధులు (వాహన సహాయం)' : '70+ Senior (Vehicle Needed)'}
+                        </span>
+                      )}
+                      <span>•</span>
+                      <span className="flex items-center gap-1">
+                        <Home className="w-3 h-3 text-amber-400" />
+                        {t.houseNo}: <strong className="text-amber-300 font-mono">{v.hn || '-'}</strong>
+                      </span>
+                    </div>
+
+                    {/* User's Custom Input / Search Alias Display */}
+                    {prof.customAlias && (
+                      <div className="mt-1 flex items-center gap-1.5 flex-wrap">
+                        <span className="inline-flex items-center gap-1 bg-emerald-950/80 border border-emerald-500/50 px-2 py-0.5 rounded-lg text-[10px] font-bold text-emerald-300">
+                          <Edit3 className="w-3 h-3 text-amber-400" />
+                          <span>నా ఇన్పుట్: <strong className="text-white font-mono">{prof.customAlias}</strong></span>
+                        </span>
+                        <span className="text-[9px] text-slate-500 italic">
+                          ({prof.customAlias} లేదా {v.n} తో సెర్చ్ చేయవచ్చు)
+                        </span>
+                      </div>
+                    )}
+                  </div>
+                </div>
+              ) : (
+                /* Layout B: Fallback when only passport photoPath or slip button exists (side-by-side) */
+                <div className="flex items-start gap-3 mt-1">
+                  {photoPath ? (
+                    <div
+                      onClick={() => onOpenSlip(v)}
+                      className="w-[75px] h-[95px] shrink-0 rounded-xl overflow-hidden border border-amber-400/50 bg-slate-950 shadow-sm relative group cursor-pointer flex flex-col items-center justify-center"
+                      title={language === 'te' ? 'పూర్తి కార్డును జూమ్ చేయడానికి క్లిక్ చేయండి' : 'Click to zoom'}
+                    >
+                      <img
+                        src={resolvePhotoUrl(photoPath)}
+                        alt={v.n}
+                        className="w-full h-full object-cover"
+                        loading="lazy"
+                      />
+                      <span className="absolute bottom-1 right-1 bg-slate-950/90 text-amber-300 font-mono font-black text-[9px] px-1 py-0.2 rounded border border-amber-500/50">
+                        #{v.s}
+                      </span>
+                    </div>
+                  ) : (
                     <button
                       type="button"
-                      onClick={(e) => {
-                        e.stopPropagation();
-                        setSelectedSurname(selectedSurname === sn.en ? 'all' : sn.en);
-                        setVisibleCount(INITIAL_VISIBLE_COUNT);
-                      }}
-                      className="px-1.5 py-0.2 rounded bg-amber-500/10 hover:bg-amber-500/20 text-amber-300 border border-amber-500/30 text-[9px] font-bold inline-flex items-center gap-0.5"
-                      title={language === 'te' ? 'ఈ ఇంటిపేరు ఓటర్లను మాత్రమే చూడండి' : 'Filter by this surname'}
+                      onClick={() => onOpenSlip(v)}
+                      className="w-14 h-16 rounded-xl bg-gradient-to-b from-slate-800 to-slate-900 border border-slate-700/80 hover:border-amber-500/80 active:scale-95 flex flex-col items-center justify-center text-slate-400 shrink-0 shadow-inner transition-all group relative cursor-pointer"
+                      title={language === 'te' ? 'పూర్తి ఓటర్ కార్డు చూడటానికి ట్యాప్ చేయండి' : 'Tap to view complete official card'}
                     >
-                      <span>🏛️ {sn.te || sn.en}</span>
+                      <div className="w-6 h-6 rounded-lg bg-amber-500/20 text-amber-400 flex items-center justify-center group-hover:scale-110 transition-transform">
+                        <span className="text-sm">📄</span>
+                      </div>
+                      <span className="text-[8.5px] font-black text-amber-300 mt-0.5 uppercase tracking-tight">
+                        స్లిప్
+                      </span>
                     </button>
-                    {dupAnalysis.voterDupMap[v.s] && (() => {
-                      const dup = dupAnalysis.voterDupMap[v.s];
-                      return (
-                        <button
-                          type="button"
-                          onClick={(e) => {
-                            e.stopPropagation();
-                            setSelectedDuplicateCluster({
-                              voters: [v, ...dup.matchingVoters],
-                              reasonTe: dup.reasonTe,
-                              reasonEn: dup.reasonEn,
-                              confidencePct: dup.confidencePct,
-                              matchLevel: dup.matchLevel
-                            });
-                          }}
-                          className={`px-1.5 py-0.5 rounded text-[9px] font-black inline-flex items-center gap-1 shadow-sm transition-all hover:scale-105 active:scale-95 ${
-                            dup.confidencePct >= 80
-                              ? 'bg-rose-950 text-rose-300 border border-rose-500/60'
-                              : 'bg-amber-950 text-amber-300 border border-amber-500/60'
-                          }`}
-                          title={`${dup.reasonTe} (సరిపోల్చడానికి ట్యాప్ చేయండి)`}
+                  )}
+
+                  <div 
+                    className="flex-1 min-w-0 cursor-pointer"
+                    onClick={() => onOpenSlip(v)}
+                    title={language === 'te' ? 'పూర్తి ఓటర్ కార్డు చూడటానికి ట్యాప్ చేయండి' : 'Tap to view complete official card'}
+                  >
+                    <div className="flex items-center gap-1.5 flex-wrap">
+                      <h3 className={`text-sm sm:text-[14.5px] font-black transition-colors break-words leading-snug ${isDeceased ? 'text-slate-400 line-through' : 'text-white hover:text-amber-300'}`}>
+                        {v.n}
+                      </h3>
+                      <button
+                        type="button"
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          setSelectedSurname(selectedSurname === sn.en ? 'all' : sn.en);
+                          setVisibleCount(INITIAL_VISIBLE_COUNT);
+                        }}
+                        className="px-1.5 py-0.2 rounded bg-amber-500/10 hover:bg-amber-500/20 text-amber-300 border border-amber-500/30 text-[9px] font-bold inline-flex items-center gap-0.5 shrink-0"
+                        title={language === 'te' ? 'ఈ ఇంటిపేరు ఓటర్లను మాత్రమే చూడండి' : 'Filter by this surname'}
+                      >
+                        <span>🏛️ {sn.te || sn.en}</span>
+                      </button>
+                      {dupAnalysis.voterDupMap[v.s] && (() => {
+                        const dup = dupAnalysis.voterDupMap[v.s];
+                        return (
+                          <button
+                            type="button"
+                            onClick={(e) => {
+                              e.stopPropagation();
+                              setSelectedDuplicateCluster({
+                                voters: [v, ...dup.matchingVoters],
+                                reasonTe: dup.reasonTe,
+                                reasonEn: dup.reasonEn,
+                                confidencePct: dup.confidencePct,
+                                matchLevel: dup.matchLevel
+                              });
+                            }}
+                            className={`px-1.5 py-0.5 rounded text-[9px] font-black inline-flex items-center gap-1 shadow-sm transition-all hover:scale-105 active:scale-95 shrink-0 ${
+                              dup.confidencePct >= 80
+                                ? 'bg-rose-950 text-rose-300 border border-rose-500/60'
+                                : 'bg-amber-950 text-amber-300 border border-amber-500/60'
+                            }`}
+                            title={`${dup.reasonTe} (సరిపోల్చడానికి ట్యాప్ చేయండి)`}
+                          >
+                            <span>⚠️ {dup.confidencePct >= 80 ? (language === 'te' ? '100% డూప్లికేట్' : '100% Duplicate') : (language === 'te' ? '50% డూప్లికేట్' : '50% Duplicate')}</span>
+                            <span className="font-mono font-bold underline">(#{dup.matchingSnos.join(', #')})</span>
+                          </button>
+                        );
+                      })()}
+                      {prof.customPhone ? (
+                        <span 
+                          className="px-1.5 py-0.2 rounded text-[8.5px] font-black tracking-wide flex items-center gap-0.5 bg-emerald-500/20 text-emerald-300 border border-emerald-500/50 shrink-0"
+                          title={language === 'te' ? 'మాన్యువల్‌గా చేర్చిన ఫోన్ (M 📞)' : 'Manually added phone (M 📞)'}
                         >
-                          <span>⚠️ {dup.confidencePct >= 80 ? (language === 'te' ? '100% డూప్లికేట్' : '100% Duplicate') : (language === 'te' ? '50% డూప్లికేట్' : '50% Duplicate')}</span>
-                          <span className="font-mono font-bold underline">(#{dup.matchingSnos.join(', #')})</span>
-                        </button>
-                      );
-                    })()}
-                    {prof.customPhone ? (
-                      <span 
-                        className="px-1.5 py-0.2 rounded text-[8.5px] font-black tracking-wide flex items-center gap-0.5 bg-emerald-500/20 text-emerald-300 border border-emerald-500/50 shrink-0"
-                        title={language === 'te' ? 'మాన్యువల్‌గా చేర్చిన ఫోన్ (M 📞)' : 'Manually added phone (M 📞)'}
-                      >
-                        <span className="font-mono font-black">M</span>
-                        <Phone className="w-2.5 h-2.5 text-emerald-400" />
-                      </span>
-                    ) : v.k_m ? (
-                      <span 
-                        className="px-1.5 py-0.2 rounded text-[8.5px] font-black tracking-wide flex items-center gap-0.5 bg-blue-500/20 text-cyan-300 border border-blue-500/50 shrink-0"
-                        title={language === 'te' ? 'జాబితా నుండి వచ్చిన ఫోన్ (A 📞)' : 'Auto list phone (A 📞)'}
-                      >
-                        <span className="font-mono font-black">A</span>
-                        <Phone className="w-2.5 h-2.5 text-cyan-400" />
-                      </span>
-                    ) : null}
-                  </div>
+                          <span className="font-mono font-black">M</span>
+                          <Phone className="w-2.5 h-2.5 text-emerald-400" />
+                        </span>
+                      ) : v.k_m ? (
+                        <span 
+                          className="px-1.5 py-0.2 rounded text-[8.5px] font-black tracking-wide flex items-center gap-0.5 bg-blue-500/20 text-cyan-300 border border-blue-500/50 shrink-0"
+                          title={language === 'te' ? 'జాబితా నుండి వచ్చిన ఫోన్ (A 📞)' : 'Auto list phone (A 📞)'}
+                        >
+                          <span className="font-mono font-black">A</span>
+                          <Phone className="w-2.5 h-2.5 text-cyan-400" />
+                        </span>
+                      ) : null}
+                    </div>
 
-                  <div className="text-[11px] text-slate-400 mt-0.5 flex items-center gap-2 flex-wrap">
-                    <span>{t.relation}: <strong className="text-slate-300 font-medium">{v.r || '-'}</strong></span>
-                    <span>•</span>
-                    <span>{t.age}: <strong className="text-slate-300 font-medium">{v.a}Y ({v.g === 'M' ? (language === 'te' ? 'పురుషుడు' : 'M') : (language === 'te' ? 'మహిళ' : 'F')})</strong></span>
-                    {Number(v.a || 0) >= 70 && !isDeceased && (
-                      <span className="px-1.5 py-0.2 rounded bg-amber-500/20 text-amber-300 border border-amber-500/50 text-[9px] font-black inline-flex items-center gap-0.5">
-                        👴 {language === 'te' ? '70+ వృద్ధులు (వాహన సహాయం)' : '70+ Senior (Vehicle Needed)'}
-                      </span>
-                    )}
-                    <span>•</span>
-                    <span className="flex items-center gap-1">
-                      <Home className="w-3 h-3 text-amber-400" />
-                      {t.houseNo}: <strong className="text-amber-300 font-mono">{v.hn || '-'}</strong>
-                    </span>
-                  </div>
-
-                  {/* User's Custom Input / Search Alias Display */}
-                  {prof.customAlias && (
-                    <div className="mt-1 flex items-center gap-1.5 flex-wrap">
-                      <span className="inline-flex items-center gap-1 bg-emerald-950/80 border border-emerald-500/50 px-2 py-0.5 rounded-lg text-[10px] font-bold text-emerald-300">
-                        <Edit3 className="w-3 h-3 text-amber-400" />
-                        <span>నా ఇన్పుట్: <strong className="text-white font-mono">{prof.customAlias}</strong></span>
-                      </span>
-                      <span className="text-[9px] text-slate-500 italic">
-                        ({prof.customAlias} లేదా {v.n} తో సెర్చ్ చేయవచ్చు)
+                    <div className="text-[11px] text-slate-400 mt-1 flex items-center gap-2 flex-wrap">
+                      <span>{t.relation}: <strong className="text-slate-300 font-medium">{v.r || '-'}</strong></span>
+                      <span>•</span>
+                      <span>{t.age}: <strong className="text-slate-300 font-medium">{v.a}Y ({v.g === 'M' ? (language === 'te' ? 'పురుషుడు' : 'M') : (language === 'te' ? 'మహిళ' : 'F')})</strong></span>
+                      {Number(v.a || 0) >= 70 && !isDeceased && (
+                        <span className="px-1.5 py-0.2 rounded bg-amber-500/20 text-amber-300 border border-amber-500/50 text-[9px] font-black inline-flex items-center gap-0.5">
+                          👴 {language === 'te' ? '70+ వృద్ధులు (వాహన సహాయం)' : '70+ Senior (Vehicle Needed)'}
+                        </span>
+                      )}
+                      <span>•</span>
+                      <span className="flex items-center gap-1">
+                        <Home className="w-3 h-3 text-amber-400" />
+                        {t.houseNo}: <strong className="text-amber-300 font-mono">{v.hn || '-'}</strong>
                       </span>
                     </div>
-                  )}
-                </div>
-              </div>
 
-                {/* Local Election & Street Information */}
+                    {/* User's Custom Input / Search Alias Display */}
+                    {prof.customAlias && (
+                      <div className="mt-1 flex items-center gap-1.5 flex-wrap">
+                        <span className="inline-flex items-center gap-1 bg-emerald-950/80 border border-emerald-500/50 px-2 py-0.5 rounded-lg text-[10px] font-bold text-emerald-300">
+                          <Edit3 className="w-3 h-3 text-amber-400" />
+                          <span>నా ఇన్పుట్: <strong className="text-white font-mono">{prof.customAlias}</strong></span>
+                        </span>
+                        <span className="text-[9px] text-slate-500 italic">
+                          ({prof.customAlias} లేదా {v.n} తో సెర్చ్ చేయవచ్చు)
+                        </span>
+                      </div>
+                    )}
+                  </div>
+                </div>
+              )}
+{/* Local Election & Street Information */}
                 {(v.ward_no || v.ac_part || v.sec) && (
                   <div className="flex items-center gap-1.5 flex-wrap text-[10px] text-slate-400 mt-1">
                     {v.ward_no && (
