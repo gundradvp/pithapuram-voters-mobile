@@ -460,7 +460,8 @@ _దయచేసి మీ ఓటు హక్కును వినియోగ
   // Unique streets list for chips
   const streetsList = useMemo(() => {
     const sMap = new Map<string, number>();
-    voters.forEach(v => {
+    const base = selectedWard !== 'all' ? voters.filter(v => String(v.ward_no ?? '') === selectedWard) : voters;
+    base.forEach(v => {
       let s = v.sec || '';
       if (s.includes(' - ')) {
         s = s.split(' - ').slice(1).join(' - ');
@@ -470,7 +471,7 @@ _దయచేసి మీ ఓటు హక్కును వినియోగ
       }
     });
     return Array.from(sMap.entries()).sort((a, b) => b[1] - a[1]);
-  }, [voters]);
+  }, [voters, selectedWard]);
 
   // Unique wards list for chips (Panchayat Election: View by Ward inside Village)
   const wardsList = useMemo(() => {
@@ -562,7 +563,7 @@ _దయచేసి మీ ఓటు హక్కును వినియోగ
 
       return true;
     });
-  }, [voters, searchQuery, selectedStreet, selectedSurname, filterMode, profiles, isPhoneticEnabled, dupAnalysis.voterDupMap, snoFilterPredicate, searchSnoPredicate]);
+  }, [voters, searchQuery, selectedWard, selectedStreet, selectedSurname, filterMode, profiles, isPhoneticEnabled, dupAnalysis.voterDupMap, snoFilterPredicate, searchSnoPredicate]);
 
   // Counts for pills
   const counts = useMemo(() => {
@@ -586,7 +587,11 @@ _దయచేసి మీ ఓటు హక్కును వినియోగ
     let womenVoted = 0;
     let menVoted = 0;
 
-    voters.forEach(v => {
+    const baseVoters = selectedWard !== 'all'
+      ? voters.filter(v => String(v.ward_no ?? '') === selectedWard)
+      : voters;
+
+    baseVoters.forEach(v => {
       const prof = profiles[v.s] || {};
       const pct = prof.supportPct;
       const phone = prof.customPhone || v.k_m;
@@ -633,7 +638,7 @@ _దయచేసి మీ ఓటు హక్కును వినియోగ
     });
 
     return {
-      all: voters.length,
+      all: baseVoters.length,
       full,
       soft,
       strong,
@@ -657,7 +662,7 @@ _దయచేసి మీ ఓటు హక్కును వినియోగ
       exactDups: dupAnalysis.exactCount,
       partial50Dups: dupAnalysis.partial50Count
     };
-  }, [voters, profiles, dupAnalysis.totalDuplicateVotersCount, dupAnalysis.exactCount, dupAnalysis.partial50Count]);
+  }, [voters, selectedWard, profiles, dupAnalysis.totalDuplicateVotersCount, dupAnalysis.exactCount, dupAnalysis.partial50Count]);
 
   const displayedVoters = filteredVoters.slice(0, visibleCount);
 
@@ -1197,7 +1202,7 @@ _దయచేసి మీ ఓటు హక్కును వినియోగ
                             : 'border-slate-800 text-slate-300 hover:border-slate-700'
                         }`}
                       >
-                        <option value="all">🏛️ {language === 'te' ? 'మొత్తం గ్రామం (All Wards)' : 'All Wards'} ({counts.all})</option>
+                        <option value="all">🏛️ {language === 'te' ? 'మొత్తం గ్రామం (All Wards)' : 'All Wards'} ({voters.length})</option>
                         {wardsList.map(([wNo, cnt]) => (
                           <option key={wNo} value={String(wNo)}>
                             {language === 'te' ? `వార్డు #${wNo}` : `Ward #${wNo}`} ({cnt} ఓటర్లు)
