@@ -1085,6 +1085,7 @@ export function App() {
         onOpenThemeSelector={() => setIsThemeModalOpen(true)}
         onOpenBoothSelector={() => setIsBoothSelectorOpen(true)}
         onOpenAdminHub={() => setIsAdminModalOpen(true)}
+        onUnload={boothData ? handleUnloadList : undefined}
         onLogout={() => {
           logoutUser();
           setSession(null);
@@ -1265,63 +1266,15 @@ export function App() {
 
         {boothData && (
           <>
-            {/* Active Loaded List Top Bar with Unload Button (Requirement 3 & 5) */}
-            <div className="flex items-center justify-between gap-2 p-2 px-3 rounded-2xl bg-slate-900/90 border border-slate-800 shadow-md mb-2 flex-wrap">
-              <div className="flex items-center gap-2">
-                <span className="w-2.5 h-2.5 rounded-full bg-emerald-500 animate-pulse"></span>
-                <span className="text-xs font-bold text-white">
-                  {boothData.voters.length} {lang === 'te' ? 'ఓటర్లు లోడ్ అయ్యారు' : 'Voters Loaded'}
-                </span>
-                {session?.role === 'admin' && remainingTime.hasTimer && (
-                  <span className="px-2 py-0.5 rounded-full text-[10px] font-mono font-bold flex items-center gap-1 bg-amber-950/80 border border-amber-500/40 text-amber-300">
-                    <Clock className="w-3 h-3" />
-                    <span>[Admin] {remainingTime.formatted}</span>
-                  </span>
-                )}
-              </div>
-              <button
-                type="button"
-                onClick={handleUnloadList}
-                className="px-2.5 py-1 rounded-xl bg-slate-800 hover:bg-red-950 text-slate-300 hover:text-red-300 border border-slate-700 hover:border-red-500/50 text-xs font-bold flex items-center gap-1 transition-all cursor-pointer shadow-sm active:scale-95"
-                title="ఓటర్ల జాబితాను మెమరీ నుండి అన్‌లోడ్ చేయండి"
-              >
-                <span>📤 {lang === 'te' ? 'అన్‌లోడ్ చేయండి' : 'Unload List'}</span>
-              </button>
-            </div>
-            {/* Top Winning Score Banner (Hidden in Excel view so grid takes full height) */}
-            {activeTab === 'voters' && votersViewMode !== 'excel' && winningScore && (
-              showVictoryPredictor ? (
-                <WinningScoreBanner
-                  calc={winningScore}
-                  language={lang}
-                  onOpenWarRoom={() => setActiveTab('warroom')}
-                  onToggleMode={handleToggleVictoryMode}
-                  onHide={() => handleToggleVictoryPredictor(false)}
-                />
-              ) : (
-                <div className="flex items-center justify-between mb-2.5 px-0.5">
-                  <button
-                    onClick={() => handleToggleVictoryPredictor(true)}
-                    className="w-full py-2 px-3 bg-gradient-to-r from-slate-900 via-slate-900 to-slate-950 hover:bg-slate-850 text-slate-300 hover:text-white border border-amber-500/30 rounded-2xl text-xs font-bold flex items-center justify-between shadow-md transition-all active:scale-[0.99] group"
-                    title="బూత్ గెలుపు అంచనా (విక్టరీ ప్రిడిక్టర్) వివరాలు చూడటానికి ట్యాప్ చేయండి"
-                  >
-                    <div className="flex items-center gap-2">
-                      <div className="p-1.5 rounded-lg bg-amber-500/10 text-amber-400 border border-amber-500/30 group-hover:scale-110 transition-transform">
-                        <Trophy className="w-3.5 h-3.5" />
-                      </div>
-                      <span className="font-black text-amber-300">
-                        {lang === 'te' ? '🏆 బూత్ గెలుపు అంచనా (విక్టరీ ప్రిడిక్టర్) ▾' : '🏆 Booth Victory Predictor ▾'}
-                      </span>
-                    </div>
-                    <div className="flex items-center gap-2">
-                      <span className="text-[10px] font-mono px-2 py-0.5 rounded-full bg-slate-800 text-slate-300 border border-slate-700">
-                        {victoryPredictorMode === 'entry' ? (lang === 'te' ? '📋 క్షేత్ర నమోదు' : 'Field Entry') : (lang === 'te' ? '🤖 సిమ్యులేషన్' : 'Simulation')}
-                      </span>
-                      <span className="text-amber-400 font-bold text-xs">▾</span>
-                    </div>
-                  </button>
-                </div>
-              )
+            {/* Top Winning Score Banner (Shown only when opened via [🏆 విక్టరీ] button) */}
+            {activeTab === 'voters' && votersViewMode !== 'excel' && winningScore && showVictoryPredictor && (
+              <WinningScoreBanner
+                calc={winningScore}
+                language={lang}
+                onOpenWarRoom={() => setActiveTab('warroom')}
+                onToggleMode={handleToggleVictoryMode}
+                onHide={() => handleToggleVictoryPredictor(false)}
+              />
             )}
 
             {/* TAB 1: Voters Tab */}
@@ -1333,6 +1286,8 @@ export function App() {
                 profiles={profiles}
                 language={lang}
                 layoutMode={layoutMode}
+                onToggleVictoryPredictor={() => handleToggleVictoryPredictor(!showVictoryPredictor)}
+                showVictoryPredictor={showVictoryPredictor}
                 onOpenPhoneEditor={v => setSelectedVoterForPhone(v)}
                 onOpenSupportPicker={(title, currentPct, currentNotes, voterSno) => {
                   setSupportPickerState({

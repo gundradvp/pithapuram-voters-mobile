@@ -29,6 +29,7 @@ interface HeaderMobileProps {
   onOpenBoothSelector: () => void;
   onOpenAdminHub?: () => void;
   onLogout: () => void;
+  onUnload?: () => void;
 }
 
 export const HeaderMobile: React.FC<HeaderMobileProps> = ({
@@ -53,7 +54,8 @@ export const HeaderMobile: React.FC<HeaderMobileProps> = ({
   onOpenThemeSelector,
   onOpenBoothSelector,
   onOpenAdminHub,
-  onLogout
+  onLogout,
+  onUnload
 }) => {
   const currentThemeConfig = THEMES.find(t => t.id === theme) || THEMES[0];
 
@@ -134,6 +136,19 @@ export const HeaderMobile: React.FC<HeaderMobileProps> = ({
           >
             <Crown className="w-3 h-3" />
             <span className="hidden xs:inline">కేటాయింపులు</span>
+          </button>
+        )}
+
+                {/* Unload Booth Button */}
+        {onUnload && boothInfo && (
+          <button
+            type="button"
+            onClick={onUnload}
+            className="flex items-center gap-1 px-2 py-1 rounded-lg text-[10px] font-bold bg-slate-800/80 hover:bg-rose-950/80 text-rose-300 hover:text-rose-200 border border-slate-700 hover:border-rose-500/50 transition-all shadow-sm active:scale-95 cursor-pointer"
+            title={language === 'te' ? 'ఓటర్ల జాబితాను అన్‌లోడ్ చేయండి' : 'Unload Current Voter List'}
+          >
+            <LogOut className="w-3 h-3 text-rose-400" />
+            <span className="hidden sm:inline font-bold">{language === 'te' ? 'అన్‌లోడ్' : 'Unload'}</span>
           </button>
         )}
 

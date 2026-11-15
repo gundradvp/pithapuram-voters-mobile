@@ -1,5 +1,5 @@
 import React, { useState, useMemo, useEffect } from 'react';
-import { Search, Phone, PhoneCall, MessageSquare, Send, Printer, CheckCircle2, Flag, Star, UserX, AlertCircle, Sparkles, Home, UserCheck, Sliders, Plus, Clock, User, Volume2, Users, Building, ChevronDown, ChevronUp, Copy, Hash, X, Mic, MicOff, Zap, RotateCcw, CheckSquare, Square, Table, Edit3, LayoutGrid, List } from 'lucide-react';
+import { Search, Phone, Trophy, PhoneCall, MessageSquare, Send, Printer, CheckCircle2, Flag, Star, UserX, AlertCircle, Sparkles, Home, UserCheck, Sliders, Plus, Clock, User, Volume2, Users, Building, ChevronDown, ChevronUp, Copy, Hash, X, Mic, MicOff, Zap, RotateCcw, CheckSquare, Square, Table, Edit3, LayoutGrid, List } from 'lucide-react';
 import { MobileVoter, BoothInfo, VoterSurveyStatus, VoterCampaignProfile } from '../types';
 import { Language, translations } from '../utils/i18n';
 import { resolvePhotoUrl } from '../utils/photoResolver';
@@ -33,6 +33,8 @@ interface VotersTabMobileProps {
   controlledViewMode?: 'list' | 'surnames' | 'excel';
   onViewModeChange?: (mode: 'list' | 'surnames' | 'excel') => void;
   layoutMode?: 'mobile' | 'desktop';
+  onToggleVictoryPredictor?: () => void;
+  showVictoryPredictor?: boolean;
 }
 
 const INITIAL_VISIBLE_COUNT = 50;
@@ -91,7 +93,9 @@ export const VotersTabMobile: React.FC<VotersTabMobileProps> = ({
   onUpdateSupportPct,
   controlledViewMode,
   onViewModeChange,
-  layoutMode
+  layoutMode,
+  onToggleVictoryPredictor,
+  showVictoryPredictor
 }) => {
   // Check layout: Strictly single card per row on mobile or any viewport under 1024px.
   // Multi-column is enabled ONLY on wide desktop screens (>= 1024px) when layoutMode is desktop.
@@ -825,35 +829,7 @@ _దయచేసి మీ ఓటు హక్కును వినియోగ
 
   return (
     <div className="space-y-3 pb-24 text-xs">
-      {/* Laptop / Desktop Excel Grid Mode Suggestion Bar (Hidden when in Excel View) */}
-      {viewMode !== 'excel' && (
-      <div className="hidden md:flex items-center justify-between p-2.5 bg-gradient-to-r from-emerald-950/70 via-slate-900 to-slate-900 border border-emerald-500/40 rounded-2xl text-xs shadow-md">
-        <div className="flex items-center gap-2">
-          <div className="w-7 h-7 rounded-lg bg-emerald-600/30 border border-emerald-500/50 flex items-center justify-center text-emerald-300">
-            <Table className="w-4 h-4 text-emerald-400" />
-          </div>
-          <div>
-            <span className="font-bold text-white">
-              {language === 'te' ? 'ల్యాప్‌టాప్ / డెస్క్‌టాప్ మోడ్: ఎక్సెల్ డేటా గ్రిడ్ లభ్యం' : 'Laptop / Desktop Mode: Excel Grid View Available'}
-            </span>
-            <span className="text-[11px] text-slate-400 block">
-              {language === 'te'
-                ? 'మొదటి కాలమ్‌లో కార్డు చిత్రం, పక్కన పార్స్ చేసిన డేటా & మీ సొంత ఇన్పుట్ / సెర్చ్ అలియాస్ (kanniaha) ఎడిట్ చేసుకోండి'
-                : 'Card Image, parsed text and custom input alias (kanniaha) editor'}
-            </span>
-          </div>
-        </div>
-        <button
-          type="button"
-          onClick={() => handleSetViewMode('excel')}
-          className="px-3 py-1.5 rounded-xl font-bold text-xs flex items-center gap-1.5 transition-all shadow-sm cursor-pointer bg-emerald-600 hover:bg-emerald-500 text-white shadow-emerald-950/50"
-        >
-          <Table className="w-3.5 h-3.5" />
-          <span>{language === 'te' ? '📊 ఎక్సెల్ వ్యూ ఓపెన్ చేయండి' : '📊 Open Excel View'}</span>
-        </button>
-      </div>
-      )}
-
+      
       {/* Search Input & View Mode Controls */}
       <div className="sticky top-[51px] z-30 bg-slate-950/95 backdrop-blur-md pt-2 pb-1 space-y-2">
         <div className="flex items-center gap-1.5">
@@ -930,6 +906,23 @@ _దయచేసి మీ ఓటు హక్కును వినియోగ
             <Hash className="w-3.5 h-3.5" />
             <span className="font-mono text-[10px] font-bold">S.No</span>
           </button>
+
+          {/* Victory Predictor Quick Toggle Button */}
+          {onToggleVictoryPredictor && (
+            <button
+              type="button"
+              onClick={onToggleVictoryPredictor}
+              className={`px-2.5 py-2 rounded-xl text-[10px] font-bold border transition-all flex items-center gap-1.5 shrink-0 cursor-pointer ${
+                showVictoryPredictor
+                  ? 'bg-amber-500 text-slate-950 border-amber-400 font-black shadow-md'
+                  : 'bg-slate-900 border-slate-800 text-amber-300 hover:text-white hover:border-amber-500/50'
+              }`}
+              title={language === 'te' ? 'బూత్ గెలుపు అంచనా (విక్టరీ ప్రిడిక్టర్)' : 'Booth Victory Predictor'}
+            >
+              <Trophy className="w-3.5 h-3.5 text-amber-400" />
+              <span className="hidden sm:inline font-bold">{language === 'te' ? 'విక్టరీ' : 'Victory'}</span>
+            </button>
+          )}
 
           {/* Filter Display Mode / Collapsible Toggle Button */}
           <button
