@@ -41,16 +41,16 @@ export const THEMES: ThemeConfig[] = [
   },
   {
     id: 'solar-crm',
-    nameTe: '🌞 తేజో సోలార్ CRM (Tejo Clean)',
-    nameEn: '🌞 Tejo Solar CRM Clean',
-    descTe: 'తేజో భారత్ CRM తరహా నీట్ వైట్ కార్డ్స్, టీల్ గ్రీన్ & సాఫ్ట్ స్లేట్ లుక్',
-    descEn: 'Ultra-clean white cards, teal primary accents & soft slate CRM styling',
+    nameTe: '🌞 తేజో సోలార్ CRM (Tejo Cream)',
+    nameEn: '🌞 Tejo Solar CRM Cream',
+    descTe: 'తేజో భారత్ CRM తరహా వార్మ్ క్రీమ్ బ్యాక్‌గ్రౌండ్, వైట్ కార్డ్స్ & గోల్డెన్ బార్డర్ లుక్',
+    descEn: 'Warm vanilla cream background, white cards with gold borders & pastel chips',
     icon: '🌞',
     isDark: false,
-    bgPreview: '#f8fafc',
+    bgPreview: '#fefce8',
     cardPreview: '#ffffff',
-    accentPreview: '#0d9488',
-    badgePreview: '#ccfbf1'
+    accentPreview: '#fde047',
+    badgePreview: '#fef08a'
   },
   {
     id: 'jsp-light',

@@ -187,11 +187,20 @@ export const HeaderMobile: React.FC<HeaderMobileProps> = ({
         {/* Theme Switcher Button */}
         <button
           onClick={onOpenThemeSelector}
-          className="flex items-center gap-0.5 px-1.5 py-1 rounded-lg text-[10px] font-black border transition-all bg-slate-800/80 text-amber-300 border-slate-700 hover:border-amber-400/60 active:scale-95 shadow-sm"
+          className={`flex items-center gap-1.5 px-2 py-1 rounded-lg text-[10px] font-black border transition-all active:scale-95 shadow-sm cursor-pointer ${
+            theme === 'solar-crm'
+              ? 'bg-amber-100 text-amber-900 border-amber-300 ring-1 ring-amber-400/50'
+              : 'bg-slate-800/80 text-amber-300 border-slate-700 hover:border-amber-400/60'
+          }`}
           title={language === 'te' ? 'యాప్ థీమ్ మార్చండి (తేజో సోలార్ CRM / లైట్ / డార్క్)' : 'Change Theme (Tejo Solar CRM / Light / Dark)'}
         >
-          <Palette className="w-3.5 h-3.5 text-amber-400" />
-          <span className="text-[10px]">{currentThemeConfig.icon}</span>
+          <Palette className="w-3.5 h-3.5 text-amber-500" />
+          <span>{currentThemeConfig.icon}</span>
+          <span className="hidden sm:inline font-bold">
+            {theme === 'solar-crm' 
+              ? (language === 'te' ? 'తేజో CRM' : 'Solar CRM')
+              : (language === 'te' ? 'థీమ్' : 'Theme')}
+          </span>
         </button>
 
         {/* Language Switcher Pill */}

@@ -28,94 +28,184 @@ body {
    ============================================================= */
 
 /* -------------------------------------------------------------
-   1. 🌞 TEJO SOLAR CRM CLEAN LIGHT (Matches Tejo Bharat CRM)
-   Clean white cards, soft slate-50 background, teal accents
+   1. 🌞 TEJO SOLAR CRM CREAM THEME (Matches Tejo Bharat Solar CRM)
+   Warm cream background (#FEFCE8), crisp white cards with
+   golden yellow perimeter borders (#FDE047), dark slate typography,
+   clean pastel status chips, and modern SaaS desktop feel.
    ------------------------------------------------------------- */
 [data-theme="solar-crm"] {
   color-scheme: light;
 }
 
 [data-theme="solar-crm"] body,
-[data-theme="solar-crm"] .bg-slate-950 {
-  background-color: #f8fafc !important;
-  color: #1e293b !important;
+[data-theme="solar-crm"] #root,
+[data-theme="solar-crm"] .bg-slate-950,
+[data-theme="solar-crm"] .bg-slate-950\/95,
+[data-theme="solar-crm"] .bg-slate-950\/90,
+[data-theme="solar-crm"] .bg-slate-950\/80 {
+  background-color: #FEFCE8 !important; /* Signature warm cream / vanilla tone from screenshot */
+  color: #0F172A !important;
 }
 
+/* Header & Navigation Bar */
+[data-theme="solar-crm"] header {
+  background-color: #FFFFFF !important;
+  border-bottom: 1.5px solid #FEF08A !important;
+  box-shadow: 0 2px 10px rgba(234, 179, 8, 0.06) !important;
+}
+
+[data-theme="solar-crm"] nav {
+  background-color: #FFFFFF !important;
+  border-top: 1.5px solid #FEF08A !important;
+  box-shadow: 0 -2px 10px rgba(234, 179, 8, 0.04) !important;
+}
+
+/* Sticky top filter bar */
+[data-theme="solar-crm"] .sticky {
+  background-color: #FEFCE8 !important;
+}
+
+/* Voter Cards: Pure White with Golden Yellow Perimeter Border */
 [data-theme="solar-crm"] .bg-slate-900,
 [data-theme="solar-crm"] .bg-slate-900\/90,
 [data-theme="solar-crm"] .bg-slate-900\/95,
 [data-theme="solar-crm"] .bg-slate-900\/98 {
-  background-color: #ffffff !important;
-  color: #1e293b !important;
-  box-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.05), 0 1px 2px -1px rgba(0, 0, 0, 0.05);
+  background-color: #FFFFFF !important;
+  color: #0F172A !important;
+  border: 1.5px solid #FDE047 !important; /* Golden yellow perimeter matching screenshot */
+  border-radius: 1rem !important;
+  box-shadow: 0 4px 14px -2px rgba(234, 179, 8, 0.12), 0 2px 6px -1px rgba(0, 0, 0, 0.04) !important;
 }
 
-[data-theme="solar-crm"] .bg-slate-950\/80,
+/* Card inner sub-surfaces & trays */
 [data-theme="solar-crm"] .bg-slate-950\/70,
-[data-theme="solar-crm"] .bg-slate-950\/90,
 [data-theme="solar-crm"] .bg-slate-950\/60,
-[data-theme="solar-crm"] .bg-slate-950\/40 {
-  background-color: #f1f5f9 !important;
-  color: #1e293b !important;
+[data-theme="solar-crm"] .bg-slate-950\/40,
+[data-theme="solar-crm"] .bg-slate-800,
+[data-theme="solar-crm"] .bg-slate-800\/80,
+[data-theme="solar-crm"] .bg-slate-800\/60 {
+  background-color: #F8FAFC !important;
+  color: #1E293B !important;
+  border-color: #E2E8F0 !important;
 }
 
-[data-theme="solar-crm"] .bg-slate-800 {
-  background-color: #f1f5f9 !important;
-  color: #334155 !important;
-}
-
+/* Borders */
 [data-theme="solar-crm"] .border-slate-800,
 [data-theme="solar-crm"] .border-slate-800\/80,
 [data-theme="solar-crm"] .border-slate-800\/60,
 [data-theme="solar-crm"] .border-slate-700 {
-  border-color: #e2e8f0 !important;
+  border-color: #E2E8F0 !important;
 }
 
+/* Typography */
 [data-theme="solar-crm"] .text-white,
 [data-theme="solar-crm"] .text-slate-100,
 [data-theme="solar-crm"] .text-slate-200 {
-  color: #0f172a !important;
+  color: #0F172A !important;
 }
 
 [data-theme="solar-crm"] .text-slate-300,
 [data-theme="solar-crm"] .text-slate-400 {
-  color: #475569 !important;
+  color: #334155 !important;
 }
 
 [data-theme="solar-crm"] .text-slate-500 {
-  color: #64748b !important;
+  color: #64748B !important;
 }
 
-[data-theme="solar-crm"] header {
-  background-color: #ffffff !important;
-  border-bottom: 1px solid #e2e8f0 !important;
-  box-shadow: 0 1px 2px 0 rgba(0, 0, 0, 0.03);
-}
-
-[data-theme="solar-crm"] nav {
-  background-color: #ffffff !important;
-  border-top: 1px solid #e2e8f0 !important;
-  box-shadow: 0 -1px 3px 0 rgba(0, 0, 0, 0.03);
-}
-
+/* Search Bar, Inputs & Selects */
 [data-theme="solar-crm"] input,
 [data-theme="solar-crm"] textarea,
 [data-theme="solar-crm"] select {
-  background-color: #ffffff !important;
-  color: #0f172a !important;
-  border: 1px solid #cbd5e1 !important;
+  background-color: #FFFFFF !important;
+  color: #0F172A !important;
+  border: 1.5px solid #CBD5E1 !important;
+  border-radius: 0.75rem !important;
+  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.04) !important;
+}
+
+[data-theme="solar-crm"] input:focus,
+[data-theme="solar-crm"] textarea:focus,
+[data-theme="solar-crm"] select:focus {
+  border-color: #EAB308 !important;
+  outline: none !important;
+  box-shadow: 0 0 0 3px rgba(234, 179, 8, 0.15) !important;
 }
 
 [data-theme="solar-crm"] input::placeholder,
 [data-theme="solar-crm"] textarea::placeholder {
-  color: #94a3b8 !important;
+  color: #94A3B8 !important;
 }
 
+/* Modals & Dialogs */
 [data-theme="solar-crm"] .fixed.inset-0 .bg-slate-900 {
-  background-color: #ffffff !important;
-  color: #0f172a !important;
-  border: 1px solid #e2e8f0 !important;
-  box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 8px 10px -6px rgba(0, 0, 0, 0.05);
+  background-color: #FFFFFF !important;
+  color: #0F172A !important;
+  border: 2px solid #FDE047 !important;
+  box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.2) !important;
+}
+
+/* Pastel Metric Chips matching screenshot */
+[data-theme="solar-crm"] .bg-amber-500\/20,
+[data-theme="solar-crm"] .bg-amber-950\/70,
+[data-theme="solar-crm"] .bg-amber-950\/40 {
+  background-color: #FEF3C7 !important;
+  color: #92400E !important;
+  border-color: #FDE68A !important;
+}
+
+[data-theme="solar-crm"] .bg-emerald-500\/20,
+[data-theme="solar-crm"] .bg-emerald-950\/70,
+[data-theme="solar-crm"] .bg-emerald-950\/60,
+[data-theme="solar-crm"] .bg-emerald-950\/40 {
+  background-color: #DCFCE7 !important;
+  color: #166534 !important;
+  border-color: #86EFAC !important;
+}
+
+[data-theme="solar-crm"] .bg-blue-500\/20,
+[data-theme="solar-crm"] .bg-blue-950\/60,
+[data-theme="solar-crm"] .bg-blue-950\/40 {
+  background-color: #EFF6FF !important;
+  color: #1D4ED8 !important;
+  border-color: #BFDBFE !important;
+}
+
+[data-theme="solar-crm"] .bg-red-950\/70,
+[data-theme="solar-crm"] .bg-red-950\/40 {
+  background-color: #FEE2E2 !important;
+  color: #991B1B !important;
+  border-color: #FECACA !important;
+}
+
+/* Card Action Buttons (Inactive buttons styled as clean white cards) */
+[data-theme="solar-crm"] button.bg-slate-950:not([class*="bg-gradient-"]),
+[data-theme="solar-crm"] button.bg-slate-900:not([class*="bg-gradient-"]):not([class*="bg-amber-500"]):not([class*="bg-emerald-600"]) {
+  background-color: #FFFFFF !important;
+  border: 1px solid #E2E8F0 !important;
+  color: #334155 !important;
+  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.04) !important;
+}
+
+[data-theme="solar-crm"] button.bg-slate-950:hover,
+[data-theme="solar-crm"] button.bg-slate-900:hover {
+  background-color: #FEFCE8 !important;
+  border-color: #FDE047 !important;
+}
+
+/* Excel Grid in Solar CRM */
+[data-theme="solar-crm"] table {
+  background-color: #FFFFFF !important;
+}
+
+[data-theme="solar-crm"] th {
+  background-color: #F8FAFC !important;
+  color: #0F172A !important;
+  border-color: #E2E8F0 !important;
+}
+
+[data-theme="solar-crm"] tr:hover td {
+  background-color: #FEF9C3 !important;
 }
 
 /* -------------------------------------------------------------
