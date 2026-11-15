@@ -1955,35 +1955,7 @@ _దయచేసి మీ ఓటు హక్కును వినియోగ
                 <span>{showCards ? '📇 కార్డులు: ఆన్' : '📄 కార్డులు: ఆఫ్'}</span>
               </button>
 
-              {/* Desktop View Switcher: Grid vs List (Visible on screens >= 640px) */}
-              <div className="hidden sm:inline-flex items-center bg-slate-900 border border-slate-700/80 rounded-lg p-0.5 shadow-sm">
-                <button
-                  type="button"
-                  onClick={() => handleSetDesktopViewStyle('grid')}
-                  className={`px-2 py-0.5 rounded-md text-[10.5px] font-bold flex items-center gap-1 transition-all cursor-pointer ${
-                    desktopViewStyle === 'grid'
-                      ? 'bg-amber-500 text-slate-950 font-black shadow-sm'
-                      : 'text-slate-400 hover:text-white'
-                  }`}
-                  title={language === 'te' ? 'గ్రిడ్ వ్యూ (కార్డులు)' : 'Grid View (Cards)'}
-                >
-                  <LayoutGrid className="w-3 h-3" />
-                  <span>{language === 'te' ? 'గ్రిడ్' : 'Grid'}</span>
-                </button>
-                <button
-                  type="button"
-                  onClick={() => handleSetDesktopViewStyle('list')}
-                  className={`px-2 py-0.5 rounded-md text-[10.5px] font-bold flex items-center gap-1 transition-all cursor-pointer ${
-                    desktopViewStyle === 'list'
-                      ? 'bg-amber-500 text-slate-950 font-black shadow-sm'
-                      : 'text-slate-400 hover:text-white'
-                  }`}
-                  title={language === 'te' ? 'లిస్ట్ వ్యూ (హారిజాంటల్ వరుసలు)' : 'List View (Compact Rows)'}
-                >
-                  <List className="w-3 h-3" />
-                  <span>{language === 'te' ? 'లిస్ట్' : 'List'}</span>
-                </button>
-              </div>
+              
 
               {/* Select Specific Voters for Printing */}
               <button
@@ -2564,7 +2536,7 @@ _దయచేసి మీ ఓటు హక్కును వినియోగ
             );
           })}
         </div>
-      ) : isDesktopMultiCol && desktopViewStyle === 'list' ? (
+      ) : isDesktopMultiCol && cardLayout === 'row' ? (
         /* Desktop Compact List/Row View (Full Width) */
         <div className="space-y-1.5 w-full">
           {displayedVoters.map(v => {
