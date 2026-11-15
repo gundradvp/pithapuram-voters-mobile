@@ -58,6 +58,7 @@ const filesToSync = [
   'GUIDE_HOW_TO_USE.md',
   'public/assignments.json',
   'public/profiles/profiles_ward_14.json',
+  'public/profiles/profiles_gp_durgada.json',
   'public/profiles/profiles_mptc_durgada_1.json',
   'public/booths_index.json',
   'public/local_elections_index.json',
