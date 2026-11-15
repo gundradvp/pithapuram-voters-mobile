@@ -137,6 +137,26 @@ export const VotersTabMobile: React.FC<VotersTabMobileProps> = ({
     }
   });
   const [isLiveTrackerExpanded, setIsLiveTrackerExpanded] = useState<boolean>(false);
+  const [showCards, setShowCards] = useState<boolean>(() => {
+    try {
+      const saved = localStorage.getItem('jsp_pref_show_cards');
+      if (saved !== null) return saved === 'true';
+      // Default: ON for desktop (>= 768px), OFF for mobile (< 768px)
+      return typeof window !== 'undefined' ? window.innerWidth >= 768 : false;
+    } catch {
+      return false;
+    }
+  });
+
+  const handleToggleShowCards = () => {
+    setShowCards(prev => {
+      const next = !prev;
+      try {
+        localStorage.setItem('jsp_pref_show_cards', String(next));
+      } catch {}
+      return next;
+    });
+  };
 
   const handleSetFilterDisplayStyle = (style: 'dropdown' | 'chips' | 'hidden') => {
     setFilterDisplayStyle(style);
@@ -1842,6 +1862,20 @@ _దయచేసి మీ ఓటు హక్కును వినియోగ
                 <span>{language === 'te' ? `📋 జాబితా (${filteredVoters.length})` : `📋 Roster (${filteredVoters.length})`}</span>
               </button>
 
+              {/* Toggle Show Cards / Off Cards */}
+              <button
+                type="button"
+                onClick={handleToggleShowCards}
+                className={`px-2 py-0.5 rounded-lg text-[10.5px] font-bold flex items-center gap-1 border transition-all active:scale-95 shadow-sm cursor-pointer ${
+                  showCards
+                    ? 'bg-amber-500/20 text-amber-300 border-amber-500/50 hover:bg-amber-500/30 ring-1 ring-amber-400/40'
+                    : 'bg-slate-900 hover:bg-slate-800 text-slate-400 border-slate-700 hover:text-white'
+                }`}
+                title={language === 'te' ? (showCards ? 'కార్డుల ఫుల్ ప్రివ్యూ ఆపండి (కాంపాక్ట్ వ్యూ)' : 'కార్డుల ఫుల్ ప్రివ్యూ ఆన్ చేయండి') : (showCards ? 'Turn Off Cards' : 'Show Cards')}
+              >
+                <span>{showCards ? '📇 కార్డులు: ఆన్' : '📄 కార్డులు: ఆఫ్'}</span>
+              </button>
+
               {/* Select Specific Voters for Printing */}
               <button
                 type="button"
@@ -2423,7 +2457,7 @@ _దయచేసి మీ ఓటు హక్కును వినియోగ
         </div>
       ) : (
         /* Voter Cards List (Responsive Multi-Column on Desktop, Single Column on Mobile) */
-        <div className="grid grid-cols-1 lg:grid-cols-2 xl:grid-cols-2 2xl:grid-cols-3 gap-3.5">
+        <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-3.5">
         {displayedVoters.map(v => {
           const prof = profiles[v.s] || {};
           const phone = prof.customPhone || v.k_m;
@@ -2516,8 +2550,8 @@ _దయచేసి మీ ఓటు హక్కును వినియోగ
               </div>
 
               {/* Name, Card Trigger, Kriya Badge & Details */}
-              {cardPath ? (
-                /* Layout A: Full official card slip on top + full width details below (No overlapping, zero white space gap!) */
+              {showCards && cardPath ? (
+                /* Layout A (Cards ON): Full official card slip on top + full width details below (Desktop/Expanded mode) */
                 <div className="space-y-2 mt-1">
                   {/* Official Slip Image */}
                   <div
@@ -2541,7 +2575,7 @@ _దయచేసి మీ ఓటు హక్కును వినియోగ
                     </span>
                   </div>
 
-                  {/* Voter Name & Details (Full Width: Clean typography, zero text clipping or overlapping) */}
+                  {/* Voter Name & Details (Full Width: Zero text clipping or overlapping) */}
                   <div 
                     className="w-full min-w-0 cursor-pointer pt-0.5"
                     onClick={() => onOpenSlip(v)}
@@ -2625,7 +2659,6 @@ _దయచేసి మీ ఓటు హక్కును వినియోగ
                       </span>
                     </div>
 
-                    {/* User's Custom Input / Search Alias Display */}
                     {prof.customAlias && (
                       <div className="mt-1 flex items-center gap-1.5 flex-wrap">
                         <span className="inline-flex items-center gap-1 bg-emerald-950/80 border border-emerald-500/50 px-2 py-0.5 rounded-lg text-[10px] font-bold text-emerald-300">
@@ -2640,39 +2673,25 @@ _దయచేసి మీ ఓటు హక్కును వినియోగ
                   </div>
                 </div>
               ) : (
-                /* Layout B: Fallback when only passport photoPath or slip button exists (side-by-side) */
+                /* Layout B (Cards OFF / Mobile View): Previous compact 1-click view badge on left + details on right */
                 <div className="flex items-start gap-3 mt-1">
-                  {photoPath ? (
-                    <div
-                      onClick={() => onOpenSlip(v)}
-                      className="w-[75px] h-[95px] shrink-0 rounded-xl overflow-hidden border border-amber-400/50 bg-slate-950 shadow-sm relative group cursor-pointer flex flex-col items-center justify-center"
-                      title={language === 'te' ? 'పూర్తి కార్డును జూమ్ చేయడానికి క్లిక్ చేయండి' : 'Click to zoom'}
-                    >
-                      <img
-                        src={resolvePhotoUrl(photoPath)}
-                        alt={v.n}
-                        className="w-full h-full object-cover"
-                        loading="lazy"
-                      />
-                      <span className="absolute bottom-1 right-1 bg-slate-950/90 text-amber-300 font-mono font-black text-[9px] px-1 py-0.2 rounded border border-amber-500/50">
-                        #{v.s}
-                      </span>
+                  {/* Clickable Card Badge Trigger (Previous Compact View: 1-click to view complete slip) */}
+                  <button
+                    type="button"
+                    onClick={() => onOpenSlip(v)}
+                    className="w-12 h-14 rounded-2xl bg-gradient-to-b from-slate-800 to-slate-900 border border-slate-700/80 hover:border-amber-500/80 active:scale-95 flex flex-col items-center justify-center text-slate-400 shrink-0 shadow-inner transition-all group relative cursor-pointer"
+                    title={language === 'te' ? 'పూర్తి ఓటర్ కార్డు చూడటానికి ట్యాప్ చేయండి' : 'Tap to view complete official card'}
+                  >
+                    <div className="w-6 h-6 rounded-lg bg-amber-500/20 text-amber-400 flex items-center justify-center group-hover:scale-110 transition-transform">
+                      <span className="text-[12px]">{cardPath ? '📇' : photoPath ? '👤' : '📄'}</span>
                     </div>
-                  ) : (
-                    <button
-                      type="button"
-                      onClick={() => onOpenSlip(v)}
-                      className="w-14 h-16 rounded-xl bg-gradient-to-b from-slate-800 to-slate-900 border border-slate-700/80 hover:border-amber-500/80 active:scale-95 flex flex-col items-center justify-center text-slate-400 shrink-0 shadow-inner transition-all group relative cursor-pointer"
-                      title={language === 'te' ? 'పూర్తి ఓటర్ కార్డు చూడటానికి ట్యాప్ చేయండి' : 'Tap to view complete official card'}
-                    >
-                      <div className="w-6 h-6 rounded-lg bg-amber-500/20 text-amber-400 flex items-center justify-center group-hover:scale-110 transition-transform">
-                        <span className="text-sm">📄</span>
-                      </div>
-                      <span className="text-[8.5px] font-black text-amber-300 mt-0.5 uppercase tracking-tight">
-                        స్లిప్
-                      </span>
-                    </button>
-                  )}
+                    <span className="text-[8px] font-black text-amber-300 mt-1 uppercase tracking-tight">
+                      {cardPath ? 'కార్డు' : 'స్లిప్'}
+                    </span>
+                    {cardPath && (
+                      <span className="absolute -top-1 -right-1 w-2.5 h-2.5 rounded-full bg-emerald-500 border border-slate-900 shadow"></span>
+                    )}
+                  </button>
 
                   <div 
                     className="flex-1 min-w-0 cursor-pointer"
@@ -2757,7 +2776,6 @@ _దయచేసి మీ ఓటు హక్కును వినియోగ
                       </span>
                     </div>
 
-                    {/* User's Custom Input / Search Alias Display */}
                     {prof.customAlias && (
                       <div className="mt-1 flex items-center gap-1.5 flex-wrap">
                         <span className="inline-flex items-center gap-1 bg-emerald-950/80 border border-emerald-500/50 px-2 py-0.5 rounded-lg text-[10px] font-bold text-emerald-300">
