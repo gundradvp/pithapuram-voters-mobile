@@ -4,15 +4,15 @@
     "survey_status": null
   },
   "2": {
-    "supportPct": 50,
+    "supportPct": 100,
     "survey_status": null
   },
   "3": {
-    "supportPct": 50,
+    "supportPct": 100,
     "survey_status": null
   },
   "4": {
-    "supportPct": 50,
+    "supportPct": 100,
     "survey_status": null
   },
   "5": {
@@ -7204,6 +7204,22 @@
     "influencerName": "Hediboyina.Gopi Krishna",
     "influencerPhone": "9848172223"
   },
+  "6153": {
+    "supportPct": 100,
+    "survey_status": "supporter"
+  },
+  "6155": {
+    "supportPct": 100,
+    "survey_status": "out_of_city"
+  },
+  "6166": {
+    "supportPct": 100,
+    "survey_status": "supporter"
+  },
+  "6167": {
+    "supportPct": 100,
+    "survey_status": "supporter"
+  },
   "6168": {
     "supportPct": 100,
     "survey_status": "supporter",
@@ -7221,6 +7237,9 @@
     "survey_status": "supporter",
     "influencerName": "Mathina Ganesh",
     "influencerPhone": "8121112096"
+  },
+  "6178": {
+    "survey_status": "out_of_city"
   },
   "6183": {
     "supportPct": 100,

@@ -144,6 +144,22 @@ export const VotersTabMobile: React.FC<VotersTabMobileProps> = ({
     }
   });
   const [isLiveTrackerExpanded, setIsLiveTrackerExpanded] = useState<boolean>(false);
+  const [cardLayout, setCardLayout] = useState<'row' | 'grid'>(() => {
+    try {
+      const saved = localStorage.getItem('jsp_card_layout');
+      if (saved === 'row' || saved === 'grid') return saved;
+      return 'row'; // Default to wide horizontal rows matching user's mockup!
+    } catch {
+      return 'row';
+    }
+  });
+
+  const handleSetCardLayout = (layout: 'row' | 'grid') => {
+    setCardLayout(layout);
+    try {
+      localStorage.setItem('jsp_card_layout', layout);
+    } catch {}
+  };
   const [showCards, setShowCards] = useState<boolean>(() => {
     try {
       const saved = localStorage.getItem('jsp_pref_show_cards');
@@ -951,6 +967,36 @@ _దయచేసి మీ ఓటు హక్కును వినియోగ
               <ChevronUp className="w-3 h-3 opacity-70" />
             )}
           </button>
+
+          {/* Card Layout Switcher: Rows (Feed) vs Grid */}
+          <div className="flex items-center bg-slate-900 border border-slate-800 rounded-xl p-0.5 shrink-0">
+            <button
+              type="button"
+              onClick={() => handleSetCardLayout('row')}
+              className={`px-2 py-1.5 rounded-lg text-[10px] font-bold transition-all flex items-center gap-1 cursor-pointer ${
+                cardLayout === 'row'
+                  ? 'bg-amber-500 text-slate-950 font-black shadow-sm'
+                  : 'text-slate-400 hover:text-white'
+              }`}
+              title={language === 'te' ? 'రో వ్యూ (స్క్రీన్‌షాట్ తరహా విశాలమైన కార్డ్స్)' : 'Wide Row View (Matching Mockup)'}
+            >
+              <span className="font-bold text-xs">≡</span>
+              <span className="hidden sm:inline">{language === 'te' ? 'రో వ్యూ' : 'Rows'}</span>
+            </button>
+            <button
+              type="button"
+              onClick={() => handleSetCardLayout('grid')}
+              className={`px-2 py-1.5 rounded-lg text-[10px] font-bold transition-all flex items-center gap-1 cursor-pointer ${
+                cardLayout === 'grid'
+                  ? 'bg-amber-500 text-slate-950 font-black shadow-sm'
+                  : 'text-slate-400 hover:text-white'
+              }`}
+              title={language === 'te' ? 'గ్రిడ్ వ్యూ (మల్టీ కాలమ్)' : 'Grid View'}
+            >
+              <span className="font-bold text-xs">田</span>
+              <span className="hidden sm:inline">{language === 'te' ? 'గ్రిడ్' : 'Grid'}</span>
+            </button>
+          </div>
 
           {/* View Mode Toggle: List vs Surname Groups vs Excel Grid */}
           <div className="bg-slate-900 border border-slate-800 rounded-xl p-0.5 flex items-center shrink-0">
