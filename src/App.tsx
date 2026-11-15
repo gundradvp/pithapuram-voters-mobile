@@ -1124,7 +1124,7 @@ export function App() {
         activeTab === 'voters' && votersViewMode === 'excel'
           ? 'max-w-none w-full px-2 sm:px-4 lg:px-6 py-2'
           : layoutMode === 'desktop'
-            ? 'max-w-7xl w-full px-3 sm:px-6 lg:px-8 py-3 pb-8'
+            ? 'w-full max-w-none px-3 sm:px-6 lg:px-8 py-3 pb-8'
             : 'max-w-lg p-3 pb-24'
       }`}>
         {/* Unassigned Volunteer Notice Banner */}

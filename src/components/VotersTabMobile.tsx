@@ -1,5 +1,5 @@
 import React, { useState, useMemo, useEffect } from 'react';
-import { Search, Phone, PhoneCall, MessageSquare, Send, Printer, CheckCircle2, Flag, Star, UserX, AlertCircle, Sparkles, Home, UserCheck, Sliders, Plus, Clock, User, Volume2, Users, Building, ChevronDown, ChevronUp, Copy, Hash, X, Mic, MicOff, Zap, RotateCcw, CheckSquare, Square, Table, Edit3 } from 'lucide-react';
+import { Search, Phone, PhoneCall, MessageSquare, Send, Printer, CheckCircle2, Flag, Star, UserX, AlertCircle, Sparkles, Home, UserCheck, Sliders, Plus, Clock, User, Volume2, Users, Building, ChevronDown, ChevronUp, Copy, Hash, X, Mic, MicOff, Zap, RotateCcw, CheckSquare, Square, Table, Edit3, LayoutGrid, List } from 'lucide-react';
 import { MobileVoter, BoothInfo, VoterSurveyStatus, VoterCampaignProfile } from '../types';
 import { Language, translations } from '../utils/i18n';
 import { resolvePhotoUrl } from '../utils/photoResolver';
@@ -163,6 +163,23 @@ export const VotersTabMobile: React.FC<VotersTabMobileProps> = ({
       } catch {}
       return next;
     });
+  };
+
+  const [desktopViewStyle, setDesktopViewStyle] = useState<'grid' | 'list'>(() => {
+    try {
+      const saved = localStorage.getItem('jsp_desktop_view_style');
+      if (saved === 'grid' || saved === 'list') return saved;
+      return 'grid';
+    } catch {
+      return 'grid';
+    }
+  });
+
+  const handleSetDesktopViewStyle = (style: 'grid' | 'list') => {
+    setDesktopViewStyle(style);
+    try {
+      localStorage.setItem('jsp_desktop_view_style', style);
+    } catch {}
   };
 
   const handleSetFilterDisplayStyle = (style: 'dropdown' | 'chips' | 'hidden') => {
@@ -1888,6 +1905,36 @@ _దయచేసి మీ ఓటు హక్కును వినియోగ
                 <span>{showCards ? '📇 కార్డులు: ఆన్' : '📄 కార్డులు: ఆఫ్'}</span>
               </button>
 
+              {/* Desktop View Switcher: Grid vs List (Visible on screens >= 640px) */}
+              <div className="hidden sm:inline-flex items-center bg-slate-900 border border-slate-700/80 rounded-lg p-0.5 shadow-sm">
+                <button
+                  type="button"
+                  onClick={() => handleSetDesktopViewStyle('grid')}
+                  className={`px-2 py-0.5 rounded-md text-[10.5px] font-bold flex items-center gap-1 transition-all cursor-pointer ${
+                    desktopViewStyle === 'grid'
+                      ? 'bg-amber-500 text-slate-950 font-black shadow-sm'
+                      : 'text-slate-400 hover:text-white'
+                  }`}
+                  title={language === 'te' ? 'గ్రిడ్ వ్యూ (కార్డులు)' : 'Grid View (Cards)'}
+                >
+                  <LayoutGrid className="w-3 h-3" />
+                  <span>{language === 'te' ? 'గ్రిడ్' : 'Grid'}</span>
+                </button>
+                <button
+                  type="button"
+                  onClick={() => handleSetDesktopViewStyle('list')}
+                  className={`px-2 py-0.5 rounded-md text-[10.5px] font-bold flex items-center gap-1 transition-all cursor-pointer ${
+                    desktopViewStyle === 'list'
+                      ? 'bg-amber-500 text-slate-950 font-black shadow-sm'
+                      : 'text-slate-400 hover:text-white'
+                  }`}
+                  title={language === 'te' ? 'లిస్ట్ వ్యూ (హారిజాంటల్ వరుసలు)' : 'List View (Compact Rows)'}
+                >
+                  <List className="w-3 h-3" />
+                  <span>{language === 'te' ? 'లిస్ట్' : 'List'}</span>
+                </button>
+              </div>
+
               {/* Select Specific Voters for Printing */}
               <button
                 type="button"
@@ -2467,11 +2514,252 @@ _దయచేసి మీ ఓటు హక్కును వినియోగ
             );
           })}
         </div>
+      ) : isDesktopMultiCol && desktopViewStyle === 'list' ? (
+        /* Desktop Compact List/Row View (Full Width) */
+        <div className="space-y-1.5 w-full">
+          {displayedVoters.map(v => {
+            const prof = profiles[v.s] || {};
+            const phone = prof.customPhone || v.k_m;
+            const pct = prof.supportPct;
+            const sn = extractSurname(v);
+            const cardPath = v.card_url || v.card;
+            const photoPath = v.photo_url || v.photo;
+            const isDeceased = prof.survey_status === 'deceased';
+            const isOutOfCity = prof.survey_status === 'out_of_city';
+            const isOurs = pct === 100 || prof.survey_status === 'supporter';
+            const isVoted = prof.survey_status === 'voted';
+
+            return (
+              <div
+                key={v.s}
+                className={`bg-slate-900/90 hover:bg-slate-800/90 border rounded-xl px-3 py-2 transition-all flex items-center justify-between gap-3 text-xs shadow-sm ${
+                  isDeceased
+                    ? 'border-slate-800 bg-slate-950/80 opacity-75 grayscale-[20%]'
+                    : isOutOfCity
+                      ? 'border-indigo-500/40 bg-gradient-to-r from-indigo-950/25 via-slate-900 to-slate-900'
+                      : pct === 100
+                        ? 'border-red-500/50 bg-gradient-to-r from-red-950/25 via-slate-900 to-slate-900'
+                        : pct !== undefined && pct >= 75
+                          ? 'border-emerald-500/40 bg-gradient-to-r from-emerald-950/20 via-slate-900 to-slate-900'
+                          : pct === 40
+                            ? 'border-amber-500/40 bg-gradient-to-r from-amber-950/20 via-slate-900 to-slate-900'
+                            : 'border-slate-800 hover:border-slate-700'
+                } ${selectedVoterSnos.has(v.s) ? 'ring-2 ring-emerald-500/80 border-emerald-500' : ''}`}
+              >
+                {/* S.No, Checkbox, Card/Slip Thumbnail, EPIC */}
+                <div className="flex items-center gap-2.5 shrink-0">
+                  {isSelectionMode && (
+                    <button
+                      type="button"
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        handleToggleSelectVoter(v.s);
+                      }}
+                      className="p-0.5 text-amber-400 hover:text-white"
+                    >
+                      {selectedVoterSnos.has(v.s) ? (
+                        <CheckSquare className="w-4 h-4 text-emerald-400 fill-emerald-400/20" />
+                      ) : (
+                        <Square className="w-4 h-4 text-slate-500 hover:text-amber-400" />
+                      )}
+                    </button>
+                  )}
+                  <span className="w-12 text-center px-1.5 py-1 bg-amber-500/20 text-amber-300 border border-amber-500/40 rounded-lg text-xs font-mono font-black shrink-0">
+                    #{v.s}
+                  </span>
+
+                  {/* Thumbnail / Card Button */}
+                  <button
+                    type="button"
+                    onClick={() => onOpenSlip(v)}
+                    className="w-10 h-10 rounded-lg bg-slate-950 border border-slate-700 hover:border-amber-400 flex items-center justify-center shrink-0 overflow-hidden relative group cursor-pointer shadow-inner"
+                    title={language === 'te' ? 'పూర్తి ఓటర్ కార్డు చూడటానికి క్లిక్ చేయండి' : 'Click to view card'}
+                  >
+                    {photoPath ? (
+                      <img src={resolvePhotoUrl(photoPath)} alt={v.n} className="w-full h-full object-cover group-hover:scale-110 transition-transform" />
+                    ) : (
+                      <span className="text-base">{cardPath ? '📇' : '👤'}</span>
+                    )}
+                  </button>
+
+                  {/* EPIC ID & Ward */}
+                  <div className="w-28 shrink-0">
+                    <button
+                      type="button"
+                      onClick={() => handleCopyEpic(v.id, String(v.s))}
+                      className="font-mono text-xs font-black text-amber-400 hover:text-white flex items-center gap-1"
+                      title="EPIC ID కాపీ చేయండి"
+                    >
+                      <span>{v.id}</span>
+                      {copiedEpicId === String(v.s) ? <span className="text-[9px] text-emerald-400 font-bold">✓</span> : <Copy className="w-2.5 h-2.5 text-slate-500" />}
+                    </button>
+                    {v.ward_no && (
+                      <span className="text-[10px] text-blue-300 font-mono font-bold block">
+                        🏛️ వార్డు #{v.ward_no}
+                      </span>
+                    )}
+                  </div>
+                </div>
+
+                {/* Voter Details: Name, Surname, Relation, Age, House No */}
+                <div className="flex-1 min-w-0 flex items-center gap-3">
+                  <div className="min-w-0 flex-1 cursor-pointer" onClick={() => onOpenSlip(v)}>
+                    <div className="flex items-center gap-2 flex-wrap">
+                      <span className={`text-sm font-black truncate ${isDeceased ? 'line-through text-slate-500' : 'text-white hover:text-amber-300'}`}>
+                        {v.n}
+                      </span>
+                      <button
+                        type="button"
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          setSelectedSurname(selectedSurname === sn.en ? 'all' : sn.en);
+                          setVisibleCount(INITIAL_VISIBLE_COUNT);
+                        }}
+                        className="px-1.5 py-0.2 rounded bg-amber-500/10 hover:bg-amber-500/20 text-amber-300 border border-amber-500/30 text-[9.5px] font-bold shrink-0"
+                        title="ఈ ఇంటిపేరు ఓటర్లను ఫిల్టర్ చేయండి"
+                      >
+                        🏛️ {sn.te || sn.en}
+                      </button>
+                      {prof.customAlias && (
+                        <span className="px-1.5 py-0.2 rounded bg-emerald-950/80 text-emerald-300 border border-emerald-500/50 text-[9px] font-mono shrink-0">
+                          {prof.customAlias}
+                        </span>
+                      )}
+                      {dupAnalysis.voterDupMap[v.s] && (
+                        <span className="px-1.5 py-0.2 rounded bg-rose-950 text-rose-300 border border-rose-500/50 text-[9px] font-bold shrink-0">
+                          ⚠️ డూప్లికేట్
+                        </span>
+                      )}
+                    </div>
+                    <div className="text-[11px] text-slate-400 flex items-center gap-2 mt-0.5 flex-wrap">
+                      <span>{t.relation}: <strong className="text-slate-300 font-medium">{v.r || '-'}</strong></span>
+                      <span>•</span>
+                      <span>{t.age}: <strong className="text-slate-300 font-medium">{v.a}Y ({v.g === 'M' ? (language === 'te' ? 'పు' : 'M') : (language === 'te' ? 'మహిళ' : 'F')})</strong></span>
+                      <span>•</span>
+                      <span>{t.houseNo}: <strong className="text-slate-300 font-mono">{v.hn || '-'}</strong></span>
+                      {v.sec && (
+                        <>
+                          <span>•</span>
+                          <span className="text-amber-300/80 truncate max-w-[220px]">
+                            📍 {v.sec.includes(' - ') ? v.sec.split(' - ').slice(1).join(' - ') : v.sec}
+                          </span>
+                        </>
+                      )}
+                    </div>
+                  </div>
+                </div>
+
+                {/* Phone & WhatsApp */}
+                <div className="w-40 shrink-0 flex items-center gap-1.5">
+                  {phone ? (
+                    <div className="inline-flex items-center gap-1 bg-slate-950 border border-slate-700/80 px-2 py-1 rounded-lg text-xs">
+                      <Phone className="w-3 h-3 text-emerald-400" />
+                      <a href={`tel:${phone}`} className="font-mono font-bold text-emerald-200 hover:text-white hover:underline text-[11px]">
+                        {phone}
+                      </a>
+                      <button
+                        type="button"
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          handleCopyPhone(phone, `list_p_${v.s}`);
+                        }}
+                        className="p-0.5 text-slate-400 hover:text-white"
+                        title="కాపీ"
+                      >
+                        {copiedPhoneId === `list_p_${v.s}` ? <span className="text-[8px] text-emerald-400">✓</span> : <Copy className="w-2.5 h-2.5 text-slate-400" />}
+                      </button>
+                    </div>
+                  ) : (
+                    <button
+                      onClick={() => onOpenPhoneEditor(v)}
+                      className="text-amber-400/80 hover:text-amber-300 text-[10.5px] font-bold border border-dashed border-slate-700 hover:border-amber-500/50 px-2 py-1 rounded-lg"
+                    >
+                      + ఫోన్
+                    </button>
+                  )}
+                  {phone && (
+                    <button
+                      type="button"
+                      onClick={() => handleSendWhatsAppSlip(v, phone)}
+                      className="p-1 rounded-lg bg-emerald-950/80 hover:bg-emerald-900 text-emerald-400 border border-emerald-500/40 cursor-pointer"
+                      title="వాట్సాప్ స్లిప్ పంపండి"
+                    >
+                      <MessageSquare className="w-3.5 h-3.5" />
+                    </button>
+                  )}
+                </div>
+
+                {/* Actions: Leaning Badge, 1-Click Status Toggles, Visits, Slip */}
+                <div className="flex items-center gap-1.5 shrink-0">
+                  {/* Leaning Support Picker */}
+                  <button
+                    type="button"
+                    onClick={() => onOpenSupportPicker(v.n, pct ?? 50, prof.notes, v.s)}
+                    className="cursor-pointer transition-transform hover:scale-105 active:scale-95"
+                    title="మొగ్గు మార్చడానికి క్లిక్ చేయండి"
+                  >
+                    {getLeaningBadge(pct)}
+                  </button>
+
+                  {/* Quick Mark Ours */}
+                  <button
+                    type="button"
+                    onClick={() => handleToggleOurs(v.s)}
+                    className={`px-2 py-1 rounded-lg text-[10.5px] font-bold flex items-center gap-1 transition-all border cursor-pointer ${
+                      isOurs
+                        ? 'bg-gradient-to-r from-emerald-600 to-amber-600 text-white border-emerald-400 font-black shadow-sm'
+                        : 'bg-slate-950 hover:bg-slate-800 text-slate-300 border-slate-700'
+                    }`}
+                    title={isOurs ? 'మనవాళ్లే (రిసెట్ చేయడానికి క్లిక్ చేయండి)' : 'మనవాళ్లే అని మార్క్ చేయండి'}
+                  >
+                    <Star className={`w-3 h-3 ${isOurs ? 'fill-current' : 'text-amber-400'}`} />
+                    <span>{isOurs ? 'మనవాళ్లే' : 'మనవాళ్లే?'}</span>
+                  </button>
+
+                  {/* Quick Mark Voted */}
+                  <button
+                    type="button"
+                    onClick={() => handleToggleVoted(v.s)}
+                    className={`px-2 py-1 rounded-lg text-[10.5px] font-bold flex items-center gap-1 transition-all border cursor-pointer ${
+                      isVoted
+                        ? 'bg-gradient-to-r from-emerald-600 to-teal-600 text-white border-emerald-400 font-black shadow-sm'
+                        : 'bg-slate-950 hover:bg-slate-800 text-slate-300 border-slate-700'
+                    }`}
+                    title={isVoted ? 'ఓటేశారు (అన్‌మార్క్ చేయడానికి క్లిక్ చేయండి)' : 'ఓటు వేశారు అని మార్క్ చేయండి'}
+                  >
+                    <CheckCircle2 className={`w-3 h-3 ${isVoted ? 'fill-current' : 'text-emerald-400'}`} />
+                    <span>{isVoted ? 'ఓటేశారు' : 'ఓటు?'}</span>
+                  </button>
+
+                  {/* Visit Log */}
+                  <button
+                    type="button"
+                    onClick={() => onOpenLogVisit(v)}
+                    className="px-2 py-1 rounded-lg bg-slate-950 hover:bg-slate-800 text-amber-300 border border-slate-700 text-[10.5px] font-bold cursor-pointer"
+                    title="విజిట్ నమోదు చేయండి"
+                  >
+                    {prof.visits?.length ? `✓ ${prof.visits.length}` : '+విజిట్'}
+                  </button>
+
+                  {/* Slip button */}
+                  <button
+                    type="button"
+                    onClick={() => onOpenSlip(v)}
+                    className="px-2.5 py-1 rounded-lg bg-gradient-to-r from-amber-500/20 to-amber-600/20 hover:from-amber-500/30 hover:to-amber-600/30 text-amber-300 border border-amber-500/40 text-[10.5px] font-bold flex items-center gap-1 cursor-pointer"
+                    title="పూర్తి అధికారిక కార్డు స్లిప్ చూడండి"
+                  >
+                    <span>📇 స్లిప్</span>
+                  </button>
+                </div>
+              </div>
+            );
+          })}
+        </div>
       ) : (
-        /* Voter Cards List: Strictly 1 card per row on mobile; responsive multi-column only on desktop (>= 1024px) */
+        /* Voter Cards List: Strictly 1 card per row on mobile; responsive multi-column on desktop (>= 1024px) utilizing full screen */
         <div className={
           isDesktopMultiCol
-            ? "grid grid-cols-1 lg:grid-cols-2 2xl:grid-cols-3 gap-3.5"
+            ? "grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-3 2xl:grid-cols-4 min-[1900px]:grid-cols-5 min-[2500px]:grid-cols-6 gap-3.5"
             : "grid grid-cols-1 gap-3.5"
         }>
         {displayedVoters.map(v => {
