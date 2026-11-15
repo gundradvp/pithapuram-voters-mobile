@@ -2652,7 +2652,7 @@ _దయచేసి మీ ఓటు హక్కును వినియోగ
                         <>
                           <span>•</span>
                           <span className="text-amber-300/80 truncate max-w-[220px]">
-                            📍 {v.sec.includes(' - ') ? v.sec.split(' - ').slice(1).join(' - ') : v.sec}
+                            📍 {typeof v.sec === 'string' && v.sec.includes(' - ') ? v.sec.split(' - ').slice(1).join(' - ') : v.sec}
                           </span>
                         </>
                       )}
@@ -3120,7 +3120,7 @@ _దయచేసి మీ ఓటు హక్కును వినియోగ
                     )}
                     {v.sec && (
                       <span className="text-amber-300/90 text-[10px] truncate max-w-[260px]">
-                        📍 {v.sec.includes(' - ') ? v.sec.split(' - ').slice(1).join(' - ') : v.sec}
+                        📍 {typeof v.sec === 'string' && v.sec.includes(' - ') ? v.sec.split(' - ').slice(1).join(' - ') : v.sec}
                       </span>
                     )}
                   </div>

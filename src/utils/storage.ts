@@ -413,15 +413,16 @@ export function autoGenerateHouseFamilies(partNo: number | string, voters: Mobil
   houseMap.forEach((members, hn) => {
     const famId = `fam_${hn.replace(/[^a-zA-Z0-9]/g, '_')}`;
     const head = members[0];
+    const headName = head?.n || (head as any)?.name || 'కుటుంబం';
     const kriyaCount = members.filter(m => m.kriya).length;
     // Pure entry mode: default to neutral 50%, candidate/team will explicitly set leaning
     const defaultPct = 50;
 
     map[famId] = {
       id: famId,
-      name: `${head.n.split(' ')[0]} Family (H.No ${hn})`,
+      name: `${headName.split(' ')[0]} Family (H.No ${hn})`,
       houseNumbers: [hn],
-      headName: head.n,
+      headName: headName,
       supportPct: defaultPct,
       supportCategory: 'neutral_swing',
       memberSnos: members.map(m => m.s),

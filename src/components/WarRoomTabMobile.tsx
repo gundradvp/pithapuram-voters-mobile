@@ -835,7 +835,7 @@ export const WarRoomTabMobile: React.FC<WarRoomTabMobileProps> = ({
                   className="text-amber-400 hover:underline text-[10px] font-bold flex items-center gap-0.5"
                 >
                   <UserCheck className="w-3 h-3" />
-                  <span>{prof.influencerName ? prof.influencerName.split(' ')[0] : t.assignLead}</span>
+                  <span>{typeof prof.influencerName === 'string' && prof.influencerName ? prof.influencerName.split(' ')[0] : t.assignLead}</span>
                 </button>
               </div>
             </div>
