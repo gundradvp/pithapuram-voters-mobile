@@ -469,10 +469,11 @@ _దయచేసి మీ ఓటు హక్కును వినియోగ
     return analyzeDuplicateVoters(voters);
   }, [voters]);
 
-  // Precomputed Surnames Grouping with Duplicate counts
+  // Precomputed Surnames Grouping with Duplicate counts (scoped to selected ward)
   const surnameGroups = useMemo(() => {
-    return classifyBoothSurnames(voters, profiles, dupAnalysis.voterDupMap);
-  }, [voters, profiles, dupAnalysis.voterDupMap]);
+    const base = selectedWard !== 'all' ? voters.filter(v => String(v.ward_no ?? '') === selectedWard) : voters;
+    return classifyBoothSurnames(base, profiles, dupAnalysis.voterDupMap);
+  }, [voters, selectedWard, profiles, dupAnalysis.voterDupMap]);
 
   // Unique streets list for chips
   const streetsList = useMemo(() => {
@@ -1067,7 +1068,7 @@ _దయచేసి మీ ఓటు హక్కును వినియోగ
                 <span>🏛️ {language === 'te' ? `వార్డు #${selectedWard}` : `Ward #${selectedWard}`}</span>
                 <button
                   type="button"
-                  onClick={() => { setSelectedWard('all'); setVisibleCount(INITIAL_VISIBLE_COUNT); }}
+                  onClick={() => { setSelectedWard('all'); setSelectedSurname('all'); setSelectedStreet('all'); setVisibleCount(INITIAL_VISIBLE_COUNT); }}
                   className="hover:text-white p-0.5"
                   title="Remove Ward Filter"
                 >
@@ -1212,7 +1213,12 @@ _దయచేసి మీ ఓటు హక్కును వినియోగ
                     <div className="relative">
                       <select
                         value={selectedWard}
-                        onChange={(e) => { setSelectedWard(e.target.value); setVisibleCount(INITIAL_VISIBLE_COUNT); }}
+                        onChange={(e) => {
+                          setSelectedWard(e.target.value);
+                          setSelectedSurname('all');
+                          setSelectedStreet('all');
+                          setVisibleCount(INITIAL_VISIBLE_COUNT);
+                        }}
                         className={`w-full bg-slate-950 border text-xs font-bold rounded-lg px-2.5 py-1.5 pr-7 appearance-none focus:outline-none cursor-pointer truncate ${
                           selectedWard !== 'all'
                             ? 'border-emerald-500 text-emerald-300 bg-emerald-950/40 ring-1 ring-emerald-500/40'
@@ -1437,7 +1443,7 @@ _దయచేసి మీ ఓటు హక్కును వినియోగ
               🏛️ {language === 'te' ? 'వార్డు:' : 'Ward:'}
             </span>
             <button
-              onClick={() => { setSelectedWard('all'); setVisibleCount(INITIAL_VISIBLE_COUNT); }}
+              onClick={() => { setSelectedWard('all'); setSelectedSurname('all'); setSelectedStreet('all'); setVisibleCount(INITIAL_VISIBLE_COUNT); }}
               className={`px-2 py-0.5 rounded-md font-bold whitespace-nowrap transition-all ${
                 selectedWard === 'all'
                   ? 'bg-emerald-600 text-white font-black shadow-sm'
@@ -1449,7 +1455,12 @@ _దయచేసి మీ ఓటు హక్కును వినియోగ
             {wardsList.map(([wNo, cnt]) => (
               <button
                 key={wNo}
-                onClick={() => { setSelectedWard(selectedWard === String(wNo) ? 'all' : String(wNo)); setVisibleCount(INITIAL_VISIBLE_COUNT); }}
+                onClick={() => {
+                  setSelectedWard(selectedWard === String(wNo) ? 'all' : String(wNo));
+                  setSelectedSurname('all');
+                  setSelectedStreet('all');
+                  setVisibleCount(INITIAL_VISIBLE_COUNT);
+                }}
                 className={`px-2 py-0.5 rounded-md font-bold whitespace-nowrap transition-all flex items-center gap-1 ${
                   selectedWard === String(wNo)
                     ? 'bg-emerald-500 text-slate-950 font-black shadow-sm'
