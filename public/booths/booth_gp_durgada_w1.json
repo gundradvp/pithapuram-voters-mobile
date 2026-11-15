@@ -13213,11 +13213,11 @@
       "sno": 378,
       "id": "YOU2417046",
       "epic": "YOU2417046",
-      "n": "RAMESH BOMMIDI (రమేశ్ బొమ్మిడి)",
-      "name_te": "రమేశ్ బొమ్మిడి",
+      "n": "RAMESH BOMMIDI (రమేశ్‌ బొమ్మిడి)",
+      "name_te": "రమేశ్‌ బొమ్మిడి",
       "name_en": "RAMESH BOMMIDI",
-      "r": "SRINIVASU BOMMIDII (శ్రీనివాసు బొమ్మిడి) (Father)",
-      "rel_name_te": "శ్రీనివాసు బొమ్మిడి",
+      "r": "SRINIVASU BOMMIDII (థ్రీనివాసు బొమ్మిడి) (Father)",
+      "rel_name_te": "థ్రీనివాసు బొమ్మిడి",
       "rel_name_en": "SRINIVASU BOMMIDII",
       "rel_type_te": "తండ్రి",
       "rel_type_en": "Father",
@@ -13241,7 +13241,9 @@
       "ac_sno": 489,
       "booth_no": 45,
       "ps_no": 45,
-      "polling_station_en": "Booth #45: Mandal Praja Parishad Primary School, Inti Kaasulu gaari School, Durgada"
+      "polling_station_en": "Booth #45: Mandal Praja Parishad Primary School, Inti Kaasulu gaari School, Durgada",
+      "rel_type_display": "తండ్రి / Father",
+      "gender_display": "పురుషుడు / Male"
     },
     {
       "s": 379,

@@ -1943,11 +1943,11 @@
       "sno": 586,
       "id": "YOU2334654",
       "epic": "YOU2334654",
-      "n": "SIREESHA GUTURI (శిరీష గుటూరీ)",
-      "name_te": "శిరీష గుటూరీ",
+      "n": "SIREESHA GUTURI (శిరీషగుటూరీ)",
+      "name_te": "శిరీషగుటూరీ",
       "name_en": "SIREESHA GUTURI",
-      "r": "GUTURI SURYANARAYANA GUTURI SURYANARAYANA (గుటూరీ సుర్య నారాయణ) (Father)",
-      "rel_name_te": "గుటూరీ సుర్య నారాయణ",
+      "r": "GUTURI SURYANARAYANA GUTURI SURYANARAYANA (గుటూరీ సుర్యనారాయణ) (Father)",
+      "rel_name_te": "గుటూరీ సుర్యనారాయణ",
       "rel_name_en": "GUTURI SURYANARAYANA GUTURI SURYANARAYANA",
       "rel_type_te": "తండ్రి",
       "rel_type_en": "Father",
@@ -1971,7 +1971,9 @@
       "ac_sno": 778,
       "booth_no": 45,
       "ps_no": 45,
-      "polling_station_en": "Booth #45: Mandal Praja Parishad Primary School, Inti Kaasulu gaari School, Durgada"
+      "polling_station_en": "Booth #45: Mandal Praja Parishad Primary School, Inti Kaasulu gaari School, Durgada",
+      "rel_type_display": "తండ్రి / Father",
+      "gender_display": "మహిళ / Female"
     },
     {
       "s": 587,
@@ -13046,9 +13048,9 @@
       "rel_name_en": "RAMANA",
       "rel_type_te": "భర్త",
       "rel_type_en": "Husband",
-      "hn": "1-183/1",
-      "house_no": "1-183/1",
-      "door_no": "1-183/1",
+      "hn": "1-183/'1",
+      "house_no": "1-183/'1",
+      "door_no": "1-183/'1",
       "a": "44",
       "age": 44,
       "g": "F",
@@ -13066,7 +13068,9 @@
       "ac_sno": 818,
       "booth_no": 45,
       "ps_no": 45,
-      "polling_station_en": "Booth #45: Mandal Praja Parishad Primary School, Inti Kaasulu gaari School, Durgada"
+      "polling_station_en": "Booth #45: Mandal Praja Parishad Primary School, Inti Kaasulu gaari School, Durgada",
+      "rel_type_display": "భర్త / Husband",
+      "gender_display": "మహిళ / Female"
     },
     {
       "s": 904,

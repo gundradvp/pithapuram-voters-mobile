@@ -2111,7 +2111,9 @@
       "ac_sno": 1071,
       "booth_no": 46,
       "ps_no": 46,
-      "polling_station_en": "Booth #46: Durgada 1 Swarna Gramam, Beside Grama Panchayati Office, Vegulamma Gudi Center, Durgada"
+      "polling_station_en": "Booth #46: Durgada 1 Swarna Gramam, Beside Grama Panchayati Office, Vegulamma Gudi Center, Durgada",
+      "rel_type_display": "భర్త / Husband",
+      "gender_display": "మహిళ / Female"
     },
     {
       "s": 1121,
@@ -5618,8 +5620,8 @@
       "sno": 1221,
       "id": "YOU1074319",
       "epic": "YOU1074319",
-      "n": "PRASANNA KUMAR INTI (ప్రసన్న కుమార్ ఇంటి)",
-      "name_te": "ప్రసన్న కుమార్ ఇంటి",
+      "n": "PRASANNA KUMAR INTI (ప్రసన్న కుమార్‌ ఇంటి)",
+      "name_te": "ప్రసన్న కుమార్‌ ఇంటి",
       "name_en": "PRASANNA KUMAR INTI",
       "r": "RAJARAO INTI (రాజారావు ఇంటి) (Father)",
       "rel_name_te": "రాజారావు ఇంటి",
@@ -5646,7 +5648,9 @@
       "ac_sno": 89,
       "booth_no": 46,
       "ps_no": 46,
-      "polling_station_en": "Booth #46: Durgada 1 Swarna Gramam, Beside Grama Panchayati Office, Vegulamma Gudi Center, Durgada"
+      "polling_station_en": "Booth #46: Durgada 1 Swarna Gramam, Beside Grama Panchayati Office, Vegulamma Gudi Center, Durgada",
+      "rel_type_display": "తండ్రి / Father",
+      "gender_display": "పురుషుడు / Male"
     },
     {
       "s": 1222,

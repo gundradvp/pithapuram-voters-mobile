@@ -9721,9 +9721,9 @@
       "rel_name_en": "PADDARAJU",
       "rel_type_te": "తండ్రి",
       "rel_type_en": "Father",
-      "hn": "4-37 AD",
-      "house_no": "4-37 AD",
-      "door_no": "4-37 AD",
+      "hn": "4-37",
+      "house_no": "4-37",
+      "door_no": "4-37",
       "a": "42",
       "age": 42,
       "g": "M",
@@ -9741,7 +9741,9 @@
       "ac_sno": 45,
       "booth_no": 47,
       "ps_no": 47,
-      "polling_station_en": "Booth #47: Mandal Praja Parishad Primary School, EBC Colony, Durgada"
+      "polling_station_en": "Booth #47: Mandal Praja Parishad Primary School, EBC Colony, Durgada",
+      "rel_type_display": "తండ్రి / Father",
+      "gender_display": "పురుషుడు / Male"
     },
     {
       "s": 2399,
@@ -12681,7 +12683,9 @@
       "ac_sno": 64,
       "booth_no": 47,
       "ps_no": 47,
-      "polling_station_en": "Booth #47: Mandal Praja Parishad Primary School, EBC Colony, Durgada"
+      "polling_station_en": "Booth #47: Mandal Praja Parishad Primary School, EBC Colony, Durgada",
+      "rel_type_display": "తండ్రి / Father",
+      "gender_display": "పురుషుడు / Male"
     },
     {
       "s": 2483,
@@ -12933,12 +12937,12 @@
       "sno": 2490,
       "id": "YOU2452878",
       "epic": "YOU2452878",
-      "n": "PAVAN KRISHNA KALIBOINA (పవన్ కృష్ణ కాలిబోయిన)",
-      "name_te": "పవన్ కృష్ణ కాలిబోయిన",
-      "name_en": "PAVAN KRISHNA KALIBOINA",
-      "r": "VENKATALAKSHMI KALIBOINA (వెంకటలక్ష్మి కాలిబోయిన) (Mother)",
-      "rel_name_te": "వెంకటలక్ష్మి కాలిబోయిన",
-      "rel_name_en": "VENKATALAKSHMI KALIBOINA",
+      "n": "Pavan Krishna Kaliboina (పవన్‌ కృష్ణ క్రాలిబోయిన)",
+      "name_te": "పవన్‌ కృష్ణ క్రాలిబోయిన",
+      "name_en": "Pavan Krishna Kaliboina",
+      "r": "Venkatalakshmi Kaliboina (వెంకటలక్ష్మి కాల్తిబోయిన) (Mother)",
+      "rel_name_te": "వెంకటలక్ష్మి కాల్తిబోయిన",
+      "rel_name_en": "Venkatalakshmi Kaliboina",
       "rel_type_te": "తల్లి",
       "rel_type_en": "Mother",
       "hn": "4-59",
@@ -12961,7 +12965,9 @@
       "ac_sno": 1144,
       "booth_no": 47,
       "ps_no": 47,
-      "polling_station_en": "Booth #47: Mandal Praja Parishad Primary School, EBC Colony, Durgada"
+      "polling_station_en": "Booth #47: Mandal Praja Parishad Primary School, EBC Colony, Durgada",
+      "rel_type_display": "తల్లి / Mother",
+      "gender_display": "పురుషుడు / Male"
     },
     {
       "s": 2491,
@@ -13181,8 +13187,8 @@
       "n": "YASHODA KRISHNA NEMALA (యశోద కృష్ణ నేమల)",
       "name_te": "యశోద కృష్ణ నేమల",
       "name_en": "YASHODA KRISHNA NEMALA",
-      "r": "APPALASWAMY NEMALA (అప్పా లస్వా మి నేమల) (Father)",
-      "rel_name_te": "అప్పా లస్వా మి నేమల",
+      "r": "APPALASWAMY NEMALA (అప్పాలస్వామి నేమల) (Father)",
+      "rel_name_te": "అప్పాలస్వామి నేమల",
       "rel_name_en": "APPALASWAMY NEMALA",
       "rel_type_te": "తండ్రి",
       "rel_type_en": "Father",
@@ -13206,7 +13212,9 @@
       "ac_sno": 25,
       "booth_no": 47,
       "ps_no": 47,
-      "polling_station_en": "Booth #47: Mandal Praja Parishad Primary School, EBC Colony, Durgada"
+      "polling_station_en": "Booth #47: Mandal Praja Parishad Primary School, EBC Colony, Durgada",
+      "rel_type_display": "తండ్రి / Father",
+      "gender_display": "పురుషుడు / Male"
     },
     {
       "s": 2498,
@@ -16433,12 +16441,12 @@
       "sno": 2590,
       "id": "YOU1473412",
       "epic": "YOU1473412",
-      "n": "SURYAKUMARI SAKHUNALA (సుర్య కుమారి శకునాల)",
-      "name_te": "సుర్య కుమారి శకునాల",
-      "name_en": "SURYAKUMARI SAKHUNALA",
-      "r": "VENKATARAMANA SAKHUNALA (వెంకటరమణ శకునాల) (Husband)",
+      "n": "Suryakumari Sakhunala (సుర్యకుమారి శకునాల)",
+      "name_te": "సుర్యకుమారి శకునాల",
+      "name_en": "Suryakumari Sakhunala",
+      "r": "Venkataramana Sakhunala (వెంకటరమణ శకునాల) (Husband)",
       "rel_name_te": "వెంకటరమణ శకునాల",
-      "rel_name_en": "VENKATARAMANA SAKHUNALA",
+      "rel_name_en": "Venkataramana Sakhunala",
       "rel_type_te": "భర్త",
       "rel_type_en": "Husband",
       "hn": "4-85",
@@ -16461,7 +16469,9 @@
       "ac_sno": 79,
       "booth_no": 47,
       "ps_no": 47,
-      "polling_station_en": "Booth #47: Mandal Praja Parishad Primary School, EBC Colony, Durgada"
+      "polling_station_en": "Booth #47: Mandal Praja Parishad Primary School, EBC Colony, Durgada",
+      "rel_type_display": "భర్త / Husband",
+      "gender_display": "మహిళ / Female"
     },
     {
       "s": 2591,

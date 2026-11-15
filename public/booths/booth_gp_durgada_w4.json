@@ -2041,7 +2041,9 @@
       "ac_sno": 991,
       "booth_no": 46,
       "ps_no": 46,
-      "polling_station_en": "Booth #46: Durgada 1 Swarna Gramam, Beside Grama Panchayati Office, Vegulamma Gudi Center, Durgada"
+      "polling_station_en": "Booth #46: Durgada 1 Swarna Gramam, Beside Grama Panchayati Office, Vegulamma Gudi Center, Durgada",
+      "rel_type_display": "భర్త / Husband",
+      "gender_display": "మహిళ / Female"
     },
     {
       "s": 1649,
