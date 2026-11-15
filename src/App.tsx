@@ -1331,6 +1331,7 @@ export function App() {
                 boothInfo={boothData.booth_info}
                 profiles={profiles}
                 language={lang}
+                layoutMode={layoutMode}
                 onOpenPhoneEditor={v => setSelectedVoterForPhone(v)}
                 onOpenSupportPicker={(title, currentPct, currentNotes, voterSno) => {
                   setSupportPickerState({

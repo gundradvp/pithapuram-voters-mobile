@@ -32,6 +32,7 @@ interface VotersTabMobileProps {
   onUpdateSupportPct?: (serialNo: number, pct: number) => void;
   controlledViewMode?: 'list' | 'surnames' | 'excel';
   onViewModeChange?: (mode: 'list' | 'surnames' | 'excel') => void;
+  layoutMode?: 'mobile' | 'desktop';
 }
 
 const INITIAL_VISIBLE_COUNT = 50;
@@ -89,8 +90,14 @@ export const VotersTabMobile: React.FC<VotersTabMobileProps> = ({
   onUpdateCustomPhone,
   onUpdateSupportPct,
   controlledViewMode,
-  onViewModeChange
+  onViewModeChange,
+  layoutMode
 }) => {
+  // Check layout: Strictly single card per row on mobile or any viewport under 1024px.
+  // Multi-column is enabled ONLY on wide desktop screens (>= 1024px) when layoutMode is desktop.
+  const effectiveLayoutMode = layoutMode || (typeof window !== 'undefined' && window.innerWidth >= 1024 ? 'desktop' : 'mobile');
+  const isDesktopMultiCol = effectiveLayoutMode === 'desktop' && (typeof window === 'undefined' || window.innerWidth >= 1024);
+
   const [searchQuery, setSearchQuery] = useState('');
   const [snoQuery, setSnoQuery] = useState('');
   const [isSnoFilterOpen, setIsSnoFilterOpen] = useState(false);
@@ -141,8 +148,8 @@ export const VotersTabMobile: React.FC<VotersTabMobileProps> = ({
     try {
       const saved = localStorage.getItem('jsp_pref_show_cards');
       if (saved !== null) return saved === 'true';
-      // Default: ON for desktop (>= 768px), OFF for mobile (< 768px)
-      return typeof window !== 'undefined' ? window.innerWidth >= 768 : false;
+      // Default: ON for desktop (>= 1024px) in desktop layout mode, OFF for mobile
+      return isDesktopMultiCol;
     } catch {
       return false;
     }
@@ -2456,8 +2463,12 @@ _దయచేసి మీ ఓటు హక్కును వినియోగ
           })}
         </div>
       ) : (
-        /* Voter Cards List (Responsive Multi-Column on Desktop, Single Column on Mobile) */
-        <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-3.5">
+        /* Voter Cards List: Strictly 1 card per row on mobile; responsive multi-column only on desktop (>= 1024px) */
+        <div className={
+          isDesktopMultiCol
+            ? "grid grid-cols-1 lg:grid-cols-2 2xl:grid-cols-3 gap-3.5"
+            : "grid grid-cols-1 gap-3.5"
+        }>
         {displayedVoters.map(v => {
           const prof = profiles[v.s] || {};
           const phone = prof.customPhone || v.k_m;
