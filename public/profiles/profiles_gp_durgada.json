@@ -1,7 +1,13 @@
 {
   "1": {
     "supportPct": 50,
-    "survey_status": null
+    "survey_status": "out_of_city",
+    "customAlias": "satya narayana desineedi",
+    "customPhone": "9000273028",
+    "altPhone": "",
+    "influencerId": "",
+    "influencerName": "",
+    "influencerMobile": ""
   },
   "2": {
     "supportPct": 100,
@@ -9,41 +15,55 @@
   },
   "3": {
     "supportPct": 100,
-    "survey_status": null
+    "survey_status": null,
+    "influencerId": "inf_1",
+    "influencerName": "Guddati Veerraju",
+    "influencerMobile": "9848596259"
   },
   "4": {
     "supportPct": 100,
-    "survey_status": null
+    "survey_status": null,
+    "customAlias": "veera lakshmi gopisetti",
+    "influencerId": "inf_1",
+    "influencerName": "Guddati Veerraju",
+    "influencerMobile": "9848596259"
   },
   "5": {
     "supportPct": 50,
     "survey_status": null,
-    "influencerName": "Koppula Siva Chakradharrao",
-    "influencerPhone": "9493949669"
+    "influencerName": "Guddati Veerraju",
+    "influencerPhone": "9493949669",
+    "influencerId": "inf_1",
+    "influencerMobile": "9848596259"
   },
   "6": {
     "supportPct": 50,
-    "survey_status": null,
-    "influencerName": "Gadhi.Suryanarayana",
-    "influencerPhone": "9705888474"
+    "survey_status": "voted",
+    "influencerName": "Guddati Veerraju",
+    "influencerPhone": "9705888474",
+    "influencerId": "inf_1",
+    "influencerMobile": "9848596259"
   },
   "7": {
     "supportPct": 100,
-    "survey_status": "supporter"
+    "survey_status": "out_of_city"
   },
   "8": {
-    "survey_status": "supporter",
+    "survey_status": "voted",
     "supportPct": 100
   },
   "9": {
     "supportPct": 100,
-    "survey_status": "supporter",
+    "survey_status": "voted",
     "influencerName": "Koppula Siva Chakradharrao",
     "influencerPhone": "9493949669"
   },
   "10": {
     "supportPct": 100,
-    "survey_status": "supporter"
+    "survey_status": "voted"
+  },
+  "11": {
+    "survey_status": "out_of_city"
   },
   "12": {
     "supportPct": 100,
@@ -193,7 +213,7 @@
   },
   "49": {
     "supportPct": 100,
-    "survey_status": "supporter"
+    "survey_status": "deceased"
   },
   "50": {
     "supportPct": 50,
@@ -393,7 +413,7 @@
   },
   "93": {
     "supportPct": 100,
-    "survey_status": "supporter"
+    "survey_status": "out_of_city"
   },
   "94": {
     "supportPct": 100,
@@ -7006,6 +7026,10 @@
     "influencerName": "Gollapalli Ganga Eswarudu",
     "influencerPhone": "7386273250"
   },
+  "5903": {
+    "supportPct": 100,
+    "survey_status": "supporter"
+  },
   "5904": {
     "supportPct": 100,
     "survey_status": "supporter",
@@ -7066,6 +7090,10 @@
     "influencerName": "Keerthi.Venkataramana",
     "influencerPhone": "8688859842"
   },
+  "6010": {
+    "supportPct": 100,
+    "survey_status": "supporter"
+  },
   "6011": {
     "supportPct": 100,
     "survey_status": "supporter",
@@ -7086,7 +7114,7 @@
   },
   "6015": {
     "supportPct": 100,
-    "survey_status": "supporter",
+    "survey_status": "out_of_city",
     "influencerName": "Jyothula Srinivasu",
     "influencerPhone": "9949048940"
   },

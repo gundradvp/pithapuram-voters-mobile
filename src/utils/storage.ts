@@ -38,7 +38,7 @@ export function setAdminPin(newPin: string): void {
 // -------------------------------------------------------------
 // Offline Booth Caching (Full Offline Field Work Support)
 // -------------------------------------------------------------
-export const DATA_CACHE_VERSION = '2026.11.16.v8487_durgada_ocr_aligned_1794776952';
+export const DATA_CACHE_VERSION = '2026.11.16.v8487_durgada_ocr_aligned_1794777860';
 const CACHE_VERSION_KEY = 'jsp_data_cache_version';
 
 function getBoothStorageKey(partNo: number | string): string {
