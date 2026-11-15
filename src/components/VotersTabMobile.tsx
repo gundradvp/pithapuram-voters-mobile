@@ -2423,12 +2423,14 @@ _దయచేసి మీ ఓటు హక్కును వినియోగ
         </div>
       ) : (
         /* Voter Cards List (Responsive Multi-Column on Desktop, Single Column on Mobile) */
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-2 xl:grid-cols-3 gap-2.5">
+        <div className="grid grid-cols-1 lg:grid-cols-2 xl:grid-cols-2 2xl:grid-cols-3 gap-3.5">
         {displayedVoters.map(v => {
           const prof = profiles[v.s] || {};
           const phone = prof.customPhone || v.k_m;
           const pct = prof.supportPct;
           const sn = extractSurname(v);
+          const cardPath = v.card_url || v.card;
+          const photoPath = v.photo_url || v.photo;
 
           const isDeceased = prof.survey_status === 'deceased';
           const isOutOfCity = prof.survey_status === 'out_of_city';
@@ -2515,23 +2517,60 @@ _దయచేసి మీ ఓటు హక్కును వినియోగ
 
               {/* Name, Card Trigger, Kriya Badge & Details */}
               <div className="flex items-start gap-3 mt-1">
-                {/* Clickable Card Badge Trigger */}
-                <button
-                  type="button"
-                  onClick={() => onOpenSlip(v)}
-                  className="w-12 h-14 rounded-2xl bg-gradient-to-b from-slate-800 to-slate-900 border border-slate-700/80 hover:border-amber-500/80 active:scale-95 flex flex-col items-center justify-center text-slate-400 shrink-0 shadow-inner transition-all group relative cursor-pointer"
-                  title={language === 'te' ? 'పూర్తి ఓటర్ కార్డు చూడటానికి ట్యాప్ చేయండి' : 'Tap to view complete official card'}
-                >
-                  <div className="w-6 h-6 rounded-lg bg-amber-500/20 text-amber-400 flex items-center justify-center group-hover:scale-110 transition-transform">
-                    <span className="text-[12px]">📄</span>
+                {/* Large Official Voter Card Slip (Prominent & Clear, matching screenshot) */}
+                {cardPath ? (
+                  <div
+                    onClick={() => onOpenSlip(v)}
+                    className="w-[180px] xs:w-[220px] sm:w-[260px] md:w-[280px] shrink-0 rounded-2xl overflow-hidden border-2 border-amber-400 bg-slate-950 shadow-sm relative group cursor-pointer hover:border-amber-300 hover:shadow-md transition-all active:scale-[0.99]"
+                    title={language === 'te' ? 'పూర్తి కార్డును జూమ్ చేయడానికి క్లిక్ చేయండి' : 'Click to zoom complete voter card'}
+                  >
+                    <img
+                      src={resolvePhotoUrl(cardPath)}
+                      alt={`Card #${v.s}`}
+                      className="w-full h-auto object-contain block group-hover:scale-105 transition-transform duration-200"
+                      loading="lazy"
+                      onError={(e) => {
+                        const target = e.currentTarget as HTMLImageElement;
+                        const cleanPath = cardPath.startsWith('/') ? cardPath : `/${cardPath}`;
+                        target.src = `https://raw.githubusercontent.com/gundradvp/pithapuram-voters-mobile/main/public${cleanPath}`;
+                      }}
+                    />
+                    {/* Corner S.No Tag matching screenshot */}
+                    <span className="absolute bottom-1 right-1 bg-slate-950/90 text-amber-300 font-mono font-black text-[10.5px] px-2 py-0.5 rounded-lg border border-amber-500/50 shadow">
+                      #{v.s}
+                    </span>
                   </div>
-                  <span className="text-[8px] font-black text-amber-300 mt-1 uppercase tracking-tight">
-                    {v.card_url || v.card ? 'కార్డు' : 'స్లిప్'}
-                  </span>
-                  {(v.card_url || v.card) && (
-                    <span className="absolute -top-1 -right-1 w-2.5 h-2.5 rounded-full bg-emerald-500 border border-slate-900 shadow"></span>
-                  )}
-                </button>
+                ) : photoPath ? (
+                  <div
+                    onClick={() => onOpenSlip(v)}
+                    className="w-[100px] h-[125px] shrink-0 rounded-2xl overflow-hidden border-2 border-amber-400 bg-slate-950 shadow-sm relative group cursor-pointer flex flex-col items-center justify-center"
+                    title={language === 'te' ? 'పూర్తి కార్డును జూమ్ చేయడానికి క్లిక్ చేయండి' : 'Click to zoom'}
+                  >
+                    <img
+                      src={resolvePhotoUrl(photoPath)}
+                      alt={v.n}
+                      className="w-full h-full object-cover"
+                      loading="lazy"
+                    />
+                    <span className="absolute bottom-1 right-1 bg-slate-950/90 text-amber-300 font-mono font-black text-[10px] px-1.5 py-0.2 rounded border border-amber-500/50">
+                      #{v.s}
+                    </span>
+                  </div>
+                ) : (
+                  <button
+                    type="button"
+                    onClick={() => onOpenSlip(v)}
+                    className="w-16 h-20 rounded-2xl bg-gradient-to-b from-slate-800 to-slate-900 border border-slate-700/80 hover:border-amber-500/80 active:scale-95 flex flex-col items-center justify-center text-slate-400 shrink-0 shadow-inner transition-all group relative cursor-pointer"
+                    title={language === 'te' ? 'పూర్తి ఓటర్ కార్డు చూడటానికి ట్యాప్ చేయండి' : 'Tap to view complete official card'}
+                  >
+                    <div className="w-8 h-8 rounded-lg bg-amber-500/20 text-amber-400 flex items-center justify-center group-hover:scale-110 transition-transform">
+                      <span className="text-base">📄</span>
+                    </div>
+                    <span className="text-[9px] font-black text-amber-300 mt-1 uppercase tracking-tight">
+                      స్లిప్
+                    </span>
+                  </button>
+                )}
 
                 <div 
                   className="flex-1 min-w-0 cursor-pointer"
