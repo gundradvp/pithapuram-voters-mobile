@@ -542,7 +542,8 @@ export function App() {
     // Step B: Check local cache first (Instant load)
     const cached = getCachedBoothData(partNo);
     const isStaleDurgadaCache = (partNo === 'gp_durgada' || partNo === 'booth_gp_durgada') && cached && cached.voters && cached.voters.length < 8000;
-    if (cached && Array.isArray(cached.voters) && cached.voters.length > 0 && !isStaleDurgadaCache) {
+    const isStaleTatiparthyCache = (partNo === 'gp_tatiparthy' || partNo === 'booth_gp_tatiparthy') && cached && cached.voters && cached.voters.length < 6500;
+    if (cached && Array.isArray(cached.voters) && cached.voters.length > 0 && !isStaleDurgadaCache && !isStaleTatiparthyCache) {
       setBoothData(cached);
       setFamilies(getFamilyGroups(partNo, cached.voters));
       setIsCached(true);

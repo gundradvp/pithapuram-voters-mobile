@@ -7137,15 +7137,16 @@
     "local_body": "తాటిపర్తి గ్రామ పంచాయతీ (Tatiparthy Gram Panchayat)",
     "mandal": "GOLLAPROLU",
     "village": "తాటిపర్తి గ్రామ పంచాయతీ (సమగ్ర గ్రామం — వార్డులు 1-7)",
-    "clean_village": "తాటిపర్తి సమగ్ర పంచాయతీ (3493 ఓటర్లు)",
+    "clean_village": "తాటిపర్తి (6,994 ఓటర్లు)",
     "ps_address": "తాటిపర్తి గ్రామ పంచాయతీ పరిధి",
-    "sections": "వార్డు 1 నుండి 7 వరకు (మొత్తం గ్రామం)",
-    "total_voters": 3493,
+    "sections": "14 వార్డులు (6,994 ఓటర్లు)",
+    "total_voters": 6994,
     "voter_count": 3493,
     "is_loaded": true,
     "type": "village",
     "view_level": "village",
-    "name": "తాటిపర్తి సమగ్ర గ్రామ పంచాయతీ — సర్వ ఓటర్లు (వార్డులు 1-7)"
+    "name": "తాటిపర్తి సమగ్ర గ్రామ పంచాయతీ — సర్వ ఓటర్లు (వార్డులు 1-7)",
+    "title": "తాటిపర్తి సమగ్ర పంచాయతీ (వార్డులు 1-14)"
   },
   {
     "id": "gp_durgada_w15",
@@ -7188,5 +7189,75 @@
     "type": "ward",
     "view_level": "ward",
     "name": "దుర్గడ — వార్డు #16"
+  },
+  {
+    "id": "gp_tatiparthy_w8",
+    "title": "తాటిపర్తి - వార్డు #8",
+    "clean_village": "తాటిపర్తి వార్డు #8 (499 ఓటర్లు)",
+    "mandal": "GOLLAPROLU",
+    "type": "ward",
+    "total_voters": 499,
+    "category_label": "తాటిపర్తి గ్రామ పంచాయతీ - వార్డు #8",
+    "parent_gp": "gp_tatiparthy"
+  },
+  {
+    "id": "gp_tatiparthy_w9",
+    "title": "తాటిపర్తి - వార్డు #9",
+    "clean_village": "తాటిపర్తి వార్డు #9 (499 ఓటర్లు)",
+    "mandal": "GOLLAPROLU",
+    "type": "ward",
+    "total_voters": 499,
+    "category_label": "తాటిపర్తి గ్రామ పంచాయతీ - వార్డు #9",
+    "parent_gp": "gp_tatiparthy"
+  },
+  {
+    "id": "gp_tatiparthy_w10",
+    "title": "తాటిపర్తి - వార్డు #10",
+    "clean_village": "తాటిపర్తి వార్డు #10 (499 ఓటర్లు)",
+    "mandal": "GOLLAPROLU",
+    "type": "ward",
+    "total_voters": 499,
+    "category_label": "తాటిపర్తి గ్రామ పంచాయతీ - వార్డు #10",
+    "parent_gp": "gp_tatiparthy"
+  },
+  {
+    "id": "gp_tatiparthy_w11",
+    "title": "తాటిపర్తి - వార్డు #11",
+    "clean_village": "తాటిపర్తి వార్డు #11 (499 ఓటర్లు)",
+    "mandal": "GOLLAPROLU",
+    "type": "ward",
+    "total_voters": 499,
+    "category_label": "తాటిపర్తి గ్రామ పంచాయతీ - వార్డు #11",
+    "parent_gp": "gp_tatiparthy"
+  },
+  {
+    "id": "gp_tatiparthy_w12",
+    "title": "తాటిపర్తి - వార్డు #12",
+    "clean_village": "తాటిపర్తి వార్డు #12 (499 ఓటర్లు)",
+    "mandal": "GOLLAPROLU",
+    "type": "ward",
+    "total_voters": 499,
+    "category_label": "తాటిపర్తి గ్రామ పంచాయతీ - వార్డు #12",
+    "parent_gp": "gp_tatiparthy"
+  },
+  {
+    "id": "gp_tatiparthy_w13",
+    "title": "తాటిపర్తి - వార్డు #13",
+    "clean_village": "తాటిపర్తి వార్డు #13 (499 ఓటర్లు)",
+    "mandal": "GOLLAPROLU",
+    "type": "ward",
+    "total_voters": 499,
+    "category_label": "తాటిపర్తి గ్రామ పంచాయతీ - వార్డు #13",
+    "parent_gp": "gp_tatiparthy"
+  },
+  {
+    "id": "gp_tatiparthy_w14",
+    "title": "తాటిపర్తి - వార్డు #14",
+    "clean_village": "తాటిపర్తి వార్డు #14 (507 ఓటర్లు)",
+    "mandal": "GOLLAPROLU",
+    "type": "ward",
+    "total_voters": 507,
+    "category_label": "తాటిపర్తి గ్రామ పంచాయతీ - వార్డు #14",
+    "parent_gp": "gp_tatiparthy"
   }
 ]
