@@ -1,12 +1,12 @@
-const fs = require('fs');
-const path = require('path');
-const https = require('https');
+import fs from 'node:fs';
+import path from 'node:path';
 
 const COMMIT_SHA = 'main';
 
 const filesToSync = [
   'sync.js',
   'sync.cjs',
+  'sync.mjs',
   'public/_redirects',
   'index.html',
   'package.json',
@@ -59,121 +59,81 @@ const filesToSync = [
   'public/assignments.json',
   'public/profiles/profiles_ward_14.json',
   'public/profiles/profiles_gp_durgada.json',
+  "public/local_elections_index.json",
+  "public/booths_index.json",
+  "public/booths/gp_durgada.json",
+  "public/booths/booth_gp_durgada.json",
+  "public/booths/mptc_durgada_1.json",
+  "public/booths/booth_mptc_durgada_1.json",
+  "public/booths/mptc_durgada_2.json",
+  "public/booths/booth_mptc_durgada_2.json",
+  "public/booths/mptc_durgada_3.json",
+  "public/booths/booth_mptc_durgada_3.json",
+  "public/booths/gp_durgada_w1.json",
+  "public/booths/booth_gp_durgada_w1.json",
+  "public/booths/gp_durgada_w2.json",
+  "public/booths/booth_gp_durgada_w2.json",
+  "public/booths/gp_durgada_w3.json",
+  "public/booths/booth_gp_durgada_w3.json",
+  "public/booths/gp_durgada_w4.json",
+  "public/booths/booth_gp_durgada_w4.json",
+  "public/booths/gp_durgada_w5.json",
+  "public/booths/booth_gp_durgada_w5.json",
+  "public/booths/gp_durgada_w6.json",
+  "public/booths/booth_gp_durgada_w6.json",
+  "public/booths/gp_durgada_w7.json",
+  "public/booths/booth_gp_durgada_w7.json",
+  "public/booths/gp_durgada_w8.json",
+  "public/booths/booth_gp_durgada_w8.json",
+  "public/booths/gp_durgada_w9.json",
+  "public/booths/booth_gp_durgada_w9.json",
+  "public/booths/gp_durgada_w10.json",
+  "public/booths/booth_gp_durgada_w10.json",
+  "public/booths/gp_durgada_w11.json",
+  "public/booths/booth_gp_durgada_w11.json",
+  "public/booths/gp_durgada_w12.json",
+  "public/booths/booth_gp_durgada_w12.json",
+  "public/booths/gp_durgada_w13.json",
+  "public/booths/booth_gp_durgada_w13.json",
+  "public/booths/gp_durgada_w14.json",
+  "public/booths/booth_gp_durgada_w14.json",
+  "public/booths/gp_durgada_w15.json",
+  "public/booths/booth_gp_durgada_w15.json",
+  "public/booths/gp_durgada_w16.json",
+  "public/booths/booth_gp_durgada_w16.json",
   'public/profiles/profiles_mptc_durgada_1.json',
   'public/booths_index.json',
-  'public/local_elections_index.json',
-  'public/booths/mptc_chebrolu_4.json',
-  'public/booths/mptc_tatiparthy_1.json',
-    'public/booths/booth_mptc_tatiparthy_1.json',
-    'public/booths/booth_gp_tatiparthy_w1.json',
-    'public/booths/booth_gp_tatiparthy_w2.json',
-    'public/booths/booth_gp_tatiparthy_w3.json',
-    'public/booths/booth_gp_tatiparthy_w4.json',
-    'public/booths/booth_gp_tatiparthy_w5.json',
-    'public/booths/booth_gp_tatiparthy_w6.json',
-    'public/booths/booth_gp_tatiparthy_w7.json',
-    'public/booths/mptc_tatiparthy_2.json',
-  'public/booths/booth_mptc_tatiparthy_2.json',
-  'public/booths/booth_mptc_chebrolu_4.json',
-  'public/booths/booth_ward_14.json',
-  'public/booths/ward_14.json',
-  'public/booths/booth_gollaprolu_ward_11.json',
-  'public/booths/gollaprolu_ward_11.json',
-  'public/booths/gp_vannepudi.json',
-  'public/booths/booth_gp_vannepudi.json',
-  'public/booths/mptc_durgada_1.json',
-  'public/booths/booth_mptc_durgada_1.json',
-  'public/booths/mptc_durgada_1_b45.json',
-  'public/booths/booth_mptc_durgada_1_b45.json',
-  'public/booths/mptc_durgada_1_b46.json',
-  'public/booths/booth_mptc_durgada_1_b46.json',
-  'public/booths/mptc_durgada_1_b47.json',
-  'public/booths/booth_mptc_durgada_1_b47.json',
-  'public/booths/mptc_durgada_3.json',
-  'public/booths/booth_mptc_durgada_3.json',
-  'public/booths/gp_durgada.json',
-  'public/booths/booth_gp_durgada.json',
-  'public/booths/booth_9.json',
-  'public/booths/booth_11.json',
-  'public/booths/booth_12.json',
-  'public/booths/booth_13.json',
-  'public/booths/booth_14.json',
-  'public/booths/booth_15.json',
-  'public/booths/booth_16.json',
-  'public/booths/booth_17.json',
-  'public/booths/booth_18.json',
-  'public/booths/booth_19.json',
-  'public/booths/booth_23.json',
-  'public/booths/booth_24.json',
-  'public/booths/booth_25.json'
+  'public/local_elections_index.json'
 ];
-
-function fetchWithHttps(url, maxRedirects = 5) {
-  return new Promise((resolve, reject) => {
-    if (maxRedirects < 0) return reject(new Error('Too many redirects'));
-    const req = https.get(url, {
-      headers: {
-        'User-Agent': 'Mozilla/5.0 (Bolt-Sync/1.0)',
-        'Accept': '*/*'
-      }
-    }, (res) => {
-      if (res.statusCode >= 300 && res.statusCode < 400 && res.headers.location) {
-        return fetchWithHttps(res.headers.location, maxRedirects - 1).then(resolve).catch(reject);
-      }
-      if (res.statusCode !== 200) {
-        return reject(new Error(`HTTP ${res.statusCode}`));
-      }
-      let data = '';
-      res.setEncoding('utf8');
-      res.on('data', chunk => data += chunk);
-      res.on('end', () => resolve(data));
-    });
-    req.on('error', reject);
-    req.setTimeout(15000, () => {
-      req.destroy();
-      reject(new Error('Timeout'));
-    });
-  });
-}
 
 async function syncFile(file, index, total) {
   const ts = Date.now();
   const rawUrl = `https://raw.githubusercontent.com/gundradvp/pithapuram-voters-mobile/${COMMIT_SHA}/${file}?t=${ts}`;
-  const cdnUrl = `https://cdn.jsdelivr.net/gh/gundradvp/pithapuram-voters-mobile@${COMMIT_SHA}/${file}`;
 
-  let content = null;
   try {
-    content = await fetchWithHttps(rawUrl);
-  } catch (e) {
-    try {
-      content = await fetchWithHttps(cdnUrl);
-    } catch (e2) {}
-  }
-
-  if (content === null) {
-    console.error(`❌ [${index}/${total}] Failed to fetch: ${file}`);
+    const res = await fetch(rawUrl);
+    if (!res.ok) throw new Error(`HTTP ${res.status}`);
+    const text = await res.text();
+    const dir = path.dirname(file);
+    if (!fs.existsSync(dir)) fs.mkdirSync(dir, { recursive: true });
+    fs.writeFileSync(file, text, 'utf8');
+    console.log(`✅ [${index}/${total}] Updated ${file}`);
+    return true;
+  } catch (err) {
+    console.error(`❌ [${index}/${total}] Failed: ${file} (${err.message})`);
     return false;
   }
-
-  const dir = path.dirname(file);
-  if (!fs.existsSync(dir)) {
-    fs.mkdirSync(dir, { recursive: true });
-  }
-
-  fs.writeFileSync(file, content, 'utf8');
-  console.log(`✅ [${index}/${total}] Updated ${file}`);
-  return true;
 }
 
 async function run() {
-  console.log(`🚀 Starting sync of JSP Pithapuram Voter Mobile App into Bolt...`);
-  let successCount = 0;
+  console.log(`🚀 Starting sync in Bolt (ESM Mode)...`);
+  let count = 0;
   for (let i = 0; i < filesToSync.length; i++) {
     const ok = await syncFile(filesToSync[i], i + 1, filesToSync.length);
-    if (ok) successCount++;
+    if (ok) count++;
   }
-  console.log(`\n🎉 DONE! ${successCount}/${filesToSync.length} files successfully updated inside Bolt!`);
-  console.log(`👉 Run 'npm run dev' to restart your preview.`);
+  console.log(`\n🎉 DONE! ${count}/${filesToSync.length} files updated in Bolt!`);
+  console.log(`👉 Run 'npm run dev' to restart preview.`);
 }
 
 run();
