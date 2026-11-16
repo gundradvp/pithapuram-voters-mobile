@@ -198,6 +198,14 @@ export function analyzeDuplicateVoters(voters: MobileVoter[]): DuplicateAnalysis
         for (let j = i + 1; j < list.length; j++) {
           const v1 = list[i];
           const v2 = list[j];
+
+          // Guard: If both have distinct Telugu names that differ, they are completely different electors!
+          const { te: te1 } = getComparableNames(v1);
+          const { te: te2 } = getComparableNames(v2);
+          if (te1 && te2 && te1 !== te2 && !te1.includes(te2) && !te2.includes(te1)) {
+            continue;
+          }
+
           const hn1 = cleanHouseNo(v1.hn);
           const hn2 = cleanHouseNo(v2.hn);
           const a1 = parseInt(v1.a, 10) || 0;
@@ -240,6 +248,14 @@ export function analyzeDuplicateVoters(voters: MobileVoter[]): DuplicateAnalysis
         for (let j = i + 1; j < list.length; j++) {
           const v1 = list[i];
           const v2 = list[j];
+
+          // Guard: If both have distinct Telugu names that differ, they are completely different electors!
+          const { te: te1 } = getComparableNames(v1);
+          const { te: te2 } = getComparableNames(v2);
+          if (te1 && te2 && te1 !== te2 && !te1.includes(te2) && !te2.includes(te1)) {
+            continue;
+          }
+
           const a1 = parseInt(v1.a, 10) || 0;
           const a2 = parseInt(v2.a, 10) || 0;
           const ageDiff = Math.abs(a1 - a2);
@@ -267,6 +283,14 @@ export function analyzeDuplicateVoters(voters: MobileVoter[]): DuplicateAnalysis
         for (let j = i + 1; j < list.length; j++) {
           const v1 = list[i];
           const v2 = list[j];
+
+          // Guard: If both have distinct Telugu names that differ, they are completely different electors!
+          const { te: te1 } = getComparableNames(v1);
+          const { te: te2 } = getComparableNames(v2);
+          if (te1 && te2 && te1 !== te2 && !te1.includes(te2) && !te2.includes(te1)) {
+            continue;
+          }
+
           const k1 = `${v1.s}-${v2.s}`;
           if (edgeMeta.has(k1)) continue; // Already covered by exact/high rule
 
