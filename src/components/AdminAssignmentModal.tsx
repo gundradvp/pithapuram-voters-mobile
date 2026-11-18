@@ -1,43 +1,21 @@
-import React, { useState, useEffect, useMemo } from 'react';
+import React, { useState, useEffect } from 'react';
 import { 
-  X, 
-  UserPlus, 
-  Send, 
-  Trash2, 
-  Edit3, 
-  Check, 
-  Phone, 
-  Building2, 
-  Landmark, 
-  ShieldCheck, 
-  Share2, 
-  ExternalLink,
-  Users,
-  Copy,
-  CheckCircle2,
-  Trees,
-  MapPin,
-  RefreshCw,
-  Search,
-  CheckSquare,
-  Square,
-  ChevronDown,
-  ChevronUp,
-  Clock,
-  AlertTriangle
+  X, UserPlus, Phone, Trash2, Edit3, Check, Copy, 
+  CheckCircle2, RefreshCw, Clock, AlertTriangle, ChevronDown, ChevronUp, 
+  Trees, Search, ShieldCheck, Send, User, Home, Building
 } from 'lucide-react';
 import { 
   VolunteerAssignment, 
   getAssignments, 
   saveAssignment, 
   deleteAssignment, 
-  generateAssignmentWhatsAppMessage, 
-  getWhatsAppShareUrl, 
-  cleanPhoneNumber,
-  fetchFreshAssignments,
-  isAssignmentExpired,
+  extendAssignmentTime,
   getRemainingTime,
-  extendAssignmentTime
+  isAssignmentExpired,
+  cleanPhoneNumber,
+  generateAssignmentWhatsAppMessage as getWhatsAppShareMessage,
+  getWhatsAppShareUrl,
+  fetchFreshAssignments
 } from '../utils/auth';
 import { BoothIndexItem, LocalElectionUnit } from '../types';
 import { Language } from '../utils/i18n';
@@ -47,15 +25,25 @@ interface AdminAssignmentModalProps {
   onClose: () => void;
   boothsIndex: BoothIndexItem[];
   localUnits: LocalElectionUnit[];
-  language: Language;
+  language?: Language;
+}
+
+interface GroupedVillageInfo {
+  villageId: string;
+  name: string;
+  isFullGp: boolean;
+  totalVoters: number;
+  assignedWards: number[];
+  totalWardsCount: number;
+  badgeCls: string;
 }
 
 export const AdminAssignmentModal: React.FC<AdminAssignmentModalProps> = ({
   isOpen,
   onClose,
   boothsIndex,
-  localUnits,
-  language
+  localUnits: _localUnits,
+  language = 'te'
 }) => {
   const [assignments, setAssignments] = useState<VolunteerAssignment[]>(() => getAssignments());
   const [isAddingNew, setIsAddingNew] = useState(false);
@@ -63,6 +51,7 @@ export const AdminAssignmentModal: React.FC<AdminAssignmentModalProps> = ({
   const [isSyncing, setIsSyncing] = useState(false);
   const [isBoothSelectorOpen, setIsBoothSelectorOpen] = useState(false);
   const [boothFilterQuery, setBoothFilterQuery] = useState('');
+  const [expandedWardsForAssignment, setExpandedWardsForAssignment] = useState<Record<string, boolean>>({});
 
   // Form State
   const [name, setName] = useState('');
@@ -70,19 +59,14 @@ export const AdminAssignmentModal: React.FC<AdminAssignmentModalProps> = ({
   const [assemblyBoothsInput, setAssemblyBoothsInput] = useState('');
   const [selectedWards, setSelectedWards] = useState<string[]>([]);
   const [notes, setNotes] = useState('');
-  const [expiryMinutes, setExpiryMinutes] = useState<number>(60);
+  const [expiryMinutes, setExpiryMinutes] = useState<number>(0);
   const [copiedId, setCopiedId] = useState<string | null>(null);
 
-  // Sync latest assignments on mount
-  useEffect(() => {
-    fetchFreshAssignments().then(fresh => {
-      if (fresh && fresh.length > 0) {
-        setAssignments(fresh);
-      }
-    }).catch(() => {});
-  }, []);
+  // Form Accordions
+  const [showTatiparthyWards, setShowTatiparthyWards] = useState(false);
+  const [showDurgadaWards, setShowDurgadaWards] = useState(false);
 
-  // Escape key to close modal
+  // Close on Escape key
   useEffect(() => {
     const handleKeyDown = (e: KeyboardEvent) => {
       if (e.key === 'Escape') {
@@ -92,6 +76,15 @@ export const AdminAssignmentModal: React.FC<AdminAssignmentModalProps> = ({
     window.addEventListener('keydown', handleKeyDown);
     return () => window.removeEventListener('keydown', handleKeyDown);
   }, [onClose]);
+
+  // Sync latest assignments on mount
+  useEffect(() => {
+    fetchFreshAssignments().then(fresh => {
+      if (fresh && fresh.length > 0) {
+        setAssignments(fresh);
+      }
+    }).catch(() => {});
+  }, []);
 
   const handleManualSync = async () => {
     setIsSyncing(true);
@@ -107,60 +100,17 @@ export const AdminAssignmentModal: React.FC<AdminAssignmentModalProps> = ({
 
   if (!isOpen) return null;
 
-  // Assembly Booth Labels Dictionary
-  const assemblyLabels: Record<number, string> = {};
-  boothsIndex.forEach(b => {
-    if (typeof b.part_no === 'number') {
-      assemblyLabels[b.part_no] = b.clean_village;
-    }
-  });
-
-  // Local Wards Dictionary
-  const wardLabels: Record<string, string> = {};
-  localUnits.forEach(u => {
-    wardLabels[u.id] = u.clean_village || u.local_body;
-  });
-
-  const getUnitBadge = (w: string) => {
-    switch (w) {
-      case 'ward_14':
-        return { label: '🏛️ పిఠాపురం వార్డు 14 (1,256)', cls: 'bg-blue-950/60 border-blue-500/40 text-blue-300' };
-      case 'gollaprolu_ward_11':
-        return { label: '🏡 గొల్లప్రోలు వార్డు 11 (991)', cls: 'bg-emerald-950/60 border-emerald-500/40 text-emerald-300' };
-      case 'mptc_durgada_1':
-        return { label: '🌾 దుర్గడ MPTC 1 (2,650)', cls: 'bg-teal-950/60 border-teal-500/40 text-teal-300' };
-      case 'mptc_durgada_1_b45':
-        return { label: '🌾 దుర్గడ #45 (1,060 - ఇంటి కాసుల స్కూల్)', cls: 'bg-teal-950/80 border-teal-400 text-teal-200' };
-      case 'mptc_durgada_1_b46':
-        return { label: '🌾 దుర్గడ #46 (1,060 - వేగులమ్మ గుడి)', cls: 'bg-teal-950/80 border-teal-400 text-teal-200' };
-      case 'mptc_durgada_1_b47':
-        return { label: '🌾 దుర్గడ #47 (530 - EBC కాలనీ)', cls: 'bg-teal-950/80 border-teal-400 text-teal-200' };
-      case 'mptc_durgada_3':
-        return { label: '🌾 దుర్గడ MPTC 3 (1,874)', cls: 'bg-sky-950/60 border-sky-500/40 text-sky-300' };
-      case 'gp_tatiparthy':
-        return { label: '🏡 తాటిపర్తి సమగ్ర GP (6,994)', cls: 'bg-emerald-950/80 border-emerald-400 text-emerald-200' };
-      case 'gp_durgada':
-        return { label: '🏡 దుర్గడ సమగ్ర GP (8,487)', cls: 'bg-amber-950/80 border-amber-400 text-amber-200' };
-      case 'gp_vannepudi':
-        return { label: '🌴 వన్నెపూడి పంచాయతీ (3,201)', cls: 'bg-purple-950/60 border-purple-500/40 text-purple-300' };
-      case 'mptc_chebrolu_4':
-        return { label: '🌾 చేబ్రోలు MPTC 4 (2,979)', cls: 'bg-indigo-950/60 border-indigo-500/40 text-indigo-300' };
-      case 'mptc_tatiparthy_2':
-        return { label: '🌾 తాటిపర్తి MPTC 2 (3,501)', cls: 'bg-rose-950/60 border-rose-500/40 text-rose-300' };
-      default:
-        return { label: `📍 ${wardLabels[w] || w}`, cls: 'bg-slate-800 border-slate-700 text-slate-300' };
-    }
-  };
-
   const resetForm = () => {
     setName('');
     setPhone('');
     setAssemblyBoothsInput('');
     setSelectedWards([]);
     setNotes('');
-    setExpiryMinutes(60);
+    setExpiryMinutes(0);
     setEditingId(null);
     setIsAddingNew(false);
+    setShowTatiparthyWards(false);
+    setShowDurgadaWards(false);
   };
 
   const handleEdit = (a: VolunteerAssignment) => {
@@ -170,7 +120,7 @@ export const AdminAssignmentModal: React.FC<AdminAssignmentModalProps> = ({
     setAssemblyBoothsInput(a.assemblyBooths.join(', '));
     setSelectedWards(a.municipalWards);
     setNotes(a.notes || '');
-    setExpiryMinutes(a.expiryMinutes !== undefined ? a.expiryMinutes : 60);
+    setExpiryMinutes(a.expiryMinutes !== undefined ? a.expiryMinutes : 0);
     setIsAddingNew(true);
   };
 
@@ -194,7 +144,7 @@ export const AdminAssignmentModal: React.FC<AdminAssignmentModalProps> = ({
     e.preventDefault();
     const cleanPhone = cleanPhoneNumber(phone);
     if (!cleanPhone || cleanPhone.length < 10) {
-      alert(language === 'te' ? 'సరైన 10 అంకెల మొబైల్ నంబర్ ఇవ్వండి' : 'Enter a valid 10-digit phone number');
+      alert(language === 'te' ? 'దయచేసి సరైన 10 అంకెల మొబైల్ నంబర్ ఇవ్వండి' : 'Enter a valid 10-digit phone number');
       return;
     }
     if (!name.trim()) {
@@ -212,8 +162,8 @@ export const AdminAssignmentModal: React.FC<AdminAssignmentModalProps> = ({
       id: editingId || `assign_${cleanPhone}_${Date.now()}`,
       phone: cleanPhone,
       name: name.trim(),
-      assemblyBooths: booths,
-      municipalWards: selectedWards,
+      assemblyBooths: Array.from(new Set(booths)).sort((a, b) => a - b),
+      municipalWards: Array.from(new Set(selectedWards)),
       notes: notes.trim(),
       assignedAt: new Date().toISOString(),
       expiryMinutes: expiryMinutes,
@@ -233,114 +183,215 @@ export const AdminAssignmentModal: React.FC<AdminAssignmentModalProps> = ({
     }
   };
 
-  const handleSendWhatsApp = (a: VolunteerAssignment) => {
-    const text = generateAssignmentWhatsAppMessage(a, assemblyLabels, wardLabels);
-    const url = getWhatsAppShareUrl(a.phone, text);
-    window.open(url, '_blank');
-  };
-
-  const handleCopyMessage = (a: VolunteerAssignment) => {
-    const text = generateAssignmentWhatsAppMessage(a, assemblyLabels, wardLabels);
-    navigator.clipboard.writeText(text);
-    setCopiedId(a.id);
-    setTimeout(() => setCopiedId(null), 2000);
-  };
-
   const toggleWardSelection = (wardId: string) => {
     setSelectedWards(prev => 
       prev.includes(wardId) ? prev.filter(w => w !== wardId) : [...prev, wardId]
     );
   };
 
+  const toggleTatiparthyFullGp = () => {
+    const isFull = selectedWards.includes('gp_tatiparthy');
+    const allTatWards = Array.from({ length: 14 }, (_, i) => `gp_tatiparthy_w${i + 1}`);
+    if (isFull) {
+      setSelectedWards(prev => prev.filter(w => w !== 'gp_tatiparthy' && !allTatWards.includes(w)));
+    } else {
+      setSelectedWards(prev => Array.from(new Set([...prev, 'gp_tatiparthy', ...allTatWards])));
+    }
+  };
+
+  const toggleDurgadaFullGp = () => {
+    const isFull = selectedWards.includes('gp_durgada');
+    const allDurWards = Array.from({ length: 16 }, (_, i) => `gp_durgada_w${i + 1}`);
+    if (isFull) {
+      setSelectedWards(prev => prev.filter(w => w !== 'gp_durgada' && !allDurWards.includes(w)));
+    } else {
+      setSelectedWards(prev => Array.from(new Set([...prev, 'gp_durgada', ...allDurWards])));
+    }
+  };
+
+  const handleCopyMessage = (a: VolunteerAssignment) => {
+    const msg = getWhatsAppShareMessage(a, window.location.origin);
+    navigator.clipboard.writeText(msg);
+    setCopiedId(a.id);
+    setTimeout(() => setCopiedId(null), 2500);
+  };
+
+  const handleOpenWhatsApp = (a: VolunteerAssignment) => {
+    const msg = getWhatsAppShareMessage(a, window.location.origin);
+    const url = getWhatsAppShareUrl(a.phone, msg);
+    window.open(url, '_blank');
+  };
+
+  // Helper to neatly group villages for display
+  const groupAssignmentVillages = (wards: string[]): GroupedVillageInfo[] => {
+    const groups: GroupedVillageInfo[] = [];
+
+    // 1. Tatiparthy
+    const hasTatGp = wards.includes('gp_tatiparthy');
+    const tatWards: number[] = [];
+    for (let i = 1; i <= 14; i++) {
+      if (wards.includes(`gp_tatiparthy_w${i}`)) tatWards.push(i);
+    }
+    if (hasTatGp || tatWards.length > 0) {
+      groups.push({
+        villageId: 'gp_tatiparthy',
+        name: 'తాటిపర్తి (Tatiparthy)',
+        isFullGp: hasTatGp || tatWards.length === 14,
+        totalVoters: 6994,
+        assignedWards: tatWards,
+        totalWardsCount: 14,
+        badgeCls: 'bg-emerald-950/70 border-emerald-500/40 text-emerald-300'
+      });
+    }
+
+    // 2. Durgada
+    const hasDurGp = wards.includes('gp_durgada');
+    const durWards: number[] = [];
+    for (let i = 1; i <= 16; i++) {
+      if (wards.includes(`gp_durgada_w${i}`)) durWards.push(i);
+    }
+    if (hasDurGp || durWards.length > 0) {
+      groups.push({
+        villageId: 'gp_durgada',
+        name: 'దుర్గడ (Durgada)',
+        isFullGp: hasDurGp || durWards.length === 16,
+        totalVoters: 8487,
+        assignedWards: durWards,
+        totalWardsCount: 16,
+        badgeCls: 'bg-amber-950/70 border-amber-500/40 text-amber-300'
+      });
+    }
+
+    // 3. Vannepudi
+    if (wards.includes('gp_vannepudi')) {
+      groups.push({
+        villageId: 'gp_vannepudi',
+        name: 'వన్నెపూడి (Vannepudi)',
+        isFullGp: true,
+        totalVoters: 3201,
+        assignedWards: [],
+        totalWardsCount: 0,
+        badgeCls: 'bg-purple-950/70 border-purple-500/40 text-purple-300'
+      });
+    }
+
+    // 4. Chebrolu
+    if (wards.includes('mptc_chebrolu_4')) {
+      groups.push({
+        villageId: 'mptc_chebrolu_4',
+        name: 'చేబ్రోలు MPTC 4',
+        isFullGp: true,
+        totalVoters: 2979,
+        assignedWards: [],
+        totalWardsCount: 0,
+        badgeCls: 'bg-indigo-950/70 border-indigo-500/40 text-indigo-300'
+      });
+    }
+
+    return groups;
+  };
+
+  const getInitials = (n: string) => {
+    return n.trim().slice(0, 2).toUpperCase();
+  };
+
   return (
-    <div className="fixed inset-0 z-50 bg-black/85 backdrop-blur-md flex items-end sm:items-center justify-center p-3 animate-in fade-in duration-200">
-      <div className="bg-slate-900 border border-red-500/40 rounded-3xl max-w-lg w-full p-4 sm:p-5 space-y-4 shadow-2xl relative max-h-[92vh] flex flex-col">
+    <div 
+      className="fixed inset-0 z-50 bg-black/85 backdrop-blur-md flex items-center justify-center p-3 animate-in fade-in duration-200"
+      onClick={(e) => {
+        if (e.target === e.currentTarget) onClose();
+      }}
+    >
+      <div 
+        className="bg-slate-900 border border-amber-500/40 rounded-3xl max-w-2xl w-full p-4 sm:p-5 space-y-4 shadow-2xl relative max-h-[92vh] flex flex-col"
+        onClick={(e) => e.stopPropagation()}
+      >
         {/* Header */}
         <div className="flex items-start justify-between border-b border-slate-800 pb-3 flex-shrink-0">
           <div>
-            <div className="flex items-center gap-1.5 text-xs text-red-400 font-bold uppercase tracking-wider">
-              <ShieldCheck className="w-4 h-4 text-red-400" />
-              {language === 'te' ? 'అడ్మిన్ పోర్టల్' : 'Admin Hub'}
+            <div className="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full bg-red-950/80 border border-red-500/40 text-red-300 text-[10px] font-black uppercase tracking-wider mb-1">
+              🛡️ అడ్మిన్ కంట్రోల్ హబ్ (ADMIN HUB)
             </div>
-            <h2 className="text-base sm:text-lg font-black text-white mt-0.5">
-              {language === 'te' ? 'వాలంటీర్లకు బూత్‌ల కేటాయింపు & వాట్సాప్ సందేశాలు' : 'Volunteer Assignments & WhatsApp Messaging'}
+            <h2 className="text-base font-black text-white flex items-center gap-2">
+              <span>ఎన్నికల బాధ్యతల కేటాయింపు & వాట్సాప్</span>
             </h2>
-            <p className="text-[11px] text-slate-400 mt-0.5">
-              {language === 'te'
-                ? 'ఎలక్షన్ ఇంచార్జ్ మొబైల్ నంబర్ మరియు కేటాయించిన అసెంబ్లీ బూతులు / మున్సిపల్ వార్డులను నిర్వహించండి.'
-                : 'Assign assembly booths or municipal wards to incharge phone numbers and message them on WhatsApp.'}
+            <p className="text-xs text-slate-400 mt-0.5">
+              గ్రామ పంచాయతీలు & అసెంబ్లీ బూతులను ఇంచార్జ్ ఫోన్ నంబర్లకు కేటాయించండి.
             </p>
           </div>
-          <div className="flex items-center gap-1.5 flex-shrink-0">
+          <div className="flex items-center gap-1.5">
             <button
-              type="button"
               onClick={handleManualSync}
               disabled={isSyncing}
-              className="px-2.5 py-1 bg-slate-800 hover:bg-slate-700 text-amber-300 rounded-xl text-[11px] font-bold border border-slate-700 flex items-center gap-1.5 transition-all cursor-pointer shadow-sm active:scale-95"
-              title="సర్వర్ & క్లౌడ్ నుండి తాజా కేటాయింపులను సమకాలీకరించండి"
+              className="px-3 py-1.5 bg-slate-800 hover:bg-slate-700 text-slate-200 rounded-xl text-xs font-bold flex items-center gap-1.5 border border-slate-700 transition-all cursor-pointer"
+              title="క్లౌడ్ మరియు డిస్క్ నుండి లేటెస్ట్ డేటాను సింక్ చేయండి"
             >
-              <RefreshCw className={`w-3.5 h-3.5 text-amber-400 ${isSyncing ? 'animate-spin' : ''}`} />
-              <span className="hidden sm:inline">{isSyncing ? 'సింక్...' : 'సమకాలీకరణ (Sync)'}</span>
+              <RefreshCw className={`w-3.5 h-3.5 ${isSyncing ? 'animate-spin text-amber-400' : 'text-slate-400'}`} />
+              <span>{isSyncing ? 'సింకింగ్...' : 'సింక్ (Sync)'}</span>
             </button>
             <button
               onClick={onClose}
-              className="text-slate-400 hover:text-white bg-slate-800 p-1.5 rounded-full"
+              className="text-slate-400 hover:text-white bg-slate-800 p-1.5 rounded-full transition-colors cursor-pointer"
+              title="Close (Esc)"
             >
               <X className="w-4 h-4" />
             </button>
           </div>
         </div>
 
-        {/* Content Body (Scrollable) */}
-        <div className="flex-1 overflow-y-auto space-y-4 pr-1">
-          {/* Add / Edit Form Modal Trigger */}
+        {/* Content Scrollable Body */}
+        <div className="overflow-y-auto space-y-4 pr-1 flex-1">
+          {/* Action: Add New Incharge Button */}
           {!isAddingNew ? (
             <button
+              type="button"
               onClick={() => {
                 resetForm();
                 setIsAddingNew(true);
               }}
-              className="w-full py-2.5 bg-gradient-to-r from-red-600 to-amber-600 hover:from-red-500 hover:to-amber-500 text-white font-bold rounded-xl text-xs flex items-center justify-center gap-2 shadow-md shadow-red-950/40 transition-all active:scale-98"
+              className="w-full py-3 bg-gradient-to-r from-red-600 to-amber-600 hover:from-red-500 hover:to-amber-500 text-white font-black rounded-2xl text-xs flex items-center justify-center gap-2 shadow-lg shadow-red-950/40 transition-all active:scale-98 cursor-pointer"
             >
               <UserPlus className="w-4 h-4" />
-              <span>{language === 'te' ? '+ కొత్త వాలంటీర్ కేటాయింపు జోడించండి' : '+ Add New Assignment'}</span>
+              <span>+ కొత్త ఇంచార్జ్ / వాలంటీర్ కేటాయింపు జోడించండి (+ Add Assignment)</span>
             </button>
           ) : (
-            /* CREATE / EDIT FORM */
-            <form onSubmit={handleSave} className="p-3.5 rounded-2xl bg-slate-950/90 border border-amber-500/30 space-y-3">
-              <div className="flex items-center justify-between border-b border-slate-800 pb-2">
-                <span className="text-xs font-black text-amber-400">
-                  {editingId ? (language === 'te' ? 'కేటాయింపు సవరణ' : 'Edit Assignment') : (language === 'te' ? 'కొత్త బాధ్యత కేటాయింపు' : 'New Assignment')}
-                </span>
+            /* IMPROVISED CREATE / EDIT FORM */
+            <form onSubmit={handleSave} className="p-4 rounded-2xl bg-slate-950/95 border border-amber-500/40 space-y-3.5 shadow-xl animate-in fade-in duration-150">
+              <div className="flex items-center justify-between border-b border-slate-800 pb-2.5">
+                <div className="flex items-center gap-2 text-xs font-black text-amber-400">
+                  <ShieldCheck className="w-4 h-4 text-amber-400" />
+                  <span>{editingId ? 'కేటాయింపు సవరణ (Edit Assignment)' : 'కొత్త బాధ్యత కేటాయింపు (New Assignment)'}</span>
+                </div>
                 <button
                   type="button"
                   onClick={resetForm}
-                  className="text-[11px] text-slate-400 hover:text-white"
+                  className="text-xs text-slate-400 hover:text-white bg-slate-800 px-2.5 py-1 rounded-lg transition-colors cursor-pointer"
                 >
-                  {language === 'te' ? 'రద్దు' : 'Cancel'}
+                  రద్దు (Cancel)
                 </button>
               </div>
 
+              {/* 1. Incharge Personal Details */}
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-2.5">
-                {/* Volunteer Name */}
                 <div>
-                  <label className="block text-[10px] font-bold text-slate-300 mb-1">
-                    {language === 'te' ? 'వాలంటీర్ / ఇంచార్జ్ పేరు:' : 'Incharge Name:'}
+                  <label className="block text-[11px] font-bold text-slate-300 mb-1 flex items-center gap-1">
+                    <User className="w-3.5 h-3.5 text-amber-400" />
+                    <span>వాలంటీర్ / ఇంచార్జ్ పేరు:</span>
                   </label>
                   <input
                     type="text"
                     required
                     value={name}
                     onChange={(e) => setName(e.target.value)}
-                    placeholder="e.g. దుర్గా ప్రసాద్"
-                    className="w-full px-2.5 py-1.5 bg-slate-900 border border-slate-700 rounded-lg text-xs text-white focus:outline-none focus:border-amber-400"
+                    placeholder="ఉదా: దుర్గా ప్రసాద్"
+                    className="w-full px-3 py-2 bg-slate-900 border border-slate-700 rounded-xl text-xs text-white focus:outline-none focus:border-amber-400 transition-colors"
                   />
                 </div>
 
-                {/* Phone Number */}
                 <div>
-                  <label className="block text-[10px] font-bold text-slate-300 mb-1">
-                    {language === 'te' ? 'మొబైల్ నంబర్ (10 అంకెలు):' : 'Mobile Number (10 Digits):'}
+                  <label className="block text-[11px] font-bold text-slate-300 mb-1 flex items-center gap-1">
+                    <Phone className="w-3.5 h-3.5 text-emerald-400" />
+                    <span>మొబైల్ నంబర్ (10 అంకెలు):</span>
                   </label>
                   <input
                     type="tel"
@@ -348,68 +399,295 @@ export const AdminAssignmentModal: React.FC<AdminAssignmentModalProps> = ({
                     maxLength={10}
                     value={phone}
                     onChange={(e) => setPhone(e.target.value.replace(/\D/g, ''))}
-                    placeholder="e.g. 9000273028"
-                    className="w-full px-2.5 py-1.5 bg-slate-900 border border-slate-700 rounded-lg text-xs font-mono text-white focus:outline-none focus:border-amber-400"
+                    placeholder="ఉదా: 9000273028"
+                    className="w-full px-3 py-2 bg-slate-900 border border-slate-700 rounded-xl text-xs font-mono font-bold text-white focus:outline-none focus:border-amber-400 transition-colors"
                   />
                 </div>
               </div>
 
-              {/* Assembly Booths Multi-Input & Selector */}
+              {/* Role / Notes */}
               <div>
-                <div className="flex items-center justify-between mb-1">
-                  <label className="text-[10px] font-bold text-slate-300">
-                    {language === 'te' ? 'అసెంబ్లీ బూతులు (Assembly Booths):' : 'Assembly Booths:'}
+                <label className="block text-[11px] font-bold text-slate-400 mb-1">
+                  బాధ్యత / నోట్స్ (Role / Notes):
+                </label>
+                <input
+                  type="text"
+                  value={notes}
+                  onChange={(e) => setNotes(e.target.value)}
+                  placeholder="ఉదా: పిఠాపురం అసెంబ్లీ & గ్రామ పంచాయతీ ఎన్నికల కోఆర్డినేటర్"
+                  className="w-full px-3 py-1.5 bg-slate-900 border border-slate-800 rounded-xl text-xs text-slate-300 focus:outline-none focus:border-slate-600"
+                />
+              </div>
+
+              {/* 2. Gram Panchayats (Villages & Wards) */}
+              <div className="space-y-2 p-3 rounded-2xl bg-slate-900/80 border border-slate-800">
+                <div className="flex items-center justify-between flex-wrap gap-1">
+                  <label className="text-xs font-bold text-emerald-400 flex items-center gap-1.5">
+                    <Home className="w-4 h-4" />
+                    <span>గ్రామ పంచాయతీలు & వార్డులు (ఎంచుకోండి):</span>
+                  </label>
+                  <div className="flex items-center gap-1">
+                    <button
+                      type="button"
+                      onClick={() => {
+                        const allTat = Array.from({ length: 14 }, (_, i) => `gp_tatiparthy_w${i + 1}`);
+                        const allDur = Array.from({ length: 16 }, (_, i) => `gp_durgada_w${i + 1}`);
+                        setSelectedWards(['gp_tatiparthy', 'gp_durgada', 'gp_vannepudi', 'mptc_chebrolu_4', ...allTat, ...allDur]);
+                      }}
+                      className="px-2 py-0.5 bg-emerald-500/20 hover:bg-emerald-500 hover:text-slate-950 text-emerald-300 rounded text-[10px] font-bold border border-emerald-500/30 transition-colors cursor-pointer"
+                    >
+                      అన్నీ ఎంచుకోండి
+                    </button>
+                    <button
+                      type="button"
+                      onClick={() => setSelectedWards([])}
+                      className="px-2 py-0.5 bg-slate-800 text-slate-400 hover:text-white rounded text-[10px] cursor-pointer"
+                    >
+                      తీసివేయండి
+                    </button>
+                  </div>
+                </div>
+
+                <div className="space-y-2 pt-1">
+                  {/* Village 1: Tatiparthy */}
+                  <div className="p-2.5 rounded-xl bg-slate-950 border border-emerald-500/30 space-y-2">
+                    <div className="flex items-center justify-between">
+                      <div className="flex items-center gap-2">
+                        <span className="w-2.5 h-2.5 rounded-full bg-emerald-400 animate-pulse" />
+                        <div>
+                          <div className="text-xs font-black text-white flex items-center gap-1.5">
+                            <span>🏡 తాటిపర్తి పంచాయతీ</span>
+                            <span className="text-[10px] text-emerald-400 font-mono">(6,994 ఓటర్లు)</span>
+                          </div>
+                          <span className="text-[10px] text-slate-400">14 వార్డులు • సమగ్ర గ్రామం</span>
+                        </div>
+                      </div>
+                      <div className="flex items-center gap-1.5">
+                        <button
+                          type="button"
+                          onClick={toggleTatiparthyFullGp}
+                          className={`px-2.5 py-1 rounded-lg text-[10px] font-bold border transition-all cursor-pointer ${
+                            selectedWards.includes('gp_tatiparthy')
+                              ? 'bg-emerald-500 text-slate-950 border-emerald-400 font-black shadow-sm'
+                              : 'bg-slate-900 border-slate-700 text-slate-300 hover:text-white'
+                          }`}
+                        >
+                          {selectedWards.includes('gp_tatiparthy') ? '✓ సమగ్ర GP ఎంపికైంది' : '+ సమగ్ర GP (All 14 Wards)'}
+                        </button>
+                        <button
+                          type="button"
+                          onClick={() => setShowTatiparthyWards(!showTatiparthyWards)}
+                          className="px-2 py-1 bg-slate-800 hover:bg-slate-700 text-slate-300 rounded-lg text-[10px] font-bold flex items-center gap-1 border border-slate-700 cursor-pointer"
+                        >
+                          <span>వార్డులు</span>
+                          {showTatiparthyWards ? <ChevronUp className="w-3 h-3" /> : <ChevronDown className="w-3 h-3" />}
+                        </button>
+                      </div>
+                    </div>
+
+                    {/* Wards selector chips for Tatiparthy */}
+                    {showTatiparthyWards && (
+                      <div className="pt-2 border-t border-slate-800/80 space-y-1.5 animate-in fade-in duration-100">
+                        <div className="flex items-center justify-between text-[10px] text-slate-400">
+                          <span>ప్రత్యేక వార్డుల ఎంపిక (1 నుండి 14):</span>
+                          <span className="font-mono text-emerald-400 font-bold">
+                            {Array.from({ length: 14 }, (_, i) => `gp_tatiparthy_w${i + 1}`).filter(w => selectedWards.includes(w)).length}/14 వార్డులు
+                          </span>
+                        </div>
+                        <div className="grid grid-cols-7 gap-1">
+                          {Array.from({ length: 14 }, (_, i) => {
+                            const wid = `gp_tatiparthy_w${i + 1}`;
+                            const isSel = selectedWards.includes(wid);
+                            return (
+                              <button
+                                key={wid}
+                                type="button"
+                                onClick={() => toggleWardSelection(wid)}
+                                className={`py-1 rounded text-[10px] font-mono font-bold transition-all cursor-pointer text-center ${
+                                  isSel
+                                    ? 'bg-emerald-500 text-slate-950 font-black shadow-sm'
+                                    : 'bg-slate-900 border border-slate-800 text-slate-400 hover:text-white'
+                                }`}
+                              >
+                                W#{i + 1}
+                              </button>
+                            );
+                          })}
+                        </div>
+                      </div>
+                    )}
+                  </div>
+
+                  {/* Village 2: Durgada */}
+                  <div className="p-2.5 rounded-xl bg-slate-950 border border-amber-500/30 space-y-2">
+                    <div className="flex items-center justify-between">
+                      <div className="flex items-center gap-2">
+                        <span className="w-2.5 h-2.5 rounded-full bg-amber-400 animate-pulse" />
+                        <div>
+                          <div className="text-xs font-black text-white flex items-center gap-1.5">
+                            <span>🏡 దుర్గడ పంచాయతీ</span>
+                            <span className="text-[10px] text-amber-400 font-mono">(8,487 ఓటర్లు)</span>
+                          </div>
+                          <span className="text-[10px] text-slate-400">16 వార్డులు • సమగ్ర గ్రామం</span>
+                        </div>
+                      </div>
+                      <div className="flex items-center gap-1.5">
+                        <button
+                          type="button"
+                          onClick={toggleDurgadaFullGp}
+                          className={`px-2.5 py-1 rounded-lg text-[10px] font-bold border transition-all cursor-pointer ${
+                            selectedWards.includes('gp_durgada')
+                              ? 'bg-amber-500 text-slate-950 border-amber-400 font-black shadow-sm'
+                              : 'bg-slate-900 border-slate-700 text-slate-300 hover:text-white'
+                          }`}
+                        >
+                          {selectedWards.includes('gp_durgada') ? '✓ సమగ్ర GP ఎంపికైంది' : '+ సమగ్ర GP (All 16 Wards)'}
+                        </button>
+                        <button
+                          type="button"
+                          onClick={() => setShowDurgadaWards(!showDurgadaWards)}
+                          className="px-2 py-1 bg-slate-800 hover:bg-slate-700 text-slate-300 rounded-lg text-[10px] font-bold flex items-center gap-1 border border-slate-700 cursor-pointer"
+                        >
+                          <span>వార్డులు</span>
+                          {showDurgadaWards ? <ChevronUp className="w-3 h-3" /> : <ChevronDown className="w-3 h-3" />}
+                        </button>
+                      </div>
+                    </div>
+
+                    {/* Wards selector chips for Durgada */}
+                    {showDurgadaWards && (
+                      <div className="pt-2 border-t border-slate-800/80 space-y-1.5 animate-in fade-in duration-100">
+                        <div className="flex items-center justify-between text-[10px] text-slate-400">
+                          <span>ప్రత్యేక వార్డుల ఎంపిక (1 నుండి 16):</span>
+                          <span className="font-mono text-amber-400 font-bold">
+                            {Array.from({ length: 16 }, (_, i) => `gp_durgada_w${i + 1}`).filter(w => selectedWards.includes(w)).length}/16 వార్డులు
+                          </span>
+                        </div>
+                        <div className="grid grid-cols-8 gap-1">
+                          {Array.from({ length: 16 }, (_, i) => {
+                            const wid = `gp_durgada_w${i + 1}`;
+                            const isSel = selectedWards.includes(wid);
+                            return (
+                              <button
+                                key={wid}
+                                type="button"
+                                onClick={() => toggleWardSelection(wid)}
+                                className={`py-1 rounded text-[10px] font-mono font-bold transition-all cursor-pointer text-center ${
+                                  isSel
+                                    ? 'bg-amber-500 text-slate-950 font-black shadow-sm'
+                                    : 'bg-slate-900 border border-slate-800 text-slate-400 hover:text-white'
+                                }`}
+                              >
+                                W#{i + 1}
+                              </button>
+                            );
+                          })}
+                        </div>
+                      </div>
+                    )}
+                  </div>
+
+                  {/* Village 3 & 4: Vannepudi & Chebrolu in clean 2-column grid */}
+                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
+                    <button
+                      type="button"
+                      onClick={() => toggleWardSelection('gp_vannepudi')}
+                      className={`p-2.5 rounded-xl border text-left flex items-center justify-between text-xs transition-all cursor-pointer ${
+                        selectedWards.includes('gp_vannepudi')
+                          ? 'bg-purple-950/80 border-purple-400 text-purple-200 shadow-sm ring-1 ring-purple-400'
+                          : 'bg-slate-950 border-slate-800 text-slate-400 hover:border-slate-700'
+                      }`}
+                    >
+                      <div>
+                        <div className="font-bold flex items-center gap-1.5">
+                          <Trees className="w-3.5 h-3.5 text-purple-400" />
+                          <span>వన్నెపూడి పంచాయతీ</span>
+                        </div>
+                        <span className="text-[10px] text-slate-400">3,201 ఓటర్లు • సర్వ గ్రామం</span>
+                      </div>
+                      {selectedWards.includes('gp_vannepudi') && <Check className="w-4 h-4 text-purple-400" />}
+                    </button>
+
+                    <button
+                      type="button"
+                      onClick={() => toggleWardSelection('mptc_chebrolu_4')}
+                      className={`p-2.5 rounded-xl border text-left flex items-center justify-between text-xs transition-all cursor-pointer ${
+                        selectedWards.includes('mptc_chebrolu_4')
+                          ? 'bg-indigo-950/80 border-indigo-400 text-indigo-200 shadow-sm ring-1 ring-indigo-400'
+                          : 'bg-slate-950 border-slate-800 text-slate-400 hover:border-slate-700'
+                      }`}
+                    >
+                      <div>
+                        <div className="font-bold flex items-center gap-1.5">
+                          <Building className="w-3.5 h-3.5 text-indigo-400" />
+                          <span>చేబ్రోలు MPTC 4</span>
+                        </div>
+                        <span className="text-[10px] text-slate-400">2,979 ఓటర్లు • వార్డులు 13-16</span>
+                      </div>
+                      {selectedWards.includes('mptc_chebrolu_4') && <Check className="w-4 h-4 text-indigo-400" />}
+                    </button>
+                  </div>
+                </div>
+              </div>
+
+              {/* 3. Assembly Booths (AC #37 Rural Booths) */}
+              <div className="space-y-2 p-3 rounded-2xl bg-slate-900/80 border border-slate-800">
+                <div className="flex items-center justify-between flex-wrap gap-1">
+                  <label className="text-xs font-bold text-amber-400 flex items-center gap-1.5">
+                    <Building className="w-4 h-4" />
+                    <span>అసెంబ్లీ బూతులు (Assembly Booths):</span>
                   </label>
                   <button
                     type="button"
                     onClick={() => setIsBoothSelectorOpen(!isBoothSelectorOpen)}
-                    className="text-[10px] text-amber-400 hover:underline flex items-center gap-0.5 font-bold cursor-pointer"
+                    className="text-[10px] text-amber-400 hover:underline flex items-center gap-1 font-bold cursor-pointer"
                   >
-                    <span>{isBoothSelectorOpen ? 'లిస్ట్ దాచు' : '📋 బూత్‌ల లిస్ట్ / ఎంపిక'}</span>
+                    <span>{isBoothSelectorOpen ? 'లిస్ట్ దాచు' : '📋 బూత్‌ల గ్రిడ్ ఎంపిక'}</span>
                     {isBoothSelectorOpen ? <ChevronUp className="w-3 h-3" /> : <ChevronDown className="w-3 h-3" />}
                   </button>
                 </div>
+
                 <input
                   type="text"
                   value={assemblyBoothsInput}
                   onChange={(e) => setAssemblyBoothsInput(e.target.value)}
-                  placeholder="e.g. 11, 12, 13"
-                  className="w-full px-2.5 py-1.5 bg-slate-900 border border-slate-700 rounded-lg text-xs font-mono text-white focus:outline-none focus:border-amber-400"
+                  placeholder="ఉదా: 11, 12, 13, 24, 25"
+                  className="w-full px-3 py-2 bg-slate-950 border border-slate-700 rounded-xl text-xs font-mono font-bold text-white focus:outline-none focus:border-amber-400 transition-colors"
                 />
 
-                {/* Quick action buttons: Select All / Unselect All */}
-                <div className="flex items-center justify-between gap-1 mt-1.5 flex-wrap">
-                  <div className="flex items-center gap-1 flex-wrap">
-                    <button
-                      type="button"
-                      onClick={() => {
-                        const allNums = boothsIndex.map(b => Number(b.part_no)).filter(n => !isNaN(n) && n > 0);
-                        const numsToUse = allNums.length > 0 ? allNums : Array.from({ length: 290 }, (_, i) => i + 1);
-                        setAssemblyBoothsInput(numsToUse.join(', '));
-                      }}
-                      className="px-2 py-0.5 bg-amber-500/20 hover:bg-amber-500 hover:text-slate-950 text-amber-300 rounded text-[9.5px] font-bold border border-amber-500/30 transition-all flex items-center gap-1 cursor-pointer"
-                    >
-                      <CheckSquare className="w-3 h-3" />
-                      <span>అన్నీ ఎంచుకోండి (Select All)</span>
-                    </button>
-                    <button
-                      type="button"
-                      onClick={() => setAssemblyBoothsInput('')}
-                      className="px-2 py-0.5 bg-slate-800 hover:bg-slate-700 text-slate-300 hover:text-white rounded text-[9.5px] font-bold border border-slate-700 transition-all flex items-center gap-1 cursor-pointer"
-                    >
-                      <Square className="w-3 h-3" />
-                      <span>ఎంపిక తీసివేయండి (Unselect All)</span>
-                    </button>
-                  </div>
-                  <span className="text-[9.5px] text-amber-400 font-mono font-bold">
-                    {assemblyBoothsInput.split(/[, ]+/).filter(Boolean).length} బూతులు ఎంపికయ్యాయి
-                  </span>
+                {/* Quick Booth Pills */}
+                <div className="flex items-center gap-1 flex-wrap pt-0.5">
+                  <span className="text-[10px] text-slate-400">త్వరిత ఎంపిక:</span>
+                  {[9, 11, 12, 13, 14, 15, 16, 17, 18, 19, 23, 24, 25].map(bNum => {
+                    const currentSet = new Set(
+                      assemblyBoothsInput.split(/[, ]+/).map(s => parseInt(s.trim(), 10)).filter(n => !isNaN(n) && n > 0)
+                    );
+                    const isSel = currentSet.has(bNum);
+                    return (
+                      <button
+                        key={bNum}
+                        type="button"
+                        onClick={() => {
+                          const next = new Set(currentSet);
+                          if (isSel) next.delete(bNum);
+                          else next.add(bNum);
+                          setAssemblyBoothsInput(Array.from(next).sort((a, b) => a - b).join(', '));
+                        }}
+                        className={`px-1.5 py-0.5 rounded text-[10px] font-mono font-bold transition-all cursor-pointer ${
+                          isSel
+                            ? 'bg-amber-500 text-slate-950 font-black shadow-sm'
+                            : 'bg-slate-950 border border-slate-800 text-slate-400 hover:text-white'
+                        }`}
+                      >
+                        #{bNum}
+                      </button>
+                    );
+                  })}
                 </div>
 
                 {/* Expandable Booth Selector Grid */}
                 {isBoothSelectorOpen && (
-                  <div className="mt-2 p-2.5 bg-slate-950 rounded-xl border border-slate-800 space-y-2 max-h-52 overflow-y-auto">
-                    {/* Search Filter */}
+                  <div className="mt-2 p-2.5 bg-slate-950 rounded-xl border border-slate-800 space-y-2 max-h-48 overflow-y-auto animate-in fade-in duration-100">
                     <div className="relative">
                       <Search className="w-3.5 h-3.5 absolute left-2.5 top-1/2 -translate-y-1/2 text-slate-400" />
                       <input
@@ -417,47 +695,25 @@ export const AdminAssignmentModal: React.FC<AdminAssignmentModalProps> = ({
                         value={boothFilterQuery}
                         onChange={e => setBoothFilterQuery(e.target.value)}
                         placeholder="బూత్ నెం లేదా గ్రామం ద్వారా వెతకండి..."
-                        className="w-full bg-slate-900 border border-slate-700 rounded-lg pl-8 pr-2 py-1 text-[11px] text-white"
+                        className="w-full bg-slate-900 border border-slate-700 rounded-lg pl-8 pr-2 py-1 text-[11px] text-white focus:outline-none focus:border-amber-400"
                       />
                     </div>
-
-                    {/* Range quick buttons */}
-                    <div className="flex flex-wrap gap-1 text-[9px]">
-                      <span className="text-slate-500 self-center">శ్రేణి:</span>
-                      {[
-                        { label: '1-50', min: 1, max: 50 },
-                        { label: '51-100', min: 51, max: 100 },
-                        { label: '101-150', min: 101, max: 150 },
-                        { label: '151-200', min: 151, max: 200 },
-                        { label: '201-250', min: 201, max: 250 },
-                        { label: '251-290', min: 251, max: 290 },
-                      ].map(r => (
-                        <button
-                          key={r.label}
-                          type="button"
-                          onClick={() => {
-                            const current = new Set(assemblyBoothsInput.split(/[, ]+/).map(Number).filter(Boolean));
-                            for (let i = r.min; i <= r.max; i++) current.add(i);
-                            setAssemblyBoothsInput(Array.from(current).sort((a, b) => a - b).join(', '));
-                          }}
-                          className="px-1.5 py-0.5 rounded bg-slate-800 hover:bg-slate-700 text-slate-300 font-mono cursor-pointer"
-                        >
-                          +{r.label}
-                        </button>
-                      ))}
-                    </div>
-
-                    {/* Booths Badges Grid */}
-                    <div className="flex flex-wrap gap-1">
-                      {(boothsIndex.length > 0 ? boothsIndex : Array.from({ length: 290 }, (_, i) => ({ part_no: i + 1, clean_village: '' })))
+                    <div className="grid grid-cols-6 sm:grid-cols-8 gap-1 pt-1">
+                      {boothsIndex
                         .filter(b => {
-                          if (!boothFilterQuery.trim()) return true;
-                          const q = boothFilterQuery.toLowerCase();
-                          return String(b.part_no).includes(q) || (b.clean_village && b.clean_village.toLowerCase().includes(q));
+                          const q = boothFilterQuery.toLowerCase().trim();
+                          if (!q) return true;
+                          return (
+                            b.part_no.toString().includes(q) ||
+                            b.clean_village.toLowerCase().includes(q) ||
+                            b.village.toLowerCase().includes(q)
+                          );
                         })
                         .map(b => {
                           const bNum = Number(b.part_no);
-                          const currentSet = new Set(assemblyBoothsInput.split(/[, ]+/).map(Number).filter(Boolean));
+                          const currentSet = new Set(
+                            assemblyBoothsInput.split(/[, ]+/).map(s => parseInt(s.trim(), 10)).filter(n => !isNaN(n) && n > 0)
+                          );
                           const isSel = currentSet.has(bNum);
                           return (
                             <button
@@ -469,10 +725,10 @@ export const AdminAssignmentModal: React.FC<AdminAssignmentModalProps> = ({
                                 else next.add(bNum);
                                 setAssemblyBoothsInput(Array.from(next).sort((a, b) => a - b).join(', '));
                               }}
-                              className={`px-1.5 py-0.5 rounded text-[10px] font-mono font-bold transition-all cursor-pointer ${
+                              className={`px-1 py-0.5 rounded text-[10px] font-mono font-bold transition-all cursor-pointer ${
                                 isSel
-                                  ? 'bg-amber-500 text-slate-950 font-black ring-1 ring-amber-400'
-                                  : 'bg-slate-900 border border-slate-700 text-slate-400 hover:text-white'
+                                  ? 'bg-amber-500 text-slate-950 font-black'
+                                  : 'bg-slate-900 border border-slate-800 text-slate-400 hover:text-white'
                               }`}
                               title={b.clean_village || `Booth #${bNum}`}
                             >
@@ -485,286 +741,12 @@ export const AdminAssignmentModal: React.FC<AdminAssignmentModalProps> = ({
                 )}
               </div>
 
-              {/* Municipality / Local Wards Picker */}
-              <div>
-                <div className="flex items-center justify-between mb-1.5 flex-wrap gap-1">
-                  <label className="block text-[10px] font-bold text-slate-300">
-                    {language === 'te' ? 'స్థానిక వార్డులు / పంచాయతీలు (ఎంచుకోండి):' : 'Local Wards / Panchayats (Select):'}
-                  </label>
-                  <div className="flex items-center gap-1 flex-wrap">
-                    <button
-                      type="button"
-                      onClick={() => {
-                        const allW = ['gp_tatiparthy', 'gp_durgada', 'gp_vannepudi', 'mptc_chebrolu_4'];
-                        setSelectedWards(allW);
-                      }}
-                      className="px-2 py-0.5 bg-amber-500/20 hover:bg-amber-500 hover:text-slate-950 text-amber-300 rounded text-[9.5px] font-bold border border-amber-500/30 transition-colors cursor-pointer"
-                    >
-                      అన్నీ (Select All GP)
-                    </button>
-                    <button
-                      type="button"
-                      onClick={() => setSelectedWards([])}
-                      className="px-1.5 py-0.5 bg-slate-800 text-slate-400 hover:text-white rounded text-[9.5px] cursor-pointer"
-                    >
-                      తీసివేయండి (Unselect)
-                    </button>
-                    <button
-                      type="button"
-                      onClick={() => {
-                        const tatW = ['gp_tatiparthy'];
-                        for (let i = 1; i <= 14; i++) tatW.push('gp_tatiparthy_w' + i);
-                        setSelectedWards(prev => Array.from(new Set([...prev, ...tatW])));
-                      }}
-                      className="px-2 py-0.5 bg-emerald-500/20 hover:bg-emerald-500 hover:text-slate-950 text-emerald-300 rounded text-[9.5px] font-bold border border-emerald-500/30 transition-colors cursor-pointer"
-                      title="తాటిపర్తి GP & 14 వార్డులు అన్నీ ఒకేసారి ఎంచుకోండి"
-                    >
-                      + తాటిపర్తి 14 వార్డులు
-                    </button>
-                    <button
-                      type="button"
-                      onClick={() => {
-                        const durW = ['gp_durgada'];
-                        for (let i = 1; i <= 16; i++) durW.push('gp_durgada_w' + i);
-                        setSelectedWards(prev => Array.from(new Set([...prev, ...durW])));
-                      }}
-                      className="px-2 py-0.5 bg-amber-500/20 hover:bg-amber-500 hover:text-slate-950 text-amber-300 rounded text-[9.5px] font-bold border border-amber-500/30 transition-colors cursor-pointer"
-                      title="దుర్గడ GP & 16 వార్డులు అన్నీ ఒకేసారి ఎంచుకోండి"
-                    >
-                      + దుర్గడ 16 వార్డులు
-                    </button>
-                  </div>
-                </div>
-
-                <div className="grid grid-cols-1 sm:grid-cols-2 gap-1.5">
-                  {/* Pithapuram Ward 14 */}
-                  <button
-                    type="button"
-                    onClick={() => toggleWardSelection('ward_14')}
-                    className={`p-2 rounded-xl border text-left flex items-center justify-between text-xs transition-all ${
-                      selectedWards.includes('ward_14')
-                        ? 'bg-blue-950/80 border-blue-400 text-blue-200 shadow-sm'
-                        : 'bg-slate-900 border-slate-800 text-slate-400 hover:border-slate-700'
-                    }`}
-                  >
-                    <div>
-                      <div className="font-bold flex items-center gap-1">
-                        <Building2 className="w-3.5 h-3.5 text-blue-400" />
-                        <span>పిఠాపురం వార్డు 14</span>
-                      </div>
-                      <span className="text-[10px] text-slate-400">1,256 ఓటర్లు (పల్లపు వీధి...)</span>
-                    </div>
-                    {selectedWards.includes('ward_14') && <Check className="w-3.5 h-3.5 text-blue-400" />}
-                  </button>
-
-                  {/* Gollaprolu Ward 11 */}
-                  <button
-                    type="button"
-                    onClick={() => toggleWardSelection('gollaprolu_ward_11')}
-                    className={`p-2 rounded-xl border text-left flex items-center justify-between text-xs transition-all ${
-                      selectedWards.includes('gollaprolu_ward_11')
-                        ? 'bg-emerald-950/80 border-emerald-400 text-emerald-200 shadow-sm'
-                        : 'bg-slate-900 border-slate-800 text-slate-400 hover:border-slate-700'
-                    }`}
-                  >
-                    <div>
-                      <div className="font-bold flex items-center gap-1">
-                        <Landmark className="w-3.5 h-3.5 text-emerald-400" />
-                        <span>గొల్లప్రోలు వార్డు 11</span>
-                      </div>
-                      <span className="text-[10px] text-slate-400">991 ఓటర్లు (రాయవరం రోడ్...)</span>
-                    </div>
-                    {selectedWards.includes('gollaprolu_ward_11') && <Check className="w-3.5 h-3.5 text-emerald-400" />}
-                  </button>
-
-                  {/* Durgada MPTC 1 */}
-                  <button
-                    type="button"
-                    onClick={() => toggleWardSelection('mptc_durgada_1')}
-                    className={`p-2 rounded-xl border text-left flex items-center justify-between text-xs transition-all ${
-                      selectedWards.includes('mptc_durgada_1')
-                        ? 'bg-teal-950/80 border-teal-400 text-teal-200 shadow-sm'
-                        : 'bg-slate-900 border-slate-800 text-slate-400 hover:border-slate-700'
-                    }`}
-                  >
-                    <div>
-                      <div className="font-bold flex items-center gap-1">
-                        <MapPin className="w-3.5 h-3.5 text-teal-400" />
-                        <span>దుర్గడ MPTC 1</span>
-                      </div>
-                      <span className="text-[10px] text-slate-400">2,650 ఓటర్లు (వార్డులు 1-5)</span>
-                    </div>
-                    {selectedWards.includes('mptc_durgada_1') && <Check className="w-3.5 h-3.5 text-teal-400" />}
-                  </button>
-
-                  {/* Durgada MPTC 3 */}
-                  <button
-                    type="button"
-                    onClick={() => toggleWardSelection('mptc_durgada_3')}
-                    className={`p-2 rounded-xl border text-left flex items-center justify-between text-xs transition-all ${
-                      selectedWards.includes('mptc_durgada_3')
-                        ? 'bg-sky-950/80 border-sky-400 text-sky-200 shadow-sm'
-                        : 'bg-slate-900 border-slate-800 text-slate-400 hover:border-slate-700'
-                    }`}
-                  >
-                    <div>
-                      <div className="font-bold flex items-center gap-1">
-                        <MapPin className="w-3.5 h-3.5 text-sky-400" />
-                        <span>దుర్గడ MPTC 3</span>
-                      </div>
-                      <span className="text-[10px] text-slate-400">1,874 ఓటర్లు (డోర్ నెం. 4-9)</span>
-                    </div>
-                    {selectedWards.includes('mptc_durgada_3') && <Check className="w-3.5 h-3.5 text-sky-400" />}
-                  </button>
-
-                  {/* Durgada Entire Gram Panchayat */}
-                  <button
-                    type="button"
-                    onClick={() => toggleWardSelection('gp_durgada')}
-                    className={`p-2 rounded-xl border text-left flex items-center justify-between text-xs transition-all ${
-                      selectedWards.includes('gp_durgada')
-                        ? 'bg-amber-950/80 border-amber-400 text-amber-200 shadow-sm'
-                        : 'bg-slate-900 border-slate-800 text-slate-400 hover:border-slate-700'
-                    }`}
-                  >
-                    <div>
-                      <div className="font-bold flex items-center gap-1">
-                        <MapPin className="w-3.5 h-3.5 text-amber-400" />
-                        <span>దుర్గడ సమగ్ర GP</span>
-                      </div>
-                      <span className="text-[10px] text-slate-400">7,420 ఓటర్లు (వార్డులు 1-14 సమగ్ర గ్రామం)</span>
-                    </div>
-                    {selectedWards.includes('gp_durgada') && <Check className="w-3.5 h-3.5 text-amber-400" />}
-                  </button>
-
-                  {/* Vannepudi Gram Panchayat */}
-                  <button
-                    type="button"
-                    onClick={() => toggleWardSelection('gp_vannepudi')}
-                    className={`p-2 rounded-xl border text-left flex items-center justify-between text-xs transition-all ${
-                      selectedWards.includes('gp_vannepudi')
-                        ? 'bg-purple-950/80 border-purple-400 text-purple-200 shadow-sm'
-                        : 'bg-slate-900 border-slate-800 text-slate-400 hover:border-slate-700'
-                    }`}
-                  >
-                    <div>
-                      <div className="font-bold flex items-center gap-1">
-                        <Trees className="w-3.5 h-3.5 text-purple-400" />
-                        <span>వన్నెపూడి పంచాయతీ</span>
-                      </div>
-                      <span className="text-[10px] text-slate-400">3,201 ఓటర్లు (వన్నెపూడి సర్వ ఓటర్లు)</span>
-                    </div>
-                    {selectedWards.includes('gp_vannepudi') && <Check className="w-3.5 h-3.5 text-purple-400" />}
-                  </button>
-
-                  {/* Durgada Booth 45 */}
-                  <button
-                    type="button"
-                    onClick={() => toggleWardSelection('mptc_durgada_1_b45')}
-                    className={`p-2 rounded-xl border text-left flex items-center justify-between text-xs transition-all ${
-                      selectedWards.includes('mptc_durgada_1_b45')
-                        ? 'bg-teal-950/80 border-teal-400 text-teal-200 shadow-sm'
-                        : 'bg-slate-900 border-slate-800 text-slate-400 hover:border-slate-700'
-                    }`}
-                  >
-                    <div>
-                      <div className="font-bold flex items-center gap-1">
-                        <MapPin className="w-3.5 h-3.5 text-teal-400" />
-                        <span>దుర్గడ బూత్ #45</span>
-                      </div>
-                      <span className="text-[10px] text-slate-400">1,060 ఓటర్లు (ఇంటి కాసుల వారి స్కూల్)</span>
-                    </div>
-                    {selectedWards.includes('mptc_durgada_1_b45') && <Check className="w-3.5 h-3.5 text-teal-400" />}
-                  </button>
-
-                  {/* Durgada Booth 46 */}
-                  <button
-                    type="button"
-                    onClick={() => toggleWardSelection('mptc_durgada_1_b46')}
-                    className={`p-2 rounded-xl border text-left flex items-center justify-between text-xs transition-all ${
-                      selectedWards.includes('mptc_durgada_1_b46')
-                        ? 'bg-teal-950/80 border-teal-400 text-teal-200 shadow-sm'
-                        : 'bg-slate-900 border-slate-800 text-slate-400 hover:border-slate-700'
-                    }`}
-                  >
-                    <div>
-                      <div className="font-bold flex items-center gap-1">
-                        <MapPin className="w-3.5 h-3.5 text-teal-400" />
-                        <span>దుర్గడ బూత్ #46</span>
-                      </div>
-                      <span className="text-[10px] text-slate-400">1,060 ఓటర్లు (స్వర్ణ గ్రామం, వేగులమ్మ గుడి)</span>
-                    </div>
-                    {selectedWards.includes('mptc_durgada_1_b46') && <Check className="w-3.5 h-3.5 text-teal-400" />}
-                  </button>
-
-                  {/* Durgada Booth 47 */}
-                  <button
-                    type="button"
-                    onClick={() => toggleWardSelection('mptc_durgada_1_b47')}
-                    className={`p-2 rounded-xl border text-left flex items-center justify-between text-xs transition-all ${
-                      selectedWards.includes('mptc_durgada_1_b47')
-                        ? 'bg-teal-950/80 border-teal-400 text-teal-200 shadow-sm'
-                        : 'bg-slate-900 border-slate-800 text-slate-400 hover:border-slate-700'
-                    }`}
-                  >
-                    <div>
-                      <div className="font-bold flex items-center gap-1">
-                        <MapPin className="w-3.5 h-3.5 text-teal-400" />
-                        <span>దుర్గడ బూత్ #47</span>
-                      </div>
-                      <span className="text-[10px] text-slate-400">530 ఓటర్లు (EBC కాలనీ)</span>
-                    </div>
-                    {selectedWards.includes('mptc_durgada_1_b47') && <Check className="w-3.5 h-3.5 text-teal-400" />}
-                  </button>
-
-                  {/* Chebrolu MPTC 4 */}
-                  <button
-                    type="button"
-                    onClick={() => toggleWardSelection('mptc_chebrolu_4')}
-                    className={`p-2 rounded-xl border text-left flex items-center justify-between text-xs transition-all ${
-                      selectedWards.includes('mptc_chebrolu_4')
-                        ? 'bg-indigo-950/80 border-indigo-400 text-indigo-200 shadow-sm'
-                        : 'bg-slate-900 border-slate-800 text-slate-400 hover:border-slate-700'
-                    }`}
-                  >
-                    <div>
-                      <div className="font-bold flex items-center gap-1">
-                        <MapPin className="w-3.5 h-3.5 text-indigo-400" />
-                        <span>చేబ్రోలు MPTC 4</span>
-                      </div>
-                      <span className="text-[10px] text-slate-400">2,979 ఓటర్లు (వార్డులు 13-16)</span>
-                    </div>
-                    {selectedWards.includes('mptc_chebrolu_4') && <Check className="w-3.5 h-3.5 text-indigo-400" />}
-                  </button>
-
-                  {/* Tatiparthy MPTC 2 */}
-                  <button
-                    type="button"
-                    onClick={() => toggleWardSelection('mptc_tatiparthy_2')}
-                    className={`p-2 rounded-xl border text-left flex items-center justify-between text-xs transition-all ${
-                      selectedWards.includes('mptc_tatiparthy_2')
-                        ? 'bg-rose-950/80 border-rose-400 text-rose-200 shadow-sm'
-                        : 'bg-slate-900 border-slate-800 text-slate-400 hover:border-slate-700'
-                    }`}
-                  >
-                    <div>
-                      <div className="font-bold flex items-center gap-1">
-                        <MapPin className="w-3.5 h-3.5 text-rose-400" />
-                        <span>తాటిపర్తి MPTC 2</span>
-                      </div>
-                      <span className="text-[10px] text-slate-400">3,501 ఓటర్లు (వార్డులు 8-14)</span>
-                    </div>
-                    {selectedWards.includes('mptc_tatiparthy_2') && <Check className="w-3.5 h-3.5 text-rose-400" />}
-                  </button>
-                </div>
-              </div>
-
-              {/* Expiry Timer (కాలపరిమితి / టైమర్) */}
-              <div className="space-y-2 p-3 rounded-xl bg-slate-900 border border-slate-800">
+              {/* 4. Timer / Expiry Selection */}
+              <div className="space-y-2 p-3 rounded-2xl bg-slate-900/80 border border-slate-800">
                 <div className="flex items-center justify-between">
-                  <label className="text-[10px] font-bold text-amber-400 flex items-center gap-1.5">
+                  <label className="text-xs font-bold text-amber-400 flex items-center gap-1.5">
                     <Clock className="w-3.5 h-3.5" />
-                    <span>{language === 'te' ? 'జాబితా కాలపరిమితి / టైమర్ (Timer to Unload):' : 'List Access Timer (Auto-Unload):'}</span>
+                    <span>జాబితా కాలపరిమితి / టైమర్ (Auto-Unload):</span>
                   </label>
                   <span className="text-[10px] text-amber-300 font-mono font-bold bg-amber-950/80 px-2 py-0.5 rounded border border-amber-500/40">
                     {expiryMinutes === 0 ? 'అపరిమితం (No Expiry)' : `⏱️ ${expiryMinutes} నిమిషాలు`}
@@ -772,20 +754,20 @@ export const AdminAssignmentModal: React.FC<AdminAssignmentModalProps> = ({
                 </div>
                 <div className="grid grid-cols-4 gap-1.5 text-xs">
                   {[
-                    { label: '15 నిమిషాలు', val: 15 },
-                    { label: '30 నిమిషాలు', val: 30 },
+                    { label: 'అపరిమితం (0)', val: 0 },
                     { label: '1 గంట (60m)', val: 60 },
-                    { label: '2 గంటలు', val: 120 },
-                    { label: '4 గంటలు', val: 240 },
-                    { label: '8 గంటలు', val: 480 },
+                    { label: '2 గంటలు (120m)', val: 120 },
+                    { label: '4 గంటలు (240m)', val: 240 },
+                    { label: '8 గంటలు (480m)', val: 480 },
                     { label: '1 రోజు (24h)', val: 1440 },
-                    { label: 'అపరిమితం (0)', val: 0 }
+                    { label: '30 నిమిషాలు', val: 30 },
+                    { label: '15 నిమిషాలు', val: 15 }
                   ].map(opt => (
                     <button
                       key={opt.val}
                       type="button"
                       onClick={() => setExpiryMinutes(opt.val)}
-                      className={`py-1.5 px-1 rounded-lg text-[10px] font-bold border transition-all text-center ${
+                      className={`py-1.5 px-1 rounded-xl text-[10px] font-bold border transition-all text-center cursor-pointer ${
                         expiryMinutes === opt.val
                           ? 'bg-amber-500 text-slate-950 border-amber-400 shadow-sm font-black'
                           : 'bg-slate-950 text-slate-300 border-slate-800 hover:border-slate-700'
@@ -795,224 +777,294 @@ export const AdminAssignmentModal: React.FC<AdminAssignmentModalProps> = ({
                     </button>
                   ))}
                 </div>
-                <div className="flex items-center gap-2 pt-1">
-                  <span className="text-[10px] text-slate-400">కస్టమ్ నిమిషాలు:</span>
-                  <input
-                    type="number"
-                    min="1"
-                    max="10000"
-                    value={expiryMinutes > 0 && ![15, 30, 60, 120, 240, 480, 1440].includes(expiryMinutes) ? expiryMinutes : ''}
-                    onChange={(e) => {
-                      const v = parseInt(e.target.value, 10);
-                      setExpiryMinutes(isNaN(v) || v <= 0 ? 0 : v);
-                    }}
-                    placeholder="45"
-                    className="w-20 px-2 py-1 bg-slate-950 border border-slate-700 rounded text-xs text-white text-center font-mono focus:border-amber-400 focus:outline-none"
-                  />
-                  <span className="text-[10px] text-slate-400">నిమిషాలు</span>
-                </div>
-                <p className="text-[9.5px] text-slate-400 flex items-center gap-1 text-amber-200/80">
-                  <AlertTriangle className="w-3 h-3 text-amber-400 shrink-0" />
-                  <span>ఈ సమయం దాటగానే ఓటర్ల జాబితా మొబైల్ స్క్రీన్ నుండి ఆటోమేటిక్‌గా అన్‌లోడ్ అవుతుంది.</span>
-                </p>
               </div>
 
-              {/* Notes */}
-              <div>
-                <label className="block text-[10px] font-bold text-slate-300 mb-1">
-                  {language === 'te' ? 'గమనికలు (ఐచ్ఛికం):' : 'Notes (Optional):'}
-                </label>
-                <input
-                  type="text"
-                  value={notes}
-                  onChange={(e) => setNotes(e.target.value)}
-                  placeholder="e.g. వార్డు ఇంచార్జ్, రౌండ్ 1 సర్వే..."
-                  className="w-full px-2.5 py-1.5 bg-slate-900 border border-slate-700 rounded-lg text-xs text-white focus:outline-none focus:border-amber-400"
-                />
+              {/* Form Save Actions */}
+              <div className="flex items-center gap-2 pt-1">
+                <button
+                  type="submit"
+                  className="flex-1 py-2.5 bg-gradient-to-r from-emerald-600 to-teal-600 hover:from-emerald-500 hover:to-teal-500 text-white font-black rounded-xl text-xs flex items-center justify-center gap-1.5 shadow-md shadow-emerald-950/40 cursor-pointer"
+                >
+                  <Check className="w-4 h-4" />
+                  <span>కేటాయింపును భద్రపరచండి (Save Assignment)</span>
+                </button>
+                <button
+                  type="button"
+                  onClick={resetForm}
+                  className="px-4 py-2.5 bg-slate-800 hover:bg-slate-700 text-slate-300 rounded-xl text-xs font-bold transition-colors cursor-pointer"
+                >
+                  రద్దు
+                </button>
               </div>
-
-              {/* Submit Button */}
-              <button
-                type="submit"
-                className="w-full py-2 bg-gradient-to-r from-amber-500 to-amber-600 hover:from-amber-400 hover:to-amber-500 text-slate-950 font-black rounded-xl text-xs flex items-center justify-center gap-1.5 shadow-md shadow-amber-950/40"
-              >
-                <Check className="w-4 h-4" />
-                <span>{language === 'te' ? 'కేటాయింపును భద్రపరచండి (Save)' : 'Save Assignment'}</span>
-              </button>
             </form>
           )}
 
-          {/* LIST OF ASSIGNED VOLUNTEERS */}
-          <div className="space-y-2.5">
+          {/* LIST OF REGISTERED INCHARGES (HIGHLY IMPROVISED, NEAT & GROUPED) */}
+          <div className="space-y-3">
             <div className="flex items-center justify-between text-xs text-slate-400 px-1">
-              <span>{language === 'te' ? `నమోదిత ఇంచార్జ్‌లు (${assignments.length})` : `Registered Incharges (${assignments.length})`}</span>
-              <span className="text-[10px] text-amber-400 font-bold">1-క్లిక్ వాట్సాప్ పంపండి</span>
+              <span className="font-bold text-white flex items-center gap-1.5">
+                <span>నమోదిత ఇంచార్జ్‌లు</span>
+                <span className="px-2 py-0.2 rounded-full bg-slate-800 text-amber-400 font-mono text-[10px] font-bold">
+                  {assignments.length}
+                </span>
+              </span>
+              <span className="text-[10px] text-amber-400 font-bold flex items-center gap-1">
+                <span>📲 1-క్లిక్ వాట్సాప్ పంపండి</span>
+              </span>
             </div>
 
-            {assignments.map(a => (
-              <div
-                key={a.id}
-                className="p-3.5 rounded-2xl bg-slate-950/70 border border-slate-800 hover:border-slate-700 space-y-2 transition-all"
-              >
-                {/* Person Header */}
-                <div className="flex items-start justify-between">
-                  <div>
-                    <h3 className="text-xs font-black text-white flex items-center gap-1.5">
-                      <span>{a.name}</span>
-                      <span className="px-1.5 py-0.2 rounded bg-slate-800 text-amber-400 font-mono text-[10px] font-bold">
-                        {a.phone}
-                      </span>
-                    </h3>
-                    {a.notes && (
-                      <p className="text-[10px] text-slate-400 mt-0.5">{a.notes}</p>
-                    )}
-                  </div>
-                  <div className="flex items-center gap-1">
-                    <button
-                      onClick={() => handleEdit(a)}
-                      className="p-1.5 rounded-lg bg-slate-800 hover:bg-slate-700 text-slate-300"
-                      title="Edit"
-                    >
-                      <Edit3 className="w-3.5 h-3.5" />
-                    </button>
-                    <button
-                      onClick={() => handleDelete(a.id)}
-                      className="p-1.5 rounded-lg bg-slate-800 hover:bg-red-950 text-slate-400 hover:text-red-400"
-                      title="Delete"
-                    >
-                      <Trash2 className="w-3.5 h-3.5" />
-                    </button>
-                  </div>
-                </div>
+            {assignments.length === 0 ? (
+              <div className="p-8 rounded-2xl bg-slate-950/50 border border-dashed border-slate-800 text-center space-y-2">
+                <p className="text-xs text-slate-400">ఇంకా ఎవరికీ బాధ్యతలు కేటాయించలేదు.</p>
+                <p className="text-[11px] text-amber-400 font-bold">'+ కొత్త ఇంచార్జ్ జోడించండి' పై క్లిక్ చేయండి.</p>
+              </div>
+            ) : (
+              assignments.map(a => {
+                const villageGroups = groupAssignmentVillages(a.municipalWards);
+                const isExpandedWards = !!expandedWardsForAssignment[a.id];
 
-                {/* Assigned Units Badges */}
-                <div className="space-y-1 text-xs">
-                  {/* Assembly Booths */}
-                  {a.assemblyBooths.length > 0 && (
-                    <div className="flex flex-wrap items-center gap-1">
-                      <span className="text-[10px] font-bold text-slate-400 uppercase mr-1">
-                        అసెంబ్లీ బూతులు:
-                      </span>
-                      {a.assemblyBooths.map(bn => (
-                        <span
-                          key={bn}
-                          className="px-2 py-0.5 rounded-md bg-red-950/60 border border-red-500/40 text-red-300 text-[10px] font-mono font-bold"
+                return (
+                  <div
+                    key={a.id}
+                    className="p-4 rounded-2xl bg-slate-950/80 border border-slate-800/90 hover:border-slate-700/80 space-y-3 transition-all shadow-md"
+                  >
+                    {/* Person Header */}
+                    <div className="flex items-start justify-between gap-2">
+                      <div className="flex items-center gap-2.5 min-w-0">
+                        <div className="w-9 h-9 rounded-xl bg-gradient-to-tr from-amber-600 to-red-600 flex items-center justify-center text-white font-black text-xs shadow-md shrink-0">
+                          {getInitials(a.name)}
+                        </div>
+                        <div className="min-w-0">
+                          <div className="flex items-center gap-2 flex-wrap">
+                            <h3 className="text-xs font-black text-white truncate">
+                              {a.name}
+                            </h3>
+                            <span className="px-2 py-0.5 rounded-md bg-slate-800 border border-slate-700 text-amber-400 font-mono text-[10px] font-bold flex items-center gap-1">
+                              <Phone className="w-2.5 h-2.5 text-slate-400" />
+                              <span>{a.phone}</span>
+                            </span>
+                          </div>
+                          {a.notes && (
+                            <p className="text-[10.5px] text-slate-400 mt-0.5 truncate">
+                              {a.notes}
+                            </p>
+                          )}
+                        </div>
+                      </div>
+
+                      {/* Edit / Delete Buttons */}
+                      <div className="flex items-center gap-1 shrink-0">
+                        <button
+                          onClick={() => handleEdit(a)}
+                          className="p-1.5 rounded-lg bg-slate-800 hover:bg-slate-700 text-slate-300 hover:text-white transition-colors cursor-pointer"
+                          title="Edit Assignment"
                         >
-                          బూత్ #{bn}
-                        </span>
-                      ))}
+                          <Edit3 className="w-3.5 h-3.5" />
+                        </button>
+                        <button
+                          onClick={() => handleDelete(a.id)}
+                          className="p-1.5 rounded-lg bg-slate-800 hover:bg-red-950 text-slate-400 hover:text-red-400 transition-colors cursor-pointer"
+                          title="Delete Assignment"
+                        >
+                          <Trash2 className="w-3.5 h-3.5" />
+                        </button>
+                      </div>
                     </div>
-                  )}
 
-                  {/* Municipal / Local Wards */}
-                  {a.municipalWards.length > 0 && (
-                    <div className="flex flex-wrap items-center gap-1">
-                      <span className="text-[10px] font-bold text-slate-400 uppercase mr-1">
-                        స్థానిక వార్డులు / పంచాయతీలు:
-                      </span>
-                      {a.municipalWards.map(w => {
-                        const badge = getUnitBadge(w);
-                        return (
-                          <span
-                            key={w}
-                            className={`px-2 py-0.5 rounded-md text-[10px] font-bold border ${badge.cls}`}
-                          >
-                            {badge.label}
+                    {/* NEATLY GROUPED VILLAGE & BOOTH BADGES */}
+                    <div className="space-y-2 p-2.5 rounded-xl bg-slate-900/60 border border-slate-800/80">
+                      {/* 1. Gram Panchayats (Grouped Cards) */}
+                      {villageGroups.length > 0 && (
+                        <div className="space-y-1.5">
+                          <span className="text-[9.5px] font-black text-slate-400 uppercase tracking-wider block">
+                            🏡 కేటాయించిన గ్రామ పంచాయతీలు:
                           </span>
-                        );
-                      })}
+                          <div className="grid grid-cols-1 sm:grid-cols-2 gap-1.5">
+                            {villageGroups.map(v => (
+                              <div
+                                key={v.villageId}
+                                className={`p-2 rounded-xl border flex items-center justify-between text-xs font-bold ${v.badgeCls}`}
+                              >
+                                <div className="flex items-center gap-2 min-w-0">
+                                  <span className="text-base shrink-0">🏡</span>
+                                  <div className="min-w-0 truncate">
+                                    <span className="block text-xs font-black truncate">
+                                      {v.name}
+                                    </span>
+                                    <span className="text-[9.5px] opacity-80 block">
+                                      {v.isFullGp 
+                                        ? `సమగ్ర గ్రామం (~${v.totalVoters.toLocaleString()} ఓటర్లు)`
+                                        : `${v.assignedWards.length} వార్డులు (${v.assignedWards.map(w => '#' + w).join(', ')})`}
+                                    </span>
+                                  </div>
+                                </div>
+                                <span className="text-[9px] px-1.5 py-0.5 rounded font-mono font-black bg-black/40 border border-white/10 shrink-0 ml-1">
+                                  {v.isFullGp ? 'సర్వ వార్డులు' : `${v.assignedWards.length} Wards`}
+                                </span>
+                              </div>
+                            ))}
+                          </div>
+                        </div>
+                      )}
+
+                      {/* 2. Assembly Booths */}
+                      {a.assemblyBooths.length > 0 && (
+                        <div className="pt-1 border-t border-slate-800/60">
+                          <div className="flex items-center justify-between mb-1">
+                            <span className="text-[9.5px] font-black text-slate-400 uppercase tracking-wider">
+                              🏛️ అసెంబ్లీ బూతులు (AC #37):
+                            </span>
+                            <span className="text-[9.5px] text-red-300 font-mono font-bold">
+                              {a.assemblyBooths.length} బూతులు
+                            </span>
+                          </div>
+                          <div className="flex flex-wrap items-center gap-1">
+                            {a.assemblyBooths.map(bn => (
+                              <span
+                                key={bn}
+                                className="px-2 py-0.5 rounded-md bg-red-950/70 border border-red-500/40 text-red-300 text-[10px] font-mono font-bold"
+                              >
+                                బూత్ #{bn}
+                              </span>
+                            ))}
+                          </div>
+                        </div>
+                      )}
+
+                      {/* Expand / Collapse Individual Wards */}
+                      {villageGroups.some(v => v.assignedWards.length > 0) && (
+                        <div className="pt-1 text-right">
+                          <button
+                            type="button"
+                            onClick={() => {
+                              setExpandedWardsForAssignment(prev => ({
+                                ...prev,
+                                [a.id]: !prev[a.id]
+                              }));
+                            }}
+                            className="text-[9.5px] text-amber-400 hover:underline font-bold inline-flex items-center gap-0.5 cursor-pointer"
+                          >
+                            <span>{isExpandedWards ? 'వార్డుల వివరాలు దాచు' : '🔎 ప్రత్యేక వార్డుల నంబర్లు చూడండి'}</span>
+                            {isExpandedWards ? <ChevronUp className="w-3 h-3" /> : <ChevronDown className="w-3 h-3" />}
+                          </button>
+                        </div>
+                      )}
+
+                      {isExpandedWards && (
+                        <div className="p-2 rounded-lg bg-slate-950 border border-slate-800/90 text-[10px] space-y-1 animate-in fade-in duration-100">
+                          <span className="font-bold text-slate-400 block">కేటాయించిన అన్ని వార్డుల జాబితా:</span>
+                          <div className="flex flex-wrap gap-1">
+                            {a.municipalWards.map(w => (
+                              <span key={w} className="px-1.5 py-0.5 rounded bg-slate-900 border border-slate-700 text-slate-300 font-mono text-[9px]">
+                                {w}
+                              </span>
+                            ))}
+                          </div>
+                        </div>
+                      )}
+
+                      {a.assemblyBooths.length === 0 && a.municipalWards.length === 0 && (
+                        <span className="text-[10px] text-amber-500/80 italic block text-center py-1">
+                          ఇంకా ఏ బూతులు లేదా గ్రామాలు కేటాయించలేదు
+                        </span>
+                      )}
                     </div>
-                  )}
 
-                  {a.assemblyBooths.length === 0 && a.municipalWards.length === 0 && (
-                    <span className="text-[10px] text-amber-500/80 italic">
-                      ఇంకా ఏ బూతులు కేటాయించలేదు
-                    </span>
-                  )}
-                </div>
+                    {/* Timer & Expiry Status */}
+                    <div className="flex items-center justify-between gap-1 flex-wrap pt-1">
+                      <div className="flex items-center gap-1.5">
+                        {a.expiresAt ? (
+                          isAssignmentExpired(a) ? (
+                            <span className="px-2 py-0.5 rounded-md bg-red-950 border border-red-500/50 text-red-300 text-[10px] font-bold flex items-center gap-1">
+                              <AlertTriangle className="w-3 h-3 text-red-400" />
+                              <span>కాలపరిమితి ముగిసింది (Expired)</span>
+                            </span>
+                          ) : (
+                            <span className="px-2 py-0.5 rounded-md bg-amber-950/80 border border-amber-500/50 text-amber-300 text-[10px] font-bold font-mono flex items-center gap-1">
+                              <Clock className="w-3 h-3 text-amber-400" />
+                              <span>మిగిలిన సమయం: {getRemainingTime(a).formatted}</span>
+                            </span>
+                          )
+                        ) : (
+                          <span className="px-2 py-0.5 rounded-md bg-slate-900 border border-slate-800 text-slate-400 text-[10px] font-bold flex items-center gap-1">
+                            <Clock className="w-3 h-3 text-slate-500" />
+                            <span>అపరిమిత సమయం (No Expiry)</span>
+                          </span>
+                        )}
+                      </div>
 
-                {/* Timer / Expiry Status Badge & Quick Actions */}
-                <div className="flex items-center justify-between gap-1 flex-wrap pt-1.5 border-t border-slate-800/60">
-                  <div className="flex items-center gap-1.5">
-                    {a.expiresAt ? (
-                      isAssignmentExpired(a) ? (
-                        <span className="px-2 py-0.5 rounded-md bg-red-950 border border-red-500/50 text-red-300 text-[10px] font-bold flex items-center gap-1">
-                          <AlertTriangle className="w-3 h-3 text-red-400" />
-                          <span>కాలపరిమితి ముగిసింది (Expired)</span>
-                        </span>
-                      ) : (
-                        <span className="px-2 py-0.5 rounded-md bg-amber-950/80 border border-amber-500/50 text-amber-300 text-[10px] font-bold font-mono flex items-center gap-1">
-                          <Clock className="w-3 h-3 text-amber-400" />
-                          <span>మిగిలిన సమయం: {getRemainingTime(a).formatted}</span>
-                        </span>
-                      )
-                    ) : (
-                      <span className="px-2 py-0.5 rounded-md bg-slate-900 border border-slate-800 text-slate-400 text-[10px] font-bold flex items-center gap-1">
-                        <Clock className="w-3 h-3 text-slate-500" />
-                        <span>అపరిమిత సమయం (No Expiry)</span>
-                      </span>
-                    )}
-                  </div>
-                  <div className="flex items-center gap-1">
-                    <button
-                      type="button"
-                      onClick={() => handleExtend(a.id, 30)}
-                      className="px-2 py-0.5 rounded bg-amber-500/20 hover:bg-amber-500 hover:text-slate-950 text-amber-300 text-[9.5px] font-bold border border-amber-500/30 transition-all cursor-pointer"
-                      title="30 నిమిషాలు పొడిగించండి"
-                    >
-                      +30ని.
-                    </button>
-                    <button
-                      type="button"
-                      onClick={() => handleExtend(a.id, 60)}
-                      className="px-2 py-0.5 rounded bg-amber-500/20 hover:bg-amber-500 hover:text-slate-950 text-amber-300 text-[9.5px] font-bold border border-amber-500/30 transition-all cursor-pointer"
-                      title="1 గంట పొడిగించండి"
-                    >
-                      +1గం.
-                    </button>
-                    {a.expiresAt && (
+                      <div className="flex items-center gap-1">
+                        <button
+                          type="button"
+                          onClick={() => handleExtend(a.id, 30)}
+                          className="px-2 py-0.5 rounded bg-amber-500/20 hover:bg-amber-500 hover:text-slate-950 text-amber-300 text-[9.5px] font-bold border border-amber-500/30 transition-all cursor-pointer"
+                        >
+                          +30ని.
+                        </button>
+                        <button
+                          type="button"
+                          onClick={() => handleExtend(a.id, 60)}
+                          className="px-2 py-0.5 rounded bg-amber-500/20 hover:bg-amber-500 hover:text-slate-950 text-amber-300 text-[9.5px] font-bold border border-amber-500/30 transition-all cursor-pointer"
+                        >
+                          +1గం.
+                        </button>
+                        {a.expiresAt && (
+                          <button
+                            type="button"
+                            onClick={() => handleMakeUnlimited(a.id)}
+                            className="px-2 py-0.5 rounded bg-slate-800 hover:bg-slate-700 text-slate-300 text-[9.5px] font-bold border border-slate-700 transition-all cursor-pointer"
+                          >
+                            అపరిమితం
+                          </button>
+                        )}
+                      </div>
+                    </div>
+
+                    {/* WhatsApp 1-Click Send & Copy Buttons */}
+                    <div className="grid grid-cols-2 gap-2 pt-1 border-t border-slate-800/80">
                       <button
                         type="button"
-                        onClick={() => handleMakeUnlimited(a.id)}
-                        className="px-2 py-0.5 rounded bg-slate-800 hover:bg-slate-700 text-slate-300 text-[9.5px] font-bold border border-slate-700 transition-all cursor-pointer"
-                        title="అపరిమితం చేయండి"
+                        onClick={() => handleOpenWhatsApp(a)}
+                        className="py-2 bg-emerald-600 hover:bg-emerald-500 text-white rounded-xl text-xs font-black flex items-center justify-center gap-1.5 shadow-md shadow-emerald-950/40 transition-all active:scale-98 cursor-pointer"
                       >
-                        అపరిమితం
+                        <Send className="w-3.5 h-3.5" />
+                        <span>వాట్సాప్‌లో పంపండి</span>
                       </button>
-                    )}
+                      <button
+                        type="button"
+                        onClick={() => handleCopyMessage(a)}
+                        className="py-2 bg-slate-800 hover:bg-slate-700 text-slate-200 rounded-xl text-xs font-bold flex items-center justify-center gap-1.5 border border-slate-700 transition-all active:scale-98 cursor-pointer"
+                      >
+                        {copiedId === a.id ? (
+                          <>
+                            <CheckCircle2 className="w-3.5 h-3.5 text-emerald-400" />
+                            <span className="text-emerald-300 font-bold">కాపీ అయ్యింది!</span>
+                          </>
+                        ) : (
+                          <>
+                            <Copy className="w-3.5 h-3.5 text-amber-400" />
+                            <span>వివరాలు కాపీ చేయండి</span>
+                          </>
+                        )}
+                      </button>
+                    </div>
                   </div>
-                </div>
-
-                {/* WhatsApp Action Buttons */}
-                <div className="pt-1 flex items-center gap-2 border-t border-slate-800/80">
-                  <button
-                    onClick={() => handleSendWhatsApp(a)}
-                    className="flex-1 py-1.5 px-3 rounded-xl bg-emerald-600 hover:bg-emerald-500 text-white font-bold text-[11px] flex items-center justify-center gap-1.5 shadow-sm shadow-emerald-950/50 transition-all active:scale-98"
-                  >
-                    <Send className="w-3.5 h-3.5" />
-                    <span>వాట్సాప్‌లో పంపండి (Send WhatsApp)</span>
-                  </button>
-                  <button
-                    onClick={() => handleCopyMessage(a)}
-                    className="py-1.5 px-2.5 rounded-xl bg-slate-800 hover:bg-slate-700 text-slate-300 text-[11px] font-bold flex items-center gap-1 transition-all"
-                    title="Copy message text"
-                  >
-                    {copiedId === a.id ? <CheckCircle2 className="w-3.5 h-3.5 text-emerald-400" /> : <Copy className="w-3.5 h-3.5" />}
-                    <span>{copiedId === a.id ? 'కాపీ అయింది' : 'కాపీ'}</span>
-                  </button>
-                </div>
-              </div>
-            ))}
+                );
+              })
+            )}
           </div>
         </div>
 
-        {/* Footer info */}
+        {/* Footer Note */}
         <div className="pt-2 border-t border-slate-800 text-center flex-shrink-0">
-          <p className="text-[10px] text-slate-500">
-            వాలంటీర్లు వారి మొబైల్ నంబర్‌తో లాగిన్ అయినప్పుడు మాత్రమే పైన కేటాయించిన బూత్‌లు కనిపిస్తాయి.
+          <p className="text-[10px] text-slate-500 flex items-center justify-center gap-1">
+            <ShieldCheck className="w-3 h-3 text-emerald-500" />
+            <span>వాలంటీర్లు తమ మొబైల్ నంబర్‌తో లాగిన్ అయినప్పుడు మాత్రమే పైన కేటాయించిన గ్రామాలు / బూతులు కనిపిస్తాయి.</span>
           </p>
         </div>
       </div>
     </div>
   );
 };
+
+export default AdminAssignmentModal;
