@@ -150,8 +150,8 @@ export const HeaderMobile: React.FC<HeaderMobileProps> = ({
 
       {/* Right: Actions */}
       <div className="flex items-center gap-1 flex-shrink-0">
-        {/* Quick 1-click Switch to Full Village (when currently in a ward) */}
-        {isWard && onSwitchToFullVillage && (
+        {/* Quick 1-click Switch to Full Village (STRICTLY ADMIN ONLY when viewing a single ward) */}
+        {session?.role === 'admin' && isWard && onSwitchToFullVillage && (
           <button
             type="button"
             onClick={onSwitchToFullVillage}
