@@ -737,6 +737,89 @@ export function App() {
     return calculateWinningScore(boothData, profiles, victoryPredictorMode);
   }, [boothData, profiles, victoryPredictorMode]);
 
+  // Global Escape key listener to close any active modal
+  useEffect(() => {
+    const handleGlobalKeyDown = (e: KeyboardEvent) => {
+      if (e.key === 'Escape') {
+        if (selectedVoterForSlip) {
+          setSelectedVoterForSlip(null);
+          return;
+        }
+        if (selectedVoterForPhone) {
+          setSelectedVoterForPhone(null);
+          return;
+        }
+        if (selectedVoterForVisit) {
+          setSelectedVoterForVisit(null);
+          return;
+        }
+        if (supportPickerState.open) {
+          setSupportPickerState(prev => ({ ...prev, open: false }));
+          return;
+        }
+        if (influencerAssignState.open) {
+          setInfluencerAssignState(prev => ({ ...prev, open: false }));
+          return;
+        }
+        if (createFamilyState.open) {
+          setCreateFamilyState({ open: false, initialFamily: null });
+          return;
+        }
+        if (groupPrintState.open) {
+          setGroupPrintState(prev => ({ ...prev, open: false }));
+          return;
+        }
+        if (surnameLeaningState.open) {
+          setSurnameLeaningState({ open: false });
+          return;
+        }
+        if (bulkAssignState.open) {
+          setBulkAssignState({ open: false });
+          return;
+        }
+        if (isSyncModalOpen) {
+          setIsSyncModalOpen(false);
+          return;
+        }
+        if (isThemeModalOpen) {
+          setIsThemeModalOpen(false);
+          return;
+        }
+        if (isAdminModalOpen) {
+          setIsAdminModalOpen(false);
+          return;
+        }
+        if (isBoothSelectorOpen) {
+          setIsBoothSelectorOpen(false);
+          return;
+        }
+        if (isLoginModalOpen && session) {
+          setIsLoginModalOpen(false);
+          return;
+        }
+      }
+    };
+
+    window.addEventListener('keydown', handleGlobalKeyDown);
+    return () => window.removeEventListener('keydown', handleGlobalKeyDown);
+  }, [
+    selectedVoterForSlip,
+    selectedVoterForPhone,
+    selectedVoterForVisit,
+    supportPickerState.open,
+    influencerAssignState.open,
+    createFamilyState.open,
+    groupPrintState.open,
+    surnameLeaningState.open,
+    bulkAssignState.open,
+    isSyncModalOpen,
+    isThemeModalOpen,
+    isAdminModalOpen,
+    isBoothSelectorOpen,
+    isLoginModalOpen,
+    session
+  ]);
+
   // Show score bump toast notification
   const triggerScoreNotice = (msg: string) => {
     setScoreNotification(msg);
