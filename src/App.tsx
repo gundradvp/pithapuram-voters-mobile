@@ -130,7 +130,11 @@ export function App() {
   }, [session, currentAssignment, localUnits]);
 
   const [currentPartNo, setCurrentPartNo] = useState<number | string>(() => {
-    return getAssignedBooth() || 'ward_14';
+    const saved = getAssignedBooth();
+    if (saved && saved !== 'ward_14' && saved !== 'gollaprolu_ward_11' && !String(saved).startsWith('ward_')) {
+      return saved;
+    }
+    return 'gp_tatiparthy';
   });
 
   // Desktop vs Mobile layout mode (mobile first priority; desktop mode on laptops)
@@ -173,13 +177,16 @@ export function App() {
 
     const isCurrentValid =
       (typeof currentPartNo === 'number' && assignedAssemblyBooths.includes(currentPartNo)) ||
-      (typeof currentPartNo === 'string' && assignedMunicipalWards.includes(currentPartNo));
+      (typeof currentPartNo === 'string' && assignedMunicipalWards.includes(currentPartNo) && !currentPartNo.startsWith('ward_') && currentPartNo !== 'gollaprolu_ward_11');
 
     if (!isCurrentValid) {
       if (assignedMunicipalWards.length > 0) {
-        setCurrentPartNo(assignedMunicipalWards[0]);
+        const validWard = assignedMunicipalWards.find(w => !w.startsWith('ward_') && w !== 'gollaprolu_ward_11') || assignedMunicipalWards[0];
+        setCurrentPartNo(validWard);
+        setAssignedBooth(validWard, true);
       } else if (assignedAssemblyBooths.length > 0) {
         setCurrentPartNo(assignedAssemblyBooths[0]);
+        setAssignedBooth(assignedAssemblyBooths[0], true);
       }
     }
   }, [session, currentAssignment, assignedAssemblyBooths, assignedMunicipalWards, currentPartNo]);
@@ -1141,8 +1148,8 @@ export function App() {
   const handleExitDemo = () => {
     logoutUser();
     setSession(null);
-    setCurrentPartNo('ward_14');
-    loadBooth('ward_14');
+    setCurrentPartNo('gp_tatiparthy');
+    loadBooth('gp_tatiparthy');
   };
 
   return (

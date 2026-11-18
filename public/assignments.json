@@ -1,15 +1,52 @@
 [
   {
-    "id": "assign_9479797947",
-    "phone": "9479797947",
-    "name": "గొల్లప్రోలు ఇంచార్జ్ (Gollaprolu Incharge)",
-    "assemblyBooths": [],
-    "municipalWards": [
-      "gollaprolu_ward_11"
+    "id": "assign_9000273028",
+    "phone": "9000273028",
+    "name": "దుర్గా ప్రసాద్ (Durga Prasad)",
+    "assemblyBooths": [
+      11,
+      12,
+      13,
+      24,
+      25
     ],
-    "notes": "గొల్లప్రోలు నగర పంచాయతీ 11వ వార్డు",
-    "assignedAt": "2026-11-01T00:00:00.000Z",
-    "expiresAt": 1793743682398,
-    "expiryMinutes": 30
+    "municipalWards": [
+      "gp_tatiparthy",
+      "gp_durgada",
+      "gp_vannepudi",
+      "mptc_chebrolu_4",
+      "gp_tatiparthy_w1",
+      "gp_tatiparthy_w2",
+      "gp_tatiparthy_w3",
+      "gp_tatiparthy_w4",
+      "gp_tatiparthy_w5",
+      "gp_tatiparthy_w6",
+      "gp_tatiparthy_w7",
+      "gp_tatiparthy_w8",
+      "gp_tatiparthy_w9",
+      "gp_tatiparthy_w10",
+      "gp_tatiparthy_w11",
+      "gp_tatiparthy_w12",
+      "gp_tatiparthy_w13",
+      "gp_tatiparthy_w14",
+      "gp_durgada_w1",
+      "gp_durgada_w2",
+      "gp_durgada_w3",
+      "gp_durgada_w4",
+      "gp_durgada_w5",
+      "gp_durgada_w6",
+      "gp_durgada_w7",
+      "gp_durgada_w8",
+      "gp_durgada_w9",
+      "gp_durgada_w10",
+      "gp_durgada_w11",
+      "gp_durgada_w12",
+      "gp_durgada_w13",
+      "gp_durgada_w14",
+      "gp_durgada_w15",
+      "gp_durgada_w16"
+    ],
+    "notes": "పిఠాపురం అసెంబ్లీ & గ్రామ పంచాయతీ ఎన్నికల కోఆర్డినేటర్",
+    "assignedAt": "2026-11-18T16:50:00.000Z"
   }
 ]

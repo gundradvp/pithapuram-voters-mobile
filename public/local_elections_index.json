@@ -7198,7 +7198,9 @@
     "type": "ward",
     "total_voters": 499,
     "category_label": "తాటిపర్తి గ్రామ పంచాయతీ - వార్డు #8",
-    "parent_gp": "gp_tatiparthy"
+    "parent_gp": "gp_tatiparthy",
+    "election_type": "panchayat",
+    "is_loaded": true
   },
   {
     "id": "gp_tatiparthy_w9",
@@ -7208,7 +7210,9 @@
     "type": "ward",
     "total_voters": 499,
     "category_label": "తాటిపర్తి గ్రామ పంచాయతీ - వార్డు #9",
-    "parent_gp": "gp_tatiparthy"
+    "parent_gp": "gp_tatiparthy",
+    "election_type": "panchayat",
+    "is_loaded": true
   },
   {
     "id": "gp_tatiparthy_w10",
@@ -7218,7 +7222,9 @@
     "type": "ward",
     "total_voters": 499,
     "category_label": "తాటిపర్తి గ్రామ పంచాయతీ - వార్డు #10",
-    "parent_gp": "gp_tatiparthy"
+    "parent_gp": "gp_tatiparthy",
+    "election_type": "panchayat",
+    "is_loaded": true
   },
   {
     "id": "gp_tatiparthy_w11",
@@ -7228,7 +7234,9 @@
     "type": "ward",
     "total_voters": 499,
     "category_label": "తాటిపర్తి గ్రామ పంచాయతీ - వార్డు #11",
-    "parent_gp": "gp_tatiparthy"
+    "parent_gp": "gp_tatiparthy",
+    "election_type": "panchayat",
+    "is_loaded": true
   },
   {
     "id": "gp_tatiparthy_w12",
@@ -7238,7 +7246,9 @@
     "type": "ward",
     "total_voters": 499,
     "category_label": "తాటిపర్తి గ్రామ పంచాయతీ - వార్డు #12",
-    "parent_gp": "gp_tatiparthy"
+    "parent_gp": "gp_tatiparthy",
+    "election_type": "panchayat",
+    "is_loaded": true
   },
   {
     "id": "gp_tatiparthy_w13",
@@ -7248,7 +7258,9 @@
     "type": "ward",
     "total_voters": 499,
     "category_label": "తాటిపర్తి గ్రామ పంచాయతీ - వార్డు #13",
-    "parent_gp": "gp_tatiparthy"
+    "parent_gp": "gp_tatiparthy",
+    "election_type": "panchayat",
+    "is_loaded": true
   },
   {
     "id": "gp_tatiparthy_w14",
@@ -7258,6 +7270,8 @@
     "type": "ward",
     "total_voters": 507,
     "category_label": "తాటిపర్తి గ్రామ పంచాయతీ - వార్డు #14",
-    "parent_gp": "gp_tatiparthy"
+    "parent_gp": "gp_tatiparthy",
+    "election_type": "panchayat",
+    "is_loaded": true
   }
 ]

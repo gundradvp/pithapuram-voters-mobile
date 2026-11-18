@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { 
   X, 
   Search, 
@@ -53,12 +53,23 @@ export const BoothAssignmentModal: React.FC<BoothAssignmentModalProps> = ({
     isCurrentlyLocal ? 'local' : 'assembly'
   );
   const [localSubCategory, setLocalSubCategory] = useState<'all' | 'municipal' | 'panchayat'>('all');
-  const [panchayatViewFilter, setPanchayatViewFilter] = useState<'village' | 'ward' | 'all'>('village');
+  const [panchayatViewFilter, setPanchayatViewFilter] = useState<'village' | 'ward' | 'all'>(isCurrentlyLocal ? 'all' : 'village');
   const [searchTerm, setSearchTerm] = useState('');
   const [pinInput, setPinInput] = useState('');
   const [pinUnlocked, setPinUnlocked] = useState(userRole === 'admin' || !isLocked);
   const [pinError, setPinError] = useState(false);
   const [lockOnAssign, setLockOnAssign] = useState(true);
+
+  // Escape key to close modal
+  useEffect(() => {
+    const handleKeyDown = (e: KeyboardEvent) => {
+      if (e.key === 'Escape') {
+        onClose();
+      }
+    };
+    window.addEventListener('keydown', handleKeyDown);
+    return () => window.removeEventListener('keydown', handleKeyDown);
+  }, [onClose]);
 
   const handleVerifyPin = () => {
     if (verifyAdminPin(pinInput) || pinInput.trim() === '2222') {
@@ -100,6 +111,11 @@ export const BoothAssignmentModal: React.FC<BoothAssignmentModalProps> = ({
         return false;
       }
 
+      // Municipality is not required — this is Panchayat election, exclude all municipality wards
+      if (u.election_type === 'municipal' || u.type === 'municipal' || (u.id && (u.id.startsWith('ward_') || u.id.startsWith('gollaprolu_ward_')))) {
+        return false;
+      }
+
       const isVillage = u.type === 'village' || u.view_level === 'village' || (!u.ward_no && !u.id.includes('_w'));
 
       // 1. By Village vs By Ward filter for Panchayat Elections
@@ -131,8 +147,16 @@ export const BoothAssignmentModal: React.FC<BoothAssignmentModalProps> = ({
     });
 
   return (
-    <div className="fixed inset-0 z-50 bg-black/90 backdrop-blur-md flex items-end sm:items-center justify-center p-3 animate-in fade-in duration-200">
-      <div className="bg-slate-900 border border-amber-500/40 rounded-3xl max-w-lg w-full p-4 sm:p-5 space-y-3.5 shadow-2xl relative max-h-[90vh] flex flex-col">
+    <div 
+      className="fixed inset-0 z-50 bg-black/90 backdrop-blur-md flex items-end sm:items-center justify-center p-3 animate-in fade-in duration-200"
+      onClick={(e) => {
+        if (e.target === e.currentTarget) onClose();
+      }}
+    >
+      <div 
+        className="bg-slate-900 border border-amber-500/40 rounded-3xl max-w-lg w-full p-4 sm:p-5 space-y-3.5 shadow-2xl relative max-h-[90vh] flex flex-col"
+        onClick={(e) => e.stopPropagation()}
+      >
         {/* Modal Header */}
         <div className="flex items-start justify-between border-b border-slate-800 pb-3 flex-shrink-0">
           <div>
@@ -251,7 +275,7 @@ export const BoothAssignmentModal: React.FC<BoothAssignmentModalProps> = ({
                 }`}
               >
                 <span>🏛️</span>
-                <span>{language === 'te' ? 'స్థానిక ఎన్నికలు' : 'Local Elections'}</span>
+                <span>{language === 'te' ? 'గ్రామ పంచాయతీలు (GP)' : 'Gram Panchayats (GP)'}</span>
                 <span className="px-1.5 py-0.2 bg-red-600 text-white rounded-full text-[9px] font-mono">
                   {availableLocalUnits.length}
                 </span>

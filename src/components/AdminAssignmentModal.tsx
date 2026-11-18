@@ -82,6 +82,17 @@ export const AdminAssignmentModal: React.FC<AdminAssignmentModalProps> = ({
     }).catch(() => {});
   }, []);
 
+  // Escape key to close modal
+  useEffect(() => {
+    const handleKeyDown = (e: KeyboardEvent) => {
+      if (e.key === 'Escape') {
+        onClose();
+      }
+    };
+    window.addEventListener('keydown', handleKeyDown);
+    return () => window.removeEventListener('keydown', handleKeyDown);
+  }, [onClose]);
+
   const handleManualSync = async () => {
     setIsSyncing(true);
     try {
@@ -126,8 +137,10 @@ export const AdminAssignmentModal: React.FC<AdminAssignmentModalProps> = ({
         return { label: '🌾 దుర్గడ #47 (530 - EBC కాలనీ)', cls: 'bg-teal-950/80 border-teal-400 text-teal-200' };
       case 'mptc_durgada_3':
         return { label: '🌾 దుర్గడ MPTC 3 (1,874)', cls: 'bg-sky-950/60 border-sky-500/40 text-sky-300' };
+      case 'gp_tatiparthy':
+        return { label: '🏡 తాటిపర్తి సమగ్ర GP (6,994)', cls: 'bg-emerald-950/80 border-emerald-400 text-emerald-200' };
       case 'gp_durgada':
-        return { label: '🌾 దుర్గడ సమగ్ర పంచాయతీ (4,524)', cls: 'bg-amber-950/60 border-amber-500/40 text-amber-300' };
+        return { label: '🏡 దుర్గడ సమగ్ర GP (8,487)', cls: 'bg-amber-950/80 border-amber-400 text-amber-200' };
       case 'gp_vannepudi':
         return { label: '🌴 వన్నెపూడి పంచాయతీ (3,201)', cls: 'bg-purple-950/60 border-purple-500/40 text-purple-300' };
       case 'mptc_chebrolu_4':
@@ -482,12 +495,12 @@ export const AdminAssignmentModal: React.FC<AdminAssignmentModalProps> = ({
                     <button
                       type="button"
                       onClick={() => {
-                        const allW = ['ward_14', 'gollaprolu_ward_11', 'mptc_durgada_1', 'mptc_durgada_3', 'gp_durgada', 'gp_vannepudi'];
+                        const allW = ['gp_tatiparthy', 'gp_durgada', 'gp_vannepudi', 'mptc_chebrolu_4'];
                         setSelectedWards(allW);
                       }}
                       className="px-2 py-0.5 bg-amber-500/20 hover:bg-amber-500 hover:text-slate-950 text-amber-300 rounded text-[9.5px] font-bold border border-amber-500/30 transition-colors cursor-pointer"
                     >
-                      అన్నీ (Select All)
+                      అన్నీ (Select All GP)
                     </button>
                     <button
                       type="button"
@@ -499,22 +512,26 @@ export const AdminAssignmentModal: React.FC<AdminAssignmentModalProps> = ({
                     <button
                       type="button"
                       onClick={() => {
-                        setSelectedWards(prev => Array.from(new Set([...prev, 'mptc_durgada_1', 'mptc_durgada_3'])));
+                        const tatW = ['gp_tatiparthy'];
+                        for (let i = 1; i <= 14; i++) tatW.push('gp_tatiparthy_w' + i);
+                        setSelectedWards(prev => Array.from(new Set([...prev, ...tatW])));
                       }}
-                      className="px-2 py-0.5 bg-teal-500/20 hover:bg-teal-500 hover:text-slate-950 text-teal-300 rounded text-[9.5px] font-bold border border-teal-500/30 transition-colors cursor-pointer"
-                      title="దుర్గడ 2 MPTCలు (MPTC 1 & 3) ఒకేసారి ఎంచుకోండి"
+                      className="px-2 py-0.5 bg-emerald-500/20 hover:bg-emerald-500 hover:text-slate-950 text-emerald-300 rounded text-[9.5px] font-bold border border-emerald-500/30 transition-colors cursor-pointer"
+                      title="తాటిపర్తి GP & 14 వార్డులు అన్నీ ఒకేసారి ఎంచుకోండి"
                     >
-                      + దుర్గడ 2 MPTCలు
+                      + తాటిపర్తి 14 వార్డులు
                     </button>
                     <button
                       type="button"
                       onClick={() => {
-                        setSelectedWards(prev => Array.from(new Set([...prev, 'gp_durgada', 'gp_vannepudi'])));
+                        const durW = ['gp_durgada'];
+                        for (let i = 1; i <= 16; i++) durW.push('gp_durgada_w' + i);
+                        setSelectedWards(prev => Array.from(new Set([...prev, ...durW])));
                       }}
                       className="px-2 py-0.5 bg-amber-500/20 hover:bg-amber-500 hover:text-slate-950 text-amber-300 rounded text-[9.5px] font-bold border border-amber-500/30 transition-colors cursor-pointer"
-                      title="దుర్గడ & వన్నెపూడి GPలు రెండూ ఒకేసారి ఎంచుకోండి"
+                      title="దుర్గడ GP & 16 వార్డులు అన్నీ ఒకేసారి ఎంచుకోండి"
                     >
-                      + దుర్గడ & వన్నెపూడి GP
+                      + దుర్గడ 16 వార్డులు
                     </button>
                   </div>
                 </div>

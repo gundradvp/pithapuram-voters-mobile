@@ -42,25 +42,19 @@ export const DEFAULT_ASSIGNMENTS: VolunteerAssignment[] = [
     id: 'assign_9000273028',
     phone: '9000273028',
     name: 'దుర్గా ప్రసాద్ (Durga Prasad)',
-    assemblyBooths: [11, 12, 13],
+    assemblyBooths: [11, 12, 13, 24, 25],
     municipalWards: [
-      'ward_14', 'gollaprolu_ward_11', 'gp_durgada', 'gp_vannepudi', 'gp_tatiparthy',
-      'gp_durgada_w1', 'gp_durgada_w2', 'gp_durgada_w3', 'gp_durgada_w4', 'gp_durgada_w5',
-      'gp_durgada_w6', 'gp_durgada_w7', 'gp_durgada_w8', 'gp_durgada_w9', 'gp_durgada_w10',
-      'gp_durgada_w11', 'gp_durgada_w12', 'gp_durgada_w13', 'gp_durgada_w14', 'gp_durgada_w15', 'gp_durgada_w16',
+      'gp_tatiparthy', 'gp_durgada', 'gp_vannepudi', 'mptc_chebrolu_4',
       'gp_tatiparthy_w1', 'gp_tatiparthy_w2', 'gp_tatiparthy_w3', 'gp_tatiparthy_w4',
-      'gp_tatiparthy_w5', 'gp_tatiparthy_w6', 'gp_tatiparthy_w7'
+      'gp_tatiparthy_w5', 'gp_tatiparthy_w6', 'gp_tatiparthy_w7', 'gp_tatiparthy_w8',
+      'gp_tatiparthy_w9', 'gp_tatiparthy_w10', 'gp_tatiparthy_w11', 'gp_tatiparthy_w12',
+      'gp_tatiparthy_w13', 'gp_tatiparthy_w14',
+      'gp_durgada_w1', 'gp_durgada_w2', 'gp_durgada_w3', 'gp_durgada_w4',
+      'gp_durgada_w5', 'gp_durgada_w6', 'gp_durgada_w7', 'gp_durgada_w8',
+      'gp_durgada_w9', 'gp_durgada_w10', 'gp_durgada_w11', 'gp_durgada_w12',
+      'gp_durgada_w13', 'gp_durgada_w14', 'gp_durgada_w15', 'gp_durgada_w16'
     ],
-    notes: 'పిఠాపురం అసెంబ్లీ & స్థానిక ఎన్నికల కోఆర్డినేటర్',
-    assignedAt: new Date().toISOString()
-  },
-  {
-    id: 'assign_9479797947',
-    phone: '9479797947',
-    name: 'గొల్లప్రోలు ఇంచార్జ్ (Gollaprolu Incharge)',
-    assemblyBooths: [],
-    municipalWards: ['gollaprolu_ward_11'],
-    notes: 'గొల్లప్రోలు నగర పంచాయతీ 11వ వార్డు',
+    notes: 'పిఠాపురం అసెంబ్లీ & గ్రామ పంచాయతీ ఎన్నికల కోఆర్డినేటర్',
     assignedAt: new Date().toISOString()
   }
 ];
@@ -85,27 +79,40 @@ export function getAssignments(): VolunteerAssignment[] {
       safeStorage.setItem(ASSIGNMENTS_STORAGE_KEY, JSON.stringify(DEFAULT_ASSIGNMENTS));
       return DEFAULT_ASSIGNMENTS;
     }
-    // Auto-migrate: ensure Durga Prasad (9000273028) has all active loaded units (Durgada, Chebrolu & Vannepudi)
+    // Strip out legacy municipality wards and ensure Panchayat units are present
+    let hasStripped = false;
+    for (const a of parsed) {
+      if (Array.isArray(a.municipalWards)) {
+        const filtered = a.municipalWards.filter((w: string) => !w.startsWith('ward_') && !w.startsWith('gollaprolu_ward_'));
+        if (filtered.length !== a.municipalWards.length) {
+          a.municipalWards = filtered;
+          hasStripped = true;
+        }
+      }
+    }
+
     const dp = parsed.find((a: VolunteerAssignment) => cleanPhoneNumber(a.phone) === '9000273028');
     if (dp) {
-      let changed = false;
       const requiredWards = [
-        'gp_durgada', 'gp_vannepudi', 'gp_tatiparthy',
-        'gp_durgada_w1', 'gp_durgada_w2', 'gp_durgada_w3', 'gp_durgada_w4', 'gp_durgada_w5',
-        'gp_durgada_w6', 'gp_durgada_w7', 'gp_durgada_w8', 'gp_durgada_w9', 'gp_durgada_w10',
-        'gp_durgada_w11', 'gp_durgada_w12', 'gp_durgada_w13', 'gp_durgada_w14', 'gp_durgada_w15', 'gp_durgada_w16',
+        'gp_tatiparthy', 'gp_durgada', 'gp_vannepudi',
         'gp_tatiparthy_w1', 'gp_tatiparthy_w2', 'gp_tatiparthy_w3', 'gp_tatiparthy_w4',
-        'gp_tatiparthy_w5', 'gp_tatiparthy_w6', 'gp_tatiparthy_w7'
+        'gp_tatiparthy_w5', 'gp_tatiparthy_w6', 'gp_tatiparthy_w7', 'gp_tatiparthy_w8',
+        'gp_tatiparthy_w9', 'gp_tatiparthy_w10', 'gp_tatiparthy_w11', 'gp_tatiparthy_w12',
+        'gp_tatiparthy_w13', 'gp_tatiparthy_w14',
+        'gp_durgada_w1', 'gp_durgada_w2', 'gp_durgada_w3', 'gp_durgada_w4',
+        'gp_durgada_w5', 'gp_durgada_w6', 'gp_durgada_w7', 'gp_durgada_w8',
+        'gp_durgada_w9', 'gp_durgada_w10', 'gp_durgada_w11', 'gp_durgada_w12',
+        'gp_durgada_w13', 'gp_durgada_w14', 'gp_durgada_w15', 'gp_durgada_w16'
       ];
       for (const w of requiredWards) {
         if (!dp.municipalWards.includes(w)) {
           dp.municipalWards.push(w);
-          changed = true;
+          hasStripped = true;
         }
       }
-      if (changed) {
-        safeStorage.setItem(ASSIGNMENTS_STORAGE_KEY, JSON.stringify(parsed));
-      }
+    }
+    if (hasStripped) {
+      safeStorage.setItem(ASSIGNMENTS_STORAGE_KEY, JSON.stringify(parsed));
     }
     return parsed;
   } catch (err) {
@@ -329,7 +336,7 @@ export function generateAssignmentWhatsAppMessage(
 🏛️ *అసెంబ్లీ బూతులు (Assembly Booths):*
 ${assemblyList}
 
-🏢 *స్థానిక / మున్సిపాలిటీ వార్డులు (Local Wards):*
+🏡 *గ్రామ పంచాయతీలు / వార్డులు (Villages / GP Wards):*
 ${municipalList}
 
 📲 *మొబైల్ యాప్‌లో లాగిన్ విధానం:*
