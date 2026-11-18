@@ -184,9 +184,34 @@ export const AdminAssignmentModal: React.FC<AdminAssignmentModalProps> = ({
   };
 
   const toggleWardSelection = (wardId: string) => {
-    setSelectedWards(prev => 
-      prev.includes(wardId) ? prev.filter(w => w !== wardId) : [...prev, wardId]
-    );
+    setSelectedWards(prev => {
+      const isSel = prev.includes(wardId);
+      let next = isSel ? prev.filter(w => w !== wardId) : [...prev, wardId];
+
+      // If an individual ward of Tatiparthy is toggled, remove the full GP unless all 14 are selected
+      if (wardId.startsWith('gp_tatiparthy_w')) {
+        const allTat = Array.from({ length: 14 }, (_, i) => `gp_tatiparthy_w${i + 1}`);
+        const allSelected = allTat.every(w => next.includes(w));
+        if (allSelected) {
+          next = Array.from(new Set([...next, 'gp_tatiparthy']));
+        } else {
+          next = next.filter(w => w !== 'gp_tatiparthy');
+        }
+      }
+
+      // If an individual ward of Durgada is toggled, remove the full GP unless all 16 are selected
+      if (wardId.startsWith('gp_durgada_w')) {
+        const allDur = Array.from({ length: 16 }, (_, i) => `gp_durgada_w${i + 1}`);
+        const allSelected = allDur.every(w => next.includes(w));
+        if (allSelected) {
+          next = Array.from(new Set([...next, 'gp_durgada']));
+        } else {
+          next = next.filter(w => w !== 'gp_durgada');
+        }
+      }
+
+      return next;
+    });
   };
 
   const toggleTatiparthyFullGp = () => {
@@ -233,11 +258,12 @@ export const AdminAssignmentModal: React.FC<AdminAssignmentModalProps> = ({
       if (wards.includes(`gp_tatiparthy_w${i}`)) tatWards.push(i);
     }
     if (hasTatGp || tatWards.length > 0) {
+      const isFull = hasTatGp && (tatWards.length === 0 || tatWards.length === 14);
       groups.push({
         villageId: 'gp_tatiparthy',
         name: 'తాటిపర్తి (Tatiparthy)',
-        isFullGp: hasTatGp || tatWards.length === 14,
-        totalVoters: 6994,
+        isFullGp: isFull,
+        totalVoters: isFull ? 6994 : tatWards.length * 499,
         assignedWards: tatWards,
         totalWardsCount: 14,
         badgeCls: 'bg-emerald-950/70 border-emerald-500/40 text-emerald-300'
@@ -251,11 +277,12 @@ export const AdminAssignmentModal: React.FC<AdminAssignmentModalProps> = ({
       if (wards.includes(`gp_durgada_w${i}`)) durWards.push(i);
     }
     if (hasDurGp || durWards.length > 0) {
+      const isFull = hasDurGp && (durWards.length === 0 || durWards.length === 16);
       groups.push({
         villageId: 'gp_durgada',
         name: 'దుర్గడ (Durgada)',
-        isFullGp: hasDurGp || durWards.length === 16,
-        totalVoters: 8487,
+        isFullGp: isFull,
+        totalVoters: isFull ? 8487 : durWards.length * 530,
         assignedWards: durWards,
         totalWardsCount: 16,
         badgeCls: 'bg-amber-950/70 border-amber-500/40 text-amber-300'
@@ -894,12 +921,12 @@ export const AdminAssignmentModal: React.FC<AdminAssignmentModalProps> = ({
                                     <span className="text-[9.5px] opacity-80 block">
                                       {v.isFullGp 
                                         ? `సమగ్ర గ్రామం (~${v.totalVoters.toLocaleString()} ఓటర్లు)`
-                                        : `${v.assignedWards.length} వార్డులు (${v.assignedWards.map(w => '#' + w).join(', ')})`}
+                                        : `${v.assignedWards.length === 1 ? `వార్డు #${v.assignedWards[0]}` : `${v.assignedWards.length} వార్డులు (${v.assignedWards.map(w => '#' + w).join(', ')})`} (~${v.totalVoters.toLocaleString()} ఓటర్లు)`}
                                     </span>
                                   </div>
                                 </div>
                                 <span className="text-[9px] px-1.5 py-0.5 rounded font-mono font-black bg-black/40 border border-white/10 shrink-0 ml-1">
-                                  {v.isFullGp ? 'సర్వ వార్డులు' : `${v.assignedWards.length} Wards`}
+                                  {v.isFullGp ? 'సర్వ వార్డులు' : v.assignedWards.length === 1 ? `Ward #${v.assignedWards[0]}` : `${v.assignedWards.length} Wards`}
                                 </span>
                               </div>
                             ))}

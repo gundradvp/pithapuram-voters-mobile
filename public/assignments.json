@@ -1,1 +1,25 @@
-[]
+[
+  {
+    "id": "assign_9479797947",
+    "phone": "9479797947",
+    "name": "గొల్లప్రోలు ఇంచార్జ్ (Gollaprolu Incharge)",
+    "assemblyBooths": [],
+    "municipalWards": [],
+    "notes": "గొల్లప్రోలు నగర పంచాయతీ 11వ వార్డు",
+    "assignedAt": "2026-11-01T00:00:00.000Z",
+    "expiresAt": 1793743682398,
+    "expiryMinutes": 30
+  },
+  {
+    "id": "assign_9000273028",
+    "phone": "9000273028",
+    "name": "దుర్గా ప్రసాద్ (Durga Prasad)",
+    "assemblyBooths": [],
+    "municipalWards": [
+      "gp_durgada_w12"
+    ],
+    "notes": "పిఠాపురం అసెంబ్లీ & గ్రామ పంచాయతీ ఎన్నికల కోఆర్డినేటర్",
+    "assignedAt": "2026-11-18T12:21:46.322Z",
+    "expiryMinutes": 0
+  }
+]

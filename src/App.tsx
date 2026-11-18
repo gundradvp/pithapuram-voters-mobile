@@ -94,11 +94,21 @@ export function App() {
   const [isAdminModalOpen, setIsAdminModalOpen] = useState<boolean>(false);
   const [assignmentVersion, setAssignmentVersion] = useState(0);
 
-  // Sync latest volunteer assignments across devices on startup
+  // Sync latest volunteer assignments across devices on startup and listen for live updates
   useEffect(() => {
     fetchFreshAssignments().then(() => {
       setAssignmentVersion(v => v + 1);
     }).catch(() => {});
+
+    const handleUpdate = () => {
+      setAssignmentVersion(v => v + 1);
+    };
+    window.addEventListener('jsp_assignments_updated', handleUpdate);
+    window.addEventListener('storage', handleUpdate);
+    return () => {
+      window.removeEventListener('jsp_assignments_updated', handleUpdate);
+      window.removeEventListener('storage', handleUpdate);
+    };
   }, []);
 
   useEffect(() => {

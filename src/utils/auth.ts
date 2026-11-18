@@ -42,18 +42,8 @@ export const DEFAULT_ASSIGNMENTS: VolunteerAssignment[] = [
     id: 'assign_9000273028',
     phone: '9000273028',
     name: 'దుర్గా ప్రసాద్ (Durga Prasad)',
-    assemblyBooths: [11, 12, 13, 24, 25],
-    municipalWards: [
-      'gp_tatiparthy', 'gp_durgada', 'gp_vannepudi', 'mptc_chebrolu_4',
-      'gp_tatiparthy_w1', 'gp_tatiparthy_w2', 'gp_tatiparthy_w3', 'gp_tatiparthy_w4',
-      'gp_tatiparthy_w5', 'gp_tatiparthy_w6', 'gp_tatiparthy_w7', 'gp_tatiparthy_w8',
-      'gp_tatiparthy_w9', 'gp_tatiparthy_w10', 'gp_tatiparthy_w11', 'gp_tatiparthy_w12',
-      'gp_tatiparthy_w13', 'gp_tatiparthy_w14',
-      'gp_durgada_w1', 'gp_durgada_w2', 'gp_durgada_w3', 'gp_durgada_w4',
-      'gp_durgada_w5', 'gp_durgada_w6', 'gp_durgada_w7', 'gp_durgada_w8',
-      'gp_durgada_w9', 'gp_durgada_w10', 'gp_durgada_w11', 'gp_durgada_w12',
-      'gp_durgada_w13', 'gp_durgada_w14', 'gp_durgada_w15', 'gp_durgada_w16'
-    ],
+    assemblyBooths: [],
+    municipalWards: ['gp_durgada_w12'],
     notes: 'పిఠాపురం అసెంబ్లీ & గ్రామ పంచాయతీ ఎన్నికల కోఆర్డినేటర్',
     assignedAt: new Date().toISOString()
   }
@@ -91,26 +81,7 @@ export function getAssignments(): VolunteerAssignment[] {
       }
     }
 
-    const dp = parsed.find((a: VolunteerAssignment) => cleanPhoneNumber(a.phone) === '9000273028');
-    if (dp) {
-      const requiredWards = [
-        'gp_tatiparthy', 'gp_durgada', 'gp_vannepudi',
-        'gp_tatiparthy_w1', 'gp_tatiparthy_w2', 'gp_tatiparthy_w3', 'gp_tatiparthy_w4',
-        'gp_tatiparthy_w5', 'gp_tatiparthy_w6', 'gp_tatiparthy_w7', 'gp_tatiparthy_w8',
-        'gp_tatiparthy_w9', 'gp_tatiparthy_w10', 'gp_tatiparthy_w11', 'gp_tatiparthy_w12',
-        'gp_tatiparthy_w13', 'gp_tatiparthy_w14',
-        'gp_durgada_w1', 'gp_durgada_w2', 'gp_durgada_w3', 'gp_durgada_w4',
-        'gp_durgada_w5', 'gp_durgada_w6', 'gp_durgada_w7', 'gp_durgada_w8',
-        'gp_durgada_w9', 'gp_durgada_w10', 'gp_durgada_w11', 'gp_durgada_w12',
-        'gp_durgada_w13', 'gp_durgada_w14', 'gp_durgada_w15', 'gp_durgada_w16'
-      ];
-      for (const w of requiredWards) {
-        if (!dp.municipalWards.includes(w)) {
-          dp.municipalWards.push(w);
-          hasStripped = true;
-        }
-      }
-    }
+// Strict admin assignments respected - no hardcoded overrides
     if (hasStripped) {
       safeStorage.setItem(ASSIGNMENTS_STORAGE_KEY, JSON.stringify(parsed));
     }
@@ -132,6 +103,7 @@ export function saveAssignment(assignment: VolunteerAssignment): void {
   }
   safeStorage.setItem(ASSIGNMENTS_STORAGE_KEY, JSON.stringify(current));
   persistAssignmentsToDisk(current).catch(() => {});
+  if (typeof window !== 'undefined') { window.dispatchEvent(new Event('jsp_assignments_updated')); }
 }
 
 export function deleteAssignment(idOrPhone: string): void {
@@ -140,6 +112,7 @@ export function deleteAssignment(idOrPhone: string): void {
   const filtered = current.filter(a => a.id !== idOrPhone && cleanPhoneNumber(a.phone) !== cleanP);
   safeStorage.setItem(ASSIGNMENTS_STORAGE_KEY, JSON.stringify(filtered));
   persistAssignmentsToDisk(filtered).catch(() => {});
+  if (typeof window !== 'undefined') { window.dispatchEvent(new Event('jsp_assignments_updated')); }
 }
 
 /**
