@@ -58,7 +58,10 @@ import {
   calculateWinningScore,
   fetchFreshProfiles,
   savePreloadedProfiles,
-  CampaignSyncBundle
+  CampaignSyncBundle,
+  bustAllCache,
+  formatBytes,
+  getEstimatedUnitSize
 } from './utils/storage';
 import {
   pullBoothFromSupabase,
@@ -79,7 +82,7 @@ import {
 } from './utils/auth';
 import { useI18n } from './utils/i18n';
 import { ThemeId, getSavedTheme, setSavedTheme, applyThemeToDom } from './utils/theme';
-import { Loader2, AlertCircle, Sparkles, Trophy, MessageSquare, Clock, DownloadCloud, AlertTriangle, RefreshCw, Layers } from 'lucide-react';
+import { Loader2, AlertCircle, Sparkles, Trophy, MessageSquare, Clock, DownloadCloud, AlertTriangle, RefreshCw, Layers, Database } from 'lucide-react';
 
 export function App() {
   const { lang, toggleLanguage, t } = useI18n();
@@ -254,6 +257,23 @@ export function App() {
   const [isCached, setIsCached] = useState<boolean>(false);
   const [isLoading, setIsLoading] = useState<boolean>(true);
   const [errorMsg, setErrorMsg] = useState<string | null>(null);
+
+  // Real-time Download Progress Tracking (Size in MB/KB & Loading Percentage)
+  const [downloadProgress, setDownloadProgress] = useState<{
+    isLoading: boolean;
+    loadedBytes: number;
+    totalBytes: number;
+    percent: number;
+    formattedLoaded: string;
+    formattedTotal: string;
+  }>({
+    isLoading: false,
+    loadedBytes: 0,
+    totalBytes: 0,
+    percent: 0,
+    formattedLoaded: '0 B',
+    formattedTotal: '0 B'
+  });
 
   // Campaign State
   const [profiles, setProfiles] = useState<Record<number, VoterCampaignProfile>>({});
@@ -437,8 +457,11 @@ export function App() {
     return data as BoothData;
   };
 
-  // Helper: Multi-source fetch for booth voter data (with GitHub/CDN fallbacks & no-store headers)
-  const fetchFreshBoothData = async (partNo: number | string): Promise<BoothData> => {
+  // Helper: Multi-source fetch for booth voter data with real-time stream progress & fallback size calculation
+  const fetchFreshBoothData = async (
+    partNo: number | string,
+    onProgress?: (p: { loaded: number; total: number; percent: number }) => void
+  ): Promise<BoothData> => {
     const ts = Date.now();
     const fetchOptions: RequestInit = {
       cache: 'no-store',
@@ -456,14 +479,57 @@ export function App() {
       `https://cdn.jsdelivr.net/gh/gundradvp/pithapuram-voters-mobile@main/public/booths/booth_${partNo}.json`
     ];
 
+    const estimatedSize = getEstimatedUnitSize(partNo);
     let lastError: any = null;
+
     for (const url of urlsToTry) {
       try {
         const res = await fetch(url, fetchOptions);
         if (res.ok) {
-          const data = await res.json();
-          if (data && Array.isArray(data.voters)) {
-            return normalizeBoothData(data, partNo);
+          const headerLength = res.headers.get('content-length');
+          const totalBytes = headerLength ? parseInt(headerLength, 10) : estimatedSize;
+
+          if (res.body && typeof res.body.getReader === 'function') {
+            const reader = res.body.getReader();
+            const chunks: Uint8Array[] = [];
+            let receivedLength = 0;
+
+            while (true) {
+              const { done, value } = await reader.read();
+              if (done) break;
+              chunks.push(value);
+              receivedLength += value.length;
+              if (onProgress) {
+                const effectiveTotal = Math.max(totalBytes, receivedLength);
+                const percent = Math.min(99, Math.round((receivedLength / effectiveTotal) * 100));
+                onProgress({ loaded: receivedLength, total: effectiveTotal, percent });
+              }
+            }
+
+            const chunksAll = new Uint8Array(receivedLength);
+            let position = 0;
+            for (const chunk of chunks) {
+              chunksAll.set(chunk, position);
+              position += chunk.length;
+            }
+
+            if (onProgress) {
+              onProgress({ loaded: receivedLength, total: receivedLength, percent: 100 });
+            }
+
+            const text = new TextDecoder('utf-8').decode(chunksAll);
+            const data = JSON.parse(text);
+            if (data && Array.isArray(data.voters)) {
+              return normalizeBoothData(data, partNo);
+            }
+          } else {
+            const data = await res.json();
+            if (onProgress) {
+              onProgress({ loaded: totalBytes, total: totalBytes, percent: 100 });
+            }
+            if (data && Array.isArray(data.voters)) {
+              return normalizeBoothData(data, partNo);
+            }
           }
         }
       } catch (e) {
@@ -528,6 +594,18 @@ export function App() {
     if (!isSilent) setIsLoading(true);
     setErrorMsg(null);
 
+    const estimatedTotal = getEstimatedUnitSize(partNo);
+    if (!isSilent) {
+      setDownloadProgress({
+        isLoading: true,
+        loadedBytes: 0,
+        totalBytes: estimatedTotal,
+        percent: 0,
+        formattedLoaded: '0 B',
+        formattedTotal: formatBytes(estimatedTotal)
+      });
+    }
+
     // If Demo Mode / Demo Booth is selected, load isolated demo dataset (never touches real data)
     if (partNo === 'demo_booth' || partNo === 'demo' || partNo === 999) {
       setBoothData(DEMO_BOOTH_DATA);
@@ -536,6 +614,7 @@ export function App() {
       setFamilies({});
       setInfluencers({});
       setIsLoading(false);
+      setDownloadProgress(prev => ({ ...prev, isLoading: false, percent: 100 }));
       return;
     }
 
@@ -609,12 +688,24 @@ export function App() {
 
     // Step C: Fetch latest fresh data over network with cache-busting & fallbacks
     try {
-      const onlineData = await fetchFreshBoothData(partNo);
+      const onlineData = await fetchFreshBoothData(partNo, ({ loaded, total, percent }) => {
+        if (!isSilent) {
+          setDownloadProgress({
+            isLoading: true,
+            loadedBytes: loaded,
+            totalBytes: total,
+            percent,
+            formattedLoaded: formatBytes(loaded),
+            formattedTotal: formatBytes(total)
+          });
+        }
+      });
       setBoothData(onlineData);
       saveCachedBoothData(partNo, onlineData);
       setFamilies(getFamilyGroups(partNo, onlineData.voters));
       setIsCached(true);
       setIsLoading(false);
+      setDownloadProgress(prev => ({ ...prev, isLoading: false, percent: 100 }));
     } catch (err) {
       console.warn('Network fetch failed, relying on cache:', err);
       if (!cached) {
@@ -626,6 +717,7 @@ export function App() {
         );
       }
       setIsLoading(false);
+      setDownloadProgress(prev => ({ ...prev, isLoading: false }));
     }
   }, []);
 
@@ -1244,10 +1336,14 @@ export function App() {
         onUnload={boothData ? handleUnloadList : undefined}
         onSwitchToFullVillage={handleSwitchToFullVillage}
         onLogout={() => {
+          bustAllCache();
           logoutUser();
           setSession(null);
           setBoothData(null);
           setIsListLoaded(false);
+          setProfiles({});
+          setFamilies({});
+          setInfluencers({});
           setIsLoginModalOpen(true);
         }}
       />
@@ -1311,9 +1407,67 @@ export function App() {
           </div>
         )}
         {isLoading && !boothData && (
-          <div className="py-24 flex flex-col items-center justify-center space-y-3">
-            <Loader2 className="w-8 h-8 text-amber-400 animate-spin" />
-            <p className="text-xs text-slate-400 font-bold">{lang === 'te' ? `బూత్ #${currentPartNo} ఓటర్ల డేటా లోడ్ అవుతోంది...` : `Loading Booth #${currentPartNo} Electors...`}</p>
+          <div className="py-12 max-w-md mx-auto px-4 animate-in fade-in">
+            <div className="p-6 rounded-3xl bg-slate-900/95 border border-amber-500/40 shadow-2xl space-y-4 text-center relative overflow-hidden backdrop-blur-md">
+              <div className="relative inline-flex items-center justify-center">
+                <div className="w-16 h-16 rounded-2xl bg-gradient-to-tr from-amber-500 via-indigo-600 to-emerald-500 flex items-center justify-center shadow-lg shadow-amber-950/50 border border-amber-400/40">
+                  <DownloadCloud className="w-8 h-8 text-white animate-bounce" />
+                </div>
+              </div>
+
+              <div>
+                <span className="text-[10px] uppercase font-bold text-amber-400 tracking-wider">
+                  {lang === 'te' ? 'ఓటర్ల డేటా డౌన్‌లోడ్ అవుతోంది' : 'Downloading Voter Electoral Data'}
+                </span>
+                <h3 className="text-base font-black text-white mt-0.5 truncate">
+                  {(() => {
+                    if (typeof currentPartNo === 'number') {
+                      const b = boothsIndex.find(x => Number(x.part_no) === currentPartNo);
+                      return `బూత్ #${currentPartNo}: ${b?.clean_village || b?.village || ''}`;
+                    }
+                    const u = localUnits.find(x => x.id === currentPartNo);
+                    return u ? `${u.clean_village || u.village || u.id}` : `యూనిట్ #${currentPartNo}`;
+                  })()}
+                </h3>
+              </div>
+
+              {/* File Size & Progress Metrics */}
+              <div className="bg-slate-950/80 border border-slate-800 rounded-2xl p-4 space-y-3">
+                <div className="flex items-center justify-between text-xs font-mono">
+                  <span className="text-slate-400 font-bold flex items-center gap-1.5">
+                    <Database className="w-3.5 h-3.5 text-amber-400" />
+                    <span>{lang === 'te' ? 'ఫైల్ పరిమాణం (Size):' : 'File Size:'}</span>
+                  </span>
+                  <span className="font-extrabold text-amber-300">
+                    {downloadProgress.formattedLoaded} / {downloadProgress.formattedTotal}
+                  </span>
+                </div>
+
+                {/* Animated Progress Bar */}
+                <div className="w-full bg-slate-900 h-3.5 rounded-full overflow-hidden border border-slate-700/60 p-0.5 relative shadow-inner">
+                  <div 
+                    className="h-full bg-gradient-to-r from-amber-500 via-emerald-400 to-emerald-500 rounded-full transition-all duration-150 shadow-sm shadow-emerald-500/50"
+                    style={{ width: `${Math.max(5, Math.min(100, downloadProgress.percent))}%` }}
+                  />
+                </div>
+
+                <div className="flex items-center justify-between text-xs pt-0.5">
+                  <span className="text-slate-400 flex items-center gap-1.5 font-medium">
+                    <Loader2 className="w-3.5 h-3.5 text-amber-400 animate-spin" />
+                    <span>{lang === 'te' ? 'డౌన్‌లోడ్ పురోగతి:' : 'Progress:'}</span>
+                  </span>
+                  <span className="font-black font-mono text-emerald-400 text-base">
+                    {downloadProgress.percent}%
+                  </span>
+                </div>
+              </div>
+
+              <p className="text-[10.5px] text-slate-400 leading-tight">
+                {lang === 'te'
+                  ? 'ఒక్కసారి డౌన్‌లోడ్ అయిన తర్వాత ఇంటర్నెట్ లేకపోయినా మొత్తం ఓటర్ల జాబితా ఆఫ్‌లైన్‌లో పనిచేస్తుంది.'
+                  : 'Once downloaded, the voter list will work completely offline in the field.'}
+              </p>
+            </div>
           </div>
         )}
 
