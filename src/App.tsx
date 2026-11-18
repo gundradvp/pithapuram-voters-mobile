@@ -195,6 +195,8 @@ export function App() {
       (typeof currentPartNo === 'string' && assignedMunicipalWards.includes(currentPartNo) && !currentPartNo.startsWith('ward_') && currentPartNo !== 'gollaprolu_ward_11');
 
     if (!isCurrentValid) {
+      setBoothData(null);
+      setIsListLoaded(false);
       if (assignedMunicipalWards.length > 0) {
         const validWard = assignedMunicipalWards.find(w => !w.startsWith('ward_') && w !== 'gollaprolu_ward_11') || assignedMunicipalWards[0];
         setCurrentPartNo(validWard);
@@ -207,6 +209,20 @@ export function App() {
   }, [session, currentAssignment, assignedAssemblyBooths, assignedMunicipalWards, currentPartNo]);
 
   const [boothData, setBoothData] = useState<BoothData | null>(null);
+
+  // Strict Security Guard: Prevent any unassigned data or residual Admin data from persisting in volunteer session
+  useEffect(() => {
+    if (session?.role === 'volunteer' && boothData) {
+      const bPart = boothData.booth_info?.part_no ?? (boothData.booth_info as any)?.booth_no;
+      const isValid =
+        (typeof bPart === 'number' && assignedAssemblyBooths.includes(bPart)) ||
+        (typeof bPart === 'string' && assignedMunicipalWards.includes(bPart));
+      if (!isValid) {
+        setBoothData(null);
+        setIsListLoaded(false);
+      }
+    }
+  }, [session, boothData, assignedAssemblyBooths, assignedMunicipalWards]);
 
   // STRICTLY AUTO-UNLOAD WHEN TIME EXPIRES (Requirement 5)
   useEffect(() => {
@@ -1230,6 +1246,8 @@ export function App() {
         onLogout={() => {
           logoutUser();
           setSession(null);
+          setBoothData(null);
+          setIsListLoaded(false);
           setIsLoginModalOpen(true);
         }}
       />
@@ -1659,6 +1677,9 @@ export function App() {
           onLoginSuccess={(newSession) => {
             setSession(newSession);
             setIsLoginModalOpen(false);
+            setBoothData(null);
+            setIsListLoaded(false);
+
             if (newSession.role === 'admin') {
               const curr = String(currentPartNo || '');
               if (curr.includes('_w')) {
@@ -1667,6 +1688,23 @@ export function App() {
                 setCurrentPartNo(target);
                 setAssignedBooth(target, false);
                 setIsLocked(false);
+                setIsListLoaded(true);
+                loadBooth(target);
+              }
+            } else if (newSession.role === 'volunteer') {
+              // Immediately look up volunteer assignment and auto-switch to their assigned unit
+              const assignment = getVolunteerAssignment(newSession.phone);
+              let target: string | number | null = null;
+              if (assignment?.municipalWards && assignment.municipalWards.length > 0) {
+                target = assignment.municipalWards.find(w => !w.startsWith('ward_') && w !== 'gollaprolu_ward_11') || assignment.municipalWards[0];
+              } else if (assignment?.assemblyBooths && assignment.assemblyBooths.length > 0) {
+                target = assignment.assemblyBooths[0];
+              }
+              if (target) {
+                setErrorMsg(null);
+                setCurrentPartNo(target);
+                setAssignedBooth(target, true);
+                setIsLocked(true);
                 setIsListLoaded(true);
                 loadBooth(target);
               }
