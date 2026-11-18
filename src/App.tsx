@@ -141,6 +141,11 @@ export function App() {
 
   const [currentPartNo, setCurrentPartNo] = useState<number | string>(() => {
     const saved = getAssignedBooth();
+    const currSession = getUserSession();
+    // If the active user is Admin, they shouldn't be defaulted into a single ward from a past volunteer session
+    if (currSession?.role === 'admin' && typeof saved === 'string' && saved.includes('_w')) {
+      return saved.startsWith('gp_tatiparthy') ? 'gp_tatiparthy' : 'gp_durgada';
+    }
     if (saved && saved !== 'ward_14' && saved !== 'gollaprolu_ward_11' && !String(saved).startsWith('ward_')) {
       return saved;
     }
@@ -378,6 +383,44 @@ export function App() {
 
   const [isRefreshing, setIsRefreshing] = useState<boolean>(false);
 
+  // Helper: Robust normalizer ensuring part_no, village, clean_village, ward_no, type are never undefined
+  const normalizeBoothData = (data: any, partNo: number | string): BoothData => {
+    if (!data) return data;
+    if (!data.booth_info) {
+      data.booth_info = {};
+    }
+    const info = data.booth_info;
+    const partStr = String(partNo || info.part_no || info.booth_no || '');
+
+    info.part_no = info.part_no ?? (info.booth_no ?? partNo);
+    info.booth_no = info.booth_no ?? String(info.part_no);
+
+    const isWardUnit = partStr.includes('_w') || String(info.part_no).includes('_w');
+
+    if (!info.ward_no && isWardUnit) {
+      const match = partStr.match(/_w(\d+)$/i);
+      if (match) info.ward_no = parseInt(match[1], 10);
+    }
+
+    let cleanVill = info.clean_village || info.village || data.village || '';
+    if (!cleanVill) {
+      if (partStr.includes('durgada')) cleanVill = 'దుర్గడ';
+      else if (partStr.includes('tatiparthy')) cleanVill = 'తాటిపర్తి';
+      else if (partStr.includes('vannepudi')) cleanVill = 'వన్నెపూడి';
+      else cleanVill = `బూత్ #${info.part_no}`;
+    }
+    info.clean_village = cleanVill;
+    info.village = info.village || cleanVill;
+
+    info.total_voters = info.total_voters || (Array.isArray(data.voters) ? data.voters.length : 0);
+    info.mandal = info.mandal || data.mandal || 'GOLLAPROLU';
+    info.election_type = info.election_type || (partStr.includes('gp_') || partStr.includes('mptc_') ? 'panchayat' : 'assembly');
+    info.type = info.type || (isWardUnit ? 'ward' : 'village');
+    info.view_level = info.view_level || (isWardUnit ? 'ward' : 'village');
+
+    return data as BoothData;
+  };
+
   // Helper: Multi-source fetch for booth voter data (with GitHub/CDN fallbacks & no-store headers)
   const fetchFreshBoothData = async (partNo: number | string): Promise<BoothData> => {
     const ts = Date.now();
@@ -404,28 +447,7 @@ export function App() {
         if (res.ok) {
           const data = await res.json();
           if (data && Array.isArray(data.voters)) {
-            if (!data.booth_info) {
-              data.booth_info = {
-                part_no: data.part_no || partNo,
-                village: data.village || '',
-                clean_village: data.clean_village || data.village || '',
-                mandal: data.mandal || 'GOLLAPROLU',
-                ps_address: data.ps_address || data.village || '',
-                sections: data.sections || '',
-                total_voters: data.total_voters || data.voters.length,
-                male_count: data.male_count || data.voters.filter((v: any) => v.g === 'M').length,
-                female_count: data.female_count || data.voters.filter((v: any) => v.g === 'F').length,
-                exact_kriya_count: data.exact_kriya_count || 0,
-                similar_kriya_count: data.similar_kriya_count || 0,
-                total_kriya_count: data.total_kriya_count || 0,
-                kriya_percentage: data.kriya_percentage || 0,
-                election_type: data.election_type || 'panchayat',
-                type: data.type || 'village',
-                view_level: data.view_level || 'village',
-                ward_no: data.ward_no || 0
-              };
-            }
-            return data as BoothData;
+            return normalizeBoothData(data, partNo);
           }
         }
       } catch (e) {
@@ -562,7 +584,8 @@ export function App() {
     const isStaleDurgadaCache = stale || ((partNo === 'gp_durgada' || partNo === 'booth_gp_durgada') && (!cached || !cached.voters || cached.voters.length < 8000));
     const isStaleTatiparthyCache = stale || ((partNo === 'gp_tatiparthy' || partNo === 'booth_gp_tatiparthy') && (!cached || !cached.voters || cached.voters.length < 6500));
     if (cached && Array.isArray(cached.voters) && cached.voters.length > 0 && !isStaleDurgadaCache && !isStaleTatiparthyCache) {
-      setBoothData(cached);
+      const normalizedCached = normalizeBoothData(cached, partNo);
+      setBoothData(normalizedCached);
       setFamilies(getFamilyGroups(partNo, cached.voters));
       setIsCached(true);
       if (!isSilent) setIsLoading(false);
@@ -856,6 +879,7 @@ export function App() {
         return;
       }
     }
+    setErrorMsg(null);
     // Always unload list when switching units; load only when clicked
     setIsListLoaded(false);
     setBoothData(null);
@@ -863,6 +887,20 @@ export function App() {
     setAssignedBooth(partNo, lock);
     setIsLocked(lock);
   };
+
+  // Helper: Instantly switch to complete GP from any individual ward
+  const handleSwitchToFullVillage = useCallback(() => {
+    const curr = String(currentPartNo || '');
+    let target = 'gp_durgada';
+    if (curr.startsWith('gp_tatiparthy')) target = 'gp_tatiparthy';
+    else if (curr.startsWith('gp_vannepudi')) target = 'gp_vannepudi';
+    setErrorMsg(null);
+    setCurrentPartNo(target);
+    setAssignedBooth(target, false);
+    setIsLocked(false);
+    setIsListLoaded(true);
+    loadBooth(target);
+  }, [currentPartNo, loadBooth]);
 
   // Handle Phone Number Save
   const handleSavePhone = (voter: MobileVoter, phone: string, altPhone?: string) => {
@@ -1188,6 +1226,7 @@ export function App() {
         onOpenBoothSelector={() => setIsBoothSelectorOpen(true)}
         onOpenAdminHub={() => setIsAdminModalOpen(true)}
         onUnload={boothData ? handleUnloadList : undefined}
+        onSwitchToFullVillage={handleSwitchToFullVillage}
         onLogout={() => {
           logoutUser();
           setSession(null);
@@ -1377,6 +1416,39 @@ export function App() {
                 onToggleMode={handleToggleVictoryMode}
                 onHide={() => handleToggleVictoryPredictor(false)}
               />
+            )}
+
+            {/* Admin Ward Banner: 1-click switch to full GP if Admin is currently viewing a single ward */}
+            {session?.role === 'admin' && typeof currentPartNo === 'string' && currentPartNo.includes('_w') && (
+              <div className="bg-gradient-to-r from-slate-900 via-emerald-950/60 to-slate-900 border border-emerald-500/40 rounded-2xl p-3 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 text-xs shadow-lg mb-3">
+                <div className="flex items-center gap-2.5 min-w-0">
+                  <span className="text-xl shrink-0 p-1.5 bg-emerald-500/20 rounded-xl border border-emerald-500/30">🏛️</span>
+                  <div className="min-w-0">
+                    <span className="font-extrabold text-white block text-xs sm:text-sm">
+                      {lang === 'te' 
+                        ? `మీరు ప్రస్తుతం వార్డు #${boothData.booth_info.ward_no || ''} చూస్తున్నారు (${boothData.voters.length} ఓటర్లు)` 
+                        : `Viewing Ward #${boothData.booth_info.ward_no || ''} (${boothData.voters.length} voters)`}
+                    </span>
+                    <p className="text-[11px] text-emerald-300">
+                      {lang === 'te' 
+                        ? 'అడ్మిన్‌గా మీరు మొత్తం గ్రామ పంచాయతీ ఓటర్ల జాబితాను (సమగ్ర గ్రామం) ఒకే క్లిక్‌తో చూడవచ్చు.' 
+                        : 'As Admin, you can switch to the complete Gram Panchayat with 1 click.'}
+                    </p>
+                  </div>
+                </div>
+                <button
+                  type="button"
+                  onClick={handleSwitchToFullVillage}
+                  className="px-3.5 py-2 bg-gradient-to-r from-emerald-500 to-teal-500 hover:from-emerald-400 hover:to-teal-400 text-slate-950 font-black rounded-xl text-xs whitespace-nowrap shadow-md active:scale-95 transition-all flex items-center gap-1.5 cursor-pointer shrink-0"
+                >
+                  <span>🏡</span>
+                  <span>
+                    {lang === 'te' 
+                      ? `${String(currentPartNo).includes('tatiparthy') ? 'తాటిపర్తి' : 'దుర్గడ'} సమగ్ర గ్రామం చూడండి` 
+                      : `View Complete GP`}
+                  </span>
+                </button>
+              </div>
             )}
 
             {/* TAB 1: Voters Tab */}
@@ -1587,6 +1659,18 @@ export function App() {
           onLoginSuccess={(newSession) => {
             setSession(newSession);
             setIsLoginModalOpen(false);
+            if (newSession.role === 'admin') {
+              const curr = String(currentPartNo || '');
+              if (curr.includes('_w')) {
+                const target = curr.startsWith('gp_tatiparthy') ? 'gp_tatiparthy' : 'gp_durgada';
+                setErrorMsg(null);
+                setCurrentPartNo(target);
+                setAssignedBooth(target, false);
+                setIsLocked(false);
+                setIsListLoaded(true);
+                loadBooth(target);
+              }
+            }
           }}
           onClose={session ? () => setIsLoginModalOpen(false) : undefined}
         />

@@ -30,6 +30,7 @@ interface HeaderMobileProps {
   onOpenAdminHub?: () => void;
   onLogout: () => void;
   onUnload?: () => void;
+  onSwitchToFullVillage?: () => void;
 }
 
 export const HeaderMobile: React.FC<HeaderMobileProps> = ({
@@ -55,9 +56,31 @@ export const HeaderMobile: React.FC<HeaderMobileProps> = ({
   onOpenBoothSelector,
   onOpenAdminHub,
   onLogout,
-  onUnload
+  onUnload,
+  onSwitchToFullVillage
 }) => {
   const currentThemeConfig = THEMES.find(t => t.id === theme) || THEMES[0];
+
+  // Normalize booth and ward identifiers safely to prevent any "undefined: undefined" glitches
+  const rawPart = boothInfo?.part_no ?? (boothInfo as any)?.booth_no ?? '';
+  const partStr = String(rawPart);
+  const isWard = partStr.includes('_w') || boothInfo?.election_type === 'municipal' || boothInfo?.type === 'ward';
+  const wardNo = boothInfo?.ward_no || (partStr.match(/_w(\d+)/i)?.[1] || '');
+
+  let cleanVillage = boothInfo?.clean_village || boothInfo?.village || '';
+  if (!cleanVillage) {
+    if (partStr.includes('durgada')) cleanVillage = 'దుర్గడ';
+    else if (partStr.includes('tatiparthy')) cleanVillage = 'తాటిపర్తి';
+    else if (partStr.includes('vannepudi')) cleanVillage = 'వన్నెపూడి';
+  }
+
+  // Determine parent village name for quick switch if currently on an individual ward
+  let parentVillageLabel = '';
+  if (isWard) {
+    if (partStr.includes('durgada')) parentVillageLabel = language === 'te' ? 'దుర్గడ (8,487 ఓటర్లు)' : 'Durgada GP (8,487)';
+    else if (partStr.includes('tatiparthy')) parentVillageLabel = language === 'te' ? 'తాటిపర్తి (6,994 ఓటర్లు)' : 'Tatiparthy GP (6,994)';
+    else if (partStr.includes('vannepudi')) parentVillageLabel = language === 'te' ? 'వన్నెపూడి (3,201 ఓటర్లు)' : 'Vannepudi GP (3,201)';
+  }
 
   return (
     <header className="sticky top-0 z-40 bg-slate-900/95 backdrop-blur-md border-b border-slate-800 px-3 py-2 shadow-lg flex flex-col">
@@ -113,11 +136,11 @@ export const HeaderMobile: React.FC<HeaderMobileProps> = ({
           <div className="flex items-center gap-1">
             <h1 className="text-xs font-black text-white truncate leading-tight group-hover:text-amber-300 transition-colors">
               {boothInfo ? (
-                boothInfo.type === 'village' || boothInfo.view_level === 'village' || (typeof boothInfo.part_no === 'string' && boothInfo.part_no.startsWith('gp_') && !boothInfo.part_no.includes('_w'))
-                  ? `🏡 ${boothInfo.clean_village}`
-                  : (typeof boothInfo.part_no === 'string' && (boothInfo.part_no.includes('_w') || boothInfo.election_type === 'municipal'))
-                    ? `🏛️ ${language === 'te' ? 'వార్డు' : 'Ward'} #${boothInfo.ward_no || ''}: ${boothInfo.clean_village}`
-                    : `${language === 'te' ? 'బూత్' : 'Booth'} #${boothInfo.part_no}: ${boothInfo.clean_village}`
+                boothInfo.type === 'village' || boothInfo.view_level === 'village' || (partStr.startsWith('gp_') && !partStr.includes('_w'))
+                  ? `🏡 ${cleanVillage}`
+                  : isWard
+                    ? `🏛️ ${language === 'te' ? 'వార్డు' : 'Ward'} #${wardNo || ''}: ${cleanVillage}`
+                    : `${language === 'te' ? 'బూత్' : 'Booth'} #${partStr || ''}: ${cleanVillage}`
               ) : (language === 'te' ? 'బూత్ / వార్డు ఎంచుకోండి' : 'Select Assigned Unit')}
             </h1>
             <ChevronDown className="w-3 h-3 text-slate-400 group-hover:text-amber-400 shrink-0 transition-transform group-hover:translate-y-0.5" />
@@ -127,6 +150,20 @@ export const HeaderMobile: React.FC<HeaderMobileProps> = ({
 
       {/* Right: Actions */}
       <div className="flex items-center gap-1 flex-shrink-0">
+        {/* Quick 1-click Switch to Full Village (when currently in a ward) */}
+        {isWard && onSwitchToFullVillage && (
+          <button
+            type="button"
+            onClick={onSwitchToFullVillage}
+            className="flex items-center gap-1 px-2 py-1 rounded-lg text-[10px] font-black bg-gradient-to-r from-emerald-600 to-teal-600 hover:from-emerald-500 hover:to-teal-500 text-white shadow-md active:scale-95 transition-all cursor-pointer border border-emerald-400/50"
+            title={language === 'te' ? 'పూర్తి గ్రామ పంచాయతీ ఓటర్ల జాబితాకు మారండి' : 'Switch to Full Gram Panchayat Voter List'}
+          >
+            <span>🏡</span>
+            <span className="hidden xs:inline">{language === 'te' ? 'పూర్తి గ్రామం:' : 'Full GP:'}</span>
+            <span className="font-bold underline">{parentVillageLabel || (language === 'te' ? 'పూర్తి గ్రామం' : 'Full GP')}</span>
+          </button>
+        )}
+
         {/* Admin Hub Shortcut (Only visible to Admin) */}
         {session?.role === 'admin' && onOpenAdminHub && (
           <button
@@ -244,7 +281,11 @@ export const HeaderMobile: React.FC<HeaderMobileProps> = ({
               ? (language === 'te' ? 'వార్డు 14' : 'W-14')
               : boothInfo?.part_no === 'gollaprolu_ward_11'
                 ? (language === 'te' ? 'వార్డు 11' : 'W-11')
-                : `#${boothInfo?.part_no || ''}`}
+                : isWard && wardNo
+                  ? `#W${wardNo}`
+                  : partStr.startsWith('gp_')
+                    ? 'GP'
+                    : `#${partStr || ''}`}
           </span>
         </button>
 
