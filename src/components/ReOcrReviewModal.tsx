@@ -14,9 +14,23 @@ import {
   Filter,
   Eye,
   Sparkles,
-  Maximize2
+  Maximize2,
+  Phone,
+  PhoneCall,
+  MessageSquare,
+  UserCheck,
+  Star,
+  Clock,
+  Edit3,
+  Home,
+  FileText
 } from 'lucide-react';
-import { MobileVoter } from '../types';
+import {
+  MobileVoter,
+  BoothInfo,
+  VoterSurveyStatus,
+  VoterCampaignProfile
+} from '../types';
 import { resolveCardUrl } from '../utils/photoResolver';
 
 interface ReOcrReviewModalProps {
@@ -26,6 +40,16 @@ interface ReOcrReviewModalProps {
   boothId?: string;
   language?: 'te' | 'en';
   onUpdateVoters?: (updatedVoters: MobileVoter[]) => void;
+  profiles?: Record<number, VoterCampaignProfile>;
+  boothInfo?: BoothInfo;
+  onOpenPhoneEditor?: (voter: MobileVoter) => void;
+  onOpenSupportPicker?: (title: string, currentPct: number, currentNotes?: string, voterSno?: number) => void;
+  onOpenLogVisit?: (voter: MobileVoter) => void;
+  onOpenInfluencerAssign?: (targetName: string, currentInfId?: string, voterSno?: number) => void;
+  onUpdateSurveyMark?: (serialNo: number, status: VoterSurveyStatus | null) => void;
+  onQuickToggleOurs?: (serialNo: number) => void;
+  onQuickToggleVoted?: (serialNo: number) => void;
+  onOpenSlip?: (voter: MobileVoter) => void;
 }
 
 type FilterMode = 'all' | 'marked' | 'suspected';
@@ -37,6 +61,16 @@ export const ReOcrReviewModal: React.FC<ReOcrReviewModalProps> = ({
   boothId = 'gp_durgada',
   language = 'te',
   onUpdateVoters,
+  profiles = {},
+  boothInfo,
+  onOpenPhoneEditor,
+  onOpenSupportPicker,
+  onOpenLogVisit,
+  onOpenInfluencerAssign,
+  onUpdateSurveyMark,
+  onQuickToggleOurs,
+  onQuickToggleVoted,
+  onOpenSlip,
 }) => {
   // Marked S.Nos state (persisted in localStorage)
   const storageKey = `reocr_marked_snos_${boothId}`;
@@ -62,6 +96,7 @@ export const ReOcrReviewModal: React.FC<ReOcrReviewModalProps> = ({
   const [isProcessing, setIsProcessing] = useState<boolean>(false);
   const [processStatus, setProcessStatus] = useState<string | null>(null);
   const [copiedSnos, setCopiedSnos] = useState<boolean>(false);
+  const [copiedField, setCopiedField] = useState<string | null>(null);
   const [imageError, setImageError] = useState<boolean>(false);
   const [imageFallbackIndex, setImageFallbackIndex] = useState<number>(0);
   const [fullImagePreview, setFullImagePreview] = useState<boolean>(false);
@@ -78,7 +113,6 @@ export const ReOcrReviewModal: React.FC<ReOcrReviewModalProps> = ({
   // Heuristic suspicion check: Does this card have potential OCR or transliteration mismatch?
   const isSuspected = useCallback((v: MobileVoter): boolean => {
     const nameTe = (v.name_te || '').trim();
-    const nameEn = (v.name_en || '').trim();
     const epic = (v.epic || v.id || '').trim();
 
     // 1. Noise characters in Telugu name (. : , ? / #)
@@ -90,7 +124,6 @@ export const ReOcrReviewModal: React.FC<ReOcrReviewModalProps> = ({
     // 3. No EPIC or invalid EPIC
     if (!epic || epic.length < 5 || epic.includes('UNKNOWN')) return true;
 
-    // 4. Duplicate name and relative name across different house numbers
     return false;
   }, []);
 
@@ -115,6 +148,16 @@ export const ReOcrReviewModal: React.FC<ReOcrReviewModalProps> = ({
   const currentVoter: MobileVoter | undefined = activeList[safeIndex];
   const currentSno = currentVoter ? Number(currentVoter.s || currentVoter.sno) : 0;
   const isCurrentMarked = currentSno > 0 && markedSnos.has(currentSno);
+
+  // Campaign Profile for current voter
+  const currentProf: VoterCampaignProfile = currentSno ? (profiles[currentSno] || {}) : {};
+  const currentPhone = currentProf.customPhone || currentVoter?.k_m;
+  const currentPct = currentProf.supportPct;
+
+  const isOurs = currentPct === 100 || currentProf.survey_status === 'supporter';
+  const isVoted = currentProf.survey_status === 'voted';
+  const isOutOfCity = currentProf.survey_status === 'out_of_city';
+  const isDeceased = currentProf.survey_status === 'deceased';
 
   // Reset image error state whenever current voter changes
   useEffect(() => {
@@ -146,6 +189,50 @@ export const ReOcrReviewModal: React.FC<ReOcrReviewModalProps> = ({
     });
   }, [currentSno]);
 
+  // Ground Campaign Action Handlers
+  const handleToggleOurs = useCallback(() => {
+    if (!currentSno) return;
+    if (onQuickToggleOurs) {
+      onQuickToggleOurs(currentSno);
+    } else if (onUpdateSurveyMark) {
+      onUpdateSurveyMark(currentSno, isOurs ? null : 'supporter');
+    }
+  }, [currentSno, onQuickToggleOurs, onUpdateSurveyMark, isOurs]);
+
+  const handleToggleVoted = useCallback(() => {
+    if (!currentSno) return;
+    if (onQuickToggleVoted) {
+      onQuickToggleVoted(currentSno);
+    } else if (onUpdateSurveyMark) {
+      onUpdateSurveyMark(currentSno, isVoted ? null : 'voted');
+    }
+  }, [currentSno, onQuickToggleVoted, onUpdateSurveyMark, isVoted]);
+
+  const handleToggleOutOfCity = useCallback(() => {
+    if (!currentSno || !onUpdateSurveyMark) return;
+    onUpdateSurveyMark(currentSno, isOutOfCity ? null : 'out_of_city');
+  }, [currentSno, onUpdateSurveyMark, isOutOfCity]);
+
+  const handleToggleDeceased = useCallback(() => {
+    if (!currentSno || !onUpdateSurveyMark) return;
+    onUpdateSurveyMark(currentSno, isDeceased ? null : 'deceased');
+  }, [currentSno, onUpdateSurveyMark, isDeceased]);
+
+  const handleSendWhatsAppSlip = useCallback(() => {
+    if (!currentVoter) return;
+    const epic = currentVoter.epic || currentVoter.id || '-';
+    const doorNo = currentVoter.house_no || currentVoter.door_no || currentVoter.hn || '-';
+    const station = currentVoter.sec || currentVoter.polling_station_name || boothInfo?.ps_address || '-';
+
+    const text = `🗳️ *ఓటర్ సమాచార పత్రం — పిఠాపురం నియోజకవర్గం (AC #37)*\n\nనమస్తే *${currentVoter.n}* గారు,\n\nమీ అధికారిక ఓటర్ సమాచారం:\n🔢 *క్రమ సంఖ్య (S.No):* #${currentSno}\n🆔 *ఓటర్ ఐడీ (EPIC):* ${epic}\n🏠 *ఇంటి నెం:* ${doorNo}\n🏛️ *పోలింగ్ కేంద్రం:* ${station}\n⏰ *పోలింగ్ సమయం:* ఉదయం 7:00 నుండి సాయంత్రం 5:00 వరకు\n\n_దయచేసి మీ ఓటు హక్కును సద్వినియోగం చేసుకోండి!_`;
+
+    const cleanPhone = (currentPhone || '').replace(/\D/g, '').slice(-10);
+    const waUrl = cleanPhone
+      ? `https://wa.me/91${cleanPhone}?text=${encodeURIComponent(text)}`
+      : `https://wa.me/?text=${encodeURIComponent(text)}`;
+    window.open(waUrl, '_blank');
+  }, [currentVoter, currentSno, currentPhone, boothInfo]);
+
   // Jump to specific S.No
   const handleJumpToSno = (e: React.FormEvent) => {
     e.preventDefault();
@@ -157,7 +244,6 @@ export const ReOcrReviewModal: React.FC<ReOcrReviewModalProps> = ({
       setCurrentIndex(idx);
       setJumpInput('');
     } else {
-      // If not in current filtered list, switch to 'all' and jump
       const allIdx = voters.findIndex(v => Number(v.s || v.sno) === target);
       if (allIdx !== -1) {
         setFilterMode('all');
@@ -169,12 +255,11 @@ export const ReOcrReviewModal: React.FC<ReOcrReviewModalProps> = ({
     }
   };
 
-  // Keyboard navigation listener (Space = Toggle, ArrowRight/Enter = Next, ArrowLeft = Prev, Esc = Close)
+  // Keyboard navigation listener (Space = Toggle Mark, Enter/Right = Next, Left = Prev, Esc = Close)
   useEffect(() => {
     if (!isOpen) return;
 
     const handleKeyDown = (e: KeyboardEvent) => {
-      // Don't intercept when user is typing in an input field
       const targetTag = (e.target as HTMLElement)?.tagName?.toLowerCase();
       if (targetTag === 'input' || targetTag === 'textarea') return;
 
@@ -225,6 +310,14 @@ export const ReOcrReviewModal: React.FC<ReOcrReviewModalProps> = ({
     }
   };
 
+  // Copy text helper
+  const handleCopy = (text: string, fieldId: string) => {
+    if (!text) return;
+    navigator.clipboard.writeText(text);
+    setCopiedField(fieldId);
+    setTimeout(() => setCopiedField(null), 1800);
+  };
+
   // Copy marked S.Nos
   const handleCopyMarkedSnos = () => {
     const list = Array.from(markedSnos).sort((a, b) => a - b);
@@ -254,7 +347,6 @@ export const ReOcrReviewModal: React.FC<ReOcrReviewModalProps> = ({
       const data = await res.json();
       if (data.success && data.updatedVoters && onUpdateVoters) {
         onUpdateVoters(data.updatedVoters);
-        // Remove completed S.Nos from marked queue
         setMarkedSnos(prev => {
           const next = new Set(prev);
           targetSnos.forEach(s => next.delete(s));
@@ -276,39 +368,76 @@ export const ReOcrReviewModal: React.FC<ReOcrReviewModalProps> = ({
     }
   };
 
+  // Support leaning badge
+  const renderLeaningBadge = (pct?: number) => {
+    if (pct === undefined) {
+      return (
+        <span className="px-2 py-0.5 bg-slate-800 text-slate-400 border border-slate-700 rounded-md text-[10px] font-medium flex items-center gap-1">
+          ⚪ {language === 'te' ? 'సర్వే కాలేదు' : 'Unsurveyed'}
+        </span>
+      );
+    }
+    if (pct === 100) {
+      return (
+        <span className="px-2 py-0.5 bg-emerald-600/30 text-emerald-300 border border-emerald-500/50 rounded-md text-[10px] font-black flex items-center gap-1">
+          ⭐ {language === 'te' ? '100% మనవాళ్లే' : '100% Support'}
+        </span>
+      );
+    }
+    if (pct >= 75) {
+      return (
+        <span className="px-2 py-0.5 bg-emerald-600/30 text-emerald-300 border border-emerald-500/50 rounded-md text-[10px] font-black flex items-center gap-1">
+          🟢 {pct}% {language === 'te' ? 'అనుకూలం' : 'Strong'}
+        </span>
+      );
+    }
+    if (pct === 40) {
+      return (
+        <span className="px-2 py-0.5 bg-amber-600/30 text-amber-300 border border-amber-500/50 rounded-md text-[10px] font-black flex items-center gap-1">
+          🟡 40% {language === 'te' ? 'సానుకూలం' : 'Leaning'}
+        </span>
+      );
+    }
+    return (
+      <span className="px-2 py-0.5 bg-rose-900/40 text-rose-300 border border-rose-500/50 rounded-md text-[10px] font-black flex items-center gap-1">
+        🔴 0% {language === 'te' ? 'ప్రత్యర్థులు' : 'Opponent'}
+      </span>
+    );
+  };
+
   if (!isOpen) return null;
 
   return (
-    <div className="fixed inset-0 z-[120] bg-black/85 backdrop-blur-md flex flex-col justify-between text-slate-100 select-none">
+    <div className="fixed inset-0 z-[120] bg-black/90 backdrop-blur-md flex flex-col justify-between text-slate-100 select-none">
       {/* 1. TOP HEADER BAR */}
-      <div className="bg-slate-900/95 border-b border-slate-800 px-4 py-2.5 flex items-center justify-between flex-wrap gap-2">
-        <div className="flex items-center gap-2.5">
-          <div className="w-8 h-8 rounded-lg bg-gradient-to-tr from-amber-500 to-orange-600 flex items-center justify-center text-white shadow-md shadow-amber-500/20">
-            <Sparkles className="w-4 h-4" />
+      <div className="bg-slate-900/95 border-b border-slate-800 px-3.5 py-2 flex items-center justify-between flex-wrap gap-2">
+        <div className="flex items-center gap-2">
+          <div className="w-7 h-7 rounded-lg bg-gradient-to-tr from-amber-500 to-orange-600 flex items-center justify-center text-white shadow-md shadow-amber-500/20">
+            <Sparkles className="w-3.5 h-3.5" />
           </div>
           <div>
             <div className="flex items-center gap-2">
-              <h2 className="text-sm font-black tracking-wide text-white">
-                {language === 'te' ? 'రీ-ఓసీఆర్ సింగిల్-కార్డ్ రివ్యూ స్టూడియో' : 'Re-OCR Single-Card Review Studio'}
+              <h2 className="text-xs sm:text-sm font-black tracking-wide text-white">
+                {language === 'te' ? 'రీ-ఓసీఆర్ రివ్యూ & ఓటర్ క్యాంపెయిన్ స్టూడియో' : 'Re-OCR Review & Voter Studio'}
               </h2>
-              <span className="text-[10px] bg-amber-500/20 border border-amber-500/40 text-amber-300 px-1.5 py-0.5 rounded font-mono font-bold">
+              <span className="text-[9.5px] bg-amber-500/20 border border-amber-500/40 text-amber-300 px-1.5 py-0.2 rounded font-mono font-bold">
                 1 ITEM / SCREEN
               </span>
             </div>
-            <p className="text-[10.5px] text-slate-400">
+            <p className="text-[10px] text-slate-400 hidden sm:block">
               {language === 'te'
-                ? 'స్పేస్ బార్ నొక్కి ఎంపిక/రద్దు చేయండి • ఎంటర్ లేదా కుడి బాణం నొక్కి తర్వాతి కార్డుకు వెళ్ళండి'
-                : 'Space to toggle mark • Enter / Arrow to go Next • Esc to close'}
+                ? 'స్పేస్ [Space]: రీ-ఓసీఆర్ ఎంపిక • ఎంటర్ [Enter]: తర్వాతి కార్డు • 1-ట్యాప్ మనవాళ్లే, ఫోన్, లీడర్, స్లిప్'
+                : 'Space: Toggle Re-OCR • Enter: Next • 1-Tap Support, Phone, Leader, WhatsApp Slip'}
             </p>
           </div>
         </div>
 
         {/* Filter Pills */}
-        <div className="flex items-center gap-1.5 bg-slate-950/80 p-1 rounded-xl border border-slate-800">
+        <div className="flex items-center gap-1 bg-slate-950/80 p-0.5 rounded-xl border border-slate-800">
           <button
             type="button"
             onClick={() => { setFilterMode('all'); setCurrentIndex(0); }}
-            className={`px-2.5 py-1 rounded-lg text-xs font-bold transition-all ${
+            className={`px-2 py-0.5 rounded-lg text-xs font-bold transition-all ${
               filterMode === 'all'
                 ? 'bg-amber-500 text-slate-950 shadow-sm'
                 : 'text-slate-400 hover:text-slate-200'
@@ -320,7 +449,7 @@ export const ReOcrReviewModal: React.FC<ReOcrReviewModalProps> = ({
           <button
             type="button"
             onClick={() => { setFilterMode('marked'); setCurrentIndex(0); }}
-            className={`px-2.5 py-1 rounded-lg text-xs font-bold transition-all flex items-center gap-1 ${
+            className={`px-2 py-0.5 rounded-lg text-xs font-bold transition-all flex items-center gap-1 ${
               filterMode === 'marked'
                 ? 'bg-amber-500 text-slate-950 shadow-sm'
                 : markedSnos.size > 0
@@ -329,7 +458,7 @@ export const ReOcrReviewModal: React.FC<ReOcrReviewModalProps> = ({
             }`}
           >
             <span>{language === 'te' ? 'మార్క్ చేసినవి' : 'Marked'}</span>
-            <span className={`text-[10px] px-1.5 py-0.2 rounded-full font-black ${
+            <span className={`text-[9.5px] px-1 py-0.2 rounded-full font-black ${
               filterMode === 'marked' ? 'bg-slate-950 text-amber-300' : 'bg-amber-500/20 text-amber-300'
             }`}>
               {markedSnos.size}
@@ -339,15 +468,15 @@ export const ReOcrReviewModal: React.FC<ReOcrReviewModalProps> = ({
           <button
             type="button"
             onClick={() => { setFilterMode('suspected'); setCurrentIndex(0); }}
-            className={`px-2.5 py-1 rounded-lg text-xs font-bold transition-all flex items-center gap-1 ${
+            className={`px-2 py-0.5 rounded-lg text-xs font-bold transition-all flex items-center gap-1 ${
               filterMode === 'suspected'
                 ? 'bg-red-500 text-white shadow-sm'
                 : 'text-red-400 hover:text-red-300'
             }`}
           >
             <AlertTriangle className="w-3 h-3" />
-            <span>{language === 'te' ? 'అనుమానాస్పద' : 'Suspected'}</span>
-            <span className={`text-[10px] px-1.5 py-0.2 rounded-full font-black ${
+            <span className="hidden sm:inline">{language === 'te' ? 'అనుమానాస్పద' : 'Suspected'}</span>
+            <span className={`text-[9.5px] px-1 py-0.2 rounded-full font-black ${
               filterMode === 'suspected' ? 'bg-white text-red-600' : 'bg-red-500/20 text-red-300'
             }`}>
               {suspectedCount}
@@ -356,20 +485,18 @@ export const ReOcrReviewModal: React.FC<ReOcrReviewModalProps> = ({
         </div>
 
         {/* Jump Box & Close */}
-        <div className="flex items-center gap-2">
+        <div className="flex items-center gap-1.5">
           <form onSubmit={handleJumpToSno} className="flex items-center gap-1">
-            <div className="relative">
-              <input
-                type="number"
-                placeholder="S.No..."
-                value={jumpInput}
-                onChange={e => setJumpInput(e.target.value)}
-                className="w-20 px-2 py-1 bg-slate-950 border border-slate-700 rounded-lg text-xs text-white placeholder-slate-500 focus:outline-none focus:border-amber-400 text-center font-bold"
-              />
-            </div>
+            <input
+              type="number"
+              placeholder="S.No"
+              value={jumpInput}
+              onChange={e => setJumpInput(e.target.value)}
+              className="w-16 px-1.5 py-0.5 bg-slate-950 border border-slate-700 rounded-lg text-xs text-white placeholder-slate-500 focus:outline-none focus:border-amber-400 text-center font-bold"
+            />
             <button
               type="submit"
-              className="px-2 py-1 bg-slate-800 hover:bg-slate-700 text-slate-200 border border-slate-700 rounded-lg text-xs font-bold"
+              className="px-2 py-0.5 bg-slate-800 hover:bg-slate-700 text-slate-200 border border-slate-700 rounded-lg text-xs font-bold"
             >
               Go
             </button>
@@ -378,7 +505,7 @@ export const ReOcrReviewModal: React.FC<ReOcrReviewModalProps> = ({
           <button
             type="button"
             onClick={onClose}
-            className="p-1.5 rounded-lg bg-slate-800 hover:bg-slate-700 text-slate-400 hover:text-white transition-colors"
+            className="p-1 rounded-lg bg-slate-800 hover:bg-slate-700 text-slate-400 hover:text-white transition-colors"
             title="Close (Esc)"
           >
             <X className="w-5 h-5" />
@@ -387,7 +514,7 @@ export const ReOcrReviewModal: React.FC<ReOcrReviewModalProps> = ({
       </div>
 
       {/* 2. MAIN CENTER: SINGLE CARD FOCUS VIEW (SPLIT SCREEN) */}
-      <div className="flex-1 overflow-y-auto p-4 md:p-6 flex flex-col items-center justify-center">
+      <div className="flex-1 overflow-y-auto p-2 sm:p-4 flex flex-col items-center justify-center">
         {activeList.length === 0 ? (
           <div className="text-center py-12 px-6 max-w-md bg-slate-900/60 rounded-2xl border border-slate-800">
             <CheckCircle2 className="w-12 h-12 text-emerald-400 mx-auto mb-3" />
@@ -410,124 +537,186 @@ export const ReOcrReviewModal: React.FC<ReOcrReviewModalProps> = ({
             </button>
           </div>
         ) : currentVoter ? (
-          <div className="w-full max-w-5xl bg-slate-900/90 rounded-2xl border-2 transition-all duration-200 shadow-2xl overflow-hidden flex flex-col md:flex-row min-h-[460px] max-h-[82vh]"
-            style={{
-              borderColor: isCurrentMarked ? '#f59e0b' : '#334155',
-              boxShadow: isCurrentMarked ? '0 0 35px rgba(245, 158, 11, 0.25)' : undefined
-            }}
+          <div
+            className={`w-full max-w-5xl bg-slate-900/90 rounded-2xl border-2 transition-all duration-200 shadow-2xl overflow-hidden flex flex-col md:flex-row min-h-[480px] max-h-[85vh] ${
+              isCurrentMarked ? 'border-amber-500 shadow-amber-500/20' : 'border-slate-800'
+            }`}
           >
-            {/* LEFT SIDE: CROPPED OFFICIAL CARD IMAGE */}
-            <div className="md:w-1/2 bg-slate-950/90 p-4 flex flex-col items-center justify-center border-b md:border-b-0 md:border-r border-slate-800 relative group">
-              <div className="absolute top-3 left-3 z-10 flex items-center gap-1.5">
-                <span className="px-2 py-0.5 rounded-md bg-amber-500/20 text-amber-300 border border-amber-500/40 font-mono font-black text-xs">
-                  #{currentSno}
-                </span>
-                <span className="px-2 py-0.5 rounded-md bg-slate-800/80 text-slate-300 border border-slate-700 font-mono text-xs">
-                  {currentVoter.epic || 'NO EPIC'}
-                </span>
-              </div>
+            {/* LEFT SIDE: CROPPED OFFICIAL CARD IMAGE + RE-OCR CONTROLS */}
+            <div className="md:w-5/12 bg-slate-950/90 p-3 sm:p-4 flex flex-col items-center justify-between border-b md:border-b-0 md:border-r border-slate-800 relative">
+              <div className="w-full flex items-center justify-between mb-2">
+                <div className="flex items-center gap-1.5">
+                  <span className="px-2 py-0.5 rounded-md bg-amber-500/20 text-amber-300 border border-amber-500/40 font-mono font-black text-xs">
+                    #{currentSno}
+                  </span>
+                  <span className="px-2 py-0.5 rounded-md bg-slate-800/80 text-slate-300 border border-slate-700 font-mono text-xs">
+                    {currentVoter.epic || currentVoter.id || 'NO EPIC'}
+                  </span>
+                </div>
 
-              <div className="absolute top-3 right-3 z-10">
                 <button
                   type="button"
                   onClick={() => setFullImagePreview(prev => !prev)}
-                  className="p-1.5 rounded-lg bg-slate-800/80 hover:bg-slate-700 text-slate-300 hover:text-white border border-slate-700 shadow"
-                  title="Toggle Full Preview"
+                  className="p-1 rounded-lg bg-slate-800/80 hover:bg-slate-700 text-slate-300 hover:text-white border border-slate-700 shadow"
+                  title="Toggle Zoom"
                 >
-                  <Maximize2 className="w-4 h-4" />
+                  <Maximize2 className="w-3.5 h-3.5" />
                 </button>
               </div>
 
               {/* CARD IMAGE CONTAINER */}
-              <div className="w-full flex-1 flex items-center justify-center min-h-[220px] p-2">
+              <div className="w-full flex-1 flex items-center justify-center min-h-[190px] max-h-[310px] p-1 overflow-hidden">
                 {!imageError ? (
                   <img
                     src={resolvedImageUrl}
                     alt={`Voter Card #${currentSno}`}
                     onError={handleImageError}
-                    className={`max-h-[380px] w-auto max-w-full object-contain rounded-lg border border-slate-800 shadow-lg transition-transform ${
-                      fullImagePreview ? 'scale-110' : ''
+                    className={`max-h-[290px] w-auto max-w-full object-contain rounded-lg border border-slate-800 shadow-md transition-transform ${
+                      fullImagePreview ? 'scale-115' : ''
                     }`}
                   />
                 ) : (
-                  <div className="text-center p-6 bg-slate-900/50 rounded-xl border border-slate-800">
-                    <AlertTriangle className="w-8 h-8 text-amber-400 mx-auto mb-2" />
-                    <p className="text-xs text-slate-400 font-medium">
+                  <div className="text-center p-4 bg-slate-900/50 rounded-xl border border-slate-800">
+                    <AlertTriangle className="w-6 h-6 text-amber-400 mx-auto mb-1" />
+                    <p className="text-[11px] text-slate-400 font-medium">
                       {language === 'te' ? 'కార్డు చిత్రం లోడ్ కాలేదు' : 'Card image not found'}
                     </p>
-                    <p className="text-[10px] text-slate-500 mt-1 font-mono">
+                    <p className="text-[9.5px] text-slate-500 mt-0.5 font-mono">
                       /cards/durgada/card_{currentSno}.png
                     </p>
                   </div>
                 )}
               </div>
 
-              {/* IMAGE PATH BADGE */}
-              <div className="w-full pt-2 flex items-center justify-between text-[10px] text-slate-500 border-t border-slate-800/60 px-1">
-                <span className="truncate max-w-[240px]">
-                  {currentImageUrl}
-                </span>
-                <span>{safeIndex + 1} of {activeList.length}</span>
+              {/* RE-OCR TOGGLE BUTTON & SINGLE RE-OCR */}
+              <div className="w-full pt-3 space-y-1.5">
+                <button
+                  type="button"
+                  onClick={handleToggleCurrentMark}
+                  className={`w-full py-2.5 px-3 rounded-xl font-black text-xs flex items-center justify-center gap-2 transition-all shadow-md active:scale-98 cursor-pointer ${
+                    isCurrentMarked
+                      ? 'bg-gradient-to-r from-amber-500 to-orange-500 text-slate-950 ring-2 ring-amber-300/50 shadow-amber-500/30'
+                      : 'bg-slate-800 hover:bg-slate-700 text-slate-200 border border-slate-700 hover:border-amber-500/50'
+                  }`}
+                >
+                  {isCurrentMarked ? (
+                    <>
+                      <CheckCircle2 className="w-4 h-4 fill-slate-950 text-amber-400" />
+                      <span>{language === 'te' ? '✓ రీ-ఓసీఆర్ కోసం ఎంపిక చేశారు [స్పేస్]' : '✓ MARKED FOR RE-OCR [Space]'}</span>
+                    </>
+                  ) : (
+                    <>
+                      <RotateCcw className="w-4 h-4 text-amber-400" />
+                      <span>{language === 'te' ? 'రీ-ఓసీఆర్ కోసం మార్క్ చేయండి [స్పేస్]' : 'Mark for Re-OCR [Space]'}</span>
+                    </>
+                  )}
+                </button>
+
+                <button
+                  type="button"
+                  onClick={() => handleRunReOcr([currentSno])}
+                  disabled={isProcessing}
+                  className="w-full py-1.5 px-2.5 rounded-lg bg-slate-900 hover:bg-slate-800 border border-amber-500/30 text-amber-300 font-bold text-[11px] flex items-center justify-center gap-1 transition-all disabled:opacity-50 cursor-pointer"
+                >
+                  <Zap className="w-3 h-3 text-amber-400" />
+                  <span>{language === 'te' ? '⚡ ఈ ఒక్క కార్డును తక్షణమే Re-OCR చేయి' : 'Instant Re-OCR This Card'}</span>
+                </button>
               </div>
             </div>
 
-            {/* RIGHT SIDE: EXTRACTED OCR TEXT & CONTROLS */}
-            <div className="md:w-1/2 p-5 flex flex-col justify-between bg-slate-900/60 overflow-y-auto">
+            {/* RIGHT SIDE: EXTRACTED OCR TEXT + GROUND CAMPAIGN CONTROLS */}
+            <div className="md:w-7/12 p-3 sm:p-4 flex flex-col justify-between bg-slate-900/60 overflow-y-auto space-y-3">
+              {/* TOP: IDENTITY & LEANING BADGE */}
               <div>
-                {/* Status Bar & Warning */}
-                <div className="flex items-center justify-between mb-3">
-                  <div className="flex items-center gap-2">
+                <div className="flex items-center justify-between mb-2">
+                  <div className="flex items-center gap-1.5 flex-wrap">
                     <span className="text-xs text-slate-400 font-bold">
-                      {language === 'te' ? 'క్రమ సంఖ్య:' : 'Serial No:'}
+                      {language === 'te' ? 'క్రమం:' : 'S.No:'}
                     </span>
-                    <span className="text-base font-black text-amber-400 font-mono">
+                    <span className="text-sm font-black text-amber-400 font-mono">
                       #{currentSno}
                     </span>
+                    <button
+                      type="button"
+                      onClick={() => handleCopy(String(currentSno), 'sno')}
+                      className="text-slate-400 hover:text-white p-0.5"
+                      title="Copy S.No"
+                    >
+                      {copiedField === 'sno' ? <Check className="w-3 h-3 text-emerald-400" /> : <Copy className="w-3 h-3" />}
+                    </button>
+
+                    <span className="text-slate-500 text-xs">•</span>
+
+                    <span className="text-xs font-mono font-bold text-slate-300">
+                      {currentVoter.epic || currentVoter.id || 'NO EPIC'}
+                    </span>
+                    <button
+                      type="button"
+                      onClick={() => handleCopy(currentVoter.epic || currentVoter.id || '', 'epic')}
+                      className="text-slate-400 hover:text-white p-0.5"
+                      title="Copy EPIC"
+                    >
+                      {copiedField === 'epic' ? <Check className="w-3 h-3 text-emerald-400" /> : <Copy className="w-3 h-3" />}
+                    </button>
                   </div>
 
-                  {isSuspected(currentVoter) && (
-                    <span className="px-2 py-0.5 rounded-full bg-red-500/20 text-red-400 border border-red-500/40 text-[10.5px] font-bold flex items-center gap-1">
-                      <AlertTriangle className="w-3 h-3" />
-                      {language === 'te' ? 'సందేహాస్పద OCR డేటా' : 'Suspected OCR Mismatch'}
-                    </span>
+                  {/* Leaning Support Picker Trigger */}
+                  {onOpenSupportPicker ? (
+                    <button
+                      type="button"
+                      onClick={() => onOpenSupportPicker(currentVoter.n, currentPct ?? 50, currentProf.notes, currentSno)}
+                      className="cursor-pointer transition-transform hover:scale-105 active:scale-95"
+                      title="మొగ్గు మార్చడానికి క్లిక్ చేయండి"
+                    >
+                      {renderLeaningBadge(currentPct)}
+                    </button>
+                  ) : (
+                    renderLeaningBadge(currentPct)
                   )}
                 </div>
 
                 {/* EXTRACTED FIELDS LIST */}
-                <div className="space-y-3 bg-slate-950/60 p-3.5 rounded-xl border border-slate-800">
+                <div className="space-y-2 bg-slate-950/70 p-3 rounded-xl border border-slate-800 text-xs">
                   {/* Voter Name */}
-                  <div>
-                    <span className="text-[10px] font-bold text-slate-400 uppercase tracking-wider block">
-                      {language === 'te' ? 'ఓటరు పేరు (తెలుగు / ఇంగ్లీష్):' : 'Voter Name:'}
-                    </span>
-                    <div className="text-base font-black text-white mt-0.5 leading-snug">
-                      {currentVoter.name_te || '—'}
+                  <div className="flex items-start justify-between gap-2">
+                    <div>
+                      <span className="text-[9.5px] font-bold text-slate-400 uppercase tracking-wider block">
+                        {language === 'te' ? 'ఓటరు పేరు (తెలుగు / EN):' : 'Voter Name:'}
+                      </span>
+                      <div className="text-sm sm:text-base font-black text-white leading-snug">
+                        {currentVoter.name_te || '—'}
+                      </div>
+                      <div className="text-xs font-semibold text-amber-300 font-mono">
+                        {currentVoter.name_en || '—'}
+                      </div>
                     </div>
-                    <div className="text-xs font-semibold text-amber-300 font-mono">
-                      {currentVoter.name_en || '—'}
-                    </div>
+                    {isSuspected(currentVoter) && (
+                      <span className="px-1.5 py-0.5 rounded bg-red-500/20 text-red-400 border border-red-500/40 text-[9px] font-bold shrink-0">
+                        ⚠️ OCR తేడా
+                      </span>
+                    )}
                   </div>
 
                   {/* Relative Name */}
-                  <div className="pt-2 border-t border-slate-800/80">
-                    <span className="text-[10px] font-bold text-slate-400 uppercase tracking-wider block">
+                  <div className="pt-1.5 border-t border-slate-800/80">
+                    <span className="text-[9.5px] font-bold text-slate-400 uppercase tracking-wider block">
                       {language === 'te' ? 'సంబంధీకుని పేరు & రకం:' : 'Relative Name & Relation:'}
                     </span>
-                    <div className="text-sm font-bold text-slate-200 mt-0.5">
+                    <div className="text-xs font-bold text-slate-200">
                       {currentVoter.rel_name_te || '—'}
-                      <span className="text-xs text-slate-400 ml-1.5">
+                      <span className="text-[11px] text-slate-400 ml-1">
                         ({currentVoter.rel_type_te || currentVoter.rel_type_en || 'సంబంధం'})
                       </span>
-                    </div>
-                    <div className="text-xs text-slate-400 font-mono">
-                      {currentVoter.rel_name_en || '—'} ({currentVoter.rel_type_en || 'Relative'})
+                      <span className="text-slate-400 font-mono text-[11px] ml-1.5">
+                        • {currentVoter.rel_name_en || '—'}
+                      </span>
                     </div>
                   </div>
 
-                  {/* House No, Age, Gender Grid */}
-                  <div className="pt-2 border-t border-slate-800/80 grid grid-cols-3 gap-2">
+                  {/* Door No, Age, Gender Grid */}
+                  <div className="pt-1.5 border-t border-slate-800/80 grid grid-cols-3 gap-2">
                     <div>
-                      <span className="text-[9.5px] font-bold text-slate-500 uppercase tracking-wider block">
+                      <span className="text-[9px] font-bold text-slate-500 uppercase tracking-wider block">
                         {language === 'te' ? 'ఇంటి నెం' : 'Door No'}
                       </span>
                       <span className="text-xs font-bold text-amber-200 font-mono">
@@ -535,7 +724,7 @@ export const ReOcrReviewModal: React.FC<ReOcrReviewModalProps> = ({
                       </span>
                     </div>
                     <div>
-                      <span className="text-[9.5px] font-bold text-slate-500 uppercase tracking-wider block">
+                      <span className="text-[9px] font-bold text-slate-500 uppercase tracking-wider block">
                         {language === 'te' ? 'వయస్సు' : 'Age'}
                       </span>
                       <span className="text-xs font-bold text-slate-200">
@@ -543,7 +732,7 @@ export const ReOcrReviewModal: React.FC<ReOcrReviewModalProps> = ({
                       </span>
                     </div>
                     <div>
-                      <span className="text-[9.5px] font-bold text-slate-500 uppercase tracking-wider block">
+                      <span className="text-[9px] font-bold text-slate-500 uppercase tracking-wider block">
                         {language === 'te' ? 'లింగం' : 'Gender'}
                       </span>
                       <span className="text-xs font-bold text-slate-200">
@@ -553,51 +742,190 @@ export const ReOcrReviewModal: React.FC<ReOcrReviewModalProps> = ({
                   </div>
 
                   {/* Polling Section */}
-                  <div className="pt-2 border-t border-slate-800/80">
-                    <span className="text-[9.5px] font-bold text-slate-500 uppercase tracking-wider block">
-                      {language === 'te' ? 'పోలింగ్ కేంద్రం / వార్డు' : 'Polling Station / Ward'}
+                  <div className="pt-1.5 border-t border-slate-800/80">
+                    <span className="text-[9px] font-bold text-slate-500 uppercase tracking-wider block">
+                      {language === 'te' ? 'పోలింగ్ కేంద్రం' : 'Polling Station'}
                     </span>
-                    <p className="text-[11px] text-slate-300 line-clamp-2">
+                    <p className="text-[10.5px] text-slate-300 truncate">
                       {currentVoter.sec || currentVoter.polling_station_name || '—'}
                     </p>
                   </div>
                 </div>
-              </div>
 
-              {/* TOGGLE SELECT / UNSELECT BIG PROMINENT BUTTON */}
-              <div className="pt-4 space-y-2">
-                <button
-                  type="button"
-                  onClick={handleToggleCurrentMark}
-                  className={`w-full py-3 px-4 rounded-xl font-black text-sm flex items-center justify-center gap-2.5 transition-all shadow-lg active:scale-98 cursor-pointer ${
-                    isCurrentMarked
-                      ? 'bg-gradient-to-r from-amber-500 to-orange-500 text-slate-950 ring-2 ring-amber-300/50 shadow-amber-500/30'
-                      : 'bg-slate-800 hover:bg-slate-700 text-slate-200 border border-slate-700 hover:border-amber-500/50'
-                  }`}
-                >
-                  {isCurrentMarked ? (
-                    <>
-                      <CheckCircle2 className="w-5 h-5 fill-slate-950 text-amber-400" />
-                      <span>{language === 'te' ? '✓ రీ-ఓసీఆర్ కోసం ఎంపిక చేశారు [స్పేస్]' : '✓ MARKED FOR RE-OCR [Space]'}</span>
-                    </>
-                  ) : (
-                    <>
-                      <RotateCcw className="w-5 h-5 text-amber-400" />
-                      <span>{language === 'te' ? 'రీ-ఓసీఆర్ కోసం మార్క్ చేయండి [స్పేస్]' : 'Mark for Re-OCR [Space]'}</span>
-                    </>
-                  )}
-                </button>
+                {/* ⚡ 1-TAP GROUND CAMPAIGN ACTION SWITCHES */}
+                <div className="mt-2.5 space-y-1.5">
+                  <div className="text-[10px] font-bold text-amber-400 uppercase tracking-wider flex items-center gap-1">
+                    <Star className="w-3 h-3" />
+                    <span>{language === 'te' ? 'గ్రౌండ్ సర్వే & క్యాంపెయిన్ యాక్షన్స్:' : 'Ground Survey & Campaign Actions:'}</span>
+                  </div>
 
-                {/* Instant Single Re-OCR Button */}
-                <button
-                  type="button"
-                  onClick={() => handleRunReOcr([currentSno])}
-                  disabled={isProcessing}
-                  className="w-full py-2 px-3 rounded-lg bg-slate-950 hover:bg-slate-800 border border-amber-500/30 text-amber-300 font-bold text-xs flex items-center justify-center gap-1.5 transition-all disabled:opacity-50 cursor-pointer"
-                >
-                  <Zap className="w-3.5 h-3.5 text-amber-400" />
-                  <span>{language === 'te' ? 'ఈ ఒక్క కార్డును ఇప్పుడే Re-OCR చేయి' : 'Instant Re-OCR This Single Card'}</span>
-                </button>
+                  {/* Row 1: ⭐ మనవాళ్లే (100%) & 🗳️ ఓటేశారు (Voted) */}
+                  <div className="grid grid-cols-2 gap-2">
+                    {/* 1. Quick Switch for OURS (మనవాళ్లే) */}
+                    <button
+                      type="button"
+                      onClick={handleToggleOurs}
+                      className={`py-2 px-2.5 rounded-xl text-xs font-black flex items-center justify-center gap-1.5 transition-all active:scale-95 shadow-sm border cursor-pointer ${
+                        isOurs
+                          ? 'bg-gradient-to-r from-emerald-600 to-amber-600 text-white border-emerald-400 ring-2 ring-emerald-400/40 shadow-emerald-950/50'
+                          : 'bg-slate-950 hover:bg-slate-800 text-slate-300 border-slate-700 hover:border-amber-500/60'
+                      }`}
+                      title={isOurs ? 'మనవాళ్లే (ట్యాప్ చేస్తే రీసెట్ అవుతుంది)' : '100% మనవాళ్లే అని నమోదు చేయండి'}
+                    >
+                      <Star className={`w-3.5 h-3.5 ${isOurs ? 'text-white fill-white' : 'text-amber-400'}`} />
+                      <span className="truncate">{isOurs ? (language === 'te' ? '⭐ మనవాళ్లే (100%)' : '⭐ Ours (100%)') : (language === 'te' ? '⭐ మనవాళ్లేనా?' : '+ Mark Ours')}</span>
+                    </button>
+
+                    {/* 2. Quick Switch for VOTED (ఓటేశారు) */}
+                    <button
+                      type="button"
+                      onClick={handleToggleVoted}
+                      className={`py-2 px-2.5 rounded-xl text-xs font-black flex items-center justify-center gap-1.5 transition-all active:scale-95 shadow-sm border cursor-pointer ${
+                        isVoted
+                          ? 'bg-gradient-to-r from-emerald-600 to-teal-600 text-white border-emerald-400 ring-2 ring-emerald-400/40 shadow-emerald-950/50'
+                          : 'bg-slate-950 hover:bg-slate-800 text-slate-300 border-slate-700 hover:border-emerald-500/60'
+                      }`}
+                      title={isVoted ? 'ఓటేశారు (ట్యాప్ చేస్తే అన్‌మార్క్ అవుతుంది)' : 'ఓటు వేశారు అని మార్క్ చేయండి'}
+                    >
+                      <CheckCircle2 className={`w-3.5 h-3.5 ${isVoted ? 'text-white fill-emerald-800' : 'text-emerald-400'}`} />
+                      <span className="truncate">{isVoted ? (language === 'te' ? '✅ ఓటేశారు (Voted)' : '✅ Voted') : (language === 'te' ? '🗳️ ఓటు వేయలేదు' : 'Mark Voted')}</span>
+                    </button>
+                  </div>
+
+                  {/* Row 2: ✈️ ఊర్లో లేరు (Out of Village) & 💀 మరణించారు (Deceased) */}
+                  <div className="grid grid-cols-2 gap-2">
+                    {/* 3. Quick Switch for OUT OF VILLAGE (గ్రామంలో లేరు) */}
+                    <button
+                      type="button"
+                      onClick={handleToggleOutOfCity}
+                      className={`py-1.5 px-2 rounded-xl text-xs font-black flex items-center justify-center gap-1 transition-all active:scale-95 shadow-sm border cursor-pointer ${
+                        isOutOfCity
+                          ? 'bg-gradient-to-r from-indigo-600 to-blue-700 text-white border-indigo-400 ring-2 ring-indigo-400/40 shadow-indigo-950/50'
+                          : 'bg-slate-950 hover:bg-slate-800 text-indigo-300 border-slate-700 hover:border-indigo-500/60'
+                      }`}
+                      title={isOutOfCity ? 'గ్రామంలో లేరు (ట్యాప్ చేస్తే అన్‌మార్క్ అవుతుంది)' : 'ఊర్లో లేరు / వలస వెళ్లినట్లు మార్క్ చేయండి'}
+                    >
+                      <span>✈️</span>
+                      <span className="truncate">{isOutOfCity ? (language === 'te' ? 'గ్రామంలో లేరు' : 'Away') : (language === 'te' ? 'ఊర్లో లేరు?' : '+ Out of Village')}</span>
+                    </button>
+
+                    {/* 4. Quick Switch for DECEASED (మరణించారు) */}
+                    <button
+                      type="button"
+                      onClick={handleToggleDeceased}
+                      className={`py-1.5 px-2 rounded-xl text-xs font-black flex items-center justify-center gap-1 transition-all active:scale-95 shadow-sm border cursor-pointer ${
+                        isDeceased
+                          ? 'bg-gradient-to-r from-slate-700 to-slate-800 text-white border-slate-400 ring-2 ring-slate-400/40 shadow-slate-950/50'
+                          : 'bg-slate-950 hover:bg-slate-800 text-slate-400 border-slate-700 hover:border-slate-500/60'
+                      }`}
+                      title={isDeceased ? 'మరణించారు (ట్యాప్ చేస్తే అన్‌మార్క్ అవుతుంది)' : 'మరణించినట్లు నమోదు చేయండి'}
+                    >
+                      <span>💀</span>
+                      <span className="truncate">{isDeceased ? (language === 'te' ? 'మరణించారు' : 'Deceased') : (language === 'te' ? 'మరణించారా?' : '+ Deceased')}</span>
+                    </button>
+                  </div>
+
+                  {/* CONTACT & ACTIONS ROW: Phone, Call, WhatsApp Slip, Leader, Log Visit, Full Slip */}
+                  <div className="pt-2 border-t border-slate-800/80 space-y-2 text-xs">
+                    {/* Phone Number & WhatsApp Slip Row */}
+                    <div className="flex items-center justify-between gap-1.5 flex-wrap">
+                      <div className="flex items-center gap-1.5 flex-wrap">
+                        {currentPhone ? (
+                          <div className="inline-flex items-center gap-1.5 bg-blue-950/50 border border-blue-500/40 px-2 py-0.5 rounded-lg text-xs">
+                            <span className="text-[9.5px] font-bold text-cyan-300">📞</span>
+                            <a
+                              href={`tel:${currentPhone}`}
+                              className="font-mono font-bold text-cyan-200 hover:text-white hover:underline"
+                              title="Click to Call"
+                            >
+                              {currentPhone}
+                            </a>
+                            <button
+                              type="button"
+                              onClick={() => handleCopy(currentPhone, 'phone')}
+                              className="p-0.5 text-slate-400 hover:text-white"
+                              title="Copy Phone"
+                            >
+                              {copiedField === 'phone' ? <Check className="w-3 h-3 text-emerald-400" /> : <Copy className="w-3 h-3" />}
+                            </button>
+                          </div>
+                        ) : (
+                          <span className="text-slate-500 text-[11px] italic">ఫోన్ నంబర్ లేదు</span>
+                        )}
+
+                        {onOpenPhoneEditor && (
+                          <button
+                            type="button"
+                            onClick={() => onOpenPhoneEditor(currentVoter)}
+                            className="text-amber-400 hover:text-amber-300 font-bold text-[11px] underline flex items-center gap-0.5 cursor-pointer"
+                          >
+                            <Phone className="w-2.5 h-2.5" />
+                            <span>{currentPhone ? 'నంబర్ మార్చు' : '+ ఫోన్ ఇవ్వండి'}</span>
+                          </button>
+                        )}
+                      </div>
+
+                      {/* WhatsApp Slip Button */}
+                      <button
+                        type="button"
+                        onClick={handleSendWhatsAppSlip}
+                        className="px-2.5 py-1 rounded-lg bg-emerald-950/80 hover:bg-emerald-900 border border-emerald-500/50 text-emerald-300 font-bold text-[11px] flex items-center gap-1 shadow-sm active:scale-95 cursor-pointer"
+                        title="వాట్సాప్‌లో ఓటర్ స్లిప్ పంపండి"
+                      >
+                        <MessageSquare className="w-3 h-3 text-emerald-400" />
+                        <span>{language === 'te' ? 'వాట్సాప్ స్లిప్' : 'WhatsApp Slip'}</span>
+                      </button>
+                    </div>
+
+                    {/* Leader Assignment & Log Visit Row */}
+                    <div className="flex items-center justify-between gap-1.5 flex-wrap pt-1 border-t border-slate-800/60 text-[11px]">
+                      {/* Leader Info */}
+                      <div className="flex items-center gap-1 text-slate-300">
+                        <UserCheck className="w-3.5 h-3.5 text-amber-400 shrink-0" />
+                        <span>నాయకుడు:</span>
+                        <strong className="text-white truncate max-w-[130px]">
+                          {currentProf.influencerName || 'ఎవరూ లేరు'}
+                        </strong>
+                        {onOpenInfluencerAssign && (
+                          <button
+                            type="button"
+                            onClick={() => onOpenInfluencerAssign(currentVoter.n, currentProf.influencerId, currentSno)}
+                            className="text-amber-400 hover:underline font-bold ml-1 cursor-pointer"
+                          >
+                            {currentProf.influencerName ? 'మార్చు' : '+ కేటాయించండి'}
+                          </button>
+                        )}
+                      </div>
+
+                      {/* Log Visit & Slip Action Buttons */}
+                      <div className="flex items-center gap-1.5 shrink-0">
+                        {onOpenLogVisit && (
+                          <button
+                            type="button"
+                            onClick={() => onOpenLogVisit(currentVoter)}
+                            className="px-2 py-0.5 rounded-lg bg-slate-950 hover:bg-slate-800 text-amber-300 border border-slate-700 text-[10.5px] font-bold flex items-center gap-1 cursor-pointer"
+                            title="విజిట్ నమోదు చేయండి"
+                          >
+                            <Clock className="w-3 h-3 text-amber-400" />
+                            <span>{currentProf.visits?.length ? `✓ ${currentProf.visits.length}` : '+ విజిట్'}</span>
+                          </button>
+                        )}
+
+                        {onOpenSlip && (
+                          <button
+                            type="button"
+                            onClick={() => onOpenSlip(currentVoter)}
+                            className="px-2 py-0.5 rounded-lg bg-gradient-to-r from-amber-500/20 to-amber-600/20 hover:from-amber-500/30 text-amber-300 border border-amber-500/40 text-[10.5px] font-bold flex items-center gap-1 cursor-pointer"
+                            title="పూర్తి అధికారిక కార్డు స్లిప్"
+                          >
+                            <FileText className="w-3 h-3" />
+                            <span>స్లిప్</span>
+                          </button>
+                        )}
+                      </div>
+                    </div>
+                  </div>
+                </div>
               </div>
             </div>
           </div>
@@ -605,28 +933,28 @@ export const ReOcrReviewModal: React.FC<ReOcrReviewModalProps> = ({
 
         {/* Process Status Notification */}
         {processStatus && (
-          <div className="mt-3 px-4 py-2 rounded-xl bg-amber-500/20 border border-amber-500/50 text-amber-200 text-xs font-bold animate-pulse">
+          <div className="mt-2.5 px-4 py-1.5 rounded-xl bg-amber-500/20 border border-amber-500/50 text-amber-200 text-xs font-bold animate-pulse">
             {processStatus}
           </div>
         )}
       </div>
 
       {/* 3. BOTTOM ACTION BAR & KEYBOARD SHORTCUTS BAR */}
-      <div className="bg-slate-900/95 border-t border-slate-800 px-4 py-2.5 flex items-center justify-between flex-wrap gap-2">
+      <div className="bg-slate-900/95 border-t border-slate-800 px-3.5 py-2 flex items-center justify-between flex-wrap gap-2">
         {/* Navigation Arrows & Counter */}
         <div className="flex items-center gap-2">
           <button
             type="button"
             onClick={handlePrev}
             disabled={activeList.length <= 1}
-            className="p-2 rounded-xl bg-slate-800 hover:bg-slate-700 text-white disabled:opacity-40 disabled:cursor-not-allowed border border-slate-700 flex items-center gap-1 font-bold text-xs cursor-pointer"
+            className="p-1.5 sm:px-2.5 sm:py-1 rounded-xl bg-slate-800 hover:bg-slate-700 text-white disabled:opacity-40 disabled:cursor-not-allowed border border-slate-700 flex items-center gap-1 font-bold text-xs cursor-pointer"
             title="Previous Card (Left Arrow)"
           >
             <ChevronLeft className="w-4 h-4" />
             <span className="hidden sm:inline">{language === 'te' ? 'మునుపటి' : 'Prev'}</span>
           </button>
 
-          <span className="text-xs font-mono font-bold text-slate-300 px-2">
+          <span className="text-xs font-mono font-bold text-slate-300 px-1">
             {safeIndex + 1} / {activeList.length}
           </span>
 
@@ -634,7 +962,7 @@ export const ReOcrReviewModal: React.FC<ReOcrReviewModalProps> = ({
             type="button"
             onClick={handleNext}
             disabled={activeList.length <= 1}
-            className="p-2 rounded-xl bg-slate-800 hover:bg-slate-700 text-white disabled:opacity-40 disabled:cursor-not-allowed border border-slate-700 flex items-center gap-1 font-bold text-xs cursor-pointer"
+            className="p-1.5 sm:px-2.5 sm:py-1 rounded-xl bg-slate-800 hover:bg-slate-700 text-white disabled:opacity-40 disabled:cursor-not-allowed border border-slate-700 flex items-center gap-1 font-bold text-xs cursor-pointer"
             title="Next Card (Enter / Right Arrow)"
           >
             <span className="hidden sm:inline">{language === 'te' ? 'తర్వాతి' : 'Next'}</span>
@@ -643,11 +971,11 @@ export const ReOcrReviewModal: React.FC<ReOcrReviewModalProps> = ({
         </div>
 
         {/* Keyboard Shortcuts Hint */}
-        <div className="hidden lg:flex items-center gap-3 text-[10.5px] text-slate-400 bg-slate-950 px-3 py-1.5 rounded-lg border border-slate-800">
-          <span><kbd className="px-1.5 py-0.5 bg-slate-800 rounded text-amber-300 font-mono font-bold">Space</kbd> ఎంపిక/రద్దు</span>
-          <span><kbd className="px-1.5 py-0.5 bg-slate-800 rounded text-amber-300 font-mono font-bold">Enter / ➔</kbd> తర్వాతి</span>
-          <span><kbd className="px-1.5 py-0.5 bg-slate-800 rounded text-amber-300 font-mono font-bold">⬅</kbd> మునుపటి</span>
-          <span><kbd className="px-1.5 py-0.5 bg-slate-800 rounded text-amber-300 font-mono font-bold">Esc</kbd> ముగింపు</span>
+        <div className="hidden lg:flex items-center gap-3 text-[10px] text-slate-400 bg-slate-950 px-3 py-1 rounded-lg border border-slate-800">
+          <span><kbd className="px-1 py-0.2 bg-slate-800 rounded text-amber-300 font-mono font-bold">Space</kbd> రీ-ఓసీఆర్ ఎంపిక</span>
+          <span><kbd className="px-1 py-0.2 bg-slate-800 rounded text-amber-300 font-mono font-bold">Enter / ➔</kbd> తర్వాతి</span>
+          <span><kbd className="px-1 py-0.2 bg-slate-800 rounded text-amber-300 font-mono font-bold">⬅</kbd> మునుపటి</span>
+          <span><kbd className="px-1 py-0.2 bg-slate-800 rounded text-amber-300 font-mono font-bold">Esc</kbd> ముగింపు</span>
         </div>
 
         {/* Batch Action Buttons */}
@@ -657,11 +985,11 @@ export const ReOcrReviewModal: React.FC<ReOcrReviewModalProps> = ({
             type="button"
             onClick={handleCopyMarkedSnos}
             disabled={markedSnos.size === 0}
-            className="px-2.5 py-1.5 rounded-xl bg-slate-800 hover:bg-slate-700 text-slate-300 border border-slate-700 disabled:opacity-40 text-xs font-bold flex items-center gap-1 cursor-pointer"
+            className="px-2 py-1 rounded-xl bg-slate-800 hover:bg-slate-700 text-slate-300 border border-slate-700 disabled:opacity-40 text-xs font-bold flex items-center gap-1 cursor-pointer"
             title="Copy S.Nos list"
           >
             {copiedSnos ? <Check className="w-3.5 h-3.5 text-emerald-400" /> : <Copy className="w-3.5 h-3.5" />}
-            <span>{copiedSnos ? 'కాపీ అయింది' : `S.No లు (${markedSnos.size})`}</span>
+            <span>{copiedSnos ? 'కాపీ' : `S.No లు (${markedSnos.size})`}</span>
           </button>
 
           {/* Batch Run Re-OCR on All Marked */}
@@ -669,9 +997,9 @@ export const ReOcrReviewModal: React.FC<ReOcrReviewModalProps> = ({
             type="button"
             onClick={() => handleRunReOcr(Array.from(markedSnos))}
             disabled={markedSnos.size === 0 || isProcessing}
-            className="px-4 py-2 rounded-xl bg-gradient-to-r from-red-600 via-amber-600 to-orange-600 hover:from-red-500 hover:to-orange-500 text-white font-black text-xs flex items-center gap-1.5 shadow-lg shadow-orange-600/30 disabled:opacity-40 disabled:cursor-not-allowed transition-all active:scale-95 cursor-pointer"
+            className="px-3.5 py-1.5 rounded-xl bg-gradient-to-r from-red-600 via-amber-600 to-orange-600 hover:from-red-500 hover:to-orange-500 text-white font-black text-xs flex items-center gap-1 shadow-lg shadow-orange-600/30 disabled:opacity-40 disabled:cursor-not-allowed transition-all active:scale-95 cursor-pointer"
           >
-            <Zap className="w-4 h-4 fill-white" />
+            <Zap className="w-3.5 h-3.5 fill-white" />
             <span>
               {language === 'te'
                 ? `ఎంపిక చేసిన ${markedSnos.size} కార్డులను Re-OCR చేయి`

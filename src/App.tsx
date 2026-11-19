@@ -2121,6 +2121,31 @@ export function App() {
           boothId={String(currentPartNo).includes('durgada') ? 'gp_durgada' : `booth_${currentPartNo}`}
           language={lang}
           onUpdateVoters={handleUpdateReOcrVoters}
+          profiles={profiles}
+          boothInfo={boothData.booth_info}
+          onOpenPhoneEditor={v => setSelectedVoterForPhone(v)}
+          onOpenSupportPicker={(title, currentPct, currentNotes, voterSno) => {
+            setSupportPickerState({
+              open: true,
+              title,
+              currentPct,
+              currentNotes,
+              voterSno
+            });
+          }}
+          onOpenLogVisit={v => setSelectedVoterForVisit(v)}
+          onOpenInfluencerAssign={(targetName, currentInfId, voterSno) => {
+            setInfluencerAssignState({
+              open: true,
+              targetName,
+              currentInfId,
+              voterSno
+            });
+          }}
+          onUpdateSurveyMark={handleUpdateSurveyMark}
+          onQuickToggleOurs={handleQuickToggleOurs}
+          onQuickToggleVoted={handleQuickToggleVoted}
+          onOpenSlip={v => setSelectedVoterForSlip(v)}
         />
       )}
     </div>
