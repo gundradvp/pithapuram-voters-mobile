@@ -38,6 +38,7 @@ interface VotersTabMobileProps {
   onOpenOutOfVillage?: () => void;
   onOpenFastPunch?: () => void;
   onOpenWardMargin?: () => void;
+  onOpenReOcrReview?: () => void;
 }
 
 const INITIAL_VISIBLE_COUNT = 50;
@@ -101,7 +102,8 @@ export const VotersTabMobile: React.FC<VotersTabMobileProps> = ({
   showVictoryPredictor,
   onOpenOutOfVillage,
   onOpenFastPunch,
-  onOpenWardMargin
+  onOpenWardMargin,
+  onOpenReOcrReview
 }) => {
   // Check layout: Strictly single card per row on mobile or any viewport under 1024px.
   // Multi-column is enabled ONLY on wide desktop screens (>= 1024px) when layoutMode is desktop.
@@ -2030,6 +2032,19 @@ _దయచేసి మీ ఓటు హక్కును వినియోగ
               >
                 <span>{showCards ? '📇 కార్డులు: ఆన్' : '📄 కార్డులు: ఆఫ్'}</span>
               </button>
+
+              {/* Re-OCR Single-Item Review Studio */}
+              {onOpenReOcrReview && (
+                <button
+                  type="button"
+                  onClick={onOpenReOcrReview}
+                  className="px-2 py-0.5 bg-gradient-to-r from-amber-600 via-orange-600 to-amber-700 hover:from-amber-500 hover:to-orange-500 text-white rounded-lg text-[10.5px] font-black flex items-center gap-1 shadow-sm active:scale-95 transition-all cursor-pointer ring-1 ring-amber-400/50"
+                  title={language === 'te' ? 'కార్డుల OCR సరిచూసే సింగిల్-కార్డ్ స్టూడియో (Re-OCR Studio)' : 'Re-OCR Single Card Review Studio'}
+                >
+                  <Sparkles className="w-3 h-3 text-amber-200" />
+                  <span>{language === 'te' ? '🔍 రీ-ఓసీఆర్ రివ్యూ' : '🔍 Re-OCR Studio'}</span>
+                </button>
+              )}
 
               
 

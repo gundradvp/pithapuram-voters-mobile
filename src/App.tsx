@@ -25,6 +25,7 @@ import { OutOfVillageLogisticsModal } from './components/OutOfVillageLogisticsMo
 import { PollingFastPunchModal } from './components/PollingFastPunchModal';
 import { WardMarginPredictorModal } from './components/WardMarginPredictorModal';
 import { FamilyWhatsAppCardModal, FamilyCardData } from './components/FamilyWhatsAppCardModal';
+import { ReOcrReviewModal } from './components/ReOcrReviewModal';
 import { DEMO_BOOTH_DATA, DEMO_PROFILES } from './utils/demoData';
 import {
   BoothData,
@@ -102,6 +103,7 @@ export function App() {
   const [isLogisticsModalOpen, setIsLogisticsModalOpen] = useState<boolean>(false);
   const [isFastPunchModalOpen, setIsFastPunchModalOpen] = useState<boolean>(false);
   const [isWardMarginModalOpen, setIsWardMarginModalOpen] = useState<boolean>(false);
+  const [isReOcrReviewOpen, setIsReOcrReviewOpen] = useState<boolean>(false);
   const [familySlipState, setFamilySlipState] = useState<{ open: boolean; family: FamilyCardData | null }>({
     open: false,
     family: null
@@ -1304,6 +1306,23 @@ export function App() {
     setProfiles(getVoterProfiles(currentPartNo));
   };
 
+  const handleUpdateReOcrVoters = useCallback((updatedList: MobileVoter[]) => {
+    if (!updatedList || updatedList.length === 0) return;
+    setBoothData(prev => {
+      if (!prev) return prev;
+      const updateMap = new Map<number, MobileVoter>();
+      updatedList.forEach(v => updateMap.set(Number(v.s || v.sno), v));
+      const nextVoters = prev.voters.map(v => {
+        const sno = Number(v.s || v.sno);
+        return updateMap.has(sno) ? { ...v, ...updateMap.get(sno) } : v;
+      });
+      return {
+        ...prev,
+        voters: nextVoters
+      };
+    });
+  }, []);
+
   // Handle Custom JSON file import
   const handleImportCustomJson = (customData: BoothData) => {
     setBoothData(customData);
@@ -1697,6 +1716,7 @@ export function App() {
                 onOpenOutOfVillage={() => setIsLogisticsModalOpen(true)}
                 onOpenFastPunch={() => setIsFastPunchModalOpen(true)}
                 onOpenWardMargin={() => setIsWardMarginModalOpen(true)}
+                onOpenReOcrReview={() => setIsReOcrReviewOpen(true)}
               />
             )}
 
@@ -2089,6 +2109,18 @@ export function App() {
           family={familySlipState.family}
           boothInfo={boothData.booth_info}
           profiles={profiles}
+        />
+      )}
+
+      {/* 🔍 Targeted Re-OCR Review Studio Modal */}
+      {isReOcrReviewOpen && boothData && (
+        <ReOcrReviewModal
+          isOpen={isReOcrReviewOpen}
+          onClose={() => setIsReOcrReviewOpen(false)}
+          voters={boothData.voters}
+          boothId={String(currentPartNo).includes('durgada') ? 'gp_durgada' : `booth_${currentPartNo}`}
+          language={lang}
+          onUpdateVoters={handleUpdateReOcrVoters}
         />
       )}
     </div>

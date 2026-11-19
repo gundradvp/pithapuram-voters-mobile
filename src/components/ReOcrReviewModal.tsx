@@ -1,0 +1,685 @@
+import React, { useState, useEffect, useMemo, useCallback } from 'react';
+import {
+  X,
+  ChevronLeft,
+  ChevronRight,
+  CheckCircle2,
+  AlertTriangle,
+  RotateCcw,
+  Zap,
+  Search,
+  Copy,
+  Check,
+  Download,
+  Filter,
+  Eye,
+  Sparkles,
+  Maximize2
+} from 'lucide-react';
+import { MobileVoter } from '../types';
+import { resolveCardUrl } from '../utils/photoResolver';
+
+interface ReOcrReviewModalProps {
+  isOpen: boolean;
+  onClose: () => void;
+  voters: MobileVoter[];
+  boothId?: string;
+  language?: 'te' | 'en';
+  onUpdateVoters?: (updatedVoters: MobileVoter[]) => void;
+}
+
+type FilterMode = 'all' | 'marked' | 'suspected';
+
+export const ReOcrReviewModal: React.FC<ReOcrReviewModalProps> = ({
+  isOpen,
+  onClose,
+  voters,
+  boothId = 'gp_durgada',
+  language = 'te',
+  onUpdateVoters,
+}) => {
+  // Marked S.Nos state (persisted in localStorage)
+  const storageKey = `reocr_marked_snos_${boothId}`;
+  const [markedSnos, setMarkedSnos] = useState<Set<number>>(() => {
+    try {
+      const saved = localStorage.getItem(storageKey);
+      if (saved) {
+        const arr = JSON.parse(saved);
+        if (Array.isArray(arr)) {
+          return new Set(arr.map(Number));
+        }
+      }
+    } catch (e) {
+      // fallback
+    }
+    return new Set<number>();
+  });
+
+  // Current view index in the filtered list
+  const [filterMode, setFilterMode] = useState<FilterMode>('all');
+  const [currentIndex, setCurrentIndex] = useState<number>(0);
+  const [jumpInput, setJumpInput] = useState<string>('');
+  const [isProcessing, setIsProcessing] = useState<boolean>(false);
+  const [processStatus, setProcessStatus] = useState<string | null>(null);
+  const [copiedSnos, setCopiedSnos] = useState<boolean>(false);
+  const [imageError, setImageError] = useState<boolean>(false);
+  const [imageFallbackIndex, setImageFallbackIndex] = useState<number>(0);
+  const [fullImagePreview, setFullImagePreview] = useState<boolean>(false);
+
+  // Sync marked S.Nos to localStorage
+  useEffect(() => {
+    try {
+      localStorage.setItem(storageKey, JSON.stringify(Array.from(markedSnos)));
+    } catch (e) {
+      // ignore
+    }
+  }, [markedSnos, storageKey]);
+
+  // Heuristic suspicion check: Does this card have potential OCR or transliteration mismatch?
+  const isSuspected = useCallback((v: MobileVoter): boolean => {
+    const nameTe = (v.name_te || '').trim();
+    const nameEn = (v.name_en || '').trim();
+    const epic = (v.epic || v.id || '').trim();
+
+    // 1. Noise characters in Telugu name (. : , ? / #)
+    if (/[.:;,?\/#!@$%^*_=+<>|~`0-9]/.test(nameTe)) return true;
+
+    // 2. Suspiciously short name
+    if (nameTe.length > 0 && nameTe.length < 3) return true;
+
+    // 3. No EPIC or invalid EPIC
+    if (!epic || epic.length < 5 || epic.includes('UNKNOWN')) return true;
+
+    // 4. Duplicate name and relative name across different house numbers
+    return false;
+  }, []);
+
+  // Filtered list based on active tab
+  const activeList = useMemo(() => {
+    if (filterMode === 'marked') {
+      return voters.filter(v => markedSnos.has(Number(v.s || v.sno)));
+    }
+    if (filterMode === 'suspected') {
+      return voters.filter(v => isSuspected(v));
+    }
+    return voters;
+  }, [voters, filterMode, markedSnos, isSuspected]);
+
+  // Total counts for badges
+  const suspectedCount = useMemo(() => {
+    return voters.filter(v => isSuspected(v)).length;
+  }, [voters, isSuspected]);
+
+  // Bound index safely
+  const safeIndex = Math.min(Math.max(0, currentIndex), Math.max(0, activeList.length - 1));
+  const currentVoter: MobileVoter | undefined = activeList[safeIndex];
+  const currentSno = currentVoter ? Number(currentVoter.s || currentVoter.sno) : 0;
+  const isCurrentMarked = currentSno > 0 && markedSnos.has(currentSno);
+
+  // Reset image error state whenever current voter changes
+  useEffect(() => {
+    setImageError(false);
+    setImageFallbackIndex(0);
+  }, [currentSno]);
+
+  // Navigation handlers
+  const handleNext = useCallback(() => {
+    if (activeList.length === 0) return;
+    setCurrentIndex(prev => (prev + 1 < activeList.length ? prev + 1 : 0));
+  }, [activeList.length]);
+
+  const handlePrev = useCallback(() => {
+    if (activeList.length === 0) return;
+    setCurrentIndex(prev => (prev - 1 >= 0 ? prev - 1 : activeList.length - 1));
+  }, [activeList.length]);
+
+  const handleToggleCurrentMark = useCallback(() => {
+    if (!currentSno) return;
+    setMarkedSnos(prev => {
+      const next = new Set(prev);
+      if (next.has(currentSno)) {
+        next.delete(currentSno);
+      } else {
+        next.add(currentSno);
+      }
+      return next;
+    });
+  }, [currentSno]);
+
+  // Jump to specific S.No
+  const handleJumpToSno = (e: React.FormEvent) => {
+    e.preventDefault();
+    const target = parseInt(jumpInput.trim(), 10);
+    if (isNaN(target)) return;
+
+    const idx = activeList.findIndex(v => Number(v.s || v.sno) === target);
+    if (idx !== -1) {
+      setCurrentIndex(idx);
+      setJumpInput('');
+    } else {
+      // If not in current filtered list, switch to 'all' and jump
+      const allIdx = voters.findIndex(v => Number(v.s || v.sno) === target);
+      if (allIdx !== -1) {
+        setFilterMode('all');
+        setCurrentIndex(allIdx);
+        setJumpInput('');
+      } else {
+        alert(language === 'te' ? `క్రమ సంఖ్య #${target} కనుగొనబడలేదు` : `S.No #${target} not found`);
+      }
+    }
+  };
+
+  // Keyboard navigation listener (Space = Toggle, ArrowRight/Enter = Next, ArrowLeft = Prev, Esc = Close)
+  useEffect(() => {
+    if (!isOpen) return;
+
+    const handleKeyDown = (e: KeyboardEvent) => {
+      // Don't intercept when user is typing in an input field
+      const targetTag = (e.target as HTMLElement)?.tagName?.toLowerCase();
+      if (targetTag === 'input' || targetTag === 'textarea') return;
+
+      if (e.code === 'Space') {
+        e.preventDefault();
+        handleToggleCurrentMark();
+      } else if (e.code === 'Enter' || e.code === 'ArrowRight') {
+        e.preventDefault();
+        handleNext();
+      } else if (e.code === 'ArrowLeft') {
+        e.preventDefault();
+        handlePrev();
+      } else if (e.code === 'Escape') {
+        e.preventDefault();
+        onClose();
+      }
+    };
+
+    window.addEventListener('keydown', handleKeyDown);
+    return () => window.removeEventListener('keydown', handleKeyDown);
+  }, [isOpen, handleToggleCurrentMark, handleNext, handlePrev, onClose]);
+
+  // Card image candidates with fallbacks
+  const cardImageUrls = useMemo(() => {
+    if (!currentVoter) return [];
+    const sno = Number(currentVoter.s || currentVoter.sno);
+    const epic = (currentVoter.epic || currentVoter.id || '').trim();
+    const padded = String(sno).padStart(4, '0');
+
+    const urls: string[] = [];
+    if (currentVoter.card) urls.push(currentVoter.card);
+    if (currentVoter.card_url && currentVoter.card_url !== currentVoter.card) urls.push(currentVoter.card_url);
+    urls.push(`/cards/durgada/card_${sno}.png`);
+    if (epic) {
+      urls.push(`/cards/durgada/card_sno_${padded}_${epic}.png`);
+    }
+    return Array.from(new Set(urls));
+  }, [currentVoter]);
+
+  const currentImageUrl = cardImageUrls[imageFallbackIndex] || cardImageUrls[0];
+  const resolvedImageUrl = resolveCardUrl(currentImageUrl);
+
+  const handleImageError = () => {
+    if (imageFallbackIndex + 1 < cardImageUrls.length) {
+      setImageFallbackIndex(prev => prev + 1);
+    } else {
+      setImageError(true);
+    }
+  };
+
+  // Copy marked S.Nos
+  const handleCopyMarkedSnos = () => {
+    const list = Array.from(markedSnos).sort((a, b) => a - b);
+    if (list.length === 0) return;
+    navigator.clipboard.writeText(list.join(', '));
+    setCopiedSnos(true);
+    setTimeout(() => setCopiedSnos(false), 2000);
+  };
+
+  // Run Re-OCR API (single or batch)
+  const handleRunReOcr = async (targetSnos: number[]) => {
+    if (targetSnos.length === 0) return;
+    setIsProcessing(true);
+    setProcessStatus(
+      language === 'te'
+        ? `${targetSnos.length} కార్డులకు Re-OCR జరుగుతోంది...`
+        : `Running Re-OCR on ${targetSnos.length} cards...`
+    );
+
+    try {
+      const res = await fetch('/api/run-reocr', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ snos: targetSnos, booth: boothId })
+      });
+
+      const data = await res.json();
+      if (data.success && data.updatedVoters && onUpdateVoters) {
+        onUpdateVoters(data.updatedVoters);
+        // Remove completed S.Nos from marked queue
+        setMarkedSnos(prev => {
+          const next = new Set(prev);
+          targetSnos.forEach(s => next.delete(s));
+          return next;
+        });
+        setProcessStatus(
+          language === 'te'
+            ? `✓ ${data.count} కార్డుల రీ-ఓసీఆర్ విజయవంతంగా పూర్తయింది!`
+            : `✓ Re-OCR completed successfully for ${data.count} cards!`
+        );
+      } else {
+        setProcessStatus(`Error: ${data.error || 'Re-OCR failed'}`);
+      }
+    } catch (e: any) {
+      setProcessStatus(`Network/API error: ${e?.message}`);
+    } finally {
+      setIsProcessing(false);
+      setTimeout(() => setProcessStatus(null), 4000);
+    }
+  };
+
+  if (!isOpen) return null;
+
+  return (
+    <div className="fixed inset-0 z-[120] bg-black/85 backdrop-blur-md flex flex-col justify-between text-slate-100 select-none">
+      {/* 1. TOP HEADER BAR */}
+      <div className="bg-slate-900/95 border-b border-slate-800 px-4 py-2.5 flex items-center justify-between flex-wrap gap-2">
+        <div className="flex items-center gap-2.5">
+          <div className="w-8 h-8 rounded-lg bg-gradient-to-tr from-amber-500 to-orange-600 flex items-center justify-center text-white shadow-md shadow-amber-500/20">
+            <Sparkles className="w-4 h-4" />
+          </div>
+          <div>
+            <div className="flex items-center gap-2">
+              <h2 className="text-sm font-black tracking-wide text-white">
+                {language === 'te' ? 'రీ-ఓసీఆర్ సింగిల్-కార్డ్ రివ్యూ స్టూడియో' : 'Re-OCR Single-Card Review Studio'}
+              </h2>
+              <span className="text-[10px] bg-amber-500/20 border border-amber-500/40 text-amber-300 px-1.5 py-0.5 rounded font-mono font-bold">
+                1 ITEM / SCREEN
+              </span>
+            </div>
+            <p className="text-[10.5px] text-slate-400">
+              {language === 'te'
+                ? 'స్పేస్ బార్ నొక్కి ఎంపిక/రద్దు చేయండి • ఎంటర్ లేదా కుడి బాణం నొక్కి తర్వాతి కార్డుకు వెళ్ళండి'
+                : 'Space to toggle mark • Enter / Arrow to go Next • Esc to close'}
+            </p>
+          </div>
+        </div>
+
+        {/* Filter Pills */}
+        <div className="flex items-center gap-1.5 bg-slate-950/80 p-1 rounded-xl border border-slate-800">
+          <button
+            type="button"
+            onClick={() => { setFilterMode('all'); setCurrentIndex(0); }}
+            className={`px-2.5 py-1 rounded-lg text-xs font-bold transition-all ${
+              filterMode === 'all'
+                ? 'bg-amber-500 text-slate-950 shadow-sm'
+                : 'text-slate-400 hover:text-slate-200'
+            }`}
+          >
+            {language === 'te' ? `అన్నీ (${voters.length})` : `All (${voters.length})`}
+          </button>
+
+          <button
+            type="button"
+            onClick={() => { setFilterMode('marked'); setCurrentIndex(0); }}
+            className={`px-2.5 py-1 rounded-lg text-xs font-bold transition-all flex items-center gap-1 ${
+              filterMode === 'marked'
+                ? 'bg-amber-500 text-slate-950 shadow-sm'
+                : markedSnos.size > 0
+                  ? 'text-amber-400 hover:text-amber-300'
+                  : 'text-slate-500 hover:text-slate-300'
+            }`}
+          >
+            <span>{language === 'te' ? 'మార్క్ చేసినవి' : 'Marked'}</span>
+            <span className={`text-[10px] px-1.5 py-0.2 rounded-full font-black ${
+              filterMode === 'marked' ? 'bg-slate-950 text-amber-300' : 'bg-amber-500/20 text-amber-300'
+            }`}>
+              {markedSnos.size}
+            </span>
+          </button>
+
+          <button
+            type="button"
+            onClick={() => { setFilterMode('suspected'); setCurrentIndex(0); }}
+            className={`px-2.5 py-1 rounded-lg text-xs font-bold transition-all flex items-center gap-1 ${
+              filterMode === 'suspected'
+                ? 'bg-red-500 text-white shadow-sm'
+                : 'text-red-400 hover:text-red-300'
+            }`}
+          >
+            <AlertTriangle className="w-3 h-3" />
+            <span>{language === 'te' ? 'అనుమానాస్పద' : 'Suspected'}</span>
+            <span className={`text-[10px] px-1.5 py-0.2 rounded-full font-black ${
+              filterMode === 'suspected' ? 'bg-white text-red-600' : 'bg-red-500/20 text-red-300'
+            }`}>
+              {suspectedCount}
+            </span>
+          </button>
+        </div>
+
+        {/* Jump Box & Close */}
+        <div className="flex items-center gap-2">
+          <form onSubmit={handleJumpToSno} className="flex items-center gap-1">
+            <div className="relative">
+              <input
+                type="number"
+                placeholder="S.No..."
+                value={jumpInput}
+                onChange={e => setJumpInput(e.target.value)}
+                className="w-20 px-2 py-1 bg-slate-950 border border-slate-700 rounded-lg text-xs text-white placeholder-slate-500 focus:outline-none focus:border-amber-400 text-center font-bold"
+              />
+            </div>
+            <button
+              type="submit"
+              className="px-2 py-1 bg-slate-800 hover:bg-slate-700 text-slate-200 border border-slate-700 rounded-lg text-xs font-bold"
+            >
+              Go
+            </button>
+          </form>
+
+          <button
+            type="button"
+            onClick={onClose}
+            className="p-1.5 rounded-lg bg-slate-800 hover:bg-slate-700 text-slate-400 hover:text-white transition-colors"
+            title="Close (Esc)"
+          >
+            <X className="w-5 h-5" />
+          </button>
+        </div>
+      </div>
+
+      {/* 2. MAIN CENTER: SINGLE CARD FOCUS VIEW (SPLIT SCREEN) */}
+      <div className="flex-1 overflow-y-auto p-4 md:p-6 flex flex-col items-center justify-center">
+        {activeList.length === 0 ? (
+          <div className="text-center py-12 px-6 max-w-md bg-slate-900/60 rounded-2xl border border-slate-800">
+            <CheckCircle2 className="w-12 h-12 text-emerald-400 mx-auto mb-3" />
+            <h3 className="text-base font-bold text-white mb-1">
+              {filterMode === 'marked'
+                ? (language === 'te' ? 'రీ-ఓసీఆర్ కోసం ఏ కార్డులూ ఎంపిక చేయలేదు' : 'No cards marked for Re-OCR yet')
+                : (language === 'te' ? 'కార్డులు లేవు' : 'No cards match this filter')}
+            </h3>
+            <p className="text-xs text-slate-400 mb-4">
+              {language === 'te'
+                ? 'అన్ని కార్డుల జాబితాకు వెళ్లి స్పేస్ బార్ (Space) నొక్కి రీ-ఓసీఆర్ చేయాల్సిన కార్డులను ఎంపిక చేయండి.'
+                : 'Switch to All Cards and press Space to mark cards that require Re-OCR.'}
+            </p>
+            <button
+              type="button"
+              onClick={() => setFilterMode('all')}
+              className="px-4 py-2 bg-amber-500 hover:bg-amber-400 text-slate-950 font-black text-xs rounded-xl shadow-lg"
+            >
+              {language === 'te' ? 'అన్ని కార్డులు చూపించు' : 'Show All Cards'}
+            </button>
+          </div>
+        ) : currentVoter ? (
+          <div className="w-full max-w-5xl bg-slate-900/90 rounded-2xl border-2 transition-all duration-200 shadow-2xl overflow-hidden flex flex-col md:flex-row min-h-[460px] max-h-[82vh]"
+            style={{
+              borderColor: isCurrentMarked ? '#f59e0b' : '#334155',
+              boxShadow: isCurrentMarked ? '0 0 35px rgba(245, 158, 11, 0.25)' : undefined
+            }}
+          >
+            {/* LEFT SIDE: CROPPED OFFICIAL CARD IMAGE */}
+            <div className="md:w-1/2 bg-slate-950/90 p-4 flex flex-col items-center justify-center border-b md:border-b-0 md:border-r border-slate-800 relative group">
+              <div className="absolute top-3 left-3 z-10 flex items-center gap-1.5">
+                <span className="px-2 py-0.5 rounded-md bg-amber-500/20 text-amber-300 border border-amber-500/40 font-mono font-black text-xs">
+                  #{currentSno}
+                </span>
+                <span className="px-2 py-0.5 rounded-md bg-slate-800/80 text-slate-300 border border-slate-700 font-mono text-xs">
+                  {currentVoter.epic || 'NO EPIC'}
+                </span>
+              </div>
+
+              <div className="absolute top-3 right-3 z-10">
+                <button
+                  type="button"
+                  onClick={() => setFullImagePreview(prev => !prev)}
+                  className="p-1.5 rounded-lg bg-slate-800/80 hover:bg-slate-700 text-slate-300 hover:text-white border border-slate-700 shadow"
+                  title="Toggle Full Preview"
+                >
+                  <Maximize2 className="w-4 h-4" />
+                </button>
+              </div>
+
+              {/* CARD IMAGE CONTAINER */}
+              <div className="w-full flex-1 flex items-center justify-center min-h-[220px] p-2">
+                {!imageError ? (
+                  <img
+                    src={resolvedImageUrl}
+                    alt={`Voter Card #${currentSno}`}
+                    onError={handleImageError}
+                    className={`max-h-[380px] w-auto max-w-full object-contain rounded-lg border border-slate-800 shadow-lg transition-transform ${
+                      fullImagePreview ? 'scale-110' : ''
+                    }`}
+                  />
+                ) : (
+                  <div className="text-center p-6 bg-slate-900/50 rounded-xl border border-slate-800">
+                    <AlertTriangle className="w-8 h-8 text-amber-400 mx-auto mb-2" />
+                    <p className="text-xs text-slate-400 font-medium">
+                      {language === 'te' ? 'కార్డు చిత్రం లోడ్ కాలేదు' : 'Card image not found'}
+                    </p>
+                    <p className="text-[10px] text-slate-500 mt-1 font-mono">
+                      /cards/durgada/card_{currentSno}.png
+                    </p>
+                  </div>
+                )}
+              </div>
+
+              {/* IMAGE PATH BADGE */}
+              <div className="w-full pt-2 flex items-center justify-between text-[10px] text-slate-500 border-t border-slate-800/60 px-1">
+                <span className="truncate max-w-[240px]">
+                  {currentImageUrl}
+                </span>
+                <span>{safeIndex + 1} of {activeList.length}</span>
+              </div>
+            </div>
+
+            {/* RIGHT SIDE: EXTRACTED OCR TEXT & CONTROLS */}
+            <div className="md:w-1/2 p-5 flex flex-col justify-between bg-slate-900/60 overflow-y-auto">
+              <div>
+                {/* Status Bar & Warning */}
+                <div className="flex items-center justify-between mb-3">
+                  <div className="flex items-center gap-2">
+                    <span className="text-xs text-slate-400 font-bold">
+                      {language === 'te' ? 'క్రమ సంఖ్య:' : 'Serial No:'}
+                    </span>
+                    <span className="text-base font-black text-amber-400 font-mono">
+                      #{currentSno}
+                    </span>
+                  </div>
+
+                  {isSuspected(currentVoter) && (
+                    <span className="px-2 py-0.5 rounded-full bg-red-500/20 text-red-400 border border-red-500/40 text-[10.5px] font-bold flex items-center gap-1">
+                      <AlertTriangle className="w-3 h-3" />
+                      {language === 'te' ? 'సందేహాస్పద OCR డేటా' : 'Suspected OCR Mismatch'}
+                    </span>
+                  )}
+                </div>
+
+                {/* EXTRACTED FIELDS LIST */}
+                <div className="space-y-3 bg-slate-950/60 p-3.5 rounded-xl border border-slate-800">
+                  {/* Voter Name */}
+                  <div>
+                    <span className="text-[10px] font-bold text-slate-400 uppercase tracking-wider block">
+                      {language === 'te' ? 'ఓటరు పేరు (తెలుగు / ఇంగ్లీష్):' : 'Voter Name:'}
+                    </span>
+                    <div className="text-base font-black text-white mt-0.5 leading-snug">
+                      {currentVoter.name_te || '—'}
+                    </div>
+                    <div className="text-xs font-semibold text-amber-300 font-mono">
+                      {currentVoter.name_en || '—'}
+                    </div>
+                  </div>
+
+                  {/* Relative Name */}
+                  <div className="pt-2 border-t border-slate-800/80">
+                    <span className="text-[10px] font-bold text-slate-400 uppercase tracking-wider block">
+                      {language === 'te' ? 'సంబంధీకుని పేరు & రకం:' : 'Relative Name & Relation:'}
+                    </span>
+                    <div className="text-sm font-bold text-slate-200 mt-0.5">
+                      {currentVoter.rel_name_te || '—'}
+                      <span className="text-xs text-slate-400 ml-1.5">
+                        ({currentVoter.rel_type_te || currentVoter.rel_type_en || 'సంబంధం'})
+                      </span>
+                    </div>
+                    <div className="text-xs text-slate-400 font-mono">
+                      {currentVoter.rel_name_en || '—'} ({currentVoter.rel_type_en || 'Relative'})
+                    </div>
+                  </div>
+
+                  {/* House No, Age, Gender Grid */}
+                  <div className="pt-2 border-t border-slate-800/80 grid grid-cols-3 gap-2">
+                    <div>
+                      <span className="text-[9.5px] font-bold text-slate-500 uppercase tracking-wider block">
+                        {language === 'te' ? 'ఇంటి నెం' : 'Door No'}
+                      </span>
+                      <span className="text-xs font-bold text-amber-200 font-mono">
+                        {currentVoter.house_no || currentVoter.door_no || currentVoter.hn || '—'}
+                      </span>
+                    </div>
+                    <div>
+                      <span className="text-[9.5px] font-bold text-slate-500 uppercase tracking-wider block">
+                        {language === 'te' ? 'వయస్సు' : 'Age'}
+                      </span>
+                      <span className="text-xs font-bold text-slate-200">
+                        {currentVoter.age || currentVoter.a || '—'} Y
+                      </span>
+                    </div>
+                    <div>
+                      <span className="text-[9.5px] font-bold text-slate-500 uppercase tracking-wider block">
+                        {language === 'te' ? 'లింగం' : 'Gender'}
+                      </span>
+                      <span className="text-xs font-bold text-slate-200">
+                        {currentVoter.gender_te || currentVoter.gender_en || currentVoter.g || '—'}
+                      </span>
+                    </div>
+                  </div>
+
+                  {/* Polling Section */}
+                  <div className="pt-2 border-t border-slate-800/80">
+                    <span className="text-[9.5px] font-bold text-slate-500 uppercase tracking-wider block">
+                      {language === 'te' ? 'పోలింగ్ కేంద్రం / వార్డు' : 'Polling Station / Ward'}
+                    </span>
+                    <p className="text-[11px] text-slate-300 line-clamp-2">
+                      {currentVoter.sec || currentVoter.polling_station_name || '—'}
+                    </p>
+                  </div>
+                </div>
+              </div>
+
+              {/* TOGGLE SELECT / UNSELECT BIG PROMINENT BUTTON */}
+              <div className="pt-4 space-y-2">
+                <button
+                  type="button"
+                  onClick={handleToggleCurrentMark}
+                  className={`w-full py-3 px-4 rounded-xl font-black text-sm flex items-center justify-center gap-2.5 transition-all shadow-lg active:scale-98 cursor-pointer ${
+                    isCurrentMarked
+                      ? 'bg-gradient-to-r from-amber-500 to-orange-500 text-slate-950 ring-2 ring-amber-300/50 shadow-amber-500/30'
+                      : 'bg-slate-800 hover:bg-slate-700 text-slate-200 border border-slate-700 hover:border-amber-500/50'
+                  }`}
+                >
+                  {isCurrentMarked ? (
+                    <>
+                      <CheckCircle2 className="w-5 h-5 fill-slate-950 text-amber-400" />
+                      <span>{language === 'te' ? '✓ రీ-ఓసీఆర్ కోసం ఎంపిక చేశారు [స్పేస్]' : '✓ MARKED FOR RE-OCR [Space]'}</span>
+                    </>
+                  ) : (
+                    <>
+                      <RotateCcw className="w-5 h-5 text-amber-400" />
+                      <span>{language === 'te' ? 'రీ-ఓసీఆర్ కోసం మార్క్ చేయండి [స్పేస్]' : 'Mark for Re-OCR [Space]'}</span>
+                    </>
+                  )}
+                </button>
+
+                {/* Instant Single Re-OCR Button */}
+                <button
+                  type="button"
+                  onClick={() => handleRunReOcr([currentSno])}
+                  disabled={isProcessing}
+                  className="w-full py-2 px-3 rounded-lg bg-slate-950 hover:bg-slate-800 border border-amber-500/30 text-amber-300 font-bold text-xs flex items-center justify-center gap-1.5 transition-all disabled:opacity-50 cursor-pointer"
+                >
+                  <Zap className="w-3.5 h-3.5 text-amber-400" />
+                  <span>{language === 'te' ? 'ఈ ఒక్క కార్డును ఇప్పుడే Re-OCR చేయి' : 'Instant Re-OCR This Single Card'}</span>
+                </button>
+              </div>
+            </div>
+          </div>
+        ) : null}
+
+        {/* Process Status Notification */}
+        {processStatus && (
+          <div className="mt-3 px-4 py-2 rounded-xl bg-amber-500/20 border border-amber-500/50 text-amber-200 text-xs font-bold animate-pulse">
+            {processStatus}
+          </div>
+        )}
+      </div>
+
+      {/* 3. BOTTOM ACTION BAR & KEYBOARD SHORTCUTS BAR */}
+      <div className="bg-slate-900/95 border-t border-slate-800 px-4 py-2.5 flex items-center justify-between flex-wrap gap-2">
+        {/* Navigation Arrows & Counter */}
+        <div className="flex items-center gap-2">
+          <button
+            type="button"
+            onClick={handlePrev}
+            disabled={activeList.length <= 1}
+            className="p-2 rounded-xl bg-slate-800 hover:bg-slate-700 text-white disabled:opacity-40 disabled:cursor-not-allowed border border-slate-700 flex items-center gap-1 font-bold text-xs cursor-pointer"
+            title="Previous Card (Left Arrow)"
+          >
+            <ChevronLeft className="w-4 h-4" />
+            <span className="hidden sm:inline">{language === 'te' ? 'మునుపటి' : 'Prev'}</span>
+          </button>
+
+          <span className="text-xs font-mono font-bold text-slate-300 px-2">
+            {safeIndex + 1} / {activeList.length}
+          </span>
+
+          <button
+            type="button"
+            onClick={handleNext}
+            disabled={activeList.length <= 1}
+            className="p-2 rounded-xl bg-slate-800 hover:bg-slate-700 text-white disabled:opacity-40 disabled:cursor-not-allowed border border-slate-700 flex items-center gap-1 font-bold text-xs cursor-pointer"
+            title="Next Card (Enter / Right Arrow)"
+          >
+            <span className="hidden sm:inline">{language === 'te' ? 'తర్వాతి' : 'Next'}</span>
+            <ChevronRight className="w-4 h-4" />
+          </button>
+        </div>
+
+        {/* Keyboard Shortcuts Hint */}
+        <div className="hidden lg:flex items-center gap-3 text-[10.5px] text-slate-400 bg-slate-950 px-3 py-1.5 rounded-lg border border-slate-800">
+          <span><kbd className="px-1.5 py-0.5 bg-slate-800 rounded text-amber-300 font-mono font-bold">Space</kbd> ఎంపిక/రద్దు</span>
+          <span><kbd className="px-1.5 py-0.5 bg-slate-800 rounded text-amber-300 font-mono font-bold">Enter / ➔</kbd> తర్వాతి</span>
+          <span><kbd className="px-1.5 py-0.5 bg-slate-800 rounded text-amber-300 font-mono font-bold">⬅</kbd> మునుపటి</span>
+          <span><kbd className="px-1.5 py-0.5 bg-slate-800 rounded text-amber-300 font-mono font-bold">Esc</kbd> ముగింపు</span>
+        </div>
+
+        {/* Batch Action Buttons */}
+        <div className="flex items-center gap-2">
+          {/* Copy S.Nos */}
+          <button
+            type="button"
+            onClick={handleCopyMarkedSnos}
+            disabled={markedSnos.size === 0}
+            className="px-2.5 py-1.5 rounded-xl bg-slate-800 hover:bg-slate-700 text-slate-300 border border-slate-700 disabled:opacity-40 text-xs font-bold flex items-center gap-1 cursor-pointer"
+            title="Copy S.Nos list"
+          >
+            {copiedSnos ? <Check className="w-3.5 h-3.5 text-emerald-400" /> : <Copy className="w-3.5 h-3.5" />}
+            <span>{copiedSnos ? 'కాపీ అయింది' : `S.No లు (${markedSnos.size})`}</span>
+          </button>
+
+          {/* Batch Run Re-OCR on All Marked */}
+          <button
+            type="button"
+            onClick={() => handleRunReOcr(Array.from(markedSnos))}
+            disabled={markedSnos.size === 0 || isProcessing}
+            className="px-4 py-2 rounded-xl bg-gradient-to-r from-red-600 via-amber-600 to-orange-600 hover:from-red-500 hover:to-orange-500 text-white font-black text-xs flex items-center gap-1.5 shadow-lg shadow-orange-600/30 disabled:opacity-40 disabled:cursor-not-allowed transition-all active:scale-95 cursor-pointer"
+          >
+            <Zap className="w-4 h-4 fill-white" />
+            <span>
+              {language === 'te'
+                ? `ఎంపిక చేసిన ${markedSnos.size} కార్డులను Re-OCR చేయి`
+                : `Run Re-OCR on Selected (${markedSnos.size})`}
+            </span>
+          </button>
+        </div>
+      </div>
+    </div>
+  );
+};

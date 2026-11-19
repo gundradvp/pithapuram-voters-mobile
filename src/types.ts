@@ -171,6 +171,19 @@ export interface MobileVoter {
   ps_no?: number;
   polling_station_name?: string;
   polling_station_en?: string;
+  sno?: number;
+  epic?: string;
+  name_en?: string;
+  name_te?: string;
+  rel_name_en?: string;
+  rel_name_te?: string;
+  rel_type_en?: string;
+  rel_type_te?: string;
+  house_no?: string;
+  door_no?: string;
+  age?: number | string;
+  gender_en?: string;
+  gender_te?: string;
 }
 
 export interface BoothData {
