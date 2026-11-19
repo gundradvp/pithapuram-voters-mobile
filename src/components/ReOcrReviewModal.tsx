@@ -563,7 +563,7 @@ export const ReOcrReviewModal: React.FC<ReOcrReviewModalProps> = ({
                   <button
                     type="button"
                     onClick={() => setZoomLevel(prev => Math.max(75, prev - 25))}
-                    className="p-1 hover:bg-slate-800 rounded-lg text-slate-300 hover:text-white transition-colors"
+                    className="p-1 hover:bg-slate-800 rounded-lg text-slate-300 hover:text-white transition-colors cursor-pointer"
                     title="Zoom Out"
                   >
                     <ZoomOut className="w-4 h-4" />
@@ -576,7 +576,7 @@ export const ReOcrReviewModal: React.FC<ReOcrReviewModalProps> = ({
                   <button
                     type="button"
                     onClick={() => setZoomLevel(prev => Math.min(250, prev + 25))}
-                    className="p-1 hover:bg-slate-800 rounded-lg text-slate-300 hover:text-white transition-colors"
+                    className="p-1 hover:bg-slate-800 rounded-lg text-slate-300 hover:text-white transition-colors cursor-pointer"
                     title="Zoom In"
                   >
                     <ZoomIn className="w-4 h-4" />
@@ -585,36 +585,54 @@ export const ReOcrReviewModal: React.FC<ReOcrReviewModalProps> = ({
                   <button
                     type="button"
                     onClick={() => setZoomLevel(100)}
-                    className="text-[10px] font-bold text-slate-400 hover:text-amber-300 px-2 py-0.5 hover:bg-slate-800 rounded-md transition-colors"
-                    title="Reset to 100%"
+                    className={`text-[10.5px] font-bold px-2 py-0.5 rounded-md transition-colors cursor-pointer ${
+                      zoomLevel === 100 ? 'bg-amber-500 text-slate-950 font-black' : 'text-slate-400 hover:text-white hover:bg-slate-800'
+                    }`}
+                    title="Standard View (100%)"
                   >
                     100%
                   </button>
                   <button
                     type="button"
-                    onClick={() => setZoomLevel(140)}
-                    className="text-[10px] font-bold text-slate-400 hover:text-amber-300 px-2 py-0.5 hover:bg-slate-800 rounded-md transition-colors"
-                    title="Max View 140%"
+                    onClick={() => setZoomLevel(130)}
+                    className={`text-[10.5px] font-bold px-2 py-0.5 rounded-md transition-colors cursor-pointer ${
+                      zoomLevel === 130 ? 'bg-amber-500 text-slate-950 font-black' : 'text-slate-400 hover:text-white hover:bg-slate-800'
+                    }`}
+                    title="Large View (130%)"
                   >
-                    140%
+                    130%
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => setZoomLevel(160)}
+                    className={`text-[10.5px] font-bold px-2 py-0.5 rounded-md transition-colors cursor-pointer ${
+                      zoomLevel === 160 ? 'bg-amber-500 text-slate-950 font-black' : 'text-slate-400 hover:text-white hover:bg-slate-800'
+                    }`}
+                    title="Extra Large (160%)"
+                  >
+                    160%
                   </button>
                 </div>
               </div>
 
               {/* EXPANDED HIGH-RES CARD IMAGE CONTAINER */}
-              <div className="w-full flex-1 flex items-center justify-center p-2 overflow-auto min-h-[300px] max-h-[60vh] bg-black/40 rounded-xl border border-slate-800/60 shadow-inner">
+              <div className="w-full flex-1 flex items-center justify-center p-3 sm:p-5 overflow-auto min-h-[340px] max-h-[62vh] bg-black/50 rounded-2xl border border-slate-800/80 shadow-inner">
                 {!imageError ? (
-                  <img
-                    src={resolvedImageUrl}
-                    alt={`Voter Card #${currentSno}`}
-                    onError={handleImageError}
+                  <div
                     style={{
                       transform: `scale(${zoomLevel / 100})`,
                       transformOrigin: 'center center',
                       transition: 'transform 0.15s ease-out'
                     }}
-                    className="max-h-[54vh] w-auto max-w-full object-contain rounded-xl border border-slate-700/80 shadow-2xl select-none"
-                  />
+                    className="flex items-center justify-center w-full max-w-[960px] p-2"
+                  >
+                    <img
+                      src={resolvedImageUrl}
+                      alt={`Voter Card #${currentSno}`}
+                      onError={handleImageError}
+                      className="w-full h-auto max-h-[58vh] object-contain rounded-xl border-2 border-slate-700 shadow-2xl select-none"
+                    />
+                  </div>
                 ) : (
                   <div className="text-center p-6 bg-slate-900/50 rounded-2xl border border-slate-800">
                     <AlertTriangle className="w-8 h-8 text-amber-400 mx-auto mb-2" />
