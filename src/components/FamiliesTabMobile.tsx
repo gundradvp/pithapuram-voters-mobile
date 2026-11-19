@@ -42,6 +42,7 @@ interface FamiliesTabMobileProps {
   onOpenInfluencerAssign: (targetName: string, currentInfId?: string, familyId?: string) => void;
   onOpenSlip: (voter: MobileVoter) => void;
   onOpenGroupPrint?: (title: string, subtitle: string, voters: MobileVoter[]) => void;
+  onOpenFamilySlip?: (familyData: { name: string; doorNo?: string; houseNumbers?: string[]; members: MobileVoter[] }) => void;
 }
 
 type TabMode = 'surnames' | 'houses';
@@ -60,7 +61,8 @@ export const FamiliesTabMobile: React.FC<FamiliesTabMobileProps> = ({
   onOpenSupportPicker,
   onOpenInfluencerAssign,
   onOpenSlip,
-  onOpenGroupPrint
+  onOpenGroupPrint,
+  onOpenFamilySlip
 }) => {
   const [tabMode, setTabMode] = useState<TabMode>('surnames');
   const [searchQuery, setSearchQuery] = useState('');
@@ -1057,6 +1059,21 @@ export const FamiliesTabMobile: React.FC<FamiliesTabMobileProps> = ({
                       </div>
 
                       <div className="flex items-center gap-1">
+                        {onOpenFamilySlip && memberVoters.length > 0 && (
+                          <button
+                            type="button"
+                            onClick={() => onOpenFamilySlip({
+                              name: fam.name,
+                              doorNo: fam.houseNumbers.join(', '),
+                              houseNumbers: fam.houseNumbers,
+                              members: memberVoters
+                            })}
+                            className="p-1.5 bg-emerald-950/50 hover:bg-emerald-900/70 text-emerald-300 rounded-lg text-xs border border-emerald-500/30 flex items-center gap-1 shadow-sm transition-all"
+                            title="కుటుంబ వాట్సాప్ చీటీ (Family WhatsApp Slip)"
+                          >
+                            <MessageSquare className="w-3.5 h-3.5 text-emerald-400" />
+                          </button>
+                        )}
                         {onOpenGroupPrint && memberVoters.length > 0 && (
                           <button
                             onClick={() => onOpenGroupPrint(

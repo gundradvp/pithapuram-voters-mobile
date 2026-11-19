@@ -116,6 +116,9 @@ export type MoneyInfluenceStatus =
   | 'at_risk_cash'          // ⚠️ డబ్బు ప్రభావం పడే ప్రమాదం ఉంది (Vulnerable to Cash)
   | 'counter_secured';      // 🛡️ మన బృందం కౌంటర్ చేసి భరోసా ఇచ్చింది (Countered & Secured)
 
+export type TravelStatus = 'needs_bus' | 'self_travel' | 'cannot_come' | 'pending';
+export type TravelCity = 'hyderabad' | 'bangalore' | 'vizag' | 'vijayawada' | 'gulf' | 'chennai' | 'other';
+
 export interface VoterCampaignProfile {
   customPhone?: string;
   altPhone?: string;
@@ -128,6 +131,11 @@ export interface VoterCampaignProfile {
   notes?: string;
   survey_status?: VoterSurveyStatus | null;
   outOfCityLocation?: string;
+  travelStatus?: TravelStatus;
+  travelCity?: string;
+  arrivalDate?: string;
+  travelNotes?: string;
+  markedVotedAt?: string;
   visits?: VoterVisit[];
   moneyStatus?: MoneyInfluenceStatus;
   moneyNotes?: string;

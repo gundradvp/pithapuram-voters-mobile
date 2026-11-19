@@ -2,7 +2,8 @@ import React, { useState, useEffect } from 'react';
 import { 
   X, UserPlus, Phone, Trash2, Edit3, Check, Copy, 
   CheckCircle2, RefreshCw, Clock, AlertTriangle, ChevronDown, ChevronUp, 
-  Trees, Search, ShieldCheck, Send, User, Home, Building
+  Trees, Search, ShieldCheck, Send, User, Home, Building,
+  Trophy, Award, TrendingUp, Sparkles, MessageCircle
 } from 'lucide-react';
 import { 
   VolunteerAssignment, 
@@ -46,6 +47,7 @@ export const AdminAssignmentModal: React.FC<AdminAssignmentModalProps> = ({
   language = 'te'
 }) => {
   const [assignments, setAssignments] = useState<VolunteerAssignment[]>(() => getAssignments());
+  const [adminTab, setAdminTab] = useState<'assignments' | 'leaderboard'>('assignments');
   const [isAddingNew, setIsAddingNew] = useState(false);
   const [editingId, setEditingId] = useState<string | null>(null);
   const [isSyncing, setIsSyncing] = useState(false);
@@ -366,8 +368,143 @@ export const AdminAssignmentModal: React.FC<AdminAssignmentModalProps> = ({
           </div>
         </div>
 
+        {/* Tab Switcher */}
+        <div className="flex items-center gap-2 border-b border-slate-800 pb-2.5 flex-shrink-0">
+          <button
+            type="button"
+            onClick={() => setAdminTab('assignments')}
+            className={`px-3.5 py-1.5 rounded-xl text-xs font-black flex items-center gap-1.5 transition-all cursor-pointer ${
+              adminTab === 'assignments'
+                ? 'bg-gradient-to-r from-red-600 to-amber-600 text-white shadow-md shadow-red-950/40'
+                : 'bg-slate-800/80 text-slate-400 hover:text-white'
+            }`}
+          >
+            <span>📋 ఇన్చార్జి కేటాయింపులు ({assignments.length})</span>
+          </button>
+          <button
+            type="button"
+            onClick={() => setAdminTab('leaderboard')}
+            className={`px-3.5 py-1.5 rounded-xl text-xs font-black flex items-center gap-1.5 transition-all cursor-pointer ${
+              adminTab === 'leaderboard'
+                ? 'bg-gradient-to-r from-amber-500 to-yellow-500 text-slate-950 shadow-md shadow-amber-950/40'
+                : 'bg-slate-800/80 text-slate-400 hover:text-white'
+            }`}
+          >
+            <Trophy className="w-3.5 h-3.5" />
+            <span>🏆 వాలంటీర్ లీడర్‌బోర్డ్ & కవరేజ్</span>
+          </button>
+        </div>
+
         {/* Content Scrollable Body */}
         <div className="overflow-y-auto space-y-4 pr-1 flex-1">
+          {adminTab === 'leaderboard' ? (
+            /* VOLUNTEER ACTIVITY & COVERAGE LEADERBOARD */
+            <div className="space-y-3">
+              <div className="bg-gradient-to-r from-amber-950/40 via-slate-900 to-slate-900 border border-amber-500/30 rounded-2xl p-3.5 flex items-center justify-between">
+                <div>
+                  <h3 className="text-xs font-black text-amber-400 flex items-center gap-1.5">
+                    <Trophy className="w-4 h-4 text-amber-400" />
+                    <span>పిఠాపురం నియోజకవర్గం • వాలంటీర్ గ్రౌండ్ లీడర్‌బోర్డ్</span>
+                  </h3>
+                  <p className="text-[11px] text-slate-400 mt-0.5">
+                    ప్రతి బూత్ & వార్డు ఇన్చార్జి పనితీరు, సర్వే మరియు ఓటరు కవరేజ్ ప్రగతి.
+                  </p>
+                </div>
+                <div className="text-right">
+                  <span className="text-[10px] text-slate-500 font-bold block uppercase">యాక్టివ్ ఇన్చార్జీలు</span>
+                  <span className="text-sm font-black text-white">{assignments.length} మంది</span>
+                </div>
+              </div>
+
+              {assignments.length === 0 ? (
+                <div className="p-8 text-center bg-slate-950/60 rounded-2xl border border-slate-800 text-slate-500 text-xs">
+                  ఇంకా ఎటువంటి ఇన్చార్జ్ బాధ్యతలు కేటాయించలేదు.
+                </div>
+              ) : (
+                <div className="space-y-2.5">
+                  {assignments.map((asgn, idx) => {
+                    const cleanPhone = cleanPhoneNumber(asgn.phone);
+                    const boothCount = (asgn.assemblyBooths || []).length;
+                    const wardCount = (asgn.municipalWards || []).length;
+                    
+                    // Estimate electors
+                    let estimatedElectors = 0;
+                    if (asgn.municipalWards?.includes('gp_durgada')) estimatedElectors += 8487;
+                    else if (asgn.municipalWards?.includes('gp_tatiparthy')) estimatedElectors += 6994;
+                    else if (asgn.municipalWards?.includes('gp_vannepudi')) estimatedElectors += 3201;
+                    else estimatedElectors += (wardCount * 500) + (boothCount * 1000);
+                    if (estimatedElectors === 0) estimatedElectors = 1000;
+
+                    const rankBadges = ['🥇 #1 Top Performer', '🥈 #2 Runner-Up', '🥉 #3 Achiever'];
+                    const rankBadge = rankBadges[idx] || `🏅 #${idx + 1} Incharge`;
+
+                    const handleSendMotivation = () => {
+                      const msg = `🚩 *జై జనసేన • పిఠాపురం ఎన్నికల అడ్మిన్ టీమ్*\n\nనమస్తే *${asgn.name}* గారు,\nమీకు కేటాయించిన గ్రామ/వార్డు బాధ్యతలలో మీ పనితీరు అద్భుతంగా ఉంది. మీ కవరేజ్ లక్ష్యం పూర్తి చేసి పిఠాపురంలో భారీ మెజారిటీ సాధించే దిశగా ప్రతి ఓటర్ ఇంటిని సందర్శించండి!\n\nధన్యవాదాలు 🙏`;
+                      const targetPhone = cleanPhone.startsWith('91') ? cleanPhone : `91${cleanPhone}`;
+                      window.open(`https://api.whatsapp.com/send?phone=${targetPhone}&text=${encodeURIComponent(msg)}`, '_blank');
+                    };
+
+                    return (
+                      <div
+                        key={asgn.id || idx}
+                        className="p-3.5 bg-slate-950/90 border border-slate-800 hover:border-amber-500/40 rounded-2xl transition-all shadow-md space-y-2.5"
+                      >
+                        <div className="flex items-start justify-between gap-2">
+                          <div className="flex items-center gap-2.5">
+                            <div className="w-9 h-9 rounded-xl bg-gradient-to-tr from-amber-500 to-orange-600 flex items-center justify-center text-slate-950 font-black text-xs shadow-md">
+                              {getInitials(asgn.name)}
+                            </div>
+                            <div>
+                              <div className="flex items-center gap-2">
+                                <h4 className="text-xs font-black text-white">{asgn.name}</h4>
+                                <span className="text-[10px] px-2 py-0.5 rounded-full font-bold bg-amber-500/20 text-amber-300 border border-amber-500/30">
+                                  {rankBadge}
+                                </span>
+                              </div>
+                              <span className="font-mono text-[11px] text-emerald-400 font-bold">{asgn.phone}</span>
+                            </div>
+                          </div>
+
+                          <button
+                            type="button"
+                            onClick={handleSendMotivation}
+                            className="px-2.5 py-1 bg-emerald-600/20 hover:bg-emerald-600 text-emerald-300 hover:text-white rounded-lg text-[10.5px] font-bold border border-emerald-500/30 flex items-center gap-1 transition-all cursor-pointer"
+                            title="Send Motivation & Review via WhatsApp"
+                          >
+                            <MessageCircle className="w-3 h-3 text-emerald-400" />
+                            <span>వాట్సాప్ సందేశం</span>
+                          </button>
+                        </div>
+
+                        {/* Progress Stats Bar */}
+                        <div className="grid grid-cols-3 gap-2 text-center bg-slate-900/80 rounded-xl p-2 border border-slate-800/80">
+                          <div>
+                            <span className="text-[9.5px] text-slate-400 block font-bold">కేటాయించిన పరిధి</span>
+                            <span className="text-xs font-black text-white">
+                              {wardCount > 0 ? `${wardCount} వార్డులు` : `${boothCount} బూతులు`}
+                            </span>
+                          </div>
+                          <div>
+                            <span className="text-[9.5px] text-slate-400 block font-bold">మొత్తం ఓటర్లు (సుమారు)</span>
+                            <span className="text-xs font-black text-amber-400 font-mono">
+                              {estimatedElectors.toLocaleString()}
+                            </span>
+                          </div>
+                          <div>
+                            <span className="text-[9.5px] text-slate-400 block font-bold">స్టేటస్</span>
+                            <span className="text-xs font-black text-emerald-400">
+                              🟢 యాక్టివ్
+                            </span>
+                          </div>
+                        </div>
+                      </div>
+                    );
+                  })}
+                </div>
+              )}
+            </div>
+          ) : (
+            <>
           {/* Action: Add New Incharge Button */}
           {!isAddingNew ? (
             <button
@@ -1080,6 +1217,8 @@ export const AdminAssignmentModal: React.FC<AdminAssignmentModalProps> = ({
               })
             )}
           </div>
+          </>
+          )}
         </div>
 
         {/* Footer Note */}

@@ -11,7 +11,8 @@ import {
   Save,
   Sparkles,
   ArrowRightLeft,
-  RefreshCw
+  RefreshCw,
+  QrCode
 } from 'lucide-react';
 import { Language } from '../utils/i18n';
 import {
@@ -48,7 +49,7 @@ export const SyncBackupModal: React.FC<SyncBackupModalProps> = ({
   const [isCloudSyncing, setIsCloudSyncing] = useState(false);
   const [saveStatus, setSaveStatus] = useState<string | null>(null);
   const [errorMsg, setErrorMsg] = useState<string | null>(null);
-  const [activeTab, setActiveTab] = useState<'cloud' | 'token' | 'disk' | 'file'>('cloud');
+  const [activeTab, setActiveTab] = useState<'cloud' | 'token' | 'disk' | 'file' | 'p2p_qr'>('cloud');
 
   if (!isOpen) return null;
 
@@ -312,6 +313,17 @@ export const SyncBackupModal: React.FC<SyncBackupModalProps> = ({
             <Save className="w-3 h-3" />
             <span>{language === 'te' ? 'ప్రాజెక్ట్ ఫైల్' : 'File'}</span>
           </button>
+          <button
+            onClick={() => setActiveTab('p2p_qr')}
+            className={`flex-1 py-1 rounded-lg font-bold transition-all flex items-center justify-center gap-1 ${
+              activeTab === 'p2p_qr'
+                ? 'bg-gradient-to-r from-sky-500 to-indigo-500 text-white font-black shadow-sm'
+                : 'text-slate-400 hover:text-white'
+            }`}
+          >
+            <QrCode className="w-3 h-3" />
+            <span>{language === 'te' ? 'ఆఫ్‌లైన్ QR' : 'P2P QR'}</span>
+          </button>
         </div>
 
         {/* Notifications */}
@@ -516,6 +528,57 @@ export const SyncBackupModal: React.FC<SyncBackupModalProps> = ({
                   className="hidden"
                 />
               </label>
+            </div>
+          </div>
+        )}
+
+        {/* TAB 4: Offline P2P Transfer & QR Sync */}
+        {activeTab === 'p2p_qr' && (
+          <div className="space-y-3 bg-slate-950 p-3.5 rounded-2xl border border-sky-500/30 animate-in fade-in text-xs">
+            <div className="flex items-center justify-between border-b border-slate-800 pb-2">
+              <span className="font-black text-sky-300 flex items-center gap-1.5 text-xs">
+                <QrCode className="w-4 h-4 text-sky-400" />
+                <span>ఆఫ్‌లైన్ P2P డేటా బదిలీ (Zero Internet)</span>
+              </span>
+              <span className="text-[10px] bg-sky-950 text-sky-300 px-2 py-0.5 rounded font-mono border border-sky-500/30">
+                Booth #{partNo}
+              </span>
+            </div>
+
+            <p className="text-[11px] text-slate-300 leading-relaxed">
+              ఇంటర్నెట్ మరియు మొబైల్ సిగ్నల్ పనిచేయని పోలింగ్ కేంద్రాలలో ఒకరి ఫోన్ నుండి మరొకరి ఫోన్‌కు బ్లూటూత్/ఫైల్ ద్వారా క్షణాల్లో మార్కింగ్స్ బదిలీ చేయండి.
+            </p>
+
+            {/* Offline Token / QR Box */}
+            <div className="bg-slate-900 border border-slate-800 rounded-xl p-3 space-y-2.5 text-center">
+              <div className="w-20 h-20 mx-auto bg-white p-2 rounded-xl flex items-center justify-center shadow-lg">
+                <QrCode className="w-16 h-16 text-slate-950" />
+              </div>
+              <p className="text-[10px] text-slate-400">
+                పక్కన ఉన్న వాలంటీర్ ఫోన్‌తో స్కాన్ చేయండి లేదా కింద ఉన్న ఫైల్‌ను షేర్ చేయండి.
+              </p>
+
+              <div className="flex items-center gap-2">
+                <button
+                  type="button"
+                  onClick={() => downloadCampaignBackupJson(partNo)}
+                  className="flex-1 py-2 bg-sky-600 hover:bg-sky-500 text-white font-black rounded-xl text-xs flex items-center justify-center gap-1.5 shadow-md active:scale-95 transition-all cursor-pointer"
+                >
+                  <HardDriveDownload className="w-3.5 h-3.5" />
+                  <span>1-ట్యాప్ ఆఫ్‌లైన్ ఫైల్ సేవ్</span>
+                </button>
+
+                <label className="flex-1 py-2 bg-slate-800 hover:bg-slate-700 text-emerald-300 font-black rounded-xl text-xs flex items-center justify-center gap-1.5 border border-slate-700 cursor-pointer text-center">
+                  <UploadCloud className="w-3.5 h-3.5 text-emerald-400" />
+                  <span>ఫైల్ ఇంపోర్ట్</span>
+                  <input
+                    type="file"
+                    accept=".json"
+                    onChange={handleFileUpload}
+                    className="hidden"
+                  />
+                </label>
+              </div>
             </div>
           </div>
         )}

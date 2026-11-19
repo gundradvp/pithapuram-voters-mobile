@@ -21,6 +21,10 @@ import { GroupPrintModal } from './components/GroupPrintModal';
 import { SurnameLeaningModal } from './components/SurnameLeaningModal';
 import { SyncBackupModal } from './components/SyncBackupModal';
 import { BulkAssignModal } from './components/BulkAssignModal';
+import { OutOfVillageLogisticsModal } from './components/OutOfVillageLogisticsModal';
+import { PollingFastPunchModal } from './components/PollingFastPunchModal';
+import { WardMarginPredictorModal } from './components/WardMarginPredictorModal';
+import { FamilyWhatsAppCardModal, FamilyCardData } from './components/FamilyWhatsAppCardModal';
 import { DEMO_BOOTH_DATA, DEMO_PROFILES } from './utils/demoData';
 import {
   BoothData,
@@ -95,6 +99,13 @@ export function App() {
   const [session, setSession] = useState<UserSession | null>(() => getUserSession());
   const [isLoginModalOpen, setIsLoginModalOpen] = useState<boolean>(() => !getUserSession());
   const [isAdminModalOpen, setIsAdminModalOpen] = useState<boolean>(false);
+  const [isLogisticsModalOpen, setIsLogisticsModalOpen] = useState<boolean>(false);
+  const [isFastPunchModalOpen, setIsFastPunchModalOpen] = useState<boolean>(false);
+  const [isWardMarginModalOpen, setIsWardMarginModalOpen] = useState<boolean>(false);
+  const [familySlipState, setFamilySlipState] = useState<{ open: boolean; family: FamilyCardData | null }>({
+    open: false,
+    family: null
+  });
   const [assignmentVersion, setAssignmentVersion] = useState(0);
 
   // Sync latest volunteer assignments across devices on startup and listen for live updates
@@ -1288,6 +1299,11 @@ export function App() {
     setProfiles(getVoterProfiles(currentPartNo));
   };
 
+  const handleUpdateVoterProfileData = (serialNo: number, updates: Partial<VoterCampaignProfile>) => {
+    saveVoterProfile(currentPartNo, serialNo, updates);
+    setProfiles(getVoterProfiles(currentPartNo));
+  };
+
   // Handle Custom JSON file import
   const handleImportCustomJson = (customData: BoothData) => {
     setBoothData(customData);
@@ -1678,6 +1694,9 @@ export function App() {
                 onUpdateSupportPct={handleUpdateSupportPct}
                 controlledViewMode={votersViewMode}
                 onViewModeChange={handleVotersViewModeChange}
+                onOpenOutOfVillage={() => setIsLogisticsModalOpen(true)}
+                onOpenFastPunch={() => setIsFastPunchModalOpen(true)}
+                onOpenWardMargin={() => setIsWardMarginModalOpen(true)}
               />
             )}
 
@@ -1714,6 +1733,7 @@ export function App() {
                 }}
                 onOpenSlip={v => setSelectedVoterForSlip(v)}
                 onOpenGroupPrint={handleOpenGroupPrint}
+                onOpenFamilySlip={famData => setFamilySlipState({ open: true, family: famData })}
               />
             )}
 
@@ -2021,6 +2041,54 @@ export function App() {
           language={lang}
           onClose={() => setIsSyncModalOpen(false)}
           onSyncApplied={handleSyncApplied}
+        />
+      )}
+
+      {/* ✈️ Out of Village Logistics & Travel Hub Modal */}
+      {isLogisticsModalOpen && boothData && (
+        <OutOfVillageLogisticsModal
+          isOpen={isLogisticsModalOpen}
+          onClose={() => setIsLogisticsModalOpen(false)}
+          voters={boothData.voters}
+          profiles={profiles}
+          boothInfo={boothData.booth_info}
+          onUpdateProfile={handleUpdateVoterProfileData}
+          onOpenGroupPrint={handleOpenGroupPrint}
+        />
+      )}
+
+      {/* ⚡ Polling Fast-Punch & SOS Missing Supporters Modal */}
+      {isFastPunchModalOpen && boothData && (
+        <PollingFastPunchModal
+          isOpen={isFastPunchModalOpen}
+          onClose={() => setIsFastPunchModalOpen(false)}
+          voters={boothData.voters}
+          profiles={profiles}
+          boothInfo={boothData.booth_info}
+          onUpdateSurveyMark={handleUpdateSurveyMark}
+          onOpenPhoneEditor={v => setSelectedVoterForPhone(v)}
+        />
+      )}
+
+      {/* 📊 Ward Margin & Sarpanch Victory Predictor Modal */}
+      {isWardMarginModalOpen && boothData && (
+        <WardMarginPredictorModal
+          isOpen={isWardMarginModalOpen}
+          onClose={() => setIsWardMarginModalOpen(false)}
+          voters={boothData.voters}
+          profiles={profiles}
+          boothInfo={boothData.booth_info}
+        />
+      )}
+
+      {/* 👨‍👩‍👧‍👦 Family Composite WhatsApp Slip Modal */}
+      {familySlipState.open && familySlipState.family && boothData && (
+        <FamilyWhatsAppCardModal
+          isOpen={familySlipState.open}
+          onClose={() => setFamilySlipState({ open: false, family: null })}
+          family={familySlipState.family}
+          boothInfo={boothData.booth_info}
+          profiles={profiles}
         />
       )}
     </div>

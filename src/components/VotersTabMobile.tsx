@@ -35,6 +35,9 @@ interface VotersTabMobileProps {
   layoutMode?: 'mobile' | 'desktop';
   onToggleVictoryPredictor?: () => void;
   showVictoryPredictor?: boolean;
+  onOpenOutOfVillage?: () => void;
+  onOpenFastPunch?: () => void;
+  onOpenWardMargin?: () => void;
 }
 
 const INITIAL_VISIBLE_COUNT = 50;
@@ -95,7 +98,10 @@ export const VotersTabMobile: React.FC<VotersTabMobileProps> = ({
   onViewModeChange,
   layoutMode,
   onToggleVictoryPredictor,
-  showVictoryPredictor
+  showVictoryPredictor,
+  onOpenOutOfVillage,
+  onOpenFastPunch,
+  onOpenWardMargin
 }) => {
   // Check layout: Strictly single card per row on mobile or any viewport under 1024px.
   // Multi-column is enabled ONLY on wide desktop screens (>= 1024px) when layoutMode is desktop.
@@ -406,10 +412,67 @@ export const VotersTabMobile: React.FC<VotersTabMobileProps> = ({
       };
 
       recognition.onresult = (event: any) => {
-        const transcript = event.results[0]?.[0]?.transcript;
-        if (transcript) {
-          setSearchQuery(transcript);
-          setVisibleCount(INITIAL_VISIBLE_COUNT);
+        const rawTranscript = (event.results[0]?.[0]?.transcript || '').trim();
+        if (rawTranscript) {
+          const lower = rawTranscript.toLowerCase();
+
+          // 1. Serial Number Intent: "నెంబర్ 45", "క్రమ సంఖ్య 120", "నంబర్ 5", "sno 45"
+          const numMatch = rawTranscript.match(/(?:నెంబర్|నెంబరు|క్రమ\s*సంఖ్య|క్రమం|నంబర్|number|sno|serial)\s*[:#]?\s*(\d+)/i) || rawTranscript.match(/^#?(\d+)$/);
+          
+          if (numMatch) {
+            const num = numMatch[1];
+            setSnoQuery(num);
+            setIsSnoFilterOpen(true);
+            setSearchQuery('');
+            setVisibleCount(INITIAL_VISIBLE_COUNT);
+          }
+          // 2. Already Voted Intent: "ఓటు వేశారు", "ఓటు వేసిన వాళ్ళు", "voted"
+          else if (/ఓటు\s*(?:వేశారు|వేసిన|వేసారా)|voted/i.test(rawTranscript)) {
+            setFilterMode('voted');
+            setSearchQuery('');
+            setVisibleCount(INITIAL_VISIBLE_COUNT);
+          }
+          // 3. Not Voted Yet: "ఓటు వేయలేదు", "ఓటు వేయని వారు", "not voted"
+          else if (/ఓటు\s*(?:వేయలేదు|వేయని|బాకీ)|not\s*voted/i.test(rawTranscript)) {
+            setFilterMode('not_voted');
+            setSearchQuery('');
+            setVisibleCount(INITIAL_VISIBLE_COUNT);
+          }
+          // 4. JSP Supporters: "మనవాళ్ళు", "మనోళ్ళు", "జనసేన మద్దతుదారులు", "supporter"
+          else if (/మనవాళ్ళు|మనవారు|మనోళ్ళు|జనసేన|మద్దతు|supporter|ours/i.test(rawTranscript)) {
+            setFilterMode('full');
+            setSearchQuery('');
+            setVisibleCount(INITIAL_VISIBLE_COUNT);
+          }
+          // 5. Out of Village: "ఊర్లో లేరు", "వలస వెళ్ళిన వారు", "out of city"
+          else if (/ఊర్లో\s*లేరు|వలస|హైదరాబాద్|బెంగళూరు|విదేశాలు|out\s*of\s*city/i.test(rawTranscript)) {
+            setFilterMode('out_of_city');
+            setSearchQuery('');
+            setVisibleCount(INITIAL_VISIBLE_COUNT);
+          }
+          // 6. Has Phone: "ఫోన్ ఉన్నవారు", "మొబైల్ ఉన్నవాళ్ళు", "phone"
+          else if (/ఫోన్|మొబైల్|phone|mobile/i.test(rawTranscript)) {
+            setFilterMode('has_phone');
+            setSearchQuery('');
+            setVisibleCount(INITIAL_VISIBLE_COUNT);
+          }
+          // 7. Women Electors: "మహిళలు", "ఆడవారు", "women", "female"
+          else if (/మహిళలు|ఆడవారు|స్త్రీలు|women|female/i.test(rawTranscript)) {
+            setFilterMode('women');
+            setSearchQuery('');
+            setVisibleCount(INITIAL_VISIBLE_COUNT);
+          }
+          // 8. Men Electors: "పురుషులు", "మగవారు", "men", "male"
+          else if (/పురుషులు|మగవారు|men|male/i.test(rawTranscript)) {
+            setFilterMode('men');
+            setSearchQuery('');
+            setVisibleCount(INITIAL_VISIBLE_COUNT);
+          }
+          // 9. Standard Search
+          else {
+            setSearchQuery(rawTranscript);
+            setVisibleCount(INITIAL_VISIBLE_COUNT);
+          }
         }
         setIsVoiceListening(false);
       };
@@ -1969,6 +2032,42 @@ _దయచేసి మీ ఓటు హక్కును వినియోగ
               </button>
 
               
+
+              {/* Fast Punch Polling Mode */}
+              {onOpenFastPunch && (
+                <button
+                  type="button"
+                  onClick={onOpenFastPunch}
+                  className="px-2 py-0.5 bg-gradient-to-r from-red-600 to-amber-600 hover:from-red-500 hover:to-amber-500 text-white rounded-lg text-[10.5px] font-black flex items-center gap-1 shadow-sm active:scale-95 transition-all cursor-pointer"
+                  title={language === 'te' ? 'ఎన్నికల రోజు 0.2 సెకండ్లలో ఓటు టిక్ చేసే ఫాస్ట్ పంచ్ & SOS అలర్ట్' : 'Polling Day Fast-Punch & SOS Missing Supporters'}
+                >
+                  <span>⚡ ఫాస్ట్ పంచ్</span>
+                </button>
+              )}
+
+              {/* Out of Village Logistics Hub */}
+              {onOpenOutOfVillage && (
+                <button
+                  type="button"
+                  onClick={onOpenOutOfVillage}
+                  className="px-2 py-0.5 bg-sky-950/80 hover:bg-sky-900 text-sky-300 border border-sky-500/40 rounded-lg text-[10.5px] font-black flex items-center gap-1 shadow-sm active:scale-95 transition-all cursor-pointer"
+                  title={language === 'te' ? 'వలస ఓటర్ల ప్రయాణం & బస్సు రవాణా సమన్వయం' : 'Out of Village Electors Travel Coordination'}
+                >
+                  <span>✈️ వలస ఓటర్లు</span>
+                </button>
+              )}
+
+              {/* Ward Margin & Sarpanch Victory Predictor */}
+              {onOpenWardMargin && (
+                <button
+                  type="button"
+                  onClick={onOpenWardMargin}
+                  className="px-2 py-0.5 bg-purple-950/80 hover:bg-purple-900 text-purple-300 border border-purple-500/40 rounded-lg text-[10.5px] font-black flex items-center gap-1 shadow-sm active:scale-95 transition-all cursor-pointer"
+                  title={language === 'te' ? 'వార్డుల వారీగా మెజారిటీ & సర్పంచ్ గెలుపు అంచనా' : 'Ward-by-Ward Margin & Victory Calculator'}
+                >
+                  <span>📊 గెలుపు గణితం</span>
+                </button>
+              )}
 
               {/* Select Specific Voters for Printing */}
               <button
