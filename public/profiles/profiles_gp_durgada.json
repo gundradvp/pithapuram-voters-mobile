@@ -10,12 +10,12 @@
     "influencerMobile": ""
   },
   "2": {
-    "supportPct": 50,
-    "survey_status": null
+    "supportPct": 100,
+    "survey_status": "supporter"
   },
   "3": {
-    "supportPct": 50,
-    "survey_status": null,
+    "supportPct": 100,
+    "survey_status": "supporter",
     "influencerId": "inf_1",
     "influencerName": "Guddati Veerraju",
     "influencerMobile": "9848596259"

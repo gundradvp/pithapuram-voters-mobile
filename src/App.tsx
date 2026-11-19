@@ -255,7 +255,7 @@ export function App() {
   };
   const [isLocked, setIsLocked] = useState<boolean>(() => isBoothLocked());
   const [isCached, setIsCached] = useState<boolean>(false);
-  const [isLoading, setIsLoading] = useState<boolean>(true);
+  const [isLoading, setIsLoading] = useState<boolean>(() => !!getUserSession());
   const [errorMsg, setErrorMsg] = useState<string | null>(null);
 
   // Real-time Download Progress Tracking (Size in MB/KB & Loading Percentage)
@@ -266,13 +266,17 @@ export function App() {
     percent: number;
     formattedLoaded: string;
     formattedTotal: string;
-  }>({
-    isLoading: false,
-    loadedBytes: 0,
-    totalBytes: 0,
-    percent: 0,
-    formattedLoaded: '0 B',
-    formattedTotal: '0 B'
+  }>(() => {
+    const saved = getAssignedBooth() || 'gp_durgada';
+    const est = getEstimatedUnitSize(saved);
+    return {
+      isLoading: true,
+      loadedBytes: 0,
+      totalBytes: est,
+      percent: 0,
+      formattedLoaded: '0 B',
+      formattedTotal: formatBytes(est)
+    };
   });
 
   // Campaign State
@@ -487,21 +491,31 @@ export function App() {
         const res = await fetch(url, fetchOptions);
         if (res.ok) {
           const headerLength = res.headers.get('content-length');
-          const totalBytes = headerLength ? parseInt(headerLength, 10) : estimatedSize;
+          const parsedHeader = headerLength ? parseInt(headerLength, 10) : 0;
+          const totalBytes = parsedHeader > 100000 ? parsedHeader : estimatedSize;
 
           if (res.body && typeof res.body.getReader === 'function') {
             const reader = res.body.getReader();
             const chunks: Uint8Array[] = [];
             let receivedLength = 0;
+            let lastUpdate = 0;
+
+            // Immediate initial progress ping
+            if (onProgress) {
+              onProgress({ loaded: 0, total: totalBytes, percent: 1 });
+            }
 
             while (true) {
               const { done, value } = await reader.read();
               if (done) break;
               chunks.push(value);
               receivedLength += value.length;
-              if (onProgress) {
+
+              const now = Date.now();
+              if (onProgress && (now - lastUpdate >= 40 || receivedLength >= totalBytes)) {
+                lastUpdate = now;
                 const effectiveTotal = Math.max(totalBytes, receivedLength);
-                const percent = Math.min(99, Math.round((receivedLength / effectiveTotal) * 100));
+                const percent = Math.min(99, Math.max(1, Math.round((receivedLength / effectiveTotal) * 100)));
                 onProgress({ loaded: receivedLength, total: effectiveTotal, percent });
               }
             }
@@ -782,15 +796,14 @@ export function App() {
   }, [handleRefreshData]);
 
   useEffect(() => {
-    // Strictly auto-load only in demo mode. For real data, load list only when click load (Requirement 3)
-    if (session?.role === 'demo') {
-      loadBooth(currentPartNo);
+    if (session) {
       setIsListLoaded(true);
+      loadBooth(currentPartNo);
     } else {
-      setIsLocked(isBoothLocked());
-      setIsCached(isBoothCached(currentPartNo));
+      setIsLoading(false);
+      setDownloadProgress(prev => ({ ...prev, isLoading: false }));
     }
-  }, [currentPartNo, loadBooth, session?.role]);
+  }, [currentPartNo, loadBooth, session]);
 
   // Handle Load List on explicit user click (Requirement 3)
   const handleLoadList = async () => {
@@ -988,12 +1001,12 @@ export function App() {
       }
     }
     setErrorMsg(null);
-    // Always unload list when switching units; load only when clicked
-    setIsListLoaded(false);
+    setIsListLoaded(true);
     setBoothData(null);
     setCurrentPartNo(partNo);
     setAssignedBooth(partNo, lock);
     setIsLocked(lock);
+    loadBooth(partNo);
   };
 
   // Helper: Instantly switch to complete GP from any individual ward
@@ -1832,19 +1845,24 @@ export function App() {
             setSession(newSession);
             setIsLoginModalOpen(false);
             setBoothData(null);
-            setIsListLoaded(false);
+            setIsListLoaded(true);
 
             if (newSession.role === 'admin') {
               const curr = String(currentPartNo || '');
-              if (curr.includes('_w')) {
-                const target = curr.startsWith('gp_tatiparthy') ? 'gp_tatiparthy' : 'gp_durgada';
-                setErrorMsg(null);
-                setCurrentPartNo(target);
-                setAssignedBooth(target, false);
-                setIsLocked(false);
-                setIsListLoaded(true);
-                loadBooth(target);
+              let target: string | number = 'gp_durgada';
+              if (curr.startsWith('gp_tatiparthy')) {
+                target = 'gp_tatiparthy';
+              } else if (curr.startsWith('gp_vannepudi')) {
+                target = 'gp_vannepudi';
+              } else if (curr && !curr.includes('_w') && curr !== 'demo_booth') {
+                target = curr;
               }
+              setErrorMsg(null);
+              setCurrentPartNo(target);
+              setAssignedBooth(target, false);
+              setIsLocked(false);
+              setIsListLoaded(true);
+              loadBooth(target);
             } else if (newSession.role === 'volunteer') {
               // Immediately look up volunteer assignment and auto-switch to their assigned unit
               const assignment = getVolunteerAssignment(newSession.phone);
@@ -1862,6 +1880,9 @@ export function App() {
                 setIsListLoaded(true);
                 loadBooth(target);
               }
+            } else if (newSession.role === 'demo') {
+              setCurrentPartNo('demo_booth');
+              loadBooth('demo_booth');
             }
           }}
           onClose={session ? () => setIsLoginModalOpen(false) : undefined}

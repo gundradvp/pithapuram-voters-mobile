@@ -120,22 +120,28 @@ export function bustAllCache(): void {
 }
 
 export function formatBytes(bytes: number, decimals: number = 1): string {
-  if (bytes === 0) return '0 B';
+  if (!bytes || isNaN(bytes) || bytes <= 0) return '0 B';
   const k = 1024;
   const dm = decimals < 0 ? 0 : decimals;
   const sizes = ['B', 'KB', 'MB', 'GB'];
   const i = Math.floor(Math.log(bytes) / Math.log(k));
-  return parseFloat((bytes / Math.pow(k, i)).toFixed(dm)) + ' ' + sizes[i];
+  const safeI = Math.min(sizes.length - 1, Math.max(0, i));
+  return parseFloat((bytes / Math.pow(k, safeI)).toFixed(dm)) + ' ' + sizes[safeI];
 }
 
 export function getEstimatedUnitSize(partNo: string | number): number {
-  const p = String(partNo).toLowerCase();
-  if (p.includes('gp_durgada') && !p.includes('_w')) return 15728640; // 15.0 MB
+  const p = String(partNo || '').toLowerCase();
+  if (p.includes('gp_durgada') && !p.includes('_w')) return 15792476; // 15.1 MB
   if (p.includes('gp_tatiparthy') && !p.includes('_w')) return 13368579; // 12.8 MB
   if (p.includes('gp_vannepudi')) return 6815744; // 6.5 MB
+  if (p.includes('mptc_tatiparthy_1')) return 6498434; // 6.2 MB
+  if (p.includes('mptc_tatiparthy_2')) return 6877861; // 6.6 MB
+  if (p.includes('mptc_durgada_1')) return 7600000; // 7.2 MB
+  if (p.includes('mptc_durgada_2')) return 7500000; // 7.1 MB
+  if (p.includes('mptc_durgada_3')) return 4200000; // 4.0 MB
   if (p.includes('mptc_')) return 6500000; // 6.2 MB
-  if (p.includes('_w')) return 1150000; // 1.1 MB
-  return 220000; // 220 KB for standard assembly booth
+  if (p.includes('_w')) return 960000; // ~950 KB for single ward
+  return 250000; // ~250 KB for standard assembly booth
 }
 
 export function isBoothCached(partNo: number | string): boolean {
