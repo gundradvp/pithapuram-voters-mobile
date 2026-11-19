@@ -2146,6 +2146,7 @@ export function App() {
           onQuickToggleOurs={handleQuickToggleOurs}
           onQuickToggleVoted={handleQuickToggleVoted}
           onOpenSlip={v => setSelectedVoterForSlip(v)}
+          onUpdateProfile={handleUpdateVoterProfileData}
         />
       )}
     </div>

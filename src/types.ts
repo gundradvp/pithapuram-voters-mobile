@@ -123,6 +123,10 @@ export interface VoterCampaignProfile {
   customPhone?: string;
   altPhone?: string;
   customAlias?: string; // User's own input / custom alternate name / search alias (e.g. kanniaha)
+  correctedNameTe?: string;
+  correctedNameEn?: string;
+  surnameTe?: string;
+  surnameEn?: string;
   supportPct?: number; // 100, 75, 50, 40, 25, 0
   influencerId?: string;
   influencerName?: string;

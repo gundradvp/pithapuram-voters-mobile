@@ -26,7 +26,10 @@ import {
   Clock,
   Edit3,
   Home,
-  FileText
+  FileText,
+  Globe,
+  Save,
+  CheckSquare
 } from 'lucide-react';
 import {
   MobileVoter,
@@ -35,6 +38,11 @@ import {
   VoterCampaignProfile
 } from '../types';
 import { resolveCardUrl } from '../utils/photoResolver';
+import {
+  parseNameAndSurname,
+  transliterateEnglishToTelugu,
+  ParsedNameDetails
+} from '../utils/teluguTransliterator';
 
 interface ReOcrReviewModalProps {
   isOpen: boolean;
@@ -53,6 +61,7 @@ interface ReOcrReviewModalProps {
   onQuickToggleOurs?: (serialNo: number) => void;
   onQuickToggleVoted?: (serialNo: number) => void;
   onOpenSlip?: (voter: MobileVoter) => void;
+  onUpdateProfile?: (serialNo: number, updates: Partial<VoterCampaignProfile>) => void;
 }
 
 type FilterMode = 'all' | 'marked' | 'suspected';
@@ -74,6 +83,7 @@ export const ReOcrReviewModal: React.FC<ReOcrReviewModalProps> = ({
   onQuickToggleOurs,
   onQuickToggleVoted,
   onOpenSlip,
+  onUpdateProfile,
 }) => {
   // Marked S.Nos state (persisted in localStorage)
   const storageKey = `reocr_marked_snos_${boothId}`;
@@ -161,6 +171,101 @@ export const ReOcrReviewModal: React.FC<ReOcrReviewModalProps> = ({
   const isVoted = currentProf.survey_status === 'voted';
   const isOutOfCity = currentProf.survey_status === 'out_of_city';
   const isDeceased = currentProf.survey_status === 'deceased';
+
+  // Name & Surname Edit state
+  const [isEditingName, setIsEditingName] = useState<boolean>(false);
+  const [editFirstNameTe, setEditFirstNameTe] = useState<string>('');
+  const [editSurnameTe, setEditSurnameTe] = useState<string>('');
+  const [editFirstNameEn, setEditFirstNameEn] = useState<string>('');
+  const [editSurnameEn, setEditSurnameEn] = useState<string>('');
+  const [isSavingName, setIsSavingName] = useState<boolean>(false);
+  const [nameSaveSuccess, setNameSaveSuccess] = useState<boolean>(false);
+
+  // Compute parsed name details for current voter
+  const parsedName: ParsedNameDetails | null = useMemo(() => {
+    if (!currentVoter) return null;
+    return parseNameAndSurname(currentVoter);
+  }, [currentVoter]);
+
+  // Sync edit form fields whenever current voter changes
+  useEffect(() => {
+    if (parsedName) {
+      setEditFirstNameTe(parsedName.firstNameTe);
+      setEditSurnameTe(parsedName.surnameTe);
+      setEditFirstNameEn(parsedName.firstNameEn);
+      setEditSurnameEn(parsedName.surnameEn);
+      setIsEditingName(false);
+      setNameSaveSuccess(false);
+    }
+  }, [currentSno, parsedName]);
+
+  // Handler: "Select English as Correct" (1-Click Auto-Fix Telugu from English)
+  const handleSelectEnglishAsCorrect = useCallback(() => {
+    if (!parsedName) return;
+    const transFirst = transliterateEnglishToTelugu(parsedName.firstNameEn);
+    const transSurname = transliterateEnglishToTelugu(parsedName.surnameEn);
+    setEditFirstNameTe(transFirst);
+    setEditSurnameTe(transSurname);
+    setEditFirstNameEn(parsedName.firstNameEn);
+    setEditSurnameEn(parsedName.surnameEn);
+    setIsEditingName(true);
+  }, [parsedName]);
+
+  // Handler: Save & Sync Corrected Name Permanently
+  const handleSaveNameAndSync = async () => {
+    if (!currentVoter || !currentSno) return;
+    const cleanFirstTe = editFirstNameTe.trim();
+    const cleanSurnameTe = editSurnameTe.trim();
+    const cleanFirstEn = editFirstNameEn.trim().toUpperCase();
+    const cleanSurnameEn = editSurnameEn.trim().toUpperCase();
+
+    const fullTe = cleanSurnameTe && cleanFirstTe !== cleanSurnameTe
+      ? `${cleanFirstTe} ${cleanSurnameTe}`
+      : (cleanFirstTe || currentVoter.name_te || '');
+
+    const fullEn = cleanSurnameEn && cleanFirstEn !== cleanSurnameEn
+      ? `${cleanFirstEn} ${cleanSurnameEn}`
+      : (cleanFirstEn || currentVoter.name_en || '');
+
+    setIsSavingName(true);
+    try {
+      const res = await fetch('/api/update-voter-name', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          booth: boothId,
+          sno: currentSno,
+          name_te: fullTe,
+          name_en: fullEn,
+          surname_te: cleanSurnameTe,
+          surname_en: cleanSurnameEn
+        })
+      });
+
+      const data = await res.json();
+      if (data.success && data.updatedVoter) {
+        if (onUpdateVoters) {
+          onUpdateVoters([data.updatedVoter]);
+        }
+        if (onUpdateProfile) {
+          onUpdateProfile(currentSno, {
+            customAlias: fullTe,
+            correctedNameTe: fullTe,
+            correctedNameEn: fullEn
+          });
+        }
+        setNameSaveSuccess(true);
+        setIsEditingName(false);
+        setTimeout(() => setNameSaveSuccess(false), 3000);
+      } else {
+        alert(`Error: ${data.error || 'Failed to update voter name'}`);
+      }
+    } catch (e: any) {
+      alert(`Network error: ${e?.message}`);
+    } finally {
+      setIsSavingName(false);
+    }
+  };
 
   // Reset image error state whenever current voter changes
   useEffect(() => {
@@ -735,23 +840,195 @@ export const ReOcrReviewModal: React.FC<ReOcrReviewModalProps> = ({
 
                 {/* EXTRACTED FIELDS BOX */}
                 <div className="space-y-2.5 bg-slate-950/80 p-3.5 rounded-2xl border border-slate-800 text-xs">
-                  {/* Voter Name */}
-                  <div className="flex items-start justify-between gap-2">
-                    <div>
-                      <span className="text-[10px] font-bold text-slate-400 uppercase tracking-wider block">
-                        {language === 'te' ? 'ఓటరు పేరు (తెలుగు / EN):' : 'Voter Name:'}
-                      </span>
-                      <div className="text-base sm:text-lg font-black text-white leading-snug">
-                        {currentVoter.name_te || '—'}
+                  {/* Voter Name & Surname Intelligence Box */}
+                  <div className="space-y-2 bg-slate-900/90 p-3 rounded-xl border border-slate-800">
+                    {/* Header with Title & Action Buttons */}
+                    <div className="flex items-center justify-between flex-wrap gap-1.5 pb-2 border-b border-slate-800/80">
+                      <div className="flex items-center gap-1.5">
+                        <span className="text-[10px] font-black text-amber-400 uppercase tracking-wider">
+                          {language === 'te' ? 'ఓటరు పేరు & ఇంటిపేరు విశ్లేషణ:' : 'Voter Name & Surname:'}
+                        </span>
+                        {parsedName?.isTeluguSuspected && (
+                          <span className="px-1.5 py-0.2 rounded bg-red-500/20 text-red-400 border border-red-500/40 text-[9px] font-bold">
+                            ⚠️ తెలుగు పేరులో తేడా
+                          </span>
+                        )}
                       </div>
-                      <div className="text-xs sm:text-sm font-bold text-amber-300 font-mono mt-0.5">
-                        {currentVoter.name_en || '—'}
+
+                      <div className="flex items-center gap-1.5">
+                        {/* 1-Click: Select English as Correct */}
+                        <button
+                          type="button"
+                          onClick={handleSelectEnglishAsCorrect}
+                          className="px-2 py-0.5 rounded-lg bg-indigo-950/80 hover:bg-indigo-900 border border-indigo-500/40 text-indigo-300 text-[10.5px] font-bold flex items-center gap-1 transition-all active:scale-95 cursor-pointer shadow-sm"
+                          title="ఇంగ్లీష్ పేరు సరైనదిగా తీసుకుని తెలుగు పేరును ఆటోమేటిక్‌గా సరిచేయండి"
+                        >
+                          <Globe className="w-3 h-3 text-indigo-400" />
+                          <span>{language === 'te' ? '🌐 ఇంగ్లీష్ ప్రకారం తెలుగు సరిచేయి' : 'Use English as Correct'}</span>
+                        </button>
+
+                        {/* Edit Toggle Button */}
+                        <button
+                          type="button"
+                          onClick={() => setIsEditingName(prev => !prev)}
+                          className="px-2 py-0.5 rounded-lg bg-amber-500/10 hover:bg-amber-500/20 text-amber-300 border border-amber-500/30 text-[10.5px] font-bold flex items-center gap-1 transition-all active:scale-95 cursor-pointer"
+                          title="పేరు లేదా ఇంటిపేరును మాన్యువల్‌గా ఎడిట్ చేయండి"
+                        >
+                          <Edit3 className="w-3 h-3 text-amber-400" />
+                          <span>{isEditingName ? (language === 'te' ? 'రద్దు' : 'Cancel') : (language === 'te' ? 'సరిదిద్దు' : 'Edit')}</span>
+                        </button>
                       </div>
                     </div>
-                    {isSuspected(currentVoter) && (
-                      <span className="px-2 py-0.5 rounded-lg bg-red-500/20 text-red-400 border border-red-500/40 text-[9.5px] font-bold shrink-0">
-                        ⚠️ OCR తేడా
-                      </span>
+
+                    {/* Normal View Mode: Shows structured Name & Surname breakdown */}
+                    {!isEditingName ? (
+                      <div className="space-y-2 pt-1">
+                        {/* Structured Name & Surname Chips */}
+                        <div className="grid grid-cols-2 gap-2">
+                          {/* Identified Surname */}
+                          <div className="bg-slate-950/80 p-2 rounded-xl border border-slate-800">
+                            <span className="text-[9.5px] font-bold text-slate-500 uppercase tracking-wider block">
+                              🏛️ {language === 'te' ? 'గుర్తించిన ఇంటిపేరు (Surname):' : 'Identified Surname:'}
+                            </span>
+                            <div className="text-sm font-black text-amber-300 mt-0.5">
+                              {parsedName?.surnameTe || '—'}
+                            </div>
+                            <div className="text-[11px] font-bold text-slate-400 font-mono">
+                              {parsedName?.surnameEn || '—'}
+                            </div>
+                          </div>
+
+                          {/* Identified First Name */}
+                          <div className="bg-slate-950/80 p-2 rounded-xl border border-slate-800">
+                            <span className="text-[9.5px] font-bold text-slate-500 uppercase tracking-wider block">
+                              👤 {language === 'te' ? 'ఓటరు పేరు (First Name):' : 'Voter First Name:'}
+                            </span>
+                            <div className="text-sm font-black text-white mt-0.5">
+                              {parsedName?.firstNameTe || '—'}
+                            </div>
+                            <div className="text-[11px] font-bold text-slate-400 font-mono">
+                              {parsedName?.firstNameEn || '—'}
+                            </div>
+                          </div>
+                        </div>
+
+                        {/* Full Joined Display Name */}
+                        <div className="pt-1.5 flex items-center justify-between text-xs">
+                          <div>
+                            <span className="text-[9.5px] text-slate-500 font-bold uppercase tracking-wider block">
+                              {language === 'te' ? 'ప్రస్తుత పూర్తి పేరు (Full Display Name):' : 'Full Name:'}
+                            </span>
+                            <div className="text-base font-black text-white mt-0.5 leading-snug">
+                              {currentVoter.name_te || '—'}
+                            </div>
+                            <div className="text-xs font-bold text-amber-300 font-mono">
+                              {currentVoter.name_en || '—'}
+                            </div>
+                          </div>
+
+                          {nameSaveSuccess && (
+                            <span className="px-2.5 py-1 bg-emerald-500/20 border border-emerald-500/50 text-emerald-300 rounded-xl font-bold text-xs flex items-center gap-1 shadow-sm animate-pulse">
+                              <Check className="w-3.5 h-3.5" />
+                              <span>సేవ్ & సింక్ అయింది!</span>
+                            </span>
+                          )}
+                        </div>
+                      </div>
+                    ) : (
+                      /* Inline Editing Form */
+                      <div className="space-y-2.5 pt-2 bg-slate-950/95 p-3 rounded-xl border border-amber-500/40">
+                        <div className="text-[11px] font-bold text-amber-300 flex items-center gap-1">
+                          <Edit3 className="w-3 h-3" />
+                          <span>{language === 'te' ? 'పేరు & ఇంటిపేరు సవరణ (Edit & Fix):' : 'Edit & Fix Name:'}</span>
+                        </div>
+
+                        <div className="grid grid-cols-2 gap-2 text-xs">
+                          <div>
+                            <label className="text-[10px] font-bold text-slate-400 block mb-0.5">
+                              {language === 'te' ? 'తెలుగు ఓటరు పేరు (First Name):' : 'Telugu First Name:'}
+                            </label>
+                            <input
+                              type="text"
+                              value={editFirstNameTe}
+                              onChange={e => setEditFirstNameTe(e.target.value)}
+                              className="w-full px-2.5 py-1.5 bg-slate-900 border border-slate-700 rounded-lg text-white font-bold text-xs focus:outline-none focus:border-amber-400"
+                              placeholder="ఉదా: లావణ్య"
+                            />
+                          </div>
+
+                          <div>
+                            <label className="text-[10px] font-bold text-slate-400 block mb-0.5">
+                              {language === 'te' ? 'తెలుగు ఇంటిపేరు (Surname):' : 'Telugu Surname:'}
+                            </label>
+                            <input
+                              type="text"
+                              value={editSurnameTe}
+                              onChange={e => setEditSurnameTe(e.target.value)}
+                              className="w-full px-2.5 py-1.5 bg-slate-900 border border-slate-700 rounded-lg text-white font-bold text-xs focus:outline-none focus:border-amber-400"
+                              placeholder="ఉదా: గుండ్ర"
+                            />
+                          </div>
+
+                          <div>
+                            <label className="text-[10px] font-bold text-slate-400 block mb-0.5">
+                              English First Name:
+                            </label>
+                            <input
+                              type="text"
+                              value={editFirstNameEn}
+                              onChange={e => setEditFirstNameEn(e.target.value.toUpperCase())}
+                              className="w-full px-2.5 py-1.5 bg-slate-900 border border-slate-700 rounded-lg text-amber-200 font-mono font-bold text-xs focus:outline-none focus:border-amber-400"
+                              placeholder="e.g. LAVANYA"
+                            />
+                          </div>
+
+                          <div>
+                            <label className="text-[10px] font-bold text-slate-400 block mb-0.5">
+                              English Surname:
+                            </label>
+                            <input
+                              type="text"
+                              value={editSurnameEn}
+                              onChange={e => setEditSurnameEn(e.target.value.toUpperCase())}
+                              className="w-full px-2.5 py-1.5 bg-slate-900 border border-slate-700 rounded-lg text-amber-200 font-mono font-bold text-xs focus:outline-none focus:border-amber-400"
+                              placeholder="e.g. GUNDRA"
+                            />
+                          </div>
+                        </div>
+
+                        {/* Live Preview */}
+                        <div className="bg-slate-900 p-2 rounded-lg border border-slate-800 text-[11px] flex items-center justify-between">
+                          <div>
+                            <span className="text-slate-400">సరిదిద్దిన పేరు: </span>
+                            <strong className="text-white">
+                              {editSurnameTe ? `${editFirstNameTe} ${editSurnameTe}` : editFirstNameTe}
+                            </strong>
+                            <span className="text-amber-300 font-mono ml-1.5 font-bold">
+                              ({editSurnameEn ? `${editFirstNameEn} ${editSurnameEn}` : editFirstNameEn})
+                            </span>
+                          </div>
+                        </div>
+
+                        {/* Save Button */}
+                        <div className="flex items-center justify-end gap-2 pt-1">
+                          <button
+                            type="button"
+                            onClick={() => setIsEditingName(false)}
+                            className="px-3 py-1 bg-slate-800 hover:bg-slate-700 text-slate-300 rounded-lg text-xs font-bold cursor-pointer"
+                          >
+                            {language === 'te' ? 'రద్దు' : 'Cancel'}
+                          </button>
+                          <button
+                            type="button"
+                            onClick={handleSaveNameAndSync}
+                            disabled={isSavingName}
+                            className="px-4 py-1.5 bg-gradient-to-r from-emerald-600 to-teal-600 hover:from-emerald-500 hover:to-teal-500 text-white rounded-lg text-xs font-black flex items-center gap-1.5 shadow-md active:scale-95 cursor-pointer disabled:opacity-50"
+                          >
+                            <Save className="w-3.5 h-3.5" />
+                            <span>{isSavingName ? 'సేవ్ అవుతోంది...' : (language === 'te' ? '💾 పేరు సేవ్ చేయి & సింక్ చేయి' : 'Save & Sync')}</span>
+                          </button>
+                        </div>
+                      </div>
                     )}
                   </div>
 

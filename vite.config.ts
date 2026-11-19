@@ -200,6 +200,85 @@ export default defineConfig({
             res.end();
           }
         });
+        // 5. Update Voter Name & Surname (Permanent on-disk and cross-device persistence)
+        server.middlewares.use('/api/update-voter-name', (req, res) => {
+          res.setHeader('Access-Control-Allow-Origin', '*');
+          res.setHeader('Access-Control-Allow-Methods', 'POST, OPTIONS');
+          res.setHeader('Access-Control-Allow-Headers', 'Content-Type');
+
+          if (req.method === 'OPTIONS') {
+            res.writeHead(200);
+            res.end();
+            return;
+          }
+
+          if (req.method === 'POST') {
+            let body = '';
+            req.on('data', chunk => {
+              body += chunk;
+            });
+            req.on('end', () => {
+              try {
+                const { booth, sno, name_te, name_en, surname_te, surname_en } = JSON.parse(body);
+                if (!sno || !name_te || !name_en) {
+                  res.writeHead(400, { 'Content-Type': 'application/json' });
+                  res.end(JSON.stringify({ error: 'Missing sno, name_te, or name_en' }));
+                  return;
+                }
+
+                const boothId = booth || 'gp_durgada';
+                const boothPath = path.resolve(__dirname, `public/booths/${boothId}.json`);
+
+                let updatedVoter: any = null;
+                if (fs.existsSync(boothPath)) {
+                  const raw = JSON.parse(fs.readFileSync(boothPath, 'utf8'));
+                  const voters = raw.voters || [];
+                  const idx = voters.findIndex((v: any) => Number(v.s || v.sno) === Number(sno));
+                  if (idx !== -1) {
+                    const v = voters[idx];
+                    v.name_te = name_te.trim();
+                    v.name_en = name_en.trim();
+                    v.n = `${v.name_en} (${v.name_te})`;
+                    if (surname_te) v.surname_te = surname_te.trim();
+                    if (surname_en) v.surname = surname_en.trim().toUpperCase();
+                    updatedVoter = { ...v };
+                    fs.writeFileSync(boothPath, JSON.stringify(raw, null, 2), 'utf8');
+                  }
+                }
+
+                // Also update in profiles if needed
+                const profileDir = path.resolve(__dirname, 'public/profiles');
+                const profilePath = path.join(profileDir, `profiles_${boothId}.json`);
+                if (fs.existsSync(profilePath)) {
+                  try {
+                    const profiles = JSON.parse(fs.readFileSync(profilePath, 'utf8'));
+                    if (!profiles[sno]) profiles[sno] = {};
+                    profiles[sno].customAlias = name_te.trim();
+                    profiles[sno].correctedNameTe = name_te.trim();
+                    profiles[sno].correctedNameEn = name_en.trim();
+                    if (surname_te) profiles[sno].correctedSurnameTe = surname_te.trim();
+                    if (surname_en) profiles[sno].correctedSurnameEn = surname_en.trim();
+                    profiles[sno].updatedAt = new Date().toISOString();
+                    fs.writeFileSync(profilePath, JSON.stringify(profiles, null, 2), 'utf8');
+                  } catch {}
+                }
+
+                res.writeHead(200, { 'Content-Type': 'application/json' });
+                res.end(JSON.stringify({
+                  success: true,
+                  sno,
+                  updatedVoter
+                }));
+              } catch (e: any) {
+                res.writeHead(500, { 'Content-Type': 'application/json' });
+                res.end(JSON.stringify({ error: e?.message || 'Server error' }));
+              }
+            });
+          } else {
+            res.writeHead(405);
+            res.end();
+          }
+        });
       }
     }
   ],
