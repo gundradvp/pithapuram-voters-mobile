@@ -16,6 +16,7 @@ import {
 } from 'lucide-react';
 import { MobileVoter, BoothInfo, VoterCampaignProfile } from '../types';
 import { Language } from '../utils/i18n';
+import { resolvePhotoUrl } from '../utils/photoResolver';
 
 interface GroupPrintModalProps {
   isOpen: boolean;
@@ -30,11 +31,13 @@ interface GroupPrintModalProps {
 }
 
 type SortField = 'sno' | 'hn' | 'age_desc' | 'name';
-type PrintLayout = 'slips' | 'table';
+export type PrintLayout = 'slips' | 'table' | 'cards';
 export type SlipsPerPage = 2 | 4 | 6 | 8 | 10;
+export type CardsPerPage = 2 | 4 | 6;
 export type ColorTheme = 'blue' | 'tricolor' | 'emerald' | 'crimson' | 'bw';
 type BrandingMode = 'neutral' | 'party';
 type PhoneFilter = 'all' | 'with_phone' | 'without_phone';
+export type CategoryFilter = 'all' | 'out_of_city' | 'supporter' | 'neutral' | 'opponent' | 'not_voted' | 'voted' | 'deceased';
 
 interface ThemeDefinition {
   id: ColorTheme;
@@ -185,6 +188,8 @@ export const GroupPrintModal: React.FC<GroupPrintModalProps> = ({
     }
   }, [isOpen, initialLayout]);
   const [slipsPerPage, setSlipsPerPage] = useState<SlipsPerPage>(4);
+  const [cardsPerPage, setCardsPerPage] = useState<CardsPerPage>(4);
+  const [categoryFilter, setCategoryFilter] = useState<CategoryFilter>('all');
   const [colorTheme, setColorTheme] = useState<ColorTheme>('blue');
   const [brandingMode, setBrandingMode] = useState<BrandingMode>('neutral');
   const [sortBy, setSortBy] = useState<SortField>('sno');
@@ -219,25 +224,122 @@ export const GroupPrintModal: React.FC<GroupPrintModalProps> = ({
     return { withPhone, withoutPhone };
   }, [voters, profiles]);
 
+  // Pre-calculate category counts for the requirement filter badges
+  const categoryStats = useMemo(() => {
+    let outOfCity = 0;
+    let supporter = 0;
+    let neutral = 0;
+    let opponent = 0;
+    let notVoted = 0;
+    let voted = 0;
+    let deceased = 0;
+
+    voters.forEach(v => {
+      const voterSno = v.s ?? (v as any).sno;
+      const prof = voterSno ? profiles[voterSno] : undefined;
+      if (!prof) {
+        neutral++;
+        notVoted++;
+        return;
+      }
+
+      if (prof.survey_status === 'out_of_city') outOfCity++;
+      if (prof.survey_status === 'deceased') deceased++;
+
+      if (prof.survey_status === 'voted' || (prof as any).is_voted) {
+        voted++;
+      } else if (prof.survey_status !== 'deceased') {
+        notVoted++;
+      }
+
+      const pct = prof.supportPct;
+      if (pct !== undefined) {
+        if (pct >= 75) supporter++;
+        else if (pct <= 25) opponent++;
+        else neutral++;
+      } else if (prof.survey_status === 'supporter') {
+        supporter++;
+      } else if (prof.survey_status === 'opponent') {
+        opponent++;
+      } else {
+        neutral++;
+      }
+    });
+
+    return {
+      total: voters.length,
+      outOfCity,
+      supporter,
+      neutral,
+      opponent,
+      notVoted,
+      voted,
+      deceased
+    };
+  }, [voters, profiles]);
+
   // Filtered & Sorted Voters
   const sortedVoters = useMemo(() => {
     let list = [...voters];
 
-    // 1. Gender Filter
+    // 1. Category / Requirement Filter
+    if (categoryFilter === 'out_of_city') {
+      list = list.filter(v => {
+        const s = v.s ?? (v as any).sno;
+        return profiles[s]?.survey_status === 'out_of_city';
+      });
+    } else if (categoryFilter === 'supporter') {
+      list = list.filter(v => {
+        const s = v.s ?? (v as any).sno;
+        const p = profiles[s];
+        return (p?.supportPct !== undefined && p.supportPct >= 75) || p?.survey_status === 'supporter';
+      });
+    } else if (categoryFilter === 'neutral') {
+      list = list.filter(v => {
+        const s = v.s ?? (v as any).sno;
+        const p = profiles[s];
+        return (!p || p.supportPct === undefined || (p.supportPct > 25 && p.supportPct < 75)) && p?.survey_status !== 'deceased';
+      });
+    } else if (categoryFilter === 'opponent') {
+      list = list.filter(v => {
+        const s = v.s ?? (v as any).sno;
+        const p = profiles[s];
+        return (p?.supportPct !== undefined && p.supportPct <= 25) || p?.survey_status === 'opponent';
+      });
+    } else if (categoryFilter === 'not_voted') {
+      list = list.filter(v => {
+        const s = v.s ?? (v as any).sno;
+        const p = profiles[s];
+        return (!p || (p.survey_status !== 'voted' && !(p as any).is_voted)) && p?.survey_status !== 'deceased';
+      });
+    } else if (categoryFilter === 'voted') {
+      list = list.filter(v => {
+        const s = v.s ?? (v as any).sno;
+        const p = profiles[s];
+        return p?.survey_status === 'voted' || (p as any)?.is_voted === true;
+      });
+    } else if (categoryFilter === 'deceased') {
+      list = list.filter(v => {
+        const s = v.s ?? (v as any).sno;
+        return profiles[s]?.survey_status === 'deceased';
+      });
+    }
+
+    // 2. Gender Filter
     if (genderFilter === 'M') {
       list = list.filter(v => v.g === 'M' || (v as any).gender_en === 'Male' || (v as any).gender_te === 'పురుషుడు');
     } else if (genderFilter === 'F') {
       list = list.filter(v => v.g === 'F' || v.g === 'W' || (v as any).gender_en === 'Female' || (v as any).gender_te === 'స్త్రీ');
     }
 
-    // 2. Phone Number Filter
+    // 3. Phone Number Filter
     if (phoneFilter === 'with_phone') {
       list = list.filter(v => Boolean(getVoterPhone(v)));
     } else if (phoneFilter === 'without_phone') {
       list = list.filter(v => !Boolean(getVoterPhone(v)));
     }
 
-    // 3. Sorting
+    // 4. Sorting
     list.sort((a, b) => {
       const snoA = a.s ?? (a as any).sno ?? 0;
       const snoB = b.s ?? (b as any).sno ?? 0;
@@ -261,7 +363,16 @@ export const GroupPrintModal: React.FC<GroupPrintModalProps> = ({
     });
 
     return list;
-  }, [voters, sortBy, genderFilter, phoneFilter, profiles]);
+  }, [voters, sortBy, categoryFilter, genderFilter, phoneFilter, profiles]);
+
+  // Paginated Voter Chunks for Cards Print (2, 4, 6 cards per A4 page)
+  const cardPages = useMemo(() => {
+    const pages: MobileVoter[][] = [];
+    for (let i = 0; i < sortedVoters.length; i += cardsPerPage) {
+      pages.push(sortedVoters.slice(i, i + cardsPerPage));
+    }
+    return pages;
+  }, [sortedVoters, cardsPerPage]);
 
   // Paginated Voter Chunks for Slip Print (Exact A4 Fit: 2, 4, 6, 8, 10 slips per page)
   const slipPages = useMemo(() => {
@@ -423,6 +534,16 @@ export const GroupPrintModal: React.FC<GroupPrintModalProps> = ({
             color-adjust: exact !important;
           }
 
+          .voter-card-print {
+            page-break-inside: avoid !important;
+            break-inside: avoid !important;
+            background: #ffffff !important;
+            box-shadow: none !important;
+            -webkit-print-color-adjust: exact !important;
+            print-color-adjust: exact !important;
+            color-adjust: exact !important;
+          }
+
           .print-header-bg {
             -webkit-print-color-adjust: exact !important;
             print-color-adjust: exact !important;
@@ -486,9 +607,9 @@ export const GroupPrintModal: React.FC<GroupPrintModalProps> = ({
           </div>
         </div>
 
-        {/* Toolbar Row 1: Print Layout Mode (Slips vs Normal List) & Contextual Controls */}
+        {/* Toolbar Row 1: Print Layout Mode (Slips vs Photo Cards vs Normal List) & Contextual Controls */}
         <div className="flex items-center justify-between gap-2 flex-wrap pt-2 border-t border-slate-800 text-[11px]">
-          {/* Main Format Tabs: Voter Slips vs Normal Voter List */}
+          {/* Main Format Tabs: Voter Slips vs Photo Cards vs Normal Voter List */}
           <div className="flex items-center gap-1.5 p-1 bg-slate-950 rounded-xl border border-slate-700">
             <button
               type="button"
@@ -500,7 +621,20 @@ export const GroupPrintModal: React.FC<GroupPrintModalProps> = ({
               }`}
             >
               <Printer className="w-3.5 h-3.5" />
-              <span>🖨️ ఓటర్ చీటీలు (Voter Slips)</span>
+              <span>🖨️ ఓటర్ చీటీలు (Slips)</span>
+            </button>
+            <button
+              type="button"
+              onClick={() => setPrintLayout('cards')}
+              className={`px-3 py-1.5 rounded-lg text-xs font-black flex items-center gap-1.5 transition-all cursor-pointer ${
+                printLayout === 'cards'
+                  ? 'bg-amber-500 text-slate-950 shadow-md font-black'
+                  : 'text-slate-300 hover:text-white hover:bg-slate-800'
+              }`}
+              title="అధికారిక ఫొటో ఓటర్ కార్డులు (Official Electoral Photo Cards) A4 సైజులో ముద్రించండి"
+            >
+              <Layers className="w-3.5 h-3.5 text-amber-400" />
+              <span>📇 అధికారిక కార్డులు (Photo Cards)</span>
             </button>
             <button
               type="button"
@@ -512,7 +646,7 @@ export const GroupPrintModal: React.FC<GroupPrintModalProps> = ({
               }`}
             >
               <Users className="w-3.5 h-3.5" />
-              <span>📋 సాధారణ ఓటర్ల జాబితా (Normal List)</span>
+              <span>📋 సాధారణ జాబితా (List)</span>
             </button>
           </div>
 
@@ -536,6 +670,28 @@ export const GroupPrintModal: React.FC<GroupPrintModalProps> = ({
                   title={`పేజీకి ${num} ఓటర్ స్లిప్పులు (A4 లో ${num} భాగాలు)`}
                 >
                   {num === 4 ? `4 (సిఫార్సు)` : num === 8 ? `8 (కాంపాక్ట్)` : `${num}`}
+                </button>
+              ))}
+            </div>
+          ) : printLayout === 'cards' ? (
+            /* Cards per page options (2, 4, 6 cards) */
+            <div className="flex items-center gap-1 bg-slate-800/90 p-1 rounded-xl border border-slate-700 flex-wrap">
+              <span className="text-amber-400 font-bold px-1.5 text-[10.5px] flex items-center gap-1">
+                <Layers className="w-3.5 h-3.5" /> పేజీకి కార్డులు:
+              </span>
+              {([2, 4, 6] as CardsPerPage[]).map(num => (
+                <button
+                  key={num}
+                  type="button"
+                  onClick={() => setCardsPerPage(num)}
+                  className={`px-2.5 py-1 rounded-lg text-xs font-black transition-all cursor-pointer ${
+                    cardsPerPage === num
+                      ? 'bg-amber-500 text-slate-950 shadow-md scale-105'
+                      : 'text-slate-300 hover:text-white hover:bg-slate-700/60'
+                  }`}
+                  title={`A4 పేజీకి ${num} కార్డులు`}
+                >
+                  {num === 4 ? `4 (సిఫార్సు 2x2)` : num === 6 ? `6 (కాంపాక్ట్ 2x3)` : `2 (పెద్దవి)`}
                 </button>
               ))}
             </div>
@@ -595,6 +751,113 @@ export const GroupPrintModal: React.FC<GroupPrintModalProps> = ({
               </button>
             ))}
           </div>
+        </div>
+
+        {/* Toolbar Row 1.5: Requirement / Selective Print Filter Row */}
+        <div className="pt-2 border-t border-slate-800 space-y-2">
+          <div className="flex items-center gap-1.5 bg-slate-950/90 p-1.5 rounded-xl border border-amber-500/30 flex-wrap text-[11px]">
+            <span className="text-amber-400 font-black px-1.5 text-[11px] flex items-center gap-1 shrink-0">
+              🎯 ప్రింట్ చేయాల్సిన కేటగిరీ:
+            </span>
+
+            {/* All */}
+            <button
+              type="button"
+              onClick={() => setCategoryFilter('all')}
+              className={`px-2.5 py-1 rounded-lg text-[10.5px] font-bold transition-all cursor-pointer ${
+                categoryFilter === 'all'
+                  ? 'bg-amber-500 text-slate-950 font-black shadow-md'
+                  : 'text-slate-300 hover:text-white hover:bg-slate-800'
+              }`}
+            >
+              🌐 అందరూ ({categoryStats.total})
+            </button>
+
+            {/* Out of Village (HIGHLIGHTED - As Requested by User) */}
+            <button
+              type="button"
+              onClick={() => setCategoryFilter('out_of_city')}
+              className={`px-3 py-1 rounded-lg text-[10.5px] font-black transition-all cursor-pointer flex items-center gap-1.5 ${
+                categoryFilter === 'out_of_city'
+                  ? 'bg-blue-600 text-white font-black shadow-lg ring-2 ring-blue-300 scale-105'
+                  : 'bg-blue-950/80 text-blue-300 border border-blue-500/50 hover:bg-blue-900 hover:text-white'
+              }`}
+              title="ఊరిలో లేని / వలస వెళ్లిన ఓటర్ల కార్డులు మాత్రమే ప్రింట్ చేయండి"
+            >
+              <span>✈️ ఊరిలో లేరు ({categoryStats.outOfCity})</span>
+              {categoryStats.outOfCity > 0 && (
+                <span className="w-2 h-2 rounded-full bg-blue-300 animate-pulse" />
+              )}
+            </button>
+
+            {/* 100% Support / Ours */}
+            <button
+              type="button"
+              onClick={() => setCategoryFilter('supporter')}
+              className={`px-2.5 py-1 rounded-lg text-[10.5px] font-bold transition-all cursor-pointer flex items-center gap-1 ${
+                categoryFilter === 'supporter'
+                  ? 'bg-emerald-500 text-slate-950 font-black shadow-md ring-2 ring-emerald-300'
+                  : 'text-emerald-400 hover:bg-slate-800 hover:text-white'
+              }`}
+            >
+              <span>⭐ మనవాళ్ళు ({categoryStats.supporter})</span>
+            </button>
+
+            {/* Neutral */}
+            <button
+              type="button"
+              onClick={() => setCategoryFilter('neutral')}
+              className={`px-2.5 py-1 rounded-lg text-[10.5px] font-bold transition-all cursor-pointer flex items-center gap-1 ${
+                categoryFilter === 'neutral'
+                  ? 'bg-amber-500 text-slate-950 font-black shadow-md ring-2 ring-amber-300'
+                  : 'text-amber-300 hover:bg-slate-800 hover:text-white'
+              }`}
+            >
+              <span>❓ తటస్థులు ({categoryStats.neutral})</span>
+            </button>
+
+            {/* Not Voted */}
+            <button
+              type="button"
+              onClick={() => setCategoryFilter('not_voted')}
+              className={`px-2.5 py-1 rounded-lg text-[10.5px] font-bold transition-all cursor-pointer flex items-center gap-1 ${
+                categoryFilter === 'not_voted'
+                  ? 'bg-amber-500 text-slate-950 font-black shadow-md'
+                  : 'text-slate-300 hover:bg-slate-800 hover:text-white'
+              }`}
+            >
+              <span>⏳ ఓటు వేయనివారు ({categoryStats.notVoted})</span>
+            </button>
+
+            {/* Voted */}
+            <button
+              type="button"
+              onClick={() => setCategoryFilter('voted')}
+              className={`px-2.5 py-1 rounded-lg text-[10.5px] font-bold transition-all cursor-pointer flex items-center gap-1 ${
+                categoryFilter === 'voted'
+                  ? 'bg-teal-500 text-slate-950 font-black shadow-md'
+                  : 'text-teal-300 hover:bg-slate-800 hover:text-white'
+              }`}
+            >
+              <span>🗳️ ఓటు వేసినవారు ({categoryStats.voted})</span>
+            </button>
+          </div>
+
+          {/* Quick Informative Notice when selective filter is active */}
+          {categoryFilter === 'out_of_city' && (
+            <div className="bg-blue-950/70 border border-blue-500/50 rounded-xl px-3 py-1.5 flex items-center justify-between text-xs text-blue-200">
+              <span className="flex items-center gap-1.5 font-bold">
+                ✈️ <strong>ఊరిలో లేని ఓటర్లు మాత్రమే ({sortedVoters.length} మంది)</strong> — వీరికి మాత్రమే అధికారిక కార్డులు/చీటీలు ప్రింట్ అవుతాయి. కాగితం మరియు ప్రింటర్ ఇంక్ ఆదా అవుతాయి!
+              </span>
+              <button
+                type="button"
+                onClick={() => setCategoryFilter('all')}
+                className="text-blue-300 hover:text-white underline text-[11px] font-bold cursor-pointer"
+              >
+                అందరినీ చూపించు
+              </button>
+            </div>
+          )}
         </div>
 
         {/* Toolbar Row 2: Phone Filters, Phone Print Checkbox & Branding */}
@@ -1071,6 +1334,181 @@ export const GroupPrintModal: React.FC<GroupPrintModalProps> = ({
               </div>
             );
           })
+        ) : printLayout === 'cards' ? (
+          /* =======================================================================
+             OFFICIAL PHOTO VOTER CARDS VIEW: Discrete A4 Pages (2, 4, 6 cards/page)
+             ======================================================================= */
+          cardPages.length === 0 ? (
+            <div className="bg-slate-900 border border-slate-800 rounded-2xl p-8 text-center text-slate-400">
+              <Layers className="w-10 h-10 mx-auto text-amber-500 mb-2 opacity-50" />
+              <p className="font-bold text-white text-sm">ఈ కేటగిరీలో ఎలాంటి ఓటర్లు లేరు</p>
+              <p className="text-xs text-slate-400 mt-1">వేరే కేటగిరీ లేదా అందరినీ ఎంచుకోండి.</p>
+            </div>
+          ) : (
+            cardPages.map((pageVoters, pageIndex) => {
+              const gridCols = cardsPerPage === 2 ? 'grid-cols-1' : 'grid-cols-2';
+              const gridGap = cardsPerPage === 6 ? 'gap-2' : 'gap-3';
+
+              return (
+                <div
+                  key={pageIndex}
+                  className="a4-print-page w-full bg-white text-slate-900 rounded-xl shadow-2xl p-3 sm:p-5 border border-slate-300 mx-auto flex flex-col justify-between"
+                >
+                  {/* Page Top Header */}
+                  <div className={`rounded-xl p-2.5 mb-2 border shadow-sm ${activeTheme.headerGrad} print-header-bg`}>
+                    <div className="flex items-center justify-between gap-2">
+                      <div className="flex items-center gap-2 min-w-0">
+                        <span className="text-xl shrink-0">📇</span>
+                        <div className="min-w-0">
+                          <h1 className="text-xs sm:text-sm font-black tracking-tight uppercase leading-tight truncate">
+                            అధికారిక ఓటరు కార్డులు • OFFICIAL ELECTORAL PHOTO CARDS
+                          </h1>
+                          <p className="text-[10px] font-bold opacity-90 leading-tight truncate">
+                            {boothHeaderLabel}
+                            {categoryFilter === 'out_of_city' && ' • ✈️ ఊరిలో లేని ఓటర్లు (Out of Village)'}
+                            {categoryFilter === 'supporter' && ' • ⭐ 100% మద్దతుదారులు'}
+                          </p>
+                        </div>
+                      </div>
+
+                      <div className="text-right flex flex-col items-end shrink-0">
+                        <div className="inline-flex items-center gap-1 bg-white/20 backdrop-blur-sm border border-white/40 px-2 py-0.5 rounded-full font-bold text-[9.5px] text-white">
+                          <span>SIR Draft Electoral Roll</span>
+                        </div>
+                        <span className="text-[9px] text-white/90 font-mono mt-0.5">
+                          పేజీ {pageIndex + 1} / {cardPages.length} • తేదీ: {todayDate}
+                        </span>
+                      </div>
+                    </div>
+                  </div>
+
+                  {/* Cards Grid */}
+                  <div className={`grid ${gridCols} ${gridGap} flex-1 content-start`}>
+                    {pageVoters.map((v, vIdx) => {
+                      const voterSno = v.s ?? (v as any).sno;
+                      const prof = voterSno ? profiles[voterSno] : undefined;
+                      const cardPath = v.card_url || v.card;
+                      const photoPath = v.photo_url || v.photo;
+                      const phone = getVoterPhone(v);
+                      const isOutOfCity = prof?.survey_status === 'out_of_city';
+                      const isSupporter = (prof?.supportPct !== undefined && prof.supportPct >= 75) || prof?.survey_status === 'supporter';
+                      const isMale = v.g === 'M' || (v as any).gender_en === 'Male' || (v as any).gender_te === 'పురుషుడు';
+
+                      return (
+                        <div
+                          key={voterSno || vIdx}
+                          className="voter-card-print border-2 border-slate-300 rounded-xl p-2 bg-white flex flex-col justify-between shadow-none relative"
+                          style={{ pageBreakInside: 'avoid', breakInside: 'avoid' }}
+                        >
+                          {/* Card Top Banner with S.No & Badges */}
+                          <div className="flex items-center justify-between pb-1 mb-1 border-b border-slate-200 text-[10px]">
+                            <div className="flex items-center gap-1.5 min-w-0">
+                              <span className="font-mono font-black bg-slate-900 text-white px-2 py-0.5 rounded text-[11px] shrink-0">
+                                #{voterSno}
+                              </span>
+                              <span className="font-mono font-bold bg-amber-100 text-amber-950 px-1.5 py-0.5 rounded border border-amber-300 text-[10px] truncate">
+                                {v.id || (v as any).epic}
+                              </span>
+                              <span className="text-slate-600 font-bold text-[9px] shrink-0">
+                                వార్డు #{v.ward_no || (v as any).w || boothInfo.ward_no}
+                              </span>
+                            </div>
+
+                            <div className="flex items-center gap-1 shrink-0">
+                              {isOutOfCity && (
+                                <span className="bg-blue-600 text-white font-black px-1.5 py-0.5 rounded text-[9px] uppercase tracking-wider shadow-sm">
+                                  ✈️ ఊరిలో లేరు
+                                </span>
+                              )}
+                              {isSupporter && (
+                                <span className="bg-emerald-600 text-white font-black px-1.5 py-0.5 rounded text-[9px]">
+                                  ⭐ 100%
+                                </span>
+                              )}
+                            </div>
+                          </div>
+
+                          {/* Official Voter Card Image or Structured Fallback */}
+                          {cardPath ? (
+                            <div className="rounded-lg overflow-hidden border border-slate-300 bg-slate-50 p-1 flex items-center justify-center my-auto min-h-[120px] max-h-[175px]">
+                              <img
+                                src={resolvePhotoUrl(cardPath)}
+                                alt={`Official Voter Card ${voterSno}`}
+                                className="w-full h-auto max-h-[165px] object-contain mx-auto"
+                                onError={(e) => {
+                                  const target = e.currentTarget as HTMLImageElement;
+                                  const currentSrc = target.src;
+                                  const cleanPath = cardPath.startsWith('/') ? cardPath : `/${cardPath}`;
+                                  const gitHubRaw = `https://raw.githubusercontent.com/gundradvp/pithapuram-voters-mobile/main/public${cleanPath}`;
+                                  const jsdelivrCdn = `https://cdn.jsdelivr.net/gh/gundradvp/pithapuram-voters-mobile@main/public${cleanPath}`;
+                                  if (!currentSrc.includes('raw.githubusercontent.com') && !currentSrc.includes('cdn.jsdelivr.net')) {
+                                    target.src = gitHubRaw;
+                                  } else if (currentSrc.includes('raw.githubusercontent.com')) {
+                                    target.src = jsdelivrCdn;
+                                  }
+                                }}
+                              />
+                            </div>
+                          ) : (
+                            <div className="border border-slate-300 rounded-lg p-2 bg-slate-50 flex items-start gap-2.5 my-auto">
+                              {photoPath && (
+                                <img
+                                  src={resolvePhotoUrl(photoPath)}
+                                  alt={v.n}
+                                  className="w-14 h-18 object-cover rounded border border-slate-400 bg-white shrink-0"
+                                  onError={(e) => {
+                                    (e.currentTarget as HTMLElement).style.display = 'none';
+                                  }}
+                                />
+                              )}
+                              <div className="min-w-0 flex-1 text-[11px] leading-tight space-y-0.5">
+                                <p className="font-black text-slate-900 text-xs">{v.n}</p>
+                                {v.r && <p className="text-slate-600 text-[10px]">సంబంధం: {v.r}</p>}
+                                <p className="text-slate-700 font-bold">
+                                  వయస్సు: {v.a} • {isMale ? 'పురుషుడు' : 'స్త్రీ'}
+                                </p>
+                                <p className="text-slate-600 font-medium">
+                                  ఇంటి నెం: <strong className="font-mono text-slate-900">{v.hn || '—'}</strong>
+                                </p>
+                              </div>
+                            </div>
+                          )}
+
+                          {/* Card Footer with Location, Phone & Cut Line */}
+                          <div className="mt-1 pt-1 border-t border-slate-200 text-[8.5px] text-slate-600 space-y-0.5">
+                            <div className="flex items-center justify-between gap-1">
+                              <span className="truncate max-w-[70%]">
+                                📍 {boothInfo.ps_address || boothInfo.clean_village || 'పిఠాపురం నియోజకవర్గం'}
+                              </span>
+                              {showPhone && phone && (
+                                <span className="font-mono font-bold text-slate-950 bg-emerald-50 px-1 py-0.2 rounded border border-emerald-300">
+                                  📞 {phone}
+                                </span>
+                              )}
+                            </div>
+                            <div className="border-t border-dashed border-slate-300 pt-0.5 flex items-center justify-between text-[7.5px] text-slate-400">
+                              <span>✂️ కట్ చేసుకోండి • అధికారిక ఓటరు గుర్తింపు కార్డు</span>
+                              <span className="font-mono">ECI Card #{voterSno}</span>
+                            </div>
+                          </div>
+                        </div>
+                      );
+                    })}
+                  </div>
+
+                  {/* Page Footer */}
+                  <div className="mt-2 pt-1 border-t border-slate-300 flex items-center justify-between text-[8px] text-slate-500 leading-none">
+                    <p className="font-bold text-slate-700">
+                      అధికారిక ఓటరు కార్డుల ముద్రణ • పిఠాపురం నియోజకవర్గం (AC #37)
+                    </p>
+                    <div className="text-right font-mono font-bold text-slate-600">
+                      పేజీ {pageIndex + 1} / {cardPages.length} • మొత్తం కార్డులు: {sortedVoters.length}
+                    </div>
+                  </div>
+                </div>
+              );
+            })
+          )
         ) : (
           /* =======================================================================
              TABLE / ROSTER VIEW

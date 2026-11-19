@@ -43,7 +43,7 @@ interface VotersExcelGridProps {
   onOpenPhoneEditor: (voter: MobileVoter) => void;
   onOpenSupportPicker: (title: string, currentPct: number, currentNotes?: string, voterSno?: number) => void;
   onOpenLogVisit: (voter: MobileVoter) => void;
-  onOpenGroupPrint?: (title: string, subtitle: string, voters: MobileVoter[], initialLayout?: 'slips' | 'table') => void;
+  onOpenGroupPrint?: (title: string, subtitle: string, voters: MobileVoter[], initialLayout?: 'slips' | 'table' | 'cards') => void;
   onSwitchToMobileView?: () => void;
 }
 

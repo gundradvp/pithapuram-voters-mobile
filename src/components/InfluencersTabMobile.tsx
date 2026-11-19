@@ -12,7 +12,7 @@ interface InfluencersTabMobileProps {
   onAddNewInfluencer: () => void;
   onOpenInfluencerAssign: (targetName: string, currentInfId?: string) => void;
   onOpenBulkAssign?: (infId?: string) => void;
-  onOpenGroupPrint?: (title: string, subtitle: string, voters: MobileVoter[], initialLayout?: 'slips' | 'table') => void;
+  onOpenGroupPrint?: (title: string, subtitle: string, voters: MobileVoter[], initialLayout?: 'slips' | 'table' | 'cards') => void;
   onOpenSyncModal?: () => void;
 }
 

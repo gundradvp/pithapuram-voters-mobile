@@ -368,7 +368,7 @@ export function App() {
     title: string;
     subtitle?: string;
     voters: MobileVoter[];
-    initialLayout?: 'slips' | 'table';
+    initialLayout?: 'slips' | 'table' | 'cards';
   }>({
     open: false,
     title: '',
@@ -381,7 +381,7 @@ export function App() {
     title: string,
     subtitle: string,
     votersList: MobileVoter[],
-    initialLayout: 'slips' | 'table' = 'slips'
+    initialLayout: 'slips' | 'table' | 'cards' = 'slips'
   ) => {
     setGroupPrintState({
       open: true,

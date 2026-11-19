@@ -1,16 +1,5 @@
 [
   {
-    "id": "assign_9479797947",
-    "phone": "9479797947",
-    "name": "గొల్లప్రోలు ఇంచార్జ్ (Gollaprolu Incharge)",
-    "assemblyBooths": [],
-    "municipalWards": [],
-    "notes": "గొల్లప్రోలు నగర పంచాయతీ 11వ వార్డు",
-    "assignedAt": "2026-11-01T00:00:00.000Z",
-    "expiresAt": 1793743682398,
-    "expiryMinutes": 30
-  },
-  {
     "id": "assign_9000273028",
     "phone": "9000273028",
     "name": "దుర్గా ప్రసాద్ (Durga Prasad)",
@@ -20,6 +9,32 @@
     ],
     "notes": "పిఠాపురం అసెంబ్లీ & గ్రామ పంచాయతీ ఎన్నికల కోఆర్డినేటర్",
     "assignedAt": "2026-11-18T12:21:46.322Z",
+    "expiryMinutes": 0
+  },
+  {
+    "id": "assign_9533061361_1795027463756",
+    "phone": "9533061361",
+    "name": "Nagarjuna",
+    "assemblyBooths": [],
+    "municipalWards": [
+      "gp_tatiparthy",
+      "gp_tatiparthy_w1",
+      "gp_tatiparthy_w2",
+      "gp_tatiparthy_w3",
+      "gp_tatiparthy_w4",
+      "gp_tatiparthy_w5",
+      "gp_tatiparthy_w6",
+      "gp_tatiparthy_w7",
+      "gp_tatiparthy_w8",
+      "gp_tatiparthy_w9",
+      "gp_tatiparthy_w10",
+      "gp_tatiparthy_w11",
+      "gp_tatiparthy_w12",
+      "gp_tatiparthy_w13",
+      "gp_tatiparthy_w14"
+    ],
+    "notes": "",
+    "assignedAt": "2026-11-18T18:44:23.756Z",
     "expiryMinutes": 0
   }
 ]

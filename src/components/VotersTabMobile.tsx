@@ -1,5 +1,5 @@
 import React, { useState, useMemo, useEffect } from 'react';
-import { Search, Phone, Trophy, PhoneCall, MessageSquare, Send, Printer, CheckCircle2, Flag, Star, UserX, AlertCircle, Sparkles, Home, UserCheck, Sliders, Plus, Clock, User, Volume2, Users, Building, ChevronDown, ChevronUp, Copy, Hash, X, Mic, MicOff, Zap, RotateCcw, CheckSquare, Square, Table, Edit3, LayoutGrid, List } from 'lucide-react';
+import { Search, Phone, Trophy, PhoneCall, MessageSquare, Send, Printer, CheckCircle2, Flag, Star, UserX, AlertCircle, Sparkles, Home, UserCheck, Sliders, Plus, Clock, User, Volume2, Users, Building, ChevronDown, ChevronUp, Copy, Hash, X, Mic, MicOff, Zap, RotateCcw, CheckSquare, Square, Table, Edit3, LayoutGrid, List, Layers } from 'lucide-react';
 import { MobileVoter, BoothInfo, VoterSurveyStatus, VoterCampaignProfile } from '../types';
 import { Language, translations } from '../utils/i18n';
 import { resolvePhotoUrl } from '../utils/photoResolver';
@@ -24,7 +24,7 @@ interface VotersTabMobileProps {
   onQuickToggleOurs?: (serialNo: number) => void;
   onQuickToggleVoted?: (serialNo: number) => void;
   onOpenSlip: (voter: MobileVoter) => void;
-  onOpenGroupPrint?: (title: string, subtitle: string, voters: MobileVoter[], initialLayout?: 'slips' | 'table') => void;
+  onOpenGroupPrint?: (title: string, subtitle: string, voters: MobileVoter[], initialLayout?: 'slips' | 'table' | 'cards') => void;
   onOpenSurnameLeaning?: (clanId?: string) => void;
   onOpenBulkAssign?: (snos?: number[]) => void;
   onUpdateCustomAlias?: (serialNo: number, alias: string) => void;
@@ -295,29 +295,31 @@ export const VotersTabMobile: React.FC<VotersTabMobileProps> = ({
     setSelectedVoterSnos(new Set(allSnos));
   };
 
-  const handlePrintSelected = (layout: 'slips' | 'table' = 'slips') => {
+  const handlePrintSelected = (layout: 'slips' | 'table' | 'cards' = 'slips') => {
     if (!onOpenGroupPrint || selectedVoterSnos.size === 0) return;
     const selected = voters.filter(v => selectedVoterSnos.has(v.s));
     onOpenGroupPrint(
       language === 'te'
-        ? (layout === 'table' ? `ఎంచుకున్న ఓటర్ల సాధారణ జాబితా (Roster)` : `ఎంచుకున్న ఓటర్ల స్లిప్పులు`)
-        : (layout === 'table' ? `Selected Voter Roster` : `Selected Voter Slips`),
+        ? (layout === 'table' ? `ఎంచుకున్న ఓటర్ల సాధారణ జాబితా (Roster)` : layout === 'cards' ? `ఎంచుకున్న ఓటర్ల అధికారిక కార్డులు (Photo Cards)` : `ఎంచుకున్న ఓటర్ల స్లిప్పులు`)
+        : (layout === 'table' ? `Selected Voter Roster` : layout === 'cards' ? `Selected Voter Photo Cards` : `Selected Voter Slips`),
       `${boothInfo.clean_village || boothInfo.ps_address} • మొత్తం ${selected.length} మంది ఓటర్లు`,
       selected,
       layout
     );
   };
 
-  const handlePrintAll = (layout: 'slips' | 'table' = 'slips') => {
+  const handlePrintAll = (layout: 'slips' | 'table' | 'cards' = 'slips') => {
     if (!onOpenGroupPrint || filteredVoters.length === 0) return;
-    const isTable = layout === 'table';
+    const suffix = layout === 'table' ? 'సాధారణ జాబితా (Roster)' : layout === 'cards' ? 'అధికారిక కార్డులు (Photo Cards)' : 'స్లిప్పులు';
     const groupTitle = selectedSurname !== 'all'
-      ? `${selectedSurname} వంశ ఓటర్ల ${isTable ? 'సాధారణ జాబితా (Roster)' : 'స్లిప్పులు'}`
+      ? `${selectedSurname} వంశ ఓటర్ల ${suffix}`
       : selectedStreet !== 'all'
-        ? `${selectedStreet} వీధి ఓటర్ల ${isTable ? 'సాధారణ జాబితా (Roster)' : 'స్లిప్పులు'}`
-        : filterMode !== 'all'
-          ? `${filterMode.toUpperCase()} వర్గం ఓటర్ల ${isTable ? 'సాధారణ జాబితా (Roster)' : 'స్లిప్పులు'}`
-          : `బూత్ #${boothInfo.part_no || boothInfo.ward_no} ఓటర్ల ${isTable ? 'సాధారణ జాబితా (Roster)' : 'స్లిప్పులు'}`;
+        ? `${selectedStreet} వీధి ఓటర్ల ${suffix}`
+        : filterMode === 'out_of_city'
+          ? `✈️ ఊరిలో లేని ఓటర్ల ${suffix}`
+          : filterMode !== 'all'
+            ? `${filterMode.toUpperCase()} వర్గం ఓటర్ల ${suffix}`
+            : `బూత్ #${boothInfo.part_no || boothInfo.ward_no} ఓటర్ల ${suffix}`;
     onOpenGroupPrint(
       groupTitle,
       `${boothInfo.clean_village || boothInfo.ps_address} • మొత్తం ${filteredVoters.length} మంది ఓటర్లు`,
@@ -1928,6 +1930,17 @@ _దయచేసి మీ ఓటు హక్కును వినియోగ
               >
                 <Printer className="w-3 h-3 text-amber-400" />
                 <span>{language === 'te' ? `🖨️ చీటీలు (${filteredVoters.length})` : `🖨️ Slips (${filteredVoters.length})`}</span>
+              </button>
+
+              {/* Print Cards (Official Electoral Photo Cards) */}
+              <button
+                type="button"
+                onClick={() => handlePrintAll('cards')}
+                className="px-2 py-0.5 bg-gradient-to-r from-amber-600 via-orange-600 to-amber-700 hover:from-amber-500 hover:to-orange-500 text-white rounded-lg text-[10.5px] font-black flex items-center gap-1 shadow-sm active:scale-95 transition-all cursor-pointer"
+                title={language === 'te' ? 'అధికారిక ఫొటో ఓటర్ కార్డులు (Photo Cards) A4 సైజులో ముద్రించండి' : 'Print Official Voter Photo Cards'}
+              >
+                <Layers className="w-3 h-3 text-amber-200" />
+                <span>{language === 'te' ? `📇 కార్డులు (${filteredVoters.length})` : `📇 Cards (${filteredVoters.length})`}</span>
               </button>
 
               {/* Print Normal Voter List (Table / Roster View) */}
@@ -3606,6 +3619,16 @@ _దయచేసి మీ ఓటు హక్కును వినియోగ
             >
               <Printer className="w-3.5 h-3.5" />
               <span>{language === 'te' ? `చీటీలు (${selectedVoterSnos.size})` : `Slips (${selectedVoterSnos.size})`}</span>
+            </button>
+            <button
+              type="button"
+              onClick={() => handlePrintSelected('cards')}
+              disabled={selectedVoterSnos.size === 0}
+              className="px-2.5 py-1.5 rounded-xl bg-gradient-to-r from-amber-500 via-orange-500 to-amber-600 hover:from-amber-400 hover:to-orange-400 text-slate-950 font-black text-[11px] flex items-center gap-1 shadow-md disabled:opacity-40 disabled:cursor-not-allowed active:scale-95 transition-all cursor-pointer"
+              title="ఎంపిక చేసిన ఓటర్ల అధికారిక ఫొటో కార్డులు (Photo Cards) ప్రింట్ చేయండి"
+            >
+              <Layers className="w-3.5 h-3.5" />
+              <span>{language === 'te' ? `కార్డులు (${selectedVoterSnos.size})` : `Cards (${selectedVoterSnos.size})`}</span>
             </button>
             <button
               type="button"
