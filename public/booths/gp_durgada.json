@@ -204,8 +204,8 @@
       "sno": 6,
       "id": "YOU1106385",
       "epic": "YOU1106385",
-      "n": "DURGA VENKATA NAGESWARA RAO GOPISETTI (దుర్గ వెంకట నాగేశ్వర రావు గ)",
-      "name_te": "దుర్గ వెంకట నాగేశ్వర రావు గ",
+      "n": "DURGA VENKATA NAGESWARA RAO GOPISETTI (దుర్గ వెంకట నాగేశ్వర రావు గోపిశెట్టి)",
+      "name_te": "దుర్గ వెంకట నాగేశ్వర రావు గోపిశెట్టి",
       "name_en": "DURGA VENKATA NAGESWARA RAO GOPISETTI",
       "r": "VENKATA RAMANA GOPISETTI (వెంకట రమణ గోపిశెట్టి) (Father)",
       "rel_name_te": "వెంకట రమణ గోపిశెట్టి",
@@ -232,7 +232,9 @@
       "ac_sno": 6,
       "booth_no": 45,
       "ps_no": 45,
-      "polling_station_en": "Booth #45: Mandal Praja Parishad Primary School, Inti Kaasulu gaari School, Durgada"
+      "polling_station_en": "Booth #45: Mandal Praja Parishad Primary School, Inti Kaasulu gaari School, Durgada",
+      "surname_te": "గోపిశెట్టి",
+      "surname": "GOPISETTI"
     },
     {
       "s": 7,
@@ -309,8 +311,8 @@
       "sno": 9,
       "id": "YQU0197343",
       "epic": "YQU0197343",
-      "n": "MANIKYAM GOPISETTI (మాణిక్యం గోపీసెట్టీ)",
-      "name_te": "మాణిక్యం గోపీసెట్టీ",
+      "n": "MANIKYAM GOPISETTI (మాణిక్యం గోపిశెట్టి)",
+      "name_te": "మాణిక్యం గోపిశెట్టి",
       "name_en": "MANIKYAM GOPISETTI",
       "r": "PADMARAJU (పద్మ రాజు) (Father)",
       "rel_name_te": "పద్మ రాజు",
@@ -337,7 +339,9 @@
       "ac_sno": 9,
       "booth_no": 45,
       "ps_no": 45,
-      "polling_station_en": "Booth #45: Mandal Praja Parishad Primary School, Inti Kaasulu gaari School, Durgada"
+      "polling_station_en": "Booth #45: Mandal Praja Parishad Primary School, Inti Kaasulu gaari School, Durgada",
+      "surname_te": "గోపిశెట్టి",
+      "surname": "GOPISETTI"
     },
     {
       "s": 10,
@@ -1394,8 +1398,8 @@
       "sno": 40,
       "id": "YOU2550432",
       "epic": "YOU2550432",
-      "n": "SIVA GAMGA JALA CHAKRA JYO TI SAKHUNALA (శివగంగ జల చక్ర జ్యోతి సకున)",
-      "name_te": "శివగంగ జల చక్ర జ్యోతి సకున",
+      "n": "SIVA GAMGA JALA CHAKRA JYO TI SAKHUNALA (శివగంగ జల చక్ర జ్యోతి సఖునాల)",
+      "name_te": "శివగంగ జల చక్ర జ్యోతి సఖునాల",
       "name_en": "SIVA GAMGA JALA CHAKRA JYO TI SAKHUNALA",
       "r": "APPA RAO SAKHUNALA (అప్పారావు సకునాల) (Father)",
       "rel_name_te": "అప్పారావు సకునాల",
@@ -1422,15 +1426,17 @@
       "ac_sno": 28,
       "booth_no": 45,
       "ps_no": 45,
-      "polling_station_en": "Booth #45: Mandal Praja Parishad Primary School, Inti Kaasulu gaari School, Durgada"
+      "polling_station_en": "Booth #45: Mandal Praja Parishad Primary School, Inti Kaasulu gaari School, Durgada",
+      "surname_te": "సఖునాల",
+      "surname": "SAKHUNALA"
     },
     {
       "s": 41,
       "sno": 41,
       "id": "YOU1336148",
       "epic": "YOU1336148",
-      "n": "SWAMY SATYANARAYANA SAKHUNALA (స్వామి సత్వనారాయణ శకున)",
-      "name_te": "స్వామి సత్వనారాయణ శకున",
+      "n": "SWAMY SATYANARAYANA SAKHUNALA (స్వామి సత్వనారాయణ సఖునాల)",
+      "name_te": "స్వామి సత్వనారాయణ సఖునాల",
       "name_en": "SWAMY SATYANARAYANA SAKHUNALA",
       "r": "TRIMURTHULU SAKHUNALA (R : త్రిమూర్తులు శకునాల) (Father)",
       "rel_name_te": "R : త్రిమూర్తులు శకునాల",
@@ -1457,7 +1463,9 @@
       "ac_sno": 864,
       "booth_no": 45,
       "ps_no": 45,
-      "polling_station_en": "Booth #45: Mandal Praja Parishad Primary School, Inti Kaasulu gaari School, Durgada"
+      "polling_station_en": "Booth #45: Mandal Praja Parishad Primary School, Inti Kaasulu gaari School, Durgada",
+      "surname_te": "సఖునాల",
+      "surname": "SAKHUNALA"
     },
     {
       "s": 42,
@@ -1989,8 +1997,8 @@
       "sno": 57,
       "id": "YOU0856189",
       "epic": "YOU0856189",
-      "n": "LAKSHMI GATTEM (లక్షి జిఅప్పెం)",
-      "name_te": "లక్షి జిఅప్పెం",
+      "n": "LAKSHMI GATTEM (లక్ష్మి గట్టెం)",
+      "name_te": "లక్ష్మి గట్టెం",
       "name_en": "LAKSHMI GATTEM",
       "r": "RAMA KRISHNA GATTEM (రామ కృష్ణ జిఅట్టెం) (Husband)",
       "rel_name_te": "రామ కృష్ణ జిఅట్టెం",
@@ -2017,7 +2025,9 @@
       "ac_sno": 42,
       "booth_no": 45,
       "ps_no": 45,
-      "polling_station_en": "Booth #45: Mandal Praja Parishad Primary School, Inti Kaasulu gaari School, Durgada"
+      "polling_station_en": "Booth #45: Mandal Praja Parishad Primary School, Inti Kaasulu gaari School, Durgada",
+      "surname_te": "గట్టెం",
+      "surname": "GATTEM"
     },
     {
       "s": 58,
@@ -2304,9 +2314,9 @@
       "sno": 66,
       "id": "YOU0196600",
       "epic": "YOU0196600",
-      "n": "VEERABBAI PENUGANDA (వీరబాయ్ పెనుగండ)",
-      "name_te": "వీరబాయ్ పెనుగండ",
-      "name_en": "VEERABBAI PENUGANDA",
+      "n": "VEERABBAI PENUGONDA (వీరబ్బాయి పెనుగండ)",
+      "name_te": "వీరబ్బాయి పెనుగండ",
+      "name_en": "VEERABBAI PENUGONDA",
       "r": "CHAKRA DHARARAO (చక్రధరారావు) (Father)",
       "rel_name_te": "చక్రధరారావు",
       "rel_name_en": "CHAKRA DHARARAO",
@@ -2332,7 +2342,9 @@
       "ac_sno": 51,
       "booth_no": 45,
       "ps_no": 45,
-      "polling_station_en": "Booth #45: Mandal Praja Parishad Primary School, Inti Kaasulu gaari School, Durgada"
+      "polling_station_en": "Booth #45: Mandal Praja Parishad Primary School, Inti Kaasulu gaari School, Durgada",
+      "surname_te": "పెనుగండ",
+      "surname": "PENUGONDA"
     },
     {
       "s": 67,
@@ -5069,9 +5081,9 @@
       "sno": 145,
       "id": "YOU1607548",
       "epic": "YOU1607548",
-      "n": "Sathyanarayan Gundra (సత్యనారాయణ గుండ)",
-      "name_te": "సత్యనారాయణ గుండ",
-      "name_en": "Sathyanarayan Gundra",
+      "n": "SATHYANARAYAN GUNDRA (సత్యనారాయణ గుండ్ర)",
+      "name_te": "సత్యనారాయణ గుండ్ర",
+      "name_en": "SATHYANARAYAN GUNDRA",
       "r": "Suryaravu (సూర్యారావు) (Father)",
       "rel_name_te": "సూర్యారావు",
       "rel_name_en": "Suryaravu",
@@ -5097,7 +5109,9 @@
       "ac_sno": 110,
       "booth_no": 45,
       "ps_no": 45,
-      "polling_station_en": "Booth #45: Mandal Praja Parishad Primary School, Inti Kaasulu gaari School, Durgada"
+      "polling_station_en": "Booth #45: Mandal Praja Parishad Primary School, Inti Kaasulu gaari School, Durgada",
+      "surname_te": "గుండ్ర",
+      "surname": "GUNDRA"
     },
     {
       "s": 146,
@@ -5139,9 +5153,9 @@
       "sno": 147,
       "id": "YOU1607522",
       "epic": "YOU1607522",
-      "n": "Manikyam Gundra (మాణిక్యం గుండ)",
-      "name_te": "మాణిక్యం గుండ",
-      "name_en": "Manikyam Gundra",
+      "n": "MANIKYAM GUNDRA (మాణిక్యం గుండ్ర)",
+      "name_te": "మాణిక్యం గుండ్ర",
+      "name_en": "MANIKYAM GUNDRA",
       "r": "Sathyanarayan (సత్య నారాయణ) (Husband)",
       "rel_name_te": "సత్య నారాయణ",
       "rel_name_en": "Sathyanarayan",
@@ -5167,7 +5181,9 @@
       "ac_sno": 112,
       "booth_no": 45,
       "ps_no": 45,
-      "polling_station_en": "Booth #45: Mandal Praja Parishad Primary School, Inti Kaasulu gaari School, Durgada"
+      "polling_station_en": "Booth #45: Mandal Praja Parishad Primary School, Inti Kaasulu gaari School, Durgada",
+      "surname_te": "గుండ్ర",
+      "surname": "GUNDRA"
     },
     {
       "s": 148,
@@ -5202,15 +5218,17 @@
       "ac_sno": 113,
       "booth_no": 45,
       "ps_no": 45,
-      "polling_station_en": "Booth #45: Mandal Praja Parishad Primary School, Inti Kaasulu gaari School, Durgada"
+      "polling_station_en": "Booth #45: Mandal Praja Parishad Primary School, Inti Kaasulu gaari School, Durgada",
+      "surname_te": "కొప్పన",
+      "surname": "KOPPANA"
     },
     {
       "s": 149,
       "sno": 149,
       "id": "YOU2450187",
       "epic": "YOU2450187",
-      "n": "VEERA SUBRAHMANYAM MEDIBOINA (వీర్తసుబ్రహ్మణ్యం మేడిబోయి)",
-      "name_te": "వీర్తసుబ్రహ్మణ్యం మేడిబోయి",
+      "n": "VEERA SUBRAHMANYAM MEDIBOINA (వీర సుబ్రహ్మణ్యం మేడిబోయిన)",
+      "name_te": "వీర సుబ్రహ్మణ్యం మేడిబోయిన",
       "name_en": "VEERA SUBRAHMANYAM MEDIBOINA",
       "r": "SATHIBABU MEDIBOINA (R : సత్తిబాబు మేడిబోయిన) (Father)",
       "rel_name_te": "R : సత్తిబాబు మేడిబోయిన",
@@ -5237,7 +5255,9 @@
       "ac_sno": 16,
       "booth_no": 45,
       "ps_no": 45,
-      "polling_station_en": "Booth #45: Mandal Praja Parishad Primary School, Inti Kaasulu gaari School, Durgada"
+      "polling_station_en": "Booth #45: Mandal Praja Parishad Primary School, Inti Kaasulu gaari School, Durgada",
+      "surname_te": "మేడిబోయిన",
+      "surname": "MEDIBOINA"
     },
     {
       "s": 150,
@@ -5594,8 +5614,8 @@
       "sno": 160,
       "id": "YOU2503787",
       "epic": "YOU2503787",
-      "n": "ANUSHA KAREDLA (అనూష కర్‌ఏండ్ల)",
-      "name_te": "అనూష కర్‌ఏండ్ల",
+      "n": "ANUSHA KAREDLA (అనుష కరెడ్ల)",
+      "name_te": "అనుష కరెడ్ల",
       "name_en": "ANUSHA KAREDLA",
       "r": "NAGESWARARAO KAREDLA (నాగేశ్వరరావు కరెడ్డ) (Father)",
       "rel_name_te": "నాగేశ్వరరావు కరెడ్డ",
@@ -5622,7 +5642,9 @@
       "ac_sno": 19,
       "booth_no": 45,
       "ps_no": 45,
-      "polling_station_en": "Booth #45: Mandal Praja Parishad Primary School, Inti Kaasulu gaari School, Durgada"
+      "polling_station_en": "Booth #45: Mandal Praja Parishad Primary School, Inti Kaasulu gaari School, Durgada",
+      "surname_te": "కరెడ్ల",
+      "surname": "KAREDLA"
     },
     {
       "s": 161,
@@ -5699,9 +5721,9 @@
       "sno": 163,
       "id": "YOU1607639",
       "epic": "YOU1607639",
-      "n": "Subbalakshmi Kosireddy (సూబ్బలక్రి] కొసిరెడ్డి)",
-      "name_te": "సూబ్బలక్రి] కొసిరెడ్డి",
-      "name_en": "Subbalakshmi Kosireddy",
+      "n": "SUBBALAKSHMI KOSIREDDY (సుబ్బలక్ష్మి కొసిరెడ్డి)",
+      "name_te": "సుబ్బలక్ష్మి కొసిరెడ్డి",
+      "name_en": "SUBBALAKSHMI KOSIREDDY",
       "r": "Apparao (అప్పా రావు) (Husband)",
       "rel_name_te": "అప్పా రావు",
       "rel_name_en": "Apparao",
@@ -5727,7 +5749,9 @@
       "ac_sno": 123,
       "booth_no": 45,
       "ps_no": 45,
-      "polling_station_en": "Booth #45: Mandal Praja Parishad Primary School, Inti Kaasulu gaari School, Durgada"
+      "polling_station_en": "Booth #45: Mandal Praja Parishad Primary School, Inti Kaasulu gaari School, Durgada",
+      "surname_te": "కొసిరెడ్డి",
+      "surname": "KOSIREDDY"
     },
     {
       "s": 164,
@@ -5804,8 +5828,8 @@
       "sno": 166,
       "id": "YOU0196956",
       "epic": "YOU0196956",
-      "n": "GANGABHAVANI KOSIREDDY (గంగాభవాని కసిరెడ్డి)",
-      "name_te": "గంగాభవాని కసిరెడ్డి",
+      "n": "GANGABHAVANI KOSIREDDY (గంగాభవాని కొసిరెడ్డి)",
+      "name_te": "గంగాభవాని కొసిరెడ్డి",
       "name_en": "GANGABHAVANI KOSIREDDY",
       "r": "SATHYANARAYAN KOSIREDDY (సత్య నారాయణ క సిరెడ్డి) (Husband)",
       "rel_name_te": "సత్య నారాయణ క సిరెడ్డి",
@@ -5832,7 +5856,9 @@
       "ac_sno": 126,
       "booth_no": 45,
       "ps_no": 45,
-      "polling_station_en": "Booth #45: Mandal Praja Parishad Primary School, Inti Kaasulu gaari School, Durgada"
+      "polling_station_en": "Booth #45: Mandal Praja Parishad Primary School, Inti Kaasulu gaari School, Durgada",
+      "surname_te": "కొసిరెడ్డి",
+      "surname": "KOSIREDDY"
     },
     {
       "s": 167,
@@ -5979,9 +6005,9 @@
       "sno": 171,
       "id": "BCK0775353",
       "epic": "BCK0775353",
-      "n": "Chakraiah Kona (చ్హకయ్యకోన)",
-      "name_te": "చ్హకయ్యకోన",
-      "name_en": "Chakraiah Kona",
+      "n": "CHAKRAIAH KONA (చక్రయ్య కొన)",
+      "name_te": "చక్రయ్య కొన",
+      "name_en": "CHAKRAIAH KONA",
       "r": "Amulu (రాములు) (Father)",
       "rel_name_te": "రాములు",
       "rel_name_en": "Amulu",
@@ -6007,7 +6033,9 @@
       "ac_sno": 483,
       "booth_no": 45,
       "ps_no": 45,
-      "polling_station_en": "Booth #45: Mandal Praja Parishad Primary School, Inti Kaasulu gaari School, Durgada"
+      "polling_station_en": "Booth #45: Mandal Praja Parishad Primary School, Inti Kaasulu gaari School, Durgada",
+      "surname_te": "కొన",
+      "surname": "KONA"
     },
     {
       "s": 172,
@@ -6154,9 +6182,9 @@
       "sno": 176,
       "id": "BCK0775197",
       "epic": "BCK0775197",
-      "n": "Gangaishwarudu Kondepudi (గంగ్రోఈశ్వరుడు కొండేపూడి)",
-      "name_te": "గంగ్రోఈశ్వరుడు కొండేపూడి",
-      "name_en": "Gangaishwarudu Kondepudi",
+      "n": "GANGAISHWARUDU KONDEPUDI (గంగా ఈశ్వరుడు కొండేపూడి)",
+      "name_te": "గంగా ఈశ్వరుడు కొండేపూడి",
+      "name_en": "GANGAISHWARUDU KONDEPUDI",
       "r": "Ramakrishan (R : రామకృష్ణ) (Father)",
       "rel_name_te": "R : రామకృష్ణ",
       "rel_name_en": "Ramakrishan",
@@ -6182,15 +6210,17 @@
       "ac_sno": 134,
       "booth_no": 45,
       "ps_no": 45,
-      "polling_station_en": "Booth #45: Mandal Praja Parishad Primary School, Inti Kaasulu gaari School, Durgada"
+      "polling_station_en": "Booth #45: Mandal Praja Parishad Primary School, Inti Kaasulu gaari School, Durgada",
+      "surname_te": "కొండేపూడి",
+      "surname": "KONDEPUDI"
     },
     {
       "s": 177,
       "sno": 177,
       "id": "YOU0382424",
       "epic": "YOU0382424",
-      "n": "NAGAVENKATASATYANARAYANA KONDEPUDI (నాగవెంకటసత్యనారాయణ)",
-      "name_te": "నాగవెంకటసత్యనారాయణ",
+      "n": "NAGAVENKATASATYANARAYANA KONDEPUDI (నాగ వెంకట సత్యనారాయణ కొండేపూడి)",
+      "name_te": "నాగ వెంకట సత్యనారాయణ కొండేపూడి",
       "name_en": "NAGAVENKATASATYANARAYANA KONDEPUDI",
       "r": "RAMAKRISHNA (రామకృష్ణ) (Father)",
       "rel_name_te": "రామకృష్ణ",
@@ -6217,15 +6247,17 @@
       "ac_sno": 135,
       "booth_no": 45,
       "ps_no": 45,
-      "polling_station_en": "Booth #45: Mandal Praja Parishad Primary School, Inti Kaasulu gaari School, Durgada"
+      "polling_station_en": "Booth #45: Mandal Praja Parishad Primary School, Inti Kaasulu gaari School, Durgada",
+      "surname_te": "కొండేపూడి",
+      "surname": "KONDEPUDI"
     },
     {
       "s": 178,
       "sno": 178,
       "id": "YOU0196972",
       "epic": "YOU0196972",
-      "n": "SUBRAHMANYESWAARI KONDEMPUDI (సుబ్రహ్మాన్యేస్వరీ కోనేంపూడీ)",
-      "name_te": "సుబ్రహ్మాన్యేస్వరీ కోనేంపూడీ",
+      "n": "SUBRAHMANYESWAARI KONDEMPUDI (సుబ్రహ్మణ్యేశ్వరి కొండేపూడి)",
+      "name_te": "సుబ్రహ్మణ్యేశ్వరి కొండేపూడి",
       "name_en": "SUBRAHMANYESWAARI KONDEMPUDI",
       "r": "Ganga Eswarudu Kondempoodi (గంగా ఈశ్వ రుడు కొండెంపూడి AN) (Husband)",
       "rel_name_te": "గంగా ఈశ్వ రుడు కొండెంపూడి AN",
@@ -6252,15 +6284,17 @@
       "ac_sno": 136,
       "booth_no": 45,
       "ps_no": 45,
-      "polling_station_en": "Booth #45: Mandal Praja Parishad Primary School, Inti Kaasulu gaari School, Durgada"
+      "polling_station_en": "Booth #45: Mandal Praja Parishad Primary School, Inti Kaasulu gaari School, Durgada",
+      "surname_te": "కొండేపూడి",
+      "surname": "KONDEMPUDI"
     },
     {
       "s": 179,
       "sno": 179,
       "id": "YOU0382366",
       "epic": "YOU0382366",
-      "n": "SUBBALAKSHMI YANDAPALLI (సుబ్బ లక్ష్మి ౟ండవల్లి)",
-      "name_te": "సుబ్బ లక్ష్మి ౟ండవల్లి",
+      "n": "SUBBALAKSHMI YANDAPALLI (సుబ్బలక్ష్మి ఎండపల్లి)",
+      "name_te": "సుబ్బలక్ష్మి ఎండపల్లి",
       "name_en": "SUBBALAKSHMI YANDAPALLI",
       "r": "SATYANARAYANA (సత్౟న్నా రా౟ణ) (Husband)",
       "rel_name_te": "సత్౟న్నా రా౟ణ",
@@ -6287,7 +6321,9 @@
       "ac_sno": 137,
       "booth_no": 45,
       "ps_no": 45,
-      "polling_station_en": "Booth #45: Mandal Praja Parishad Primary School, Inti Kaasulu gaari School, Durgada"
+      "polling_station_en": "Booth #45: Mandal Praja Parishad Primary School, Inti Kaasulu gaari School, Durgada",
+      "surname_te": "ఎండపల్లి",
+      "surname": "YANDAPALLI"
     },
     {
       "s": 180,
@@ -6609,8 +6645,8 @@
       "sno": 189,
       "id": "YOU0851205",
       "epic": "YOU0851205",
-      "n": "VEERABHADRARAO VELUGULA (వీరభ్యద్రరావ వెలుగుల)",
-      "name_te": "వీరభ్యద్రరావ వెలుగుల",
+      "n": "VEERABHADRARAO VELUGULA (వీరభద్రరావు వెలుగుల)",
+      "name_te": "వీరభద్రరావు వెలుగుల",
       "name_en": "VEERABHADRARAO VELUGULA",
       "r": "SITARAMAIAH VELUGULA (సీతారామయ్య వెలుగుల) (Father)",
       "rel_name_te": "సీతారామయ్య వెలుగుల",
@@ -6637,7 +6673,9 @@
       "ac_sno": 142,
       "booth_no": 45,
       "ps_no": 45,
-      "polling_station_en": "Booth #45: Mandal Praja Parishad Primary School, Inti Kaasulu gaari School, Durgada"
+      "polling_station_en": "Booth #45: Mandal Praja Parishad Primary School, Inti Kaasulu gaari School, Durgada",
+      "surname_te": "వెలుగుల",
+      "surname": "VELUGULA"
     },
     {
       "s": 190,
@@ -6714,9 +6752,9 @@
       "sno": 192,
       "id": "YOU1607712",
       "epic": "YOU1607712",
-      "n": "Ramanamma Endapalli (రమణమ] యండపల్లి)",
-      "name_te": "రమణమ] యండపల్లి",
-      "name_en": "Ramanamma Endapalli",
+      "n": "RAMANAMMA ENDAPALLI (రమణమ్మ యండపల్లి)",
+      "name_te": "రమణమ్మ యండపల్లి",
+      "name_en": "RAMANAMMA ENDAPALLI",
       "r": "Sathyanarayan (సత్య నారాయణ) (Husband)",
       "rel_name_te": "సత్య నారాయణ",
       "rel_name_en": "Sathyanarayan",
@@ -6742,7 +6780,9 @@
       "ac_sno": 144,
       "booth_no": 45,
       "ps_no": 45,
-      "polling_station_en": "Booth #45: Mandal Praja Parishad Primary School, Inti Kaasulu gaari School, Durgada"
+      "polling_station_en": "Booth #45: Mandal Praja Parishad Primary School, Inti Kaasulu gaari School, Durgada",
+      "surname_te": "యండపల్లి",
+      "surname": "ENDAPALLI"
     },
     {
       "s": 193,
@@ -6784,9 +6824,9 @@
       "sno": 194,
       "id": "YOU1115682",
       "epic": "YOU1115682",
-      "n": "durgaji yandapalli (దుర్గాజీయండపల్లి)",
-      "name_te": "దుర్గాజీయండపల్లి",
-      "name_en": "durgaji yandapalli",
+      "n": "DURGAJI YANDAPALLI (దుర్గాజి యండపల్లి)",
+      "name_te": "దుర్గాజి యండపల్లి",
+      "name_en": "DURGAJI YANDAPALLI",
       "r": "SATYANARAYANA YANDAPALLI (సత్యనారాయణ యణపలీ) (Father)",
       "rel_name_te": "సత్యనారాయణ యణపలీ",
       "rel_name_en": "SATYANARAYANA YANDAPALLI",
@@ -6812,7 +6852,9 @@
       "ac_sno": 146,
       "booth_no": 45,
       "ps_no": 45,
-      "polling_station_en": "Booth #45: Mandal Praja Parishad Primary School, Inti Kaasulu gaari School, Durgada"
+      "polling_station_en": "Booth #45: Mandal Praja Parishad Primary School, Inti Kaasulu gaari School, Durgada",
+      "surname_te": "యండపల్లి",
+      "surname": "YANDAPALLI"
     },
     {
       "s": 195,
@@ -55969,9 +56011,9 @@
       "sno": 1599,
       "id": "YOU1594043",
       "epic": "YOU1594043",
-      "n": "Rajabbai Yinti (ర్లాజబ్బాయ్రియింటి)",
-      "name_te": "ర్లాజబ్బాయ్రియింటి",
-      "name_en": "Rajabbai Yinti",
+      "n": "RAJABBAI YINTI INTI (రాజబ్బాయి ఇంటి)",
+      "name_te": "రాజబ్బాయి ఇంటి",
+      "name_en": "RAJABBAI YINTI INTI",
       "r": "Tammarao (తమ్మా రావు) (Father)",
       "rel_name_te": "తమ్మా రావు",
       "rel_name_en": "Tammarao",
@@ -55997,16 +56039,18 @@
       "ac_sno": 377,
       "booth_no": 46,
       "ps_no": 46,
-      "polling_station_en": "Booth #46: Durgada 1 Swarna Gramam, Beside Grama Panchayati Office, Vegulamma Gudi Center, Durgada"
+      "polling_station_en": "Booth #46: Durgada 1 Swarna Gramam, Beside Grama Panchayati Office, Vegulamma Gudi Center, Durgada",
+      "surname_te": "ఇంటి",
+      "surname": "INTI"
     },
     {
       "s": 1600,
       "sno": 1600,
       "id": "YOU1594035",
       "epic": "YOU1594035",
-      "n": "Viraveni Yinti (వీరవేణియింటి)",
-      "name_te": "వీరవేణియింటి",
-      "name_en": "Viraveni Yinti",
+      "n": "VIRAVENI YINTI INTI (వీరవేణి ఇంటి)",
+      "name_te": "వీరవేణి ఇంటి",
+      "name_en": "VIRAVENI YINTI INTI",
       "r": "Rajabbai (రాజబ్బా యి) (Husband)",
       "rel_name_te": "రాజబ్బా యి",
       "rel_name_en": "Rajabbai",
@@ -56032,7 +56076,9 @@
       "ac_sno": 378,
       "booth_no": 46,
       "ps_no": 46,
-      "polling_station_en": "Booth #46: Durgada 1 Swarna Gramam, Beside Grama Panchayati Office, Vegulamma Gudi Center, Durgada"
+      "polling_station_en": "Booth #46: Durgada 1 Swarna Gramam, Beside Grama Panchayati Office, Vegulamma Gudi Center, Durgada",
+      "surname_te": "ఇంటి",
+      "surname": "INTI"
     },
     {
       "s": 1601,
@@ -56109,9 +56155,9 @@
       "sno": 1603,
       "id": "YOU1594068",
       "epic": "YOU1594068",
-      "n": "Esubaabu Yinti (ఏసుబాబుయింటి)",
-      "name_te": "ఏసుబాబుయింటి",
-      "name_en": "Esubaabu Yinti",
+      "n": "ESUBAABU YINTI INTI (ఏసుబాబు ఇంటి)",
+      "name_te": "ఏసుబాబు ఇంటి",
+      "name_en": "ESUBAABU YINTI INTI",
       "r": "Suryanarain (సూర్యనారాయణ) (Father)",
       "rel_name_te": "సూర్యనారాయణ",
       "rel_name_en": "Suryanarain",
@@ -56137,7 +56183,9 @@
       "ac_sno": 381,
       "booth_no": 46,
       "ps_no": 46,
-      "polling_station_en": "Booth #46: Durgada 1 Swarna Gramam, Beside Grama Panchayati Office, Vegulamma Gudi Center, Durgada"
+      "polling_station_en": "Booth #46: Durgada 1 Swarna Gramam, Beside Grama Panchayati Office, Vegulamma Gudi Center, Durgada",
+      "surname_te": "ఇంటి",
+      "surname": "INTI"
     },
     {
       "s": 1604,
@@ -56914,9 +56962,9 @@
       "sno": 1626,
       "id": "YOU1594217",
       "epic": "YOU1594217",
-      "n": "Satyavathi Ponnada (సత్వవత్తిపాన్నాడ)",
-      "name_te": "సత్వవత్తిపాన్నాడ",
-      "name_en": "Satyavathi Ponnada",
+      "n": "SATYAVATHI PONNADA (సత్యవతి పొన్నడ)",
+      "name_te": "సత్యవతి పొన్నడ",
+      "name_en": "SATYAVATHI PONNADA",
       "r": "Rambabu (రాంబాబు) (Husband)",
       "rel_name_te": "రాంబాబు",
       "rel_name_en": "Rambabu",
@@ -56942,7 +56990,9 @@
       "ac_sno": 404,
       "booth_no": 46,
       "ps_no": 46,
-      "polling_station_en": "Booth #46: Durgada 1 Swarna Gramam, Beside Grama Panchayati Office, Vegulamma Gudi Center, Durgada"
+      "polling_station_en": "Booth #46: Durgada 1 Swarna Gramam, Beside Grama Panchayati Office, Vegulamma Gudi Center, Durgada",
+      "surname_te": "పొన్నడ",
+      "surname": "PONNADA"
     },
     {
       "s": 1627,

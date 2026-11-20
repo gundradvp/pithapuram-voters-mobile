@@ -54,7 +54,7 @@
   },
   "9": {
     "supportPct": 100,
-    "survey_status": "voted",
+    "survey_status": null,
     "influencerName": "Koppula Siva Chakradharrao",
     "influencerPhone": "9493949669"
   },
@@ -119,7 +119,7 @@
   },
   "23": {
     "supportPct": 100,
-    "survey_status": "supporter"
+    "survey_status": "out_of_city"
   },
   "24": {
     "supportPct": 100,
@@ -127,7 +127,7 @@
   },
   "25": {
     "supportPct": 100,
-    "survey_status": "supporter",
+    "survey_status": "voted",
     "influencerName": "Gollapalli.Sivababu",
     "influencerPhone": "9666792006"
   },
@@ -243,7 +243,7 @@
   },
   "56": {
     "supportPct": 100,
-    "survey_status": "supporter",
+    "survey_status": "voted",
     "influencerName": "Gollapalli.Sivababu",
     "influencerPhone": "9666792006"
   },
@@ -5280,17 +5280,41 @@
     "influencerName": "Akula.Arjunarao",
     "influencerPhone": "9666219909"
   },
+  "3993": {
+    "supportPct": 100,
+    "survey_status": "supporter"
+  },
+  "3994": {
+    "supportPct": 100,
+    "survey_status": "supporter"
+  },
   "3995": {
     "supportPct": 100,
     "survey_status": "supporter",
     "influencerName": "Akula.Arjunarao",
     "influencerPhone": "9666219909"
   },
+  "3996": {
+    "supportPct": 100,
+    "survey_status": "supporter"
+  },
+  "3998": {
+    "supportPct": 100,
+    "survey_status": "supporter"
+  },
   "4000": {
     "supportPct": 100,
     "survey_status": "supporter",
     "influencerName": "Akula.Arjunarao",
     "influencerPhone": "9666219909"
+  },
+  "4001": {
+    "supportPct": 100,
+    "survey_status": "supporter"
+  },
+  "4002": {
+    "supportPct": 50,
+    "survey_status": null
   },
   "4004": {
     "supportPct": 100,
@@ -5334,17 +5358,49 @@
     "influencerName": "Taticharla Gopala Krishna",
     "influencerPhone": "9030888636"
   },
+  "4015": {
+    "supportPct": 100,
+    "survey_status": "supporter"
+  },
+  "4016": {
+    "supportPct": 100,
+    "survey_status": "supporter"
+  },
   "4021": {
     "supportPct": 100,
     "survey_status": "supporter",
     "influencerName": "Mathina Ganesh",
     "influencerPhone": "8121112096"
   },
+  "4022": {
+    "supportPct": 100,
+    "survey_status": "supporter"
+  },
+  "4023": {
+    "supportPct": 100,
+    "survey_status": "supporter"
+  },
+  "4024": {
+    "supportPct": 100,
+    "survey_status": "supporter"
+  },
   "4025": {
     "supportPct": 100,
     "survey_status": "supporter",
     "influencerName": "Kommuri.Krishna",
     "influencerPhone": "9989363507"
+  },
+  "4026": {
+    "supportPct": 100,
+    "survey_status": "supporter"
+  },
+  "4027": {
+    "supportPct": 100,
+    "survey_status": "supporter"
+  },
+  "4028": {
+    "supportPct": 100,
+    "survey_status": "supporter"
   },
   "4029": {
     "supportPct": 100,
@@ -5357,6 +5413,14 @@
     "survey_status": "supporter",
     "influencerName": "Jyothula Srinivasu",
     "influencerPhone": "9949048940"
+  },
+  "4033": {
+    "supportPct": 100,
+    "survey_status": "supporter"
+  },
+  "4035": {
+    "supportPct": 100,
+    "survey_status": "supporter"
   },
   "4036": {
     "supportPct": 100,
@@ -5381,6 +5445,10 @@
     "survey_status": "supporter",
     "influencerName": "Kommuri.Krishna",
     "influencerPhone": "9989363507"
+  },
+  "4041": {
+    "supportPct": 100,
+    "survey_status": "supporter"
   },
   "4042": {
     "supportPct": 100,
@@ -7078,11 +7146,27 @@
     "influencerName": "Medisetty Nagamani",
     "influencerPhone": "6300259822"
   },
+  "5989": {
+    "supportPct": 100,
+    "survey_status": "out_of_city"
+  },
+  "5990": {
+    "survey_status": "out_of_city"
+  },
   "5996": {
     "supportPct": 100,
     "survey_status": "supporter",
     "influencerName": "Pendam Dorababu",
     "influencerPhone": "9848756699"
+  },
+  "5997": {
+    "survey_status": "out_of_city"
+  },
+  "5999": {
+    "survey_status": "out_of_city"
+  },
+  "6004": {
+    "survey_status": "out_of_city"
   },
   "6005": {
     "supportPct": 100,
@@ -7118,11 +7202,17 @@
     "influencerName": "Jyothula Srinivasu",
     "influencerPhone": "9949048940"
   },
+  "6016": {
+    "survey_status": "out_of_city"
+  },
   "6017": {
     "supportPct": 100,
     "survey_status": "supporter",
     "influencerName": "Jyothula Srinivasu",
     "influencerPhone": "9949048940"
+  },
+  "6021": {
+    "survey_status": null
   },
   "6024": {
     "supportPct": 100,
@@ -7136,11 +7226,23 @@
     "influencerName": "Jyothula Srinivasu",
     "influencerPhone": "9949048940"
   },
+  "6027": {
+    "survey_status": "out_of_city"
+  },
   "6034": {
     "supportPct": 100,
     "survey_status": "supporter",
     "influencerName": "Keerthi.Venkataramana",
     "influencerPhone": "8688859842"
+  },
+  "6038": {
+    "survey_status": "out_of_city"
+  },
+  "6039": {
+    "survey_status": "out_of_city"
+  },
+  "6042": {
+    "survey_status": "out_of_city"
   },
   "6045": {
     "supportPct": 100,
@@ -7148,11 +7250,17 @@
     "influencerName": "Jyothula Srinivasu",
     "influencerPhone": "9949048940"
   },
+  "6053": {
+    "survey_status": "out_of_city"
+  },
   "6054": {
     "supportPct": 100,
     "survey_status": "supporter",
     "influencerName": "Jyothula Srinivasu",
     "influencerPhone": "9949048940"
+  },
+  "6055": {
+    "survey_status": "out_of_city"
   },
   "6056": {
     "supportPct": 100,
@@ -7166,9 +7274,18 @@
     "influencerName": "Keerthi.Venkataramana",
     "influencerPhone": "8688859842"
   },
+  "6058": {
+    "survey_status": "out_of_city"
+  },
+  "6059": {
+    "survey_status": "out_of_city"
+  },
+  "6087": {
+    "survey_status": "out_of_city"
+  },
   "6089": {
     "supportPct": 100,
-    "survey_status": "supporter",
+    "survey_status": "out_of_city",
     "influencerName": "Jyothula Srinivasu",
     "influencerPhone": "9949048940"
   },
@@ -7226,6 +7343,12 @@
     "influencerName": "Jyothula Kanaka Lakshmi",
     "influencerPhone": "6303142633"
   },
+  "6132": {
+    "survey_status": "out_of_city"
+  },
+  "6133": {
+    "survey_status": "out_of_city"
+  },
   "6139": {
     "supportPct": 100,
     "survey_status": "supporter",
@@ -7238,6 +7361,9 @@
   },
   "6155": {
     "supportPct": 100,
+    "survey_status": "out_of_city"
+  },
+  "6165": {
     "survey_status": "out_of_city"
   },
   "6166": {
@@ -7277,13 +7403,13 @@
   },
   "6184": {
     "supportPct": 100,
-    "survey_status": "supporter",
+    "survey_status": "out_of_city",
     "influencerName": "Jyothula Srinivasu",
     "influencerPhone": "9949048940"
   },
   "6186": {
     "supportPct": 100,
-    "survey_status": "supporter",
+    "survey_status": "out_of_city",
     "influencerName": "Jyothula Srinivasu",
     "influencerPhone": "9949048940"
   },
@@ -7293,11 +7419,23 @@
     "influencerName": "Akula.Arjunarao",
     "influencerPhone": "9666219909"
   },
+  "6210": {
+    "survey_status": "out_of_city"
+  },
   "6213": {
     "supportPct": 100,
     "survey_status": "supporter",
     "influencerName": "Jyothula Srinivasu",
     "influencerPhone": "9949048940"
+  },
+  "6232": {
+    "survey_status": "out_of_city"
+  },
+  "6234": {
+    "survey_status": "out_of_city"
+  },
+  "6235": {
+    "survey_status": null
   },
   "6236": {
     "supportPct": 100,
@@ -7329,11 +7467,26 @@
     "influencerName": "Jyothula Srinivasu",
     "influencerPhone": "9949048940"
   },
+  "6250": {
+    "survey_status": "out_of_city"
+  },
+  "6251": {
+    "survey_status": "out_of_city"
+  },
+  "6253": {
+    "survey_status": "out_of_city"
+  },
   "6254": {
     "supportPct": 100,
     "survey_status": "supporter",
     "influencerName": "Madepalli Padmaraju",
     "influencerPhone": "9121721138"
+  },
+  "6269": {
+    "survey_status": "out_of_city"
+  },
+  "6278": {
+    "survey_status": "out_of_city"
   },
   "6286": {
     "supportPct": 100,
@@ -7352,6 +7505,9 @@
     "survey_status": "supporter",
     "influencerName": "Jyothula Kanaka Lakshmi",
     "influencerPhone": "6303142633"
+  },
+  "6299": {
+    "survey_status": "out_of_city"
   },
   "6305": {
     "supportPct": 100,
@@ -7395,6 +7551,9 @@
     "influencerName": "Jyothula Srinivasu",
     "influencerPhone": "9949048940"
   },
+  "6329": {
+    "survey_status": "out_of_city"
+  },
   "6334": {
     "supportPct": 100,
     "survey_status": "supporter",
@@ -7413,6 +7572,9 @@
     "influencerName": "Jyothula Srinivasu",
     "influencerPhone": "9949048940"
   },
+  "6337": {
+    "survey_status": "out_of_city"
+  },
   "6348": {
     "supportPct": 100,
     "survey_status": "supporter",
@@ -7427,9 +7589,18 @@
   },
   "6355": {
     "supportPct": 100,
-    "survey_status": "supporter",
+    "survey_status": "out_of_city",
     "influencerName": "Karri.Yesu Babu",
     "influencerPhone": "7386638843"
+  },
+  "6363": {
+    "survey_status": "out_of_city"
+  },
+  "6374": {
+    "survey_status": "out_of_city"
+  },
+  "6376": {
+    "survey_status": "out_of_city"
   },
   "6380": {
     "supportPct": 100,
@@ -7461,6 +7632,15 @@
     "influencerName": "Madiki Srinu Babu",
     "influencerPhone": "9848732206"
   },
+  "6399": {
+    "survey_status": "out_of_city"
+  },
+  "6400": {
+    "survey_status": "out_of_city"
+  },
+  "6401": {
+    "survey_status": "out_of_city"
+  },
   "6409": {
     "supportPct": 100,
     "survey_status": "supporter",
@@ -7472,6 +7652,9 @@
     "survey_status": "supporter",
     "influencerName": "Jyothula Srinivasu",
     "influencerPhone": "9949048940"
+  },
+  "6426": {
+    "survey_status": "out_of_city"
   },
   "6434": {
     "supportPct": 100,

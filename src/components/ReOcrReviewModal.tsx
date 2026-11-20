@@ -920,10 +920,10 @@ export const ReOcrReviewModal: React.FC<ReOcrReviewModalProps> = ({
               isCurrentMarked ? 'border-amber-500 shadow-amber-500/25 ring-1 ring-amber-400/40' : 'border-slate-800'
             }`}
           >
-            {/* LEFT SIDE: HIGH-RESOLUTION CROPPED CARD IMAGE (EXPANDED TO ~58% OF MODAL) */}
-            <div className="lg:w-[58%] xl:w-[60%] bg-slate-950/95 p-3 sm:p-4 flex flex-col justify-between border-b lg:border-b-0 lg:border-r border-slate-800 relative">
+            {/* LEFT SIDE: HIGH-RESOLUTION CROPPED CARD IMAGE + NAME & SURNAME BREAKDOWN BELOW */}
+            <div className="lg:w-[56%] xl:w-[57%] bg-slate-950/95 p-3 sm:p-4 flex flex-col justify-start overflow-y-auto border-b lg:border-b-0 lg:border-r border-slate-800 relative space-y-2.5">
               {/* Card Top Toolbar: S.No, EPIC, Zoom Level Controls */}
-              <div className="w-full flex items-center justify-between mb-2 flex-wrap gap-2">
+              <div className="w-full flex items-center justify-between mb-1 flex-wrap gap-2">
                 <div className="flex items-center gap-2 flex-wrap">
                   <span className="px-2.5 py-1 rounded-lg bg-amber-500/20 text-amber-300 border border-amber-500/40 font-mono font-black text-sm shadow-sm">
                     #{currentSno}
@@ -996,8 +996,8 @@ export const ReOcrReviewModal: React.FC<ReOcrReviewModalProps> = ({
                 </div>
               </div>
 
-              {/* EXPANDED HIGH-RES CARD IMAGE CONTAINER */}
-              <div className="w-full flex-1 flex items-center justify-center p-3 sm:p-5 overflow-auto min-h-[340px] max-h-[62vh] bg-black/50 rounded-2xl border border-slate-800/80 shadow-inner">
+              {/* EXPANDED HIGH-RES CARD IMAGE CONTAINER (PLACED DIRECTLY ABOVE NAME VALIDATION) */}
+              <div className="w-full flex-shrink-0 flex items-center justify-center p-2 sm:p-3 overflow-hidden min-h-[200px] max-h-[40vh] bg-black/60 rounded-2xl border border-slate-800/80 shadow-inner">
                 {!imageError ? (
                   <div
                     style={{
@@ -1005,13 +1005,13 @@ export const ReOcrReviewModal: React.FC<ReOcrReviewModalProps> = ({
                       transformOrigin: 'center center',
                       transition: 'transform 0.15s ease-out'
                     }}
-                    className="flex items-center justify-center w-full max-w-[960px] p-2"
+                    className="flex items-center justify-center w-full max-w-[960px] p-1"
                   >
                     <img
                       src={resolvedImageUrl}
                       alt={`Voter Card #${currentSno}`}
                       onError={handleImageError}
-                      className="w-full h-auto max-h-[58vh] object-contain rounded-xl border-2 border-slate-700 shadow-2xl select-none"
+                      className="w-full h-auto max-h-[36vh] object-contain rounded-xl border-2 border-slate-700 shadow-2xl select-none"
                     />
                   </div>
                 ) : (
@@ -1027,47 +1027,205 @@ export const ReOcrReviewModal: React.FC<ReOcrReviewModalProps> = ({
                 )}
               </div>
 
-              {/* RE-OCR TOGGLE BUTTON & SINGLE RE-OCR */}
-              <div className="w-full pt-3 space-y-2">
-                <button
-                  type="button"
-                  onClick={handleToggleCurrentMark}
-                  className={`w-full py-3 px-4 rounded-xl font-black text-xs sm:text-sm flex items-center justify-center gap-2.5 transition-all shadow-lg active:scale-98 cursor-pointer ${
-                    isCurrentMarked
-                      ? 'bg-gradient-to-r from-amber-500 via-orange-500 to-amber-600 text-slate-950 ring-2 ring-amber-300/50 shadow-amber-500/30'
-                      : 'bg-slate-800 hover:bg-slate-700 text-slate-200 border border-slate-700 hover:border-amber-500/50'
-                  }`}
-                >
-                  {isCurrentMarked ? (
-                    <>
-                      <CheckCircle2 className="w-5 h-5 fill-slate-950 text-amber-400" />
-                      <span>{language === 'te' ? '✓ రీ-ఓసీఆర్ కోసం ఎంపిక చేశారు [స్పేస్]' : '✓ MARKED FOR RE-OCR [Space]'}</span>
-                    </>
-                  ) : (
-                    <>
-                      <RotateCcw className="w-5 h-5 text-amber-400" />
-                      <span>{language === 'te' ? 'రీ-ఓసీఆర్ కోసం మార్క్ చేయండి [స్పేస్]' : 'Mark for Re-OCR [Space]'}</span>
-                    </>
-                  )}
-                </button>
+              {/* VOTER NAME & SURNAME INTELLIGENCE BOX (BELOW PHOTO FOR QUICK SCAN & VALIDATION) */}
+              <div className="w-full space-y-2 bg-slate-900/90 p-3 rounded-2xl border border-slate-800 shadow-md">
+                {/* Header with Title & Action Buttons */}
+                <div className="flex items-center justify-between flex-wrap gap-1.5 pb-2 border-b border-slate-800/80">
+                  <div className="flex items-center gap-1.5">
+                    <span className="text-[10px] font-black text-amber-400 uppercase tracking-wider flex items-center gap-1">
+                      <span>🏷️</span>
+                      <span>{language === 'te' ? 'ఓటరు పేరు & ఇంటిపేరు విశ్లేషణ:' : 'Voter Name & Surname:'}</span>
+                    </span>
+                    {parsedName?.isTeluguSuspected && (
+                      <span className="px-1.5 py-0.2 rounded bg-red-500/20 text-red-400 border border-red-500/40 text-[9px] font-bold">
+                        ⚠️ తెలుగు పేరులో తేడా
+                      </span>
+                    )}
+                  </div>
 
-                <button
-                  type="button"
-                  onClick={() => handleRunReOcr([currentSno])}
-                  disabled={isProcessing}
-                  className="w-full py-2 px-3 rounded-xl bg-slate-900 hover:bg-slate-800 border border-amber-500/30 text-amber-300 font-bold text-xs flex items-center justify-center gap-1.5 transition-all disabled:opacity-50 cursor-pointer shadow-sm"
-                >
-                  <Zap className="w-3.5 h-3.5 text-amber-400" />
-                  <span>{language === 'te' ? '⚡ ఈ ఒక్క కార్డును తక్షణమే Re-OCR చేయి' : 'Instant Re-OCR This Card'}</span>
-                </button>
+                  <div className="flex items-center gap-1.5">
+                    {/* 1-Click: Select English as Correct */}
+                    <button
+                      type="button"
+                      onClick={handleSelectEnglishAsCorrect}
+                      className="px-2 py-0.5 rounded-lg bg-indigo-950/80 hover:bg-indigo-900 border border-indigo-500/40 text-indigo-300 text-[10.5px] font-bold flex items-center gap-1 transition-all active:scale-95 cursor-pointer shadow-sm"
+                      title="ఇంగ్లీష్ పేరు సరైనదిగా తీసుకుని తెలుగు పేరును ఆటోమేటిక్‌గా సరిచేయండి"
+                    >
+                      <Globe className="w-3 h-3 text-indigo-400" />
+                      <span>{language === 'te' ? '🌐 ఇంగ్లీష్ ప్రకారం తెలుగు సరిచేయి' : 'Use English as Correct'}</span>
+                    </button>
+
+                    {/* Edit Toggle Button */}
+                    <button
+                      type="button"
+                      onClick={() => setIsEditingName(prev => !prev)}
+                      className="px-2 py-0.5 rounded-lg bg-amber-500/10 hover:bg-amber-500/20 text-amber-300 border border-amber-500/30 text-[10.5px] font-bold flex items-center gap-1 transition-all active:scale-95 cursor-pointer"
+                      title="పేరు లేదా ఇంటిపేరును మాన్యువల్‌గా ఎడిట్ చేయండి"
+                    >
+                      <Edit3 className="w-3 h-3 text-amber-400" />
+                      <span>{isEditingName ? (language === 'te' ? 'రద్దు' : 'Cancel') : (language === 'te' ? 'సరిదిద్దు' : 'Edit')}</span>
+                    </button>
+                  </div>
+                </div>
+
+                {/* Normal View Mode: Shows structured Name & Surname breakdown */}
+                {!isEditingName ? (
+                  <div className="space-y-2 pt-1">
+                    {/* Structured Name & Surname Chips */}
+                    <div className="grid grid-cols-2 gap-2">
+                      {/* Identified Surname */}
+                      <div className="bg-slate-950/80 p-2 rounded-xl border border-slate-800">
+                        <span className="text-[9.5px] font-bold text-slate-500 uppercase tracking-wider block">
+                          🏛️ {language === 'te' ? 'గుర్తించిన ఇంటిపేరు (Surname):' : 'Identified Surname:'}
+                        </span>
+                        <div className="text-sm font-black text-amber-300 mt-0.5">
+                          {parsedName?.surnameTe || '—'}
+                        </div>
+                        <div className="text-[11px] font-bold text-slate-400 font-mono">
+                          {parsedName?.surnameEn || '—'}
+                        </div>
+                      </div>
+
+                      {/* Identified First Name */}
+                      <div className="bg-slate-950/80 p-2 rounded-xl border border-slate-800">
+                        <span className="text-[9.5px] font-bold text-slate-500 uppercase tracking-wider block">
+                          👤 {language === 'te' ? 'ఓటరు పేరు (First Name):' : 'Voter First Name:'}
+                        </span>
+                        <div className="text-sm font-black text-white mt-0.5">
+                          {parsedName?.firstNameTe || '—'}
+                        </div>
+                        <div className="text-[11px] font-bold text-slate-400 font-mono">
+                          {parsedName?.firstNameEn || '—'}
+                        </div>
+                      </div>
+                    </div>
+
+                    {/* Full Joined Display Name */}
+                    <div className="pt-1 flex items-center justify-between text-xs">
+                      <div>
+                        <span className="text-[9.5px] text-slate-500 font-bold uppercase tracking-wider block">
+                          {language === 'te' ? 'ప్రస్తుత పూర్తి పేరు (Full Display Name):' : 'Full Name:'}
+                        </span>
+                        <div className="text-base font-black text-white mt-0.5 leading-snug">
+                          {currentVoter.name_te || '—'}
+                        </div>
+                        <div className="text-xs font-bold text-amber-300 font-mono">
+                          {currentVoter.name_en || '—'}
+                        </div>
+                      </div>
+
+                      {nameSaveSuccess && (
+                        <span className="px-2.5 py-1 bg-emerald-500/20 border border-emerald-500/50 text-emerald-300 rounded-xl font-bold text-xs flex items-center gap-1 shadow-sm animate-pulse">
+                          <Check className="w-3.5 h-3.5" />
+                          <span>సేవ్ & సింక్ అయింది!</span>
+                        </span>
+                      )}
+                    </div>
+                  </div>
+                ) : (
+                  /* Inline Editing Form */
+                  <div className="space-y-2.5 pt-2 bg-slate-950/95 p-3 rounded-xl border border-amber-500/40">
+                    <div className="text-[11px] font-bold text-amber-300 flex items-center gap-1">
+                      <Edit3 className="w-3 h-3" />
+                      <span>{language === 'te' ? 'పేరు & ఇంటిపేరు సవరణ (Edit & Fix):' : 'Edit & Fix Name:'}</span>
+                    </div>
+
+                    <div className="grid grid-cols-2 gap-2 text-xs">
+                      <div>
+                        <label className="text-[10px] font-bold text-slate-400 block mb-0.5">
+                          {language === 'te' ? 'తెలుగు ఓటరు పేరు (First Name):' : 'Telugu First Name:'}
+                        </label>
+                        <input
+                          type="text"
+                          value={editFirstNameTe}
+                          onChange={e => setEditFirstNameTe(e.target.value)}
+                          className="w-full px-2.5 py-1.5 bg-slate-900 border border-slate-700 rounded-lg text-white font-bold text-xs focus:outline-none focus:border-amber-400"
+                          placeholder="ఉదా: లావణ్య"
+                        />
+                      </div>
+
+                      <div>
+                        <label className="text-[10px] font-bold text-slate-400 block mb-0.5">
+                          {language === 'te' ? 'తెలుగు ఇంటిపేరు (Surname):' : 'Telugu Surname:'}
+                        </label>
+                        <input
+                          type="text"
+                          value={editSurnameTe}
+                          onChange={e => setEditSurnameTe(e.target.value)}
+                          className="w-full px-2.5 py-1.5 bg-slate-900 border border-slate-700 rounded-lg text-white font-bold text-xs focus:outline-none focus:border-amber-400"
+                          placeholder="ఉదా: గుండ్ర"
+                        />
+                      </div>
+
+                      <div>
+                        <label className="text-[10px] font-bold text-slate-400 block mb-0.5">
+                          English First Name:
+                        </label>
+                        <input
+                          type="text"
+                          value={editFirstNameEn}
+                          onChange={e => setEditFirstNameEn(e.target.value.toUpperCase())}
+                          className="w-full px-2.5 py-1.5 bg-slate-900 border border-slate-700 rounded-lg text-amber-200 font-mono font-bold text-xs focus:outline-none focus:border-amber-400"
+                          placeholder="e.g. LAVANYA"
+                        />
+                      </div>
+
+                      <div>
+                        <label className="text-[10px] font-bold text-slate-400 block mb-0.5">
+                          English Surname:
+                        </label>
+                        <input
+                          type="text"
+                          value={editSurnameEn}
+                          onChange={e => setEditSurnameEn(e.target.value.toUpperCase())}
+                          className="w-full px-2.5 py-1.5 bg-slate-900 border border-slate-700 rounded-lg text-amber-200 font-mono font-bold text-xs focus:outline-none focus:border-amber-400"
+                          placeholder="e.g. GUNDRA"
+                        />
+                      </div>
+                    </div>
+
+                    {/* Live Preview */}
+                    <div className="bg-slate-900 p-2 rounded-lg border border-slate-800 text-[11px] flex items-center justify-between">
+                      <div>
+                        <span className="text-slate-400">సరిదిద్దిన పేరు: </span>
+                        <strong className="text-white">
+                          {editSurnameTe ? `${editFirstNameTe} ${editSurnameTe}` : editFirstNameTe}
+                        </strong>
+                        <span className="text-amber-300 font-mono ml-1.5 font-bold">
+                          ({editSurnameEn ? `${editFirstNameEn} ${editSurnameEn}` : editFirstNameEn})
+                        </span>
+                      </div>
+                    </div>
+
+                    {/* Save Button */}
+                    <div className="flex items-center justify-end gap-2 pt-1">
+                      <button
+                        type="button"
+                        onClick={() => setIsEditingName(false)}
+                        className="px-3 py-1 bg-slate-800 hover:bg-slate-700 text-slate-300 rounded-lg text-xs font-bold cursor-pointer"
+                      >
+                        {language === 'te' ? 'రద్దు' : 'Cancel'}
+                      </button>
+                      <button
+                        type="button"
+                        onClick={handleSaveNameAndSync}
+                        disabled={isSavingName}
+                        className="px-4 py-1.5 bg-gradient-to-r from-emerald-600 to-teal-600 hover:from-emerald-500 hover:to-teal-500 text-white rounded-lg text-xs font-black flex items-center gap-1.5 shadow-md active:scale-95 cursor-pointer disabled:opacity-50"
+                      >
+                        <Save className="w-3.5 h-3.5" />
+                        <span>{isSavingName ? 'సేవ్ అవుతోంది...' : (language === 'te' ? '💾 పేరు సేవ్ చేయి & సింక్ చేయి' : 'Save & Sync')}</span>
+                      </button>
+                    </div>
+                  </div>
+                )}
               </div>
             </div>
 
-            {/* RIGHT SIDE: EXTRACTED OCR TEXT + GROUND CAMPAIGN CONTROLS (~42% OF MODAL) */}
-            <div className="lg:w-[42%] xl:w-[40%] p-4 sm:p-5 flex flex-col justify-between bg-slate-900/60 overflow-y-auto space-y-3.5">
+            {/* RIGHT SIDE: RE-OCR ACTION BUTTONS + DETAILS & GROUND CAMPAIGN CONTROLS */}
+            <div className="lg:w-[44%] xl:w-[43%] p-3.5 sm:p-4 flex flex-col justify-start bg-slate-900/60 overflow-y-auto space-y-3">
               <div>
                 {/* TOP IDENTITY & LEANING BADGE */}
-                <div className="flex items-center justify-between mb-2.5">
+                <div className="flex items-center justify-between mb-2">
                   <div className="flex items-center gap-2 flex-wrap">
                     <span className="text-xs text-slate-400 font-bold">
                       {language === 'te' ? 'క్రమం:' : 'S.No:'}
@@ -1114,202 +1272,54 @@ export const ReOcrReviewModal: React.FC<ReOcrReviewModalProps> = ({
                   )}
                 </div>
 
-                {/* EXTRACTED FIELDS BOX */}
-                <div className="space-y-2.5 bg-slate-950/80 p-3.5 rounded-2xl border border-slate-800 text-xs">
-                  {/* Voter Name & Surname Intelligence Box */}
-                  <div className="space-y-2 bg-slate-900/90 p-3 rounded-xl border border-slate-800">
-                    {/* Header with Title & Action Buttons */}
-                    <div className="flex items-center justify-between flex-wrap gap-1.5 pb-2 border-b border-slate-800/80">
-                      <div className="flex items-center gap-1.5">
-                        <span className="text-[10px] font-black text-amber-400 uppercase tracking-wider">
-                          {language === 'te' ? 'ఓటరు పేరు & ఇంటిపేరు విశ్లేషణ:' : 'Voter Name & Surname:'}
-                        </span>
-                        {parsedName?.isTeluguSuspected && (
-                          <span className="px-1.5 py-0.2 rounded bg-red-500/20 text-red-400 border border-red-500/40 text-[9px] font-bold">
-                            ⚠️ తెలుగు పేరులో తేడా
-                          </span>
-                        )}
-                      </div>
-
-                      <div className="flex items-center gap-1.5">
-                        {/* 1-Click: Select English as Correct */}
-                        <button
-                          type="button"
-                          onClick={handleSelectEnglishAsCorrect}
-                          className="px-2 py-0.5 rounded-lg bg-indigo-950/80 hover:bg-indigo-900 border border-indigo-500/40 text-indigo-300 text-[10.5px] font-bold flex items-center gap-1 transition-all active:scale-95 cursor-pointer shadow-sm"
-                          title="ఇంగ్లీష్ పేరు సరైనదిగా తీసుకుని తెలుగు పేరును ఆటోమేటిక్‌గా సరిచేయండి"
-                        >
-                          <Globe className="w-3 h-3 text-indigo-400" />
-                          <span>{language === 'te' ? '🌐 ఇంగ్లీష్ ప్రకారం తెలుగు సరిచేయి' : 'Use English as Correct'}</span>
-                        </button>
-
-                        {/* Edit Toggle Button */}
-                        <button
-                          type="button"
-                          onClick={() => setIsEditingName(prev => !prev)}
-                          className="px-2 py-0.5 rounded-lg bg-amber-500/10 hover:bg-amber-500/20 text-amber-300 border border-amber-500/30 text-[10.5px] font-bold flex items-center gap-1 transition-all active:scale-95 cursor-pointer"
-                          title="పేరు లేదా ఇంటిపేరును మాన్యువల్‌గా ఎడిట్ చేయండి"
-                        >
-                          <Edit3 className="w-3 h-3 text-amber-400" />
-                          <span>{isEditingName ? (language === 'te' ? 'రద్దు' : 'Cancel') : (language === 'te' ? 'సరిదిద్దు' : 'Edit')}</span>
-                        </button>
-                      </div>
-                    </div>
-
-                    {/* Normal View Mode: Shows structured Name & Surname breakdown */}
-                    {!isEditingName ? (
-                      <div className="space-y-2 pt-1">
-                        {/* Structured Name & Surname Chips */}
-                        <div className="grid grid-cols-2 gap-2">
-                          {/* Identified Surname */}
-                          <div className="bg-slate-950/80 p-2 rounded-xl border border-slate-800">
-                            <span className="text-[9.5px] font-bold text-slate-500 uppercase tracking-wider block">
-                              🏛️ {language === 'te' ? 'గుర్తించిన ఇంటిపేరు (Surname):' : 'Identified Surname:'}
-                            </span>
-                            <div className="text-sm font-black text-amber-300 mt-0.5">
-                              {parsedName?.surnameTe || '—'}
-                            </div>
-                            <div className="text-[11px] font-bold text-slate-400 font-mono">
-                              {parsedName?.surnameEn || '—'}
-                            </div>
-                          </div>
-
-                          {/* Identified First Name */}
-                          <div className="bg-slate-950/80 p-2 rounded-xl border border-slate-800">
-                            <span className="text-[9.5px] font-bold text-slate-500 uppercase tracking-wider block">
-                              👤 {language === 'te' ? 'ఓటరు పేరు (First Name):' : 'Voter First Name:'}
-                            </span>
-                            <div className="text-sm font-black text-white mt-0.5">
-                              {parsedName?.firstNameTe || '—'}
-                            </div>
-                            <div className="text-[11px] font-bold text-slate-400 font-mono">
-                              {parsedName?.firstNameEn || '—'}
-                            </div>
-                          </div>
-                        </div>
-
-                        {/* Full Joined Display Name */}
-                        <div className="pt-1.5 flex items-center justify-between text-xs">
-                          <div>
-                            <span className="text-[9.5px] text-slate-500 font-bold uppercase tracking-wider block">
-                              {language === 'te' ? 'ప్రస్తుత పూర్తి పేరు (Full Display Name):' : 'Full Name:'}
-                            </span>
-                            <div className="text-base font-black text-white mt-0.5 leading-snug">
-                              {currentVoter.name_te || '—'}
-                            </div>
-                            <div className="text-xs font-bold text-amber-300 font-mono">
-                              {currentVoter.name_en || '—'}
-                            </div>
-                          </div>
-
-                          {nameSaveSuccess && (
-                            <span className="px-2.5 py-1 bg-emerald-500/20 border border-emerald-500/50 text-emerald-300 rounded-xl font-bold text-xs flex items-center gap-1 shadow-sm animate-pulse">
-                              <Check className="w-3.5 h-3.5" />
-                              <span>సేవ్ & సింక్ అయింది!</span>
-                            </span>
-                          )}
-                        </div>
-                      </div>
-                    ) : (
-                      /* Inline Editing Form */
-                      <div className="space-y-2.5 pt-2 bg-slate-950/95 p-3 rounded-xl border border-amber-500/40">
-                        <div className="text-[11px] font-bold text-amber-300 flex items-center gap-1">
-                          <Edit3 className="w-3 h-3" />
-                          <span>{language === 'te' ? 'పేరు & ఇంటిపేరు సవరణ (Edit & Fix):' : 'Edit & Fix Name:'}</span>
-                        </div>
-
-                        <div className="grid grid-cols-2 gap-2 text-xs">
-                          <div>
-                            <label className="text-[10px] font-bold text-slate-400 block mb-0.5">
-                              {language === 'te' ? 'తెలుగు ఓటరు పేరు (First Name):' : 'Telugu First Name:'}
-                            </label>
-                            <input
-                              type="text"
-                              value={editFirstNameTe}
-                              onChange={e => setEditFirstNameTe(e.target.value)}
-                              className="w-full px-2.5 py-1.5 bg-slate-900 border border-slate-700 rounded-lg text-white font-bold text-xs focus:outline-none focus:border-amber-400"
-                              placeholder="ఉదా: లావణ్య"
-                            />
-                          </div>
-
-                          <div>
-                            <label className="text-[10px] font-bold text-slate-400 block mb-0.5">
-                              {language === 'te' ? 'తెలుగు ఇంటిపేరు (Surname):' : 'Telugu Surname:'}
-                            </label>
-                            <input
-                              type="text"
-                              value={editSurnameTe}
-                              onChange={e => setEditSurnameTe(e.target.value)}
-                              className="w-full px-2.5 py-1.5 bg-slate-900 border border-slate-700 rounded-lg text-white font-bold text-xs focus:outline-none focus:border-amber-400"
-                              placeholder="ఉదా: గుండ్ర"
-                            />
-                          </div>
-
-                          <div>
-                            <label className="text-[10px] font-bold text-slate-400 block mb-0.5">
-                              English First Name:
-                            </label>
-                            <input
-                              type="text"
-                              value={editFirstNameEn}
-                              onChange={e => setEditFirstNameEn(e.target.value.toUpperCase())}
-                              className="w-full px-2.5 py-1.5 bg-slate-900 border border-slate-700 rounded-lg text-amber-200 font-mono font-bold text-xs focus:outline-none focus:border-amber-400"
-                              placeholder="e.g. LAVANYA"
-                            />
-                          </div>
-
-                          <div>
-                            <label className="text-[10px] font-bold text-slate-400 block mb-0.5">
-                              English Surname:
-                            </label>
-                            <input
-                              type="text"
-                              value={editSurnameEn}
-                              onChange={e => setEditSurnameEn(e.target.value.toUpperCase())}
-                              className="w-full px-2.5 py-1.5 bg-slate-900 border border-slate-700 rounded-lg text-amber-200 font-mono font-bold text-xs focus:outline-none focus:border-amber-400"
-                              placeholder="e.g. GUNDRA"
-                            />
-                          </div>
-                        </div>
-
-                        {/* Live Preview */}
-                        <div className="bg-slate-900 p-2 rounded-lg border border-slate-800 text-[11px] flex items-center justify-between">
-                          <div>
-                            <span className="text-slate-400">సరిదిద్దిన పేరు: </span>
-                            <strong className="text-white">
-                              {editSurnameTe ? `${editFirstNameTe} ${editSurnameTe}` : editFirstNameTe}
-                            </strong>
-                            <span className="text-amber-300 font-mono ml-1.5 font-bold">
-                              ({editSurnameEn ? `${editFirstNameEn} ${editSurnameEn}` : editFirstNameEn})
-                            </span>
-                          </div>
-                        </div>
-
-                        {/* Save Button */}
-                        <div className="flex items-center justify-end gap-2 pt-1">
-                          <button
-                            type="button"
-                            onClick={() => setIsEditingName(false)}
-                            className="px-3 py-1 bg-slate-800 hover:bg-slate-700 text-slate-300 rounded-lg text-xs font-bold cursor-pointer"
-                          >
-                            {language === 'te' ? 'రద్దు' : 'Cancel'}
-                          </button>
-                          <button
-                            type="button"
-                            onClick={handleSaveNameAndSync}
-                            disabled={isSavingName}
-                            className="px-4 py-1.5 bg-gradient-to-r from-emerald-600 to-teal-600 hover:from-emerald-500 hover:to-teal-500 text-white rounded-lg text-xs font-black flex items-center gap-1.5 shadow-md active:scale-95 cursor-pointer disabled:opacity-50"
-                          >
-                            <Save className="w-3.5 h-3.5" />
-                            <span>{isSavingName ? 'సేవ్ అవుతోంది...' : (language === 'te' ? '💾 పేరు సేవ్ చేయి & సింక్ చేయి' : 'Save & Sync')}</span>
-                          </button>
-                        </div>
-                      </div>
+                {/* RE-OCR ACTION BUTTONS (MOVED TO THE RIGHT FOR DIRECT ONE-TOUCH ACCESS) */}
+                <div className="w-full space-y-2 bg-slate-950/90 p-3 rounded-2xl border border-amber-500/30 shadow-md mb-2.5">
+                  <div className="flex items-center justify-between text-[10.5px] font-black text-amber-400 uppercase tracking-wider">
+                    <span>⚡ రీ-ఓసీఆర్ యాక్షన్స్ (Re-OCR Actions):</span>
+                    {isCurrentMarked && (
+                      <span className="text-[10px] text-amber-300 font-bold bg-amber-500/20 px-2 py-0.5 rounded-full border border-amber-500/40">
+                        ✓ రీ-ఓసీఆర్ మార్క్ అయింది
+                      </span>
                     )}
                   </div>
 
+                  <button
+                    type="button"
+                    onClick={handleToggleCurrentMark}
+                    className={`w-full py-2.5 px-3 rounded-xl font-black text-xs sm:text-sm flex items-center justify-center gap-2 transition-all shadow-lg active:scale-98 cursor-pointer ${
+                      isCurrentMarked
+                        ? 'bg-gradient-to-r from-amber-500 via-orange-500 to-amber-600 text-slate-950 ring-2 ring-amber-300/50 shadow-amber-500/30'
+                        : 'bg-slate-800 hover:bg-slate-700 text-slate-200 border border-slate-700 hover:border-amber-500/50'
+                    }`}
+                  >
+                    {isCurrentMarked ? (
+                      <>
+                        <CheckCircle2 className="w-4 h-4 fill-slate-950 text-amber-400" />
+                        <span>{language === 'te' ? '✓ రీ-ఓసీఆర్ కోసం ఎంపిక చేశారు [స్పేస్]' : '✓ MARKED FOR RE-OCR [Space]'}</span>
+                      </>
+                    ) : (
+                      <>
+                        <RotateCcw className="w-4 h-4 text-amber-400" />
+                        <span>{language === 'te' ? 'రీ-ఓసీఆర్ కోసం మార్క్ చేయండి [స్పేస్]' : 'Mark for Re-OCR [Space]'}</span>
+                      </>
+                    )}
+                  </button>
+
+                  <button
+                    type="button"
+                    onClick={() => handleRunReOcr([currentSno])}
+                    disabled={isProcessing}
+                    className="w-full py-2 px-3 rounded-xl bg-slate-900 hover:bg-slate-800 border border-amber-500/30 text-amber-300 font-bold text-xs flex items-center justify-center gap-1.5 transition-all disabled:opacity-50 cursor-pointer shadow-sm"
+                  >
+                    <Zap className="w-3.5 h-3.5 text-amber-400" />
+                    <span>{language === 'te' ? '⚡ ఈ ఒక్క కార్డును తక్షణమే Re-OCR చేయి' : 'Instant Re-OCR This Card'}</span>
+                  </button>
+                </div>
+
+                {/* EXTRACTED FIELDS BOX (Relation, Door No, Age, Gender, Station) */}
+                <div className="space-y-2 bg-slate-950/80 p-3 rounded-2xl border border-slate-800 text-xs">
                   {/* Relative Name */}
-                  <div className="pt-2 border-t border-slate-800/80">
+                  <div>
                     <span className="text-[10px] font-bold text-slate-400 uppercase tracking-wider block">
                       {language === 'te' ? 'సంబంధీకుని పేరు & రకం:' : 'Relative Name & Relation:'}
                     </span>

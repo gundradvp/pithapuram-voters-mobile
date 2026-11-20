@@ -42,7 +42,10 @@
     "influencerName": "Guddati Veerraju",
     "influencerPhone": "9705888474",
     "influencerId": "inf_1",
-    "influencerMobile": "9848596259"
+    "influencerMobile": "9848596259",
+    "customAlias": "దుర్గ వెంకట నాగేశ్వర రావు గోపిశెట్టి",
+    "correctedNameTe": "దుర్గ వెంకట నాగేశ్వర రావు గోపిశెట్టి",
+    "correctedNameEn": "DURGA VENKATA NAGESWARA RAO GOPISETTI"
   },
   "7": {
     "supportPct": 50,
@@ -56,7 +59,10 @@
     "supportPct": 100,
     "survey_status": "voted",
     "influencerName": "Koppula Siva Chakradharrao",
-    "influencerPhone": "9493949669"
+    "influencerPhone": "9493949669",
+    "customAlias": "మాణిక్యం గోపిశెట్టి",
+    "correctedNameTe": "మాణిక్యం గోపిశెట్టి",
+    "correctedNameEn": "MANIKYAM GOPISETTI"
   },
   "10": {
     "supportPct": 100,
@@ -190,9 +196,17 @@
     "supportPct": 50,
     "survey_status": null
   },
+  "40": {
+    "customAlias": "శివగంగ జల చక్ర జ్యోతి సఖునాల",
+    "correctedNameTe": "శివగంగ జల చక్ర జ్యోతి సఖునాల",
+    "correctedNameEn": "SIVA GAMGA JALA CHAKRA JYO TI SAKHUNALA"
+  },
   "41": {
     "supportPct": 100,
-    "survey_status": "supporter"
+    "survey_status": "supporter",
+    "customAlias": "స్వామి సత్వనారాయణ సఖునాల",
+    "correctedNameTe": "స్వామి సత్వనారాయణ సఖునాల",
+    "correctedNameEn": "SWAMY SATYANARAYANA SAKHUNALA"
   },
   "42": {
     "influencerId": "inf_1793732645047",
@@ -267,7 +281,10 @@
     "supportPct": 100,
     "survey_status": "supporter",
     "influencerName": "Jyothula Srinivasu",
-    "influencerPhone": "9949048940"
+    "influencerPhone": "9949048940",
+    "customAlias": "లక్ష్మి గట్టెం",
+    "correctedNameTe": "లక్ష్మి గట్టెం",
+    "correctedNameEn": "LAKSHMI GATTEM"
   },
   "58": {
     "supportPct": 100,
@@ -307,7 +324,10 @@
   },
   "66": {
     "supportPct": 100,
-    "survey_status": "supporter"
+    "survey_status": "supporter",
+    "customAlias": "వీరబ్బాయి పెనుగండ",
+    "correctedNameTe": "వీరబ్బాయి పెనుగండ",
+    "correctedNameEn": "VEERABBAI PENUGONDA"
   },
   "67": {
     "supportPct": 100,
@@ -586,7 +606,25 @@
     "supportPct": 100,
     "survey_status": "supporter",
     "influencerName": "Gollapalli.Sivababu",
-    "influencerPhone": "9666792006"
+    "influencerPhone": "9666792006",
+    "customAlias": "సత్యనారాయణ గుండ్ర",
+    "correctedNameTe": "సత్యనారాయణ గుండ్ర",
+    "correctedNameEn": "SATHYANARAYAN GUNDRA"
+  },
+  "147": {
+    "customAlias": "మాణిక్యం గుండ్ర",
+    "correctedNameTe": "మాణిక్యం గుండ్ర",
+    "correctedNameEn": "MANIKYAM GUNDRA"
+  },
+  "148": {
+    "customAlias": "వెంకట కృష్ణ కొప్పన",
+    "correctedNameTe": "వెంకట కృష్ణ కొప్పన",
+    "correctedNameEn": "VENKATA KRISHAN KOPPANA"
+  },
+  "149": {
+    "customAlias": "వీర సుబ్రహ్మణ్యం మేడిబోయిన",
+    "correctedNameTe": "వీర సుబ్రహ్మణ్యం మేడిబోయిన",
+    "correctedNameEn": "VEERA SUBRAHMANYAM MEDIBOINA"
   },
   "151": {
     "supportPct": 100,
@@ -629,7 +667,10 @@
     "influencerPhone": "9949048940"
   },
   "160": {
-    "supportPct": 75
+    "supportPct": 75,
+    "customAlias": "అనుష కరెడ్ల",
+    "correctedNameTe": "అనుష కరెడ్ల",
+    "correctedNameEn": "ANUSHA KAREDLA"
   },
   "161": {
     "supportPct": 75,
@@ -640,7 +681,10 @@
     "supportPct": 75
   },
   "163": {
-    "supportPct": 75
+    "supportPct": 75,
+    "customAlias": "సుబ్బలక్ష్మి కొసిరెడ్డి",
+    "correctedNameTe": "సుబ్బలక్ష్మి కొసిరెడ్డి",
+    "correctedNameEn": "SUBBALAKSHMI KOSIREDDY"
   },
   "164": {
     "supportPct": 75
@@ -648,7 +692,10 @@
   "166": {
     "supportPct": 75,
     "influencerName": "Tangella Uday Srinivas",
-    "influencerPhone": "9568966666"
+    "influencerPhone": "9568966666",
+    "customAlias": "గంగాభవాని కొసిరెడ్డి",
+    "correctedNameTe": "గంగాభవాని కొసిరెడ్డి",
+    "correctedNameEn": "GANGABHAVANI KOSIREDDY"
   },
   "167": {
     "supportPct": 75
@@ -665,7 +712,10 @@
   "171": {
     "influencerId": "inf_1793785634261",
     "influencerName": "naresh kona",
-    "influencerMobile": "6300263735"
+    "influencerMobile": "6300263735",
+    "customAlias": "చక్రయ్య కొన",
+    "correctedNameTe": "చక్రయ్య కొన",
+    "correctedNameEn": "CHAKRAIAH KONA"
   },
   "172": {
     "influencerId": "inf_1793785634261",
@@ -678,17 +728,33 @@
     "influencerName": "Burra Anibabu",
     "influencerPhone": "9177019999"
   },
+  "176": {
+    "customAlias": "గంగా ఈశ్వరుడు కొండేపూడి",
+    "correctedNameTe": "గంగా ఈశ్వరుడు కొండేపూడి",
+    "correctedNameEn": "GANGAISHWARUDU KONDEPUDI"
+  },
+  "177": {
+    "customAlias": "నాగ వెంకట సత్యనారాయణ కొండేపూడి",
+    "correctedNameTe": "నాగ వెంకట సత్యనారాయణ కొండేపూడి",
+    "correctedNameEn": "NAGAVENKATASATYANARAYANA KONDEPUDI"
+  },
   "178": {
     "supportPct": 100,
     "survey_status": "supporter",
     "influencerName": "Yandapalli.Naresh",
-    "influencerPhone": "9494953135"
+    "influencerPhone": "9494953135",
+    "customAlias": "సుబ్రహ్మణ్యేశ్వరి కొండేపూడి",
+    "correctedNameTe": "సుబ్రహ్మణ్యేశ్వరి కొండేపూడి",
+    "correctedNameEn": "SUBRAHMANYESWAARI KONDEMPUDI"
   },
   "179": {
     "supportPct": 100,
     "survey_status": "supporter",
     "influencerName": "Gadhi.Suryanarayana",
-    "influencerPhone": "9705888474"
+    "influencerPhone": "9705888474",
+    "customAlias": "సుబ్బలక్ష్మి ఎండపల్లి",
+    "correctedNameTe": "సుబ్బలక్ష్మి ఎండపల్లి",
+    "correctedNameEn": "SUBBALAKSHMI YANDAPALLI"
   },
   "181": {
     "supportPct": 100,
@@ -709,10 +775,23 @@
     "influencerPhone": "9177084343"
   },
   "189": {
-    "supportPct": 75
+    "supportPct": 75,
+    "customAlias": "వీరభద్రరావు వెలుగుల",
+    "correctedNameTe": "వీరభద్రరావు వెలుగుల",
+    "correctedNameEn": "VEERABHADRARAO VELUGULA"
   },
   "190": {
     "supportPct": 75
+  },
+  "192": {
+    "customAlias": "రమణమ్మ యండపల్లి",
+    "correctedNameTe": "రమణమ్మ యండపల్లి",
+    "correctedNameEn": "RAMANAMMA ENDAPALLI"
+  },
+  "194": {
+    "customAlias": "దుర్గాజి యండపల్లి",
+    "correctedNameTe": "దుర్గాజి యండపల్లి",
+    "correctedNameEn": "DURGAJI YANDAPALLI"
   },
   "204": {
     "supportPct": 75
@@ -2960,11 +3039,30 @@
     "supportPct": 75,
     "notes": "Akula ramya"
   },
+  "1599": {
+    "customAlias": "రాజబ్బాయి ఇంటి",
+    "correctedNameTe": "రాజబ్బాయి ఇంటి",
+    "correctedNameEn": "RAJABBAI YINTI INTI"
+  },
   "1600": {
     "supportPct": 100,
     "survey_status": "supporter",
     "influencerName": "Vinti.Tammarao",
-    "influencerPhone": "9666728899"
+    "influencerPhone": "9666728899",
+    "customAlias": "వీరవేణి ఇంటి",
+    "correctedNameTe": "వీరవేణి ఇంటి",
+    "correctedNameEn": "VIRAVENI YINTI INTI"
+  },
+  "1603": {
+    "customAlias": "ఏసుబాబు ఇంటి",
+    "correctedNameTe": "ఏసుబాబు ఇంటి",
+    "correctedNameEn": "ESUBAABU YINTI INTI"
+  },
+  "1610": {
+    "survey_status": "deceased"
+  },
+  "1614": {
+    "survey_status": "deceased"
   },
   "1616": {
     "supportPct": 100,
@@ -2988,7 +3086,10 @@
     "supportPct": 100,
     "survey_status": "supporter",
     "influencerName": "Burra Anibabu",
-    "influencerPhone": "9177019999"
+    "influencerPhone": "9177019999",
+    "customAlias": "సత్యవతి పొన్నడ",
+    "correctedNameTe": "సత్యవతి పొన్నడ",
+    "correctedNameEn": "SATYAVATHI PONNADA"
   },
   "1638": {
     "influencerId": "inf_1793694265008",
