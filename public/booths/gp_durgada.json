@@ -173126,8 +173126,8 @@
     {
       "sno": 4310,
       "epic": "YOU0978298",
-      "name_en": "SUBBALAKSHMI AKULA",
-      "name_te": "శివాసూర్వసత్యనారాయాణ 5",
+      "name_en": "SIVA SURYA SATYA NARAYANA KOSURI",
+      "name_te": "శివా సూర్య సత్యనారాయణ కోసూరి",
       "rel_type_en": "Husband",
       "rel_type_te": "భర్త",
       "rel_type_display": "తండ్రి / Husband",
@@ -173161,7 +173161,7 @@
       "kriya": true,
       "id": "YOU0978298",
       "g": "F",
-      "n": "SUBBALAKSHMI AKULA (శివాసూర్వసత్యనారాయాణ 5)",
+      "n": "SIVA SURYA SATYA NARAYANA KOSURI (శివా సూర్య సత్యనారాయణ కోసూరి)",
       "r": "VEERABABU AKULA (పుఠరారావు కోసూరి) (Husband)",
       "s": 4310,
       "hn": "5-72",
@@ -173169,7 +173169,9 @@
       "sec": "వార్డు 9 - 11 - Mandal Praja Parishad Primary Aadarsa School, East to West-2nd Room, Durgada",
       "card": "/cards/durgada/card_sno_4310_YOU0978298.png",
       "photo": "/cards/durgada/card_sno_4310_YOU0978298.png",
-      "door_no": "5-72"
+      "door_no": "5-72",
+      "surname_te": "కోసూరి",
+      "surname": "KOSURI"
     },
     {
       "sno": 4311,

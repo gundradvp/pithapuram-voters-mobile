@@ -141,7 +141,7 @@ export const VotersTabMobile: React.FC<VotersTabMobileProps> = ({
   const [isPhoneticEnabled, setIsPhoneticEnabled] = useState<boolean>(true);
   const [expandedSurnameId, setExpandedSurnameId] = useState<string | null>(null);
   const [filterMode, setFilterMode] = useState<
-    'all' | 'full' | 'soft' | 'strong' | 'neutral' | 'opponent' | 'exact' | 'similar' | 'kriya_all' | 'voted' | 'not_voted' | 'ours_not_voted' | 'has_phone' | 'duplicates' | 'duplicates_exact' | 'duplicates_50' | 'deceased' | 'out_of_city' | 'seniors' | 'women' | 'men'
+    'all' | 'full' | 'soft' | 'strong' | 'neutral' | 'opponent' | 'exact' | 'similar' | 'kriya_all' | 'voted' | 'not_voted' | 'ours_not_voted' | 'has_phone' | 'duplicates' | 'duplicates_exact' | 'duplicates_50' | 'deceased' | 'out_of_city' | 'seniors' | 'women' | 'men' | 'manual_input'
   >('all');
   const [isSpeedDialOpen, setIsSpeedDialOpen] = useState(false);
   const [isHourlyTurnoutOpen, setIsHourlyTurnoutOpen] = useState(false);
@@ -553,8 +553,8 @@ _దయచేసి మీ ఓటు హక్కును వినియోగ
 
   // Precomputed Duplicate Votes Analysis
   const dupAnalysis = useMemo(() => {
-    return analyzeDuplicateVoters(voters);
-  }, [voters]);
+    return analyzeDuplicateVoters(voters, profiles);
+  }, [voters, profiles]);
 
   // Precomputed Surnames Grouping with Duplicate counts (scoped to selected ward)
   const surnameGroups = useMemo(() => {
@@ -630,9 +630,9 @@ _దయచేసి మీ ఓటు హక్కును వినియోగ
         }
       }
 
-      // Surname Filter
+      // Surname Filter (Strictly respects manual user input corrections & aliases)
       if (selectedSurname !== 'all') {
-        const { en } = extractSurname(v);
+        const { en } = extractSurname(v, prof);
         if (en !== selectedSurname) return false;
       }
 
@@ -642,6 +642,10 @@ _దయచేసి మీ ఓటు హక్కును వినియోగ
       }
 
       // 2. Leaning / Filter Mode
+      if (filterMode === 'manual_input') {
+        const hasManual = !!(prof.customAlias?.trim() || prof.correctedSurnameTe?.trim() || prof.correctedSurnameEn?.trim() || prof.correctedNameTe?.trim() || prof.correctedNameEn?.trim());
+        if (!hasManual) return false;
+      }
       if (filterMode === 'duplicates') return !!dupAnalysis.voterDupMap[v.s];
       if (filterMode === 'duplicates_exact') return dupAnalysis.voterDupMap[v.s]?.confidencePct >= 80;
       if (filterMode === 'duplicates_50') return dupAnalysis.voterDupMap[v.s]?.confidencePct < 80;
@@ -691,6 +695,7 @@ _దయచేసి మీ ఓటు హక్కును వినియోగ
     let men = 0;
     let womenVoted = 0;
     let menVoted = 0;
+    let manualInput = 0;
 
     const baseVoters = selectedWard !== 'all'
       ? voters.filter(v => String(v.ward_no ?? '') === selectedWard)
@@ -704,7 +709,9 @@ _దయచేసి మీ ఓటు హక్కును వినియోగ
       const isDeceased = prof.survey_status === 'deceased';
       const isOutOfCity = prof.survey_status === 'out_of_city';
       const isOurs = (pct === 100 || prof.survey_status === 'supporter') && pct !== 50;
+      const hasManual = !!(prof.customAlias?.trim() || prof.correctedSurnameTe?.trim() || prof.correctedSurnameEn?.trim() || prof.correctedNameTe?.trim() || prof.correctedNameEn?.trim());
 
+      if (hasManual) manualInput++;
       if (isDeceased) deceased++;
       if (isOutOfCity) outOfCity++;
 
@@ -763,6 +770,7 @@ _దయచేసి మీ ఓటు హక్కును వినియోగ
       men,
       womenVoted,
       menVoted,
+      manualInput,
       duplicates: dupAnalysis.totalDuplicateVotersCount,
       exactDups: dupAnalysis.exactCount,
       partial50Dups: dupAnalysis.partial50Count
@@ -1900,6 +1908,21 @@ _దయచేసి మీ ఓటు హక్కును వినియోగ
             <span>⚠️ {language === 'te' ? 'మొత్తం డూప్లికేట్లు' : 'All Dups'} ({counts.duplicates})</span>
           </button>
 
+          {counts.manualInput > 0 && (
+            <button
+              onClick={() => { setFilterMode(filterMode === 'manual_input' ? 'all' : 'manual_input'); setVisibleCount(INITIAL_VISIBLE_COUNT); }}
+              className={`px-2.5 py-1 rounded-lg font-bold whitespace-nowrap transition-all flex items-center gap-1 ${
+                filterMode === 'manual_input'
+                  ? 'bg-emerald-600 text-white font-black shadow-sm ring-1 ring-emerald-400'
+                  : 'bg-slate-900 text-emerald-300 border border-emerald-500/40 hover:bg-slate-800'
+              }`}
+              title={language === 'te' ? 'మీరు మాన్యువల్ గా ఎడిట్ చేసిన / ఇన్పుట్ ఇచ్చిన ఓటర్లందరినీ చూడండి' : 'Show all voters with manual input / alias'}
+            >
+              <Edit3 className="w-3 h-3 text-emerald-400" />
+              <span>✏️ {language === 'te' ? 'నా ఇన్పుట్స్ ఉన్నవి' : 'Manual Inputs'} ({counts.manualInput})</span>
+            </button>
+          )}
+
           <button
             onClick={() => { setFilterMode('out_of_city'); setVisibleCount(INITIAL_VISIBLE_COUNT); }}
             className={`px-2.5 py-1 rounded-lg font-bold whitespace-nowrap transition-all flex items-center gap-1 ${
@@ -2670,7 +2693,7 @@ _దయచేసి మీ ఓటు హక్కును వినియోగ
             const prof = profiles[v.s] || {};
             const phone = prof.customPhone || v.k_m;
             const pct = prof.supportPct;
-            const sn = extractSurname(v);
+            const sn = extractSurname(v, prof);
             const cardPath = v.card_url || v.card;
             const photoPath = v.photo_url || v.photo;
             const isDeceased = prof.survey_status === 'deceased';
@@ -2915,7 +2938,7 @@ _దయచేసి మీ ఓటు హక్కును వినియోగ
           const prof = profiles[v.s] || {};
           const phone = prof.customPhone || v.k_m;
           const pct = prof.supportPct;
-          const sn = extractSurname(v);
+          const sn = extractSurname(v, prof);
           const cardPath = v.card_url || v.card;
           const photoPath = v.photo_url || v.photo;
 

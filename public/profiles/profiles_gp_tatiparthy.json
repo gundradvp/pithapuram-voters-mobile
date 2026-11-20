@@ -130,7 +130,7 @@
   },
   "23": {
     "supportPct": 100,
-    "survey_status": "out_of_city",
+    "survey_status": "supporter",
     "notes": "మొదటిసారి ఓటు వేసే యువకుడు"
   },
   "24": {
@@ -140,7 +140,7 @@
   },
   "25": {
     "supportPct": 100,
-    "survey_status": "voted",
+    "survey_status": "supporter",
     "influencerName": "Gollapalli.Sivababu",
     "influencerPhone": "9666792006"
   },
@@ -267,7 +267,7 @@
   },
   "56": {
     "supportPct": 100,
-    "survey_status": "voted",
+    "survey_status": "supporter",
     "influencerName": "Gollapalli.Sivababu",
     "influencerPhone": "9666792006"
   },

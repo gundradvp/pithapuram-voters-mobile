@@ -283,7 +283,7 @@ export function parseNameAndSurname(voter: MobileVoter, profile?: VoterCampaignP
 
   // If not explicitly defined, fall back to classifier
   if (!surnameEn || !surnameTe) {
-    const extracted = extractSurname(voter);
+    const extracted = extractSurname(voter, profile);
     if (!surnameEn) surnameEn = extracted.en.trim().toUpperCase();
     if (!surnameTe) surnameTe = extracted.te.trim();
   }

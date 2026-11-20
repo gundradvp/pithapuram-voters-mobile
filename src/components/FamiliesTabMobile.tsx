@@ -91,8 +91,8 @@ export const FamiliesTabMobile: React.FC<FamiliesTabMobileProps> = ({
 
   // Precomputed Duplicate Analysis
   const dupAnalysis = useMemo(() => {
-    return analyzeDuplicateVoters(voters);
-  }, [voters]);
+    return analyzeDuplicateVoters(voters, profiles);
+  }, [voters, profiles]);
 
   // 1. Surname Clans & Winning Blueprint Memos
   const { clanGroups, winningFormula } = useMemo(() => {

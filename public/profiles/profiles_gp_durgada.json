@@ -1,14 +1,14 @@
 {
   "1": {
-    "supportPct": 50,
-    "survey_status": null,
+    "supportPct": 100,
+    "survey_status": "deceased",
     "customAlias": "satya narayana desineedi",
     "customPhone": "9000273028",
     "altPhone": "",
     "influencerId": "",
     "influencerName": "",
     "influencerMobile": "",
-    "updatedAt": "2026-11-20T07:13:49.021Z"
+    "updatedAt": "2026-11-20T12:09:29.291Z"
   },
   "2": {
     "supportPct": 50,
@@ -44,7 +44,7 @@
   "6": {
     "supportPct": 50,
     "survey_status": null,
-    "influencerName": "Guddati Veerraju",
+    "influencerName": "Gadhi.Suryanarayana",
     "influencerPhone": "9705888474",
     "influencerId": "inf_1",
     "influencerMobile": "9848596259",
@@ -126,12 +126,14 @@
   "19": {
     "supportPct": 50,
     "survey_status": null,
-    "updatedAt": "2026-11-20T07:32:47.027Z",
+    "updatedAt": "2026-11-20T08:28:32.385Z",
     "customAlias": "శ్రీనివాస్ పసగడుగుల",
     "correctedNameTe": "శ్రీనివాస్ పసగడుగుల",
     "correctedNameEn": "SRINIVAS PASAGADUGULA",
     "correctedSurnameTe": "పసగడుగుల",
-    "correctedSurnameEn": "PASAGADUGULA"
+    "correctedSurnameEn": "PASAGADUGULA",
+    "surnameTe": "పసగడుగుల",
+    "surnameEn": "PASAGADUGULA"
   },
   "20": {
     "supportPct": 100,
@@ -162,10 +164,14 @@
   "24": {
     "supportPct": 50,
     "survey_status": null,
-    "customAlias": "కన్నయ కాపు ఇంటి",
-    "correctedNameTe": "కన్నయ కాపు ఇంటి",
+    "customAlias": "కన్నయ్య కాపు ఇంటి",
+    "correctedNameTe": "కన్నయ్య కాపు ఇంటి",
     "correctedNameEn": "KANNAYAKAPU INTI",
-    "updatedAt": "2026-11-20T06:46:51.893Z"
+    "updatedAt": "2026-11-20T08:29:20.396Z",
+    "correctedSurnameTe": "ఇంటి",
+    "correctedSurnameEn": "INTI",
+    "surnameTe": "ఇంటి",
+    "surnameEn": "INTI"
   },
   "25": {
     "supportPct": 50,
@@ -784,7 +790,7 @@
     "influencerPhone": "9177019999"
   },
   "176": {
-    "customAlias": "గంగా ఈశ్వరుడు కొండేపూడి",
+    "customAlias": "గ���గా ఈశ్వరుడు కొండేపూడి",
     "correctedNameTe": "గంగా ఈశ్వరుడు కొండేపూడి",
     "correctedNameEn": "GANGAISHWARUDU KONDEPUDI"
   },
@@ -1221,6 +1227,10 @@
   "531": {
     "supportPct": 75,
     "notes": "Akula ramya"
+  },
+  "545": {
+    "customPhone": "0000000000",
+    "updatedAt": "2026-11-20T12:29:50.215Z"
   },
   "547": {
     "supportPct": 100,
@@ -3982,6 +3992,16 @@
   "2117": {
     "supportPct": 75
   },
+  "2121": {
+    "customAlias": "శ్రీనివాసు యట్టం",
+    "correctedNameTe": "శ్రీనివాసు యట్టం",
+    "correctedNameEn": "SREENUVASU YATTAM",
+    "correctedSurnameTe": "యట్టం",
+    "correctedSurnameEn": "YATTAM",
+    "surnameTe": "యట్టం",
+    "surnameEn": "YATTAM",
+    "updatedAt": "2026-11-20T13:51:45.546Z"
+  },
   "2122": {
     "supportPct": 100,
     "survey_status": "supporter",
@@ -4000,11 +4020,41 @@
     "influencerName": "Velgula Lakshman",
     "influencerPhone": "9030326217"
   },
+  "2128": {
+    "customAlias": "సూర్యనారాయణ మూర్తి కొయ్యా",
+    "correctedNameTe": "సూర్యనారాయణ మూర్తి కొయ్యా",
+    "correctedNameEn": "SURYANARAINMURTHI KOYYA",
+    "correctedSurnameTe": "కొయ్యా",
+    "correctedSurnameEn": "KOYYA",
+    "surnameTe": "కొయ్యా",
+    "surnameEn": "KOYYA",
+    "updatedAt": "2026-11-20T13:52:28.810Z"
+  },
+  "2129": {
+    "customAlias": "చక్రవేణి కొయ్యా",
+    "correctedNameTe": "చక్రవేణి కొయ్యా",
+    "correctedNameEn": "CHAKRAVENI KOYYA",
+    "correctedSurnameTe": "కొయ్యా",
+    "correctedSurnameEn": "KOYYA",
+    "surnameTe": "కొయ్యా",
+    "surnameEn": "KOYYA",
+    "updatedAt": "2026-11-20T13:53:01.349Z"
+  },
   "2130": {
     "supportPct": 100,
     "survey_status": "supporter",
     "influencerName": "Jyothula Srinivasu",
     "influencerPhone": "9949048940"
+  },
+  "2131": {
+    "customAlias": "సూరయ్యమ్మ మట్ల",
+    "correctedNameTe": "సూరయ్యమ్మ మట్ల",
+    "correctedNameEn": "SURAIAHMMA MATLA",
+    "correctedSurnameTe": "మట్ల",
+    "correctedSurnameEn": "MATLA",
+    "surnameTe": "మట్ల",
+    "surnameEn": "MATLA",
+    "updatedAt": "2026-11-20T13:53:37.309Z"
   },
   "2135": {
     "supportPct": 100,
@@ -4023,6 +4073,16 @@
   },
   "2140": {
     "supportPct": 75
+  },
+  "2141": {
+    "customAlias": "కృష్ణ కౌసిక్ మద్దాలి",
+    "correctedNameTe": "కృష్ణ కౌసిక్ మద్దాలి",
+    "correctedNameEn": "KRISHNA KAUSIK LA MADDA",
+    "correctedSurnameTe": "మద్దాలి",
+    "correctedSurnameEn": "MADDA",
+    "surnameTe": "మద్దాలి",
+    "surnameEn": "MADDA",
+    "updatedAt": "2026-11-20T13:55:31.258Z"
   },
   "2142": {
     "supportPct": 100,
@@ -4072,6 +4132,66 @@
     "influencerName": "Jyothula Srinivasu",
     "influencerPhone": "9949048940"
   },
+  "2152": {
+    "customAlias": "పెనుగొండ విశాలాక్షి",
+    "correctedNameTe": "పెనుగొండ విశాలాక్షి",
+    "correctedNameEn": "T VISALAKSHI",
+    "correctedSurnameTe": "విశాలాక్షి",
+    "correctedSurnameEn": "VISALAKSHI",
+    "surnameTe": "విశాలాక్షి",
+    "surnameEn": "VISALAKSHI",
+    "updatedAt": "2026-11-20T13:56:49.341Z"
+  },
+  "2153": {
+    "customAlias": "సూర్యనారాయణ మూర్తి మద్దాలి",
+    "correctedNameTe": "సూర్యనారాయణ మూర్తి మద్దాలి",
+    "correctedNameEn": "SURYANARAINMURTHI MADDALA",
+    "correctedSurnameTe": "మద్దాలి",
+    "correctedSurnameEn": "MADDALA",
+    "surnameTe": "మద్దాలి",
+    "surnameEn": "MADDALA",
+    "updatedAt": "2026-11-20T13:57:13.091Z"
+  },
+  "2154": {
+    "customAlias": "కృష్ణవేణి మద్దాలి",
+    "correctedNameTe": "కృష్ణవేణి మద్దాలి",
+    "correctedNameEn": "KRISHNANENI MADDALA",
+    "correctedSurnameTe": "మద్దాలి",
+    "correctedSurnameEn": "MADDALA",
+    "surnameTe": "మద్దాలి",
+    "surnameEn": "MADDALA",
+    "updatedAt": "2026-11-20T13:57:36.809Z"
+  },
+  "2156": {
+    "customAlias": "శ్రీనివాస్ అయినవిల్లి",
+    "correctedNameTe": "శ్రీనివాస్ అయినవిల్లి",
+    "correctedNameEn": "SHRINIVA AYINVILL",
+    "correctedSurnameTe": "అయినవిల్లి",
+    "correctedSurnameEn": "AYINVILL",
+    "surnameTe": "అయినవిల్లి",
+    "surnameEn": "AYINVILL",
+    "updatedAt": "2026-11-20T13:58:09.791Z"
+  },
+  "2157": {
+    "customAlias": "దుర్గ అయినవిల్లి",
+    "correctedNameTe": "దుర్గ అయినవిల్లి",
+    "correctedNameEn": "DURGA AYINMILLI",
+    "correctedSurnameTe": "అయినవిల్లి",
+    "correctedSurnameEn": "AYINMILLI",
+    "surnameTe": "అయినవిల్లి",
+    "surnameEn": "AYINMILLI",
+    "updatedAt": "2026-11-20T13:58:27.141Z"
+  },
+  "2158": {
+    "customAlias": "సాయి రామ్ అయ���నవిల్లి",
+    "correctedNameTe": "సాయి రామ్ అయినవిల్లి",
+    "correctedNameEn": "SAI RAM AINAVILLI",
+    "correctedSurnameTe": "అయినవిల్లి",
+    "correctedSurnameEn": "AINAVILLI",
+    "surnameTe": "అయినవిల్లి",
+    "surnameEn": "AINAVILLI",
+    "updatedAt": "2026-11-20T13:58:51.572Z"
+  },
   "2159": {
     "supportPct": 100,
     "survey_status": "supporter",
@@ -4090,16 +4210,60 @@
     "influencerName": "Jyothula Srinivasu",
     "influencerPhone": "9949048940"
   },
+  "2174": {
+    "customAlias": "సత్యవతి కర్రి",
+    "correctedNameTe": "సత్యవతి కర్రి",
+    "correctedNameEn": "SATYAVATI KARI",
+    "correctedSurnameTe": "కర్రి",
+    "correctedSurnameEn": "KARI",
+    "surnameTe": "కర్రి",
+    "surnameEn": "KARI",
+    "updatedAt": "2026-11-20T14:00:25.070Z"
+  },
+  "2177": {
+    "customAlias": "చంద్ర అరట్లకట్ల",
+    "correctedNameTe": "చంద్ర అరట్లకట్ల",
+    "correctedNameEn": "CHANDRA ARTKATLA",
+    "correctedSurnameTe": "అరట్లకట్ల",
+    "correctedSurnameEn": "ARTKATLA",
+    "surnameTe": "అరట్లకట్ల",
+    "surnameEn": "ARTKATLA",
+    "updatedAt": "2026-11-20T14:00:59.454Z"
+  },
+  "2182": {
+    "customAlias": "వెంకటరమణ పంపన",
+    "correctedNameTe": "వెంకటరమణ పంపన",
+    "correctedNameEn": "VENKATARAMANA PAMPANA",
+    "correctedSurnameTe": "పంపన",
+    "correctedSurnameEn": "PAMPANA",
+    "surnameTe": "పంపన",
+    "surnameEn": "PAMPANA",
+    "updatedAt": "2026-11-20T14:01:21.421Z"
+  },
+  "2183": {
+    "customAlias": "రాము తీడ",
+    "correctedNameTe": "రాము తీడ",
+    "correctedNameEn": "RAMU TEEDA",
+    "correctedSurnameTe": "తీడ",
+    "correctedSurnameEn": "TEEDA",
+    "surnameTe": "తీడ",
+    "surnameEn": "TEEDA",
+    "updatedAt": "2026-11-20T14:02:00.421Z"
+  },
   "2185": {
     "influencerId": "inf_1793732645047",
     "influencerName": "gadhi suryanrayana",
     "influencerMobile": "9705888474"
   },
   "2186": {
-    "supportPct": 75
+    "supportPct": 75,
+    "survey_status": "out_of_city",
+    "updatedAt": "2026-11-20T14:02:51.015Z"
   },
   "2187": {
-    "supportPct": 75
+    "supportPct": 75,
+    "survey_status": "out_of_city",
+    "updatedAt": "2026-11-20T14:02:45.582Z"
   },
   "2188": {
     "supportPct": 75
@@ -4202,11 +4366,81 @@
     "influencerName": "Gollapalli Ganga Eswarudu",
     "influencerPhone": "7386273250"
   },
+  "2237": {
+    "customAlias": "కుమారి దేశలంక",
+    "correctedNameTe": "కుమారి దేశలంక",
+    "correctedNameEn": "KUMARI DESHLANKA",
+    "correctedSurnameTe": "దేశలంక",
+    "correctedSurnameEn": "DESHLANKA",
+    "surnameTe": "దేశలంక",
+    "surnameEn": "DESHLANKA",
+    "updatedAt": "2026-11-20T14:08:23.034Z"
+  },
+  "2241": {
+    "customAlias": "భాను వెంకటసాయి నవీన్ తీడ",
+    "correctedNameTe": "భాను వెంకటసాయి నవీన్ తీడ",
+    "correctedNameEn": "BHANU VENKATA SAI NAVEEN THEEDA",
+    "correctedSurnameTe": "తీడ",
+    "correctedSurnameEn": "THEEDA",
+    "surnameTe": "తీడ",
+    "surnameEn": "THEEDA",
+    "updatedAt": "2026-11-20T14:09:13.006Z"
+  },
+  "2245": {
+    "customAlias": "సరోజ తీడ",
+    "correctedNameTe": "సరోజ తీడ",
+    "correctedNameEn": "SARQJA TEEDA",
+    "correctedSurnameTe": "తీడ",
+    "correctedSurnameEn": "TEEDA",
+    "surnameTe": "తీడ",
+    "surnameEn": "TEEDA",
+    "updatedAt": "2026-11-20T14:10:20.619Z"
+  },
+  "2246": {
+    "customAlias": "శ్రావణి తీడ",
+    "correctedNameTe": "శ్రావణి తీడ",
+    "correctedNameEn": "SRAVANI TEEDA",
+    "correctedSurnameTe": "తీడ",
+    "correctedSurnameEn": "TEEDA",
+    "surnameTe": "తీడ",
+    "surnameEn": "TEEDA",
+    "updatedAt": "2026-11-20T14:10:41.533Z"
+  },
+  "2248": {
+    "customAlias": "శ్రీను కొప్పిశెట్టి",
+    "correctedNameTe": "శ్రీను కొప్పిశెట్టి",
+    "correctedNameEn": "SRINU KOPPI SETTI",
+    "correctedSurnameTe": "కొప్పిశెట్టి",
+    "correctedSurnameEn": "SETTI",
+    "surnameTe": "కొప్పిశెట్టి",
+    "surnameEn": "SETTI",
+    "updatedAt": "2026-11-20T14:11:07.183Z"
+  },
+  "2249": {
+    "customAlias": "శ్రీను కొప్పిశెట్టి",
+    "correctedNameTe": "శ్రీను కొప్పిశెట్టి",
+    "correctedNameEn": "SHRINU KOPPISETTY KOPPISETTI",
+    "correctedSurnameTe": "కొప్పిశెట్టి",
+    "correctedSurnameEn": "KOPPISETTI",
+    "surnameTe": "కొప్పిశెట్టి",
+    "surnameEn": "KOPPISETTI",
+    "updatedAt": "2026-11-20T14:11:26.433Z"
+  },
   "2250": {
     "supportPct": 100,
     "survey_status": "supporter",
     "influencerName": "Gollapalli Ganga Eswarudu",
     "influencerPhone": "7386273250"
+  },
+  "2251": {
+    "customAlias": "లొవలక్ష్మి కొప్పిశెట్టి",
+    "correctedNameTe": "లొవలక్ష్మి కొప్పిశెట్టి",
+    "correctedNameEn": "LOVALAKSHMI KOPPISETTI",
+    "correctedSurnameTe": "కొప్పిశెట్టి",
+    "correctedSurnameEn": "KOPPISETTI",
+    "surnameTe": "కొప్పిశెట్టి",
+    "surnameEn": "KOPPISETTI",
+    "updatedAt": "2026-11-20T14:11:46.218Z"
   },
   "2252": {
     "supportPct": 100,
@@ -4242,16 +4476,116 @@
     "influencerName": "satyanarayana chesetti",
     "influencerMobile": "7569169892"
   },
+  "2261": {
+    "customAlias": "అప్పలకొండ అనుసూరి",
+    "correctedNameTe": "అప్పలకొండ అనుసూరి",
+    "correctedNameEn": "APPALAKONDA ANUSURI",
+    "correctedSurnameTe": "అనుసూరి",
+    "correctedSurnameEn": "ANUSURI",
+    "surnameTe": "అనుసూరి",
+    "surnameEn": "ANUSURI",
+    "updatedAt": "2026-11-20T14:13:15.565Z"
+  },
+  "2262": {
+    "customAlias": "శ్రీనివాసరావు అనుసూరి",
+    "correctedNameTe": "శ్రీనివాసరావు అనుసూరి",
+    "correctedNameEn": "SRINIVASARAO ANASURI",
+    "correctedSurnameTe": "అనుసూరి",
+    "correctedSurnameEn": "ANASURI",
+    "surnameTe": "అనుసూరి",
+    "surnameEn": "ANASURI",
+    "updatedAt": "2026-11-20T14:13:36.251Z"
+  },
+  "2263": {
+    "customAlias": "అనంత లక్ష్మి అనుసూరి",
+    "correctedNameTe": "అనంత లక్ష్మి అనుసూరి",
+    "correctedNameEn": "ANANTHALAKSHMI ANUSURI",
+    "correctedSurnameTe": "అనుసూరి",
+    "correctedSurnameEn": "ANUSURI",
+    "surnameTe": "అనుసూరి",
+    "surnameEn": "ANUSURI",
+    "updatedAt": "2026-11-20T14:14:05.333Z"
+  },
+  "2264": {
+    "customAlias": "పల్లయ్య అనుసూరి",
+    "correctedNameTe": "పల్లయ్య అనుసూరి",
+    "correctedNameEn": "PALLAIAH ANUSURI",
+    "correctedSurnameTe": "అనుసూరి",
+    "correctedSurnameEn": "ANUSURI",
+    "surnameTe": "అనుసూరి",
+    "surnameEn": "ANUSURI",
+    "updatedAt": "2026-11-20T14:14:28.252Z"
+  },
+  "2265": {
+    "customAlias": "నాని యనమల",
+    "correctedNameTe": "నాని యనమల",
+    "correctedNameEn": "NANI YANAMALA",
+    "correctedSurnameTe": "యనమల",
+    "correctedSurnameEn": "YANAMALA",
+    "surnameTe": "యనమల",
+    "surnameEn": "YANAMALA",
+    "updatedAt": "2026-11-20T14:14:55.989Z"
+  },
+  "2268": {
+    "customAlias": "దేవి జాగు",
+    "correctedNameTe": "దేవి జాగు",
+    "correctedNameEn": "DEVI JAGU",
+    "correctedSurnameTe": "జాగు",
+    "correctedSurnameEn": "JAGU",
+    "surnameTe": "జాగు",
+    "surnameEn": "JAGU",
+    "updatedAt": "2026-11-20T14:15:18.989Z"
+  },
   "2275": {
     "influencerId": "inf_1793696044209",
     "influencerName": "satyanarayana chesetti",
     "influencerMobile": "7569169892"
+  },
+  "2278": {
+    "customAlias": "నాగ అప్పలరాజు గట్టెం",
+    "correctedNameTe": "నాగ అప్పలరాజు గట్టెం",
+    "correctedNameEn": "NAGA APPALARAJU GATTEMN",
+    "correctedSurnameTe": "గట్టెం",
+    "correctedSurnameEn": "GATTEMN",
+    "surnameTe": "గట్టెం",
+    "surnameEn": "GATTEMN",
+    "updatedAt": "2026-11-20T14:17:04.621Z"
+  },
+  "2279": {
+    "customAlias": "సత్య దుర్గ మణి రాయుడు",
+    "correctedNameTe": "సత్య దుర్గ మణి రాయుడు",
+    "correctedNameEn": "SATYA DURGA MANI RAYUDU",
+    "correctedSurnameTe": "రాయుడు",
+    "correctedSurnameEn": "RAYUDU",
+    "surnameTe": "రాయుడు",
+    "surnameEn": "RAYUDU",
+    "updatedAt": "2026-11-20T14:17:33.139Z"
   },
   "2280": {
     "supportPct": 100,
     "survey_status": "supporter",
     "influencerName": "Burra Divya Raj",
     "influencerPhone": "9701809999"
+  },
+  "2286": {
+    "customAlias": "వెంకటరమణ సఖునాల",
+    "correctedNameTe": "వెంకటరమణ సఖునాల",
+    "correctedNameEn": "VENKATARAMANA SHAKHUNALA",
+    "correctedSurnameTe": "సఖునాల",
+    "correctedSurnameEn": "SHAKHUNALA",
+    "surnameTe": "సఖునాల",
+    "surnameEn": "SHAKHUNALA",
+    "updatedAt": "2026-11-20T14:18:48.340Z"
+  },
+  "2288": {
+    "customAlias": "చంద్రిక సఖునాల",
+    "correctedNameTe": "చంద్రిక సఖునాల",
+    "correctedNameEn": "CHANDRIKA SAKHUNALA",
+    "correctedSurnameTe": "సఖునాల",
+    "correctedSurnameEn": "SAKHUNALA",
+    "surnameTe": "సఖునాల",
+    "surnameEn": "SAKHUNALA",
+    "updatedAt": "2026-11-20T14:19:52.088Z"
   },
   "2290": {
     "supportPct": 100,
@@ -4264,6 +4598,36 @@
     "survey_status": "supporter",
     "influencerName": "Kaparapu.Venkataramana",
     "influencerPhone": "9177084343"
+  },
+  "2292": {
+    "customAlias": "పవన్ కుమార్ అడపా",
+    "correctedNameTe": "పవన్ కుమార్ అడపా",
+    "correctedNameEn": "PAVAN KUMAR ADAPA",
+    "correctedSurnameTe": "అడపా",
+    "correctedSurnameEn": "ADAPA",
+    "surnameTe": "అడపా",
+    "surnameEn": "ADAPA",
+    "updatedAt": "2026-11-20T14:20:45.720Z"
+  },
+  "2293": {
+    "customAlias": "సునీల్ రాయి",
+    "correctedNameTe": "సునీల్ రాయి",
+    "correctedNameEn": "SUNIL RAI",
+    "correctedSurnameTe": "రాయి",
+    "correctedSurnameEn": "RAI",
+    "surnameTe": "రాయి",
+    "surnameEn": "RAI",
+    "updatedAt": "2026-11-20T14:21:03.170Z"
+  },
+  "2294": {
+    "customAlias": "దుర్గాజి నల్రావుల",
+    "correctedNameTe": "దుర్గాజి నల్రావుల",
+    "correctedNameEn": "DURGAJI NALLARAVULA",
+    "correctedSurnameTe": "నల్రావుల",
+    "correctedSurnameEn": "NALLARAVULA",
+    "surnameTe": "నల్రావుల",
+    "surnameEn": "NALLARAVULA",
+    "updatedAt": "2026-11-20T14:21:35.534Z"
   },
   "2299": {
     "supportPct": 100,
@@ -4344,11 +4708,51 @@
     "influencerName": "Jyothula Srinivasu",
     "influencerPhone": "9949048940"
   },
+  "2321": {
+    "customAlias": "రమణమ్మ చింతలపూడి",
+    "correctedNameTe": "రమణమ్మ చింతలపూడి",
+    "correctedNameEn": "VENKATARATNAM CHENCHALAPU",
+    "correctedSurnameTe": "చింతలపూడి",
+    "correctedSurnameEn": "CHENCHALAPU",
+    "surnameTe": "చింతలపూడి",
+    "surnameEn": "CHENCHALAPU",
+    "updatedAt": "2026-11-20T14:24:05.887Z"
+  },
+  "2322": {
+    "customAlias": "లక్ష్మి సాధనాల",
+    "correctedNameTe": "లక్ష్మి సాధనాల",
+    "correctedNameEn": "LAKSHMI SADANALA",
+    "correctedSurnameTe": "సాధనాల",
+    "correctedSurnameEn": "SADANALA",
+    "surnameTe": "సాధనాల",
+    "surnameEn": "SADANALA",
+    "updatedAt": "2026-11-20T14:24:36.186Z"
+  },
   "2324": {
     "supportPct": 100,
     "survey_status": "supporter",
     "influencerName": "Kaparapu.Venkataramana",
     "influencerPhone": "9177084343"
+  },
+  "2325": {
+    "customAlias": "భవాని సాధనాల",
+    "correctedNameTe": "భవాని సాధనాల",
+    "correctedNameEn": "BHAVANI SADANALA",
+    "correctedSurnameTe": "సాధనాల",
+    "correctedSurnameEn": "SADANALA",
+    "surnameTe": "సాధనాల",
+    "surnameEn": "SADANALA",
+    "updatedAt": "2026-11-20T14:25:21.720Z"
+  },
+  "2330": {
+    "customAlias": "మేరీ పెనుపోతుల",
+    "correctedNameTe": "మేరీ పెనుపోతుల",
+    "correctedNameEn": "MERI PENUPOTULA",
+    "correctedSurnameTe": "పెనుపోతుల",
+    "correctedSurnameEn": "PENUPOTULA",
+    "surnameTe": "పెనుపోతుల",
+    "surnameEn": "PENUPOTULA",
+    "updatedAt": "2026-11-20T14:26:00.552Z"
   },
   "2334": {
     "supportPct": 100,
@@ -4407,6 +4811,26 @@
   "2355": {
     "supportPct": 75
   },
+  "2358": {
+    "customAlias": "చందన శ్రీ సామినీడి",
+    "correctedNameTe": "చందన శ్రీ సామినీడి",
+    "correctedNameEn": "CHANDANA SRI SAMINEEDI",
+    "correctedSurnameTe": "సామినీడి",
+    "correctedSurnameEn": "SAMINEEDI",
+    "surnameTe": "సామినీడి",
+    "surnameEn": "SAMINEEDI",
+    "updatedAt": "2026-11-20T14:39:29.837Z"
+  },
+  "2360": {
+    "customAlias": "సాయి మహేశ్వరీ సన్ని",
+    "correctedNameTe": "సాయి మహేశ్వరీ సన్ని",
+    "correctedNameEn": "SAI MAHESWARI SANNI",
+    "correctedSurnameTe": "సన్ని",
+    "correctedSurnameEn": "SANNI",
+    "surnameTe": "సన్ని",
+    "surnameEn": "SANNI",
+    "updatedAt": "2026-11-20T14:39:58.634Z"
+  },
   "2365": {
     "supportPct": 100,
     "survey_status": "supporter",
@@ -4431,6 +4855,16 @@
     "influencerName": "Gollapalli Ganga Eswarudu",
     "influencerPhone": "7386273250"
   },
+  "2378": {
+    "customAlias": "అచ్చియమ్మ గొల్లపల్లి",
+    "correctedNameTe": "అచ్చియమ్మ గొల్లపల్లి",
+    "correctedNameEn": "ATCHIAHMMA GOLLAPALLI",
+    "correctedSurnameTe": "గొల్లపల్లి",
+    "correctedSurnameEn": "GOLLAPALLI",
+    "surnameTe": "గొల్లపల్లి",
+    "surnameEn": "GOLLAPALLI",
+    "updatedAt": "2026-11-20T14:42:15.367Z"
+  },
   "2382": {
     "supportPct": 100,
     "survey_status": "supporter",
@@ -4447,6 +4881,16 @@
     "survey_status": "supporter",
     "influencerName": "Jyothula Srinivasu",
     "influencerPhone": "9949048940"
+  },
+  "2387": {
+    "customAlias": "సత్య వేణు గోపాల తీడ",
+    "correctedNameTe": "సత్య వేణు గోపాల తీడ",
+    "correctedNameEn": "SATYA VENUGOPAL TEEDA",
+    "correctedSurnameTe": "తీడ",
+    "correctedSurnameEn": "TEEDA",
+    "surnameTe": "తీడ",
+    "surnameEn": "TEEDA",
+    "updatedAt": "2026-11-20T14:43:07.051Z"
   },
   "2388": {
     "supportPct": 100,
@@ -4488,6 +4932,26 @@
     "influencerName": "satyanarayana chesetti",
     "influencerMobile": "7569169892"
   },
+  "2402": {
+    "customAlias": "నాగరాజు దొడ్డి",
+    "correctedNameTe": "నాగరాజు దొడ్డి",
+    "correctedNameEn": "OTARU PERU",
+    "correctedSurnameTe": "దొడ్డి",
+    "correctedSurnameEn": "PERU",
+    "surnameTe": "దొడ్డి",
+    "surnameEn": "PERU",
+    "updatedAt": "2026-11-20T14:44:48.400Z"
+  },
+  "2403": {
+    "customAlias": "పద్మ చిత్రాడ",
+    "correctedNameTe": "పద్మ చిత్రాడ",
+    "correctedNameEn": "PADMA CHITRADA",
+    "correctedSurnameTe": "చిత్రాడ",
+    "correctedSurnameEn": "CHITRADA",
+    "surnameTe": "చిత్రాడ",
+    "surnameEn": "CHITRADA",
+    "updatedAt": "2026-11-20T14:45:07.000Z"
+  },
   "2405": {
     "supportPct": 100,
     "survey_status": "supporter",
@@ -4506,11 +4970,31 @@
     "influencerName": "Ummidi Bodakonda",
     "influencerPhone": "9059898535"
   },
+  "2410": {
+    "customAlias": "సీతా రత్నం కొజ్జారపు",
+    "correctedNameTe": "సీతా రత్నం కొజ్జారపు",
+    "correctedNameEn": "SITARATNAM KOJJUVARPU",
+    "correctedSurnameTe": "కొజ్జారపు",
+    "correctedSurnameEn": "KOJJUVARPU",
+    "surnameTe": "కొజ్జారపు",
+    "surnameEn": "KOJJUVARPU",
+    "updatedAt": "2026-11-20T14:46:20.699Z"
+  },
   "2411": {
     "supportPct": 100,
     "survey_status": "supporter",
     "influencerName": "Chesetti.Veerabhadrao",
     "influencerPhone": "9951032710"
+  },
+  "2412": {
+    "customAlias": "బుల్లియ్య అనే సర్వారాయుడు గొల్లపల్లి",
+    "correctedNameTe": "బుల్లియ్య అనే సర్వారాయుడు గొల్లపల్లి",
+    "correctedNameEn": "BULLIYANESARWARAYUDU GOLLAPALL",
+    "correctedSurnameTe": "గొల్లపల్లి",
+    "correctedSurnameEn": "GOLLAPALL",
+    "surnameTe": "గొల్లపల్లి",
+    "surnameEn": "GOLLAPALL",
+    "updatedAt": "2026-11-20T14:47:05.949Z"
   },
   "2414": {
     "supportPct": 100,
@@ -4548,6 +5032,26 @@
     "influencerName": "Jyothula Srinivasu",
     "influencerPhone": "9949048940"
   },
+  "2425": {
+    "customAlias": "వరలక్ష్మి ఇంటి",
+    "correctedNameTe": "వరలక్ష్మి ఇంటి",
+    "correctedNameEn": "VERALAKSHMI INTI",
+    "correctedSurnameTe": "ఇంటి",
+    "correctedSurnameEn": "INTI",
+    "surnameTe": "ఇంటి",
+    "surnameEn": "INTI",
+    "updatedAt": "2026-11-20T14:48:39.765Z"
+  },
+  "2426": {
+    "customAlias": "వీర లక్ష్మి కాకినాడ",
+    "correctedNameTe": "వీర లక్ష్మి కాకినాడ",
+    "correctedNameEn": "VEERA LAKHSMI KAKINADA",
+    "correctedSurnameTe": "కాకినాడ",
+    "correctedSurnameEn": "KAKINADA",
+    "surnameTe": "కాకినాడ",
+    "surnameEn": "KAKINADA",
+    "updatedAt": "2026-11-20T14:48:22.934Z"
+  },
   "2427": {
     "supportPct": 100,
     "survey_status": "supporter",
@@ -4575,11 +5079,31 @@
   "2441": {
     "supportPct": 75
   },
+  "2443": {
+    "customAlias": "అనిల కుమర్ విప్పర్తి",
+    "correctedNameTe": "అనిల కుమర్ విప్పర్తి",
+    "correctedNameEn": "ANIL KUMAR VIPPARTHI",
+    "correctedSurnameTe": "విప్పర్తి",
+    "correctedSurnameEn": "VIPPARTHI",
+    "surnameTe": "విప్పర్తి",
+    "surnameEn": "VIPPARTHI",
+    "updatedAt": "2026-11-20T14:51:22.882Z"
+  },
   "2444": {
     "supportPct": 100,
     "survey_status": "supporter",
     "influencerName": "Gollapalli.Sivababu",
     "influencerPhone": "9666792006"
+  },
+  "2445": {
+    "customAlias": "చంద్రావతి నాగళ్ళ",
+    "correctedNameTe": "చంద్రావతి నాగళ్ళ",
+    "correctedNameEn": "CHANDRAVATHI NAGALLA",
+    "correctedSurnameTe": "నాగళ్ళ",
+    "correctedSurnameEn": "NAGALLA",
+    "surnameTe": "నాగళ్ళ",
+    "surnameEn": "NAGALLA",
+    "updatedAt": "2026-11-20T14:52:52.285Z"
   },
   "2446": {
     "supportPct": 100,
@@ -4597,6 +5121,16 @@
     "supportPct": 75,
     "notes": "Akula ramya"
   },
+  "2450": {
+    "customAlias": "పద్మ గిరి దేశనీడి",
+    "correctedNameTe": "పద్మ గిరి దేశనీడి",
+    "correctedNameEn": "PADMA GIRI DESINIDI",
+    "correctedSurnameTe": "దేశనీడి",
+    "correctedSurnameEn": "DESINIDI",
+    "surnameTe": "దేశనీడి",
+    "surnameEn": "DESINIDI",
+    "updatedAt": "2026-11-20T14:54:13.648Z"
+  },
   "2454": {
     "supportPct": 100,
     "survey_status": "supporter",
@@ -4609,11 +5143,31 @@
     "influencerName": "Jyothula Srinivasu",
     "influencerPhone": "9949048940"
   },
+  "2457": {
+    "customAlias": "ఫణి కుమార్ అరట్లకట్ల",
+    "correctedNameTe": "ఫణి కుమార్ అరట్లకట్ల",
+    "correctedNameEn": "PHANI KUMAR ARATAKATLA",
+    "correctedSurnameTe": "అరట్లకట్ల",
+    "correctedSurnameEn": "ARATAKATLA",
+    "surnameTe": "అరట్లకట్ల",
+    "surnameEn": "ARATAKATLA",
+    "updatedAt": "2026-11-20T14:55:23.583Z"
+  },
   "2458": {
     "supportPct": 100,
     "survey_status": "supporter",
     "influencerName": "Jyothula Srinivasu",
     "influencerPhone": "9949048940"
+  },
+  "2459": {
+    "customAlias": "వీరేంద్ర అరట్లకట్ల",
+    "correctedNameTe": "వీరేంద్ర అరట్లకట్ల",
+    "correctedNameEn": "VEERENDRA ARATAKATLA",
+    "correctedSurnameTe": "అరట్లకట్ల",
+    "correctedSurnameEn": "ARATAKATLA",
+    "surnameTe": "అరట్లకట్ల",
+    "surnameEn": "ARATAKATLA",
+    "updatedAt": "2026-11-20T14:56:34.981Z"
   },
   "2460": {
     "supportPct": 100,
@@ -4621,17 +5175,67 @@
     "influencerName": "Jyothula Srinivasu",
     "influencerPhone": "9949048940"
   },
+  "2461": {
+    "customAlias": "గోపికృష్ణ అరట్లకట్ల",
+    "correctedNameTe": "గోపికృష్ణ అరట్లకట్ల",
+    "correctedNameEn": "GOPIKRISHNA ARATAKATLA",
+    "correctedSurnameTe": "అరట్లకట్ల",
+    "correctedSurnameEn": "ARATAKATLA",
+    "surnameTe": "అరట్లకట్ల",
+    "surnameEn": "ARATAKATLA",
+    "updatedAt": "2026-11-20T14:57:26.747Z"
+  },
   "2462": {
     "supportPct": 100,
     "survey_status": "supporter",
     "influencerName": "Kaparapu.Venkataramana",
     "influencerPhone": "9177084343"
   },
+  "2463": {
+    "customAlias": "శివ అరట్లకట్ల",
+    "correctedNameTe": "శివ అరట్లకట్ల",
+    "correctedNameEn": "SANDHYA ARATAKATLA",
+    "correctedSurnameTe": "అరట్లకట్ల",
+    "correctedSurnameEn": "ARATAKATLA",
+    "surnameTe": "అరట్లకట్ల",
+    "surnameEn": "ARATAKATLA",
+    "updatedAt": "2026-11-20T14:57:52.813Z"
+  },
+  "2464": {
+    "customAlias": "నాగ వెంకట లక్ష్మి చింతలపూడి",
+    "correctedNameTe": "నాగ వెంకట లక్ష్మి చింతలపూడి",
+    "correctedNameEn": "NAGA VENKATALAKSHMI CHINTALAPUDI",
+    "correctedSurnameTe": "చింతలపూడి",
+    "correctedSurnameEn": "CHINTALAPUDI",
+    "surnameTe": "చింతలపూడి",
+    "surnameEn": "CHINTALAPUDI",
+    "updatedAt": "2026-11-20T15:03:46.880Z"
+  },
   "2466": {
     "supportPct": 100,
     "survey_status": "supporter",
     "influencerName": "Jyothula Srinivasu",
     "influencerPhone": "9949048940"
+  },
+  "2468": {
+    "customAlias": "స్వామీ అరట్లకట్ల",
+    "correctedNameTe": "స్వామీ అరట్లకట్ల",
+    "correctedNameEn": "SWAMY ARATA KATLA",
+    "correctedSurnameTe": "అరట్లకట్ల",
+    "correctedSurnameEn": "KATLA",
+    "surnameTe": "అరట్లకట్ల",
+    "surnameEn": "KATLA",
+    "updatedAt": "2026-11-20T15:04:24.215Z"
+  },
+  "2469": {
+    "customAlias": "వెంకన్న అరట్లకట్ల",
+    "correctedNameTe": "వెంకన్న అరట్లకట్ల",
+    "correctedNameEn": "VENKANNA ARATAKATLA",
+    "correctedSurnameTe": "అరట్లకట్ల",
+    "correctedSurnameEn": "ARATAKATLA",
+    "surnameTe": "అరట్లకట్ల",
+    "surnameEn": "ARATAKATLA",
+    "updatedAt": "2026-11-20T15:04:43.265Z"
   },
   "2470": {
     "supportPct": 100,
@@ -4657,10 +5261,50 @@
     "influencerName": "Gollapalli.Sivababu",
     "influencerPhone": "9666792006"
   },
+  "2477": {
+    "customAlias": "శేష వేణి బెజవాడ",
+    "correctedNameTe": "శేష వేణి బెజవాడ",
+    "correctedNameEn": "SHESHA VENI BEJAVADA",
+    "correctedSurnameTe": "బెజవాడ",
+    "correctedSurnameEn": "BEJAVADA",
+    "surnameTe": "బెజవాడ",
+    "surnameEn": "BEJAVADA",
+    "updatedAt": "2026-11-20T15:05:36.546Z"
+  },
   "2478": {
     "influencerId": "inf_1793694265008",
     "influencerName": "yaadala srinu",
     "influencerMobile": "9701453592"
+  },
+  "2479": {
+    "customAlias": "రాజు సఖునాల",
+    "correctedNameTe": "రాజు సఖునాల",
+    "correctedNameEn": "RAJU SAKHINALA",
+    "correctedSurnameTe": "సఖునాల",
+    "correctedSurnameEn": "SAKHINALA",
+    "surnameTe": "సఖునాల",
+    "surnameEn": "SAKHINALA",
+    "updatedAt": "2026-11-20T15:09:28.297Z"
+  },
+  "2480": {
+    "customAlias": "చక్రధర్ సఖునాల",
+    "correctedNameTe": "చక్రధర్ సఖునాల",
+    "correctedNameEn": "CHAKRADHAR SAKHINALA",
+    "correctedSurnameTe": "సఖునాల",
+    "correctedSurnameEn": "SAKHINALA",
+    "surnameTe": "సఖునాల",
+    "surnameEn": "SAKHINALA",
+    "updatedAt": "2026-11-20T15:09:46.463Z"
+  },
+  "2481": {
+    "customAlias": "నారాయణ సఖునాల",
+    "correctedNameTe": "నారాయణ సఖునాల",
+    "correctedNameEn": "NARAYANA SAKHINALA",
+    "correctedSurnameTe": "సఖునాల",
+    "correctedSurnameEn": "SAKHINALA",
+    "surnameTe": "సఖునాల",
+    "surnameEn": "SAKHINALA",
+    "updatedAt": "2026-11-20T15:10:10.981Z"
   },
   "2482": {
     "supportPct": 100,
@@ -4674,11 +5318,61 @@
     "influencerName": "P Durga Prasad",
     "influencerPhone": "9182426769"
   },
+  "2485": {
+    "customAlias": "వీరలక్ష్మీ యనమల",
+    "correctedNameTe": "వీరలక్ష్మీ యనమల",
+    "correctedNameEn": "VEERALAKSHMII YANAMALA",
+    "correctedSurnameTe": "యనమల",
+    "correctedSurnameEn": "YANAMALA",
+    "surnameTe": "యనమల",
+    "surnameEn": "YANAMALA",
+    "updatedAt": "2026-11-20T15:11:23.398Z"
+  },
+  "2486": {
+    "customAlias": "అనూష అరట్లకట్ల",
+    "correctedNameTe": "అనూష అరట్లకట్ల",
+    "correctedNameEn": "ANOOSHA ARATAKATLA",
+    "correctedSurnameTe": "అరట్లకట్ల",
+    "correctedSurnameEn": "ARATAKATLA",
+    "surnameTe": "అరట్లకట్ల",
+    "surnameEn": "ARATAKATLA",
+    "updatedAt": "2026-11-20T15:11:44.012Z"
+  },
+  "2487": {
+    "customAlias": "వెంకట కుసుమ గొల్లపల్లి",
+    "correctedNameTe": "వెంకట కుసుమ గొల్లపల్లి",
+    "correctedNameEn": "VENKATA KUSUMA GOLLPALLI",
+    "correctedSurnameTe": "గొల్లపల్లి",
+    "correctedSurnameEn": "GOLLPALLI",
+    "surnameTe": "గొల్లపల్లి",
+    "surnameEn": "GOLLPALLI",
+    "updatedAt": "2026-11-20T15:12:26.797Z"
+  },
   "2488": {
     "supportPct": 100,
     "survey_status": "supporter",
     "influencerName": "Sn Raju",
     "influencerPhone": "8885558526"
+  },
+  "2489": {
+    "customAlias": "కాసులమ్మ కాలిబొయిన",
+    "correctedNameTe": "కాసులమ్మ కాలిబొయిన",
+    "correctedNameEn": "KASU LAMMA KAALI BOINA",
+    "correctedSurnameTe": "కాలిబొయిన",
+    "correctedSurnameEn": "BOINA",
+    "surnameTe": "కాలిబొయిన",
+    "surnameEn": "BOINA",
+    "updatedAt": "2026-11-20T15:13:37.679Z"
+  },
+  "2490": {
+    "customAlias": "పవన కృష్ణ కాలిబొయిన",
+    "correctedNameTe": "పవన కృష్ణ కాలిబొయిన",
+    "correctedNameEn": "PAVAN KRISHNA KALIBOINA",
+    "correctedSurnameTe": "కాలిబొయిన",
+    "correctedSurnameEn": "KALIBOINA",
+    "surnameTe": "కాలిబొయిన",
+    "surnameEn": "KALIBOINA",
+    "updatedAt": "2026-11-20T15:13:59.396Z"
   },
   "2491": {
     "supportPct": 100,
@@ -4692,11 +5386,91 @@
     "influencerName": "Kaparapu.Venkataramana",
     "influencerPhone": "9177084343"
   },
+  "2493": {
+    "customAlias": "నాగసూరి ఈర్ల",
+    "correctedNameTe": "నాగసూరి ఈర్ల",
+    "correctedNameEn": "NAGASURI EERLA",
+    "correctedSurnameTe": "ఈర్ల",
+    "correctedSurnameEn": "EERLA",
+    "surnameTe": "ఈర్ల",
+    "surnameEn": "EERLA",
+    "updatedAt": "2026-11-20T15:14:45.097Z"
+  },
+  "2495": {
+    "customAlias": "బాబ్జి రాయుడు",
+    "correctedNameTe": "బాబ్జి రాయుడు",
+    "correctedNameEn": "BABJI RAMUDU",
+    "correctedSurnameTe": "రాయుడు",
+    "correctedSurnameEn": "RAMUDU",
+    "surnameTe": "రాయుడు",
+    "surnameEn": "RAMUDU",
+    "updatedAt": "2026-11-20T15:15:28.513Z"
+  },
   "2497": {
     "supportPct": 100,
     "survey_status": "supporter",
     "influencerName": "Nakka Srinu",
     "influencerPhone": "8341245339"
+  },
+  "2499": {
+    "customAlias": "చిట్టెమ్మ అరట్లకట్ల",
+    "correctedNameTe": "చిట్టెమ్మ అరట్లకట్ల",
+    "correctedNameEn": "CHITTEMMA ARTKATLA",
+    "correctedSurnameTe": "అరట్లకట్ల",
+    "correctedSurnameEn": "ARTKATLA",
+    "surnameTe": "అరట్లకట్ల",
+    "surnameEn": "ARTKATLA",
+    "updatedAt": "2026-11-20T15:16:37.896Z"
+  },
+  "2500": {
+    "customAlias": "శ్రీనివాస్ అరట్లకట్ల",
+    "correctedNameTe": "శ్రీనివాస్ అరట్లకట్ల",
+    "correctedNameEn": "SRINIVAS ARATIKATLA",
+    "correctedSurnameTe": "అరట్లకట్ల",
+    "correctedSurnameEn": "ARATIKATLA",
+    "surnameTe": "అరట్లకట్ల",
+    "surnameEn": "ARATIKATLA",
+    "updatedAt": "2026-11-20T15:17:04.692Z"
+  },
+  "2501": {
+    "customAlias": "నాగ కృష్ణ అరట్లకట్ల",
+    "correctedNameTe": "నాగ కృష్ణ అరట్లకట్ల",
+    "correctedNameEn": "NAGA KRISHNA ARATAKATLA",
+    "correctedSurnameTe": "అరట్లకట్ల",
+    "correctedSurnameEn": "ARATAKATLA",
+    "surnameTe": "అరట్లకట్ల",
+    "surnameEn": "ARATAKATLA",
+    "updatedAt": "2026-11-20T15:17:28.811Z"
+  },
+  "2502": {
+    "customAlias": "వీర వెంకట లక్ష్మి అరట్లకట్ల",
+    "correctedNameTe": "వీర వెంకట లక్ష్మి అరట్లకట్ల",
+    "correctedNameEn": "VEERA VENKATA LAKSHMII ARATAKATLA",
+    "correctedSurnameTe": "అరట్లకట్ల",
+    "correctedSurnameEn": "ARATAKATLA",
+    "surnameTe": "అరట్లకట్ల",
+    "surnameEn": "ARATAKATLA",
+    "updatedAt": "2026-11-20T15:18:12.896Z"
+  },
+  "2505": {
+    "customAlias": "నాగ చక్రం ముత్తిమిల్లి",
+    "correctedNameTe": "నాగ చక్రం ముత్తిమిల్లి",
+    "correctedNameEn": "NAGA CHAKRAM MUTHIMILLI",
+    "correctedSurnameTe": "ముత్తిమిల్లి",
+    "correctedSurnameEn": "MUTHIMILLI",
+    "surnameTe": "ముత్తిమిల్లి",
+    "surnameEn": "MUTHIMILLI",
+    "updatedAt": "2026-11-20T15:19:16.960Z"
+  },
+  "2506": {
+    "customAlias": "అదిలక్ష్మీ ముత్తిమిల్లి",
+    "correctedNameTe": "అదిలక్ష్మీ ముత్తిమిల్లి",
+    "correctedNameEn": "ADILAKSHMII MUTTUMILLI",
+    "correctedSurnameTe": "ముత్తిమిల్లి",
+    "correctedSurnameEn": "MUTTUMILLI",
+    "surnameTe": "ముత్తిమిల్లి",
+    "surnameEn": "MUTTUMILLI",
+    "updatedAt": "2026-11-20T15:19:53.711Z"
   },
   "2507": {
     "supportPct": 100,
@@ -4728,11 +5502,81 @@
     "supportPct": 75,
     "notes": "Akula ramya"
   },
+  "2516": {
+    "customAlias": "అనంత లక్ష్మి నాగ రాజకుమారి సఖునాల",
+    "correctedNameTe": "అనంత లక్ష్మి నాగ రాజకుమారి సఖునాల",
+    "correctedNameEn": "SH ANANTALAKSHMINAGARAJAKUMAAI",
+    "correctedSurnameTe": "సఖునాల",
+    "correctedSurnameEn": "ANANTALAKSHMINAGARAJAKUMAAI",
+    "surnameTe": "సఖునాల",
+    "surnameEn": "ANANTALAKSHMINAGARAJAKUMAAI",
+    "updatedAt": "2026-11-20T15:22:37.910Z"
+  },
+  "2517": {
+    "customAlias": "చిన రెడ్డియ్య మచ్చర్ల",
+    "correctedNameTe": "చిన రెడ్డియ్య మచ్చర్ల",
+    "correctedNameEn": "CHINA REDDIAH MATCHARLA",
+    "correctedSurnameTe": "మచ్చర్ల",
+    "correctedSurnameEn": "MATCHARLA",
+    "surnameTe": "మచ్చర్ల",
+    "surnameEn": "MATCHARLA",
+    "updatedAt": "2026-11-20T15:23:08.177Z"
+  },
+  "2518": {
+    "customAlias": "వెంకట లక్ష్మి మచ్చర్ల",
+    "correctedNameTe": "వెంకట లక్ష్మి మచ్చర్ల",
+    "correctedNameEn": "VENKATALAKSHMI MACHARLA",
+    "correctedSurnameTe": "మచ్చర్ల",
+    "correctedSurnameEn": "MACHARLA",
+    "surnameTe": "మచ్చర్ల",
+    "surnameEn": "MACHARLA",
+    "updatedAt": "2026-11-20T15:23:33.044Z"
+  },
   "2520": {
     "supportPct": 100,
     "survey_status": "supporter",
     "influencerName": "Jyothula Srinivasu",
     "influencerPhone": "9949048940"
+  },
+  "2524": {
+    "customAlias": "వీరలక్ష్మి దొడ్డి",
+    "correctedNameTe": "వీరలక్ష్మి దొడ్డి",
+    "correctedNameEn": "VIRALAKRI DODHI",
+    "correctedSurnameTe": "దొడ్డి",
+    "correctedSurnameEn": "DODHI",
+    "surnameTe": "దొడ్డి",
+    "surnameEn": "DODHI",
+    "updatedAt": "2026-11-20T15:24:38.677Z"
+  },
+  "2528": {
+    "customAlias": "కన్నారావు అరట్లకట్ల",
+    "correctedNameTe": "కన్నారావు అరట్లకట్ల",
+    "correctedNameEn": "KANNARAO ARTKATLA",
+    "correctedSurnameTe": "అరట్లకట్ల",
+    "correctedSurnameEn": "ARTKATLA",
+    "surnameTe": "అరట్లకట్ల",
+    "surnameEn": "ARTKATLA",
+    "updatedAt": "2026-11-20T15:25:12.442Z"
+  },
+  "2529": {
+    "customAlias": "కనకలక్షి అరట్లకట్ల",
+    "correctedNameTe": "కనకలక్షి అరట్లకట్ల",
+    "correctedNameEn": "KANAKALAKSHI ARATAKATLA",
+    "correctedSurnameTe": "అరట్లకట్ల",
+    "correctedSurnameEn": "ARATAKATLA",
+    "surnameTe": "అరట్లకట్ల",
+    "surnameEn": "ARATAKATLA",
+    "updatedAt": "2026-11-20T15:25:27.492Z"
+  },
+  "2530": {
+    "customAlias": "శ్రీనివాస్ అరట్లకట్ల",
+    "correctedNameTe": "శ్రీనివాస్ అరట్లకట్ల",
+    "correctedNameEn": "SRINIVASU ARATAKATLA",
+    "correctedSurnameTe": "అరట్లకట్ల",
+    "correctedSurnameEn": "ARATAKATLA",
+    "surnameTe": "అరట్లకట్ల",
+    "surnameEn": "ARATAKATLA",
+    "updatedAt": "2026-11-20T15:25:54.627Z"
   },
   "2531": {
     "supportPct": 100,
@@ -4756,15 +5600,75 @@
     "influencerName": "yaadala srinu",
     "influencerMobile": "9701453592"
   },
+  "2539": {
+    "customAlias": "నాగేశ్వరరావు కుమ్మరి",
+    "correctedNameTe": "నాగేశ్వరరావు కుమ్మరి",
+    "correctedNameEn": "NAGESWARARAO KAMMARI",
+    "correctedSurnameTe": "కుమ్మరి",
+    "correctedSurnameEn": "KAMMARI",
+    "surnameTe": "కుమ్మరి",
+    "surnameEn": "KAMMARI",
+    "updatedAt": "2026-11-20T15:27:01.259Z"
+  },
+  "2544": {
+    "customAlias": "రాంబాబు సఖునాల",
+    "correctedNameTe": "రాంబాబు సఖునాల",
+    "correctedNameEn": "RAMBABU SHAKUNALA",
+    "correctedSurnameTe": "సఖునాల",
+    "correctedSurnameEn": "SHAKUNALA",
+    "surnameTe": "సఖునాల",
+    "surnameEn": "SHAKUNALA",
+    "updatedAt": "2026-11-20T15:28:05.344Z"
+  },
+  "2545": {
+    "customAlias": "సత్యనారాయణ అరట్లకట్ల",
+    "correctedNameTe": "సత్యనారాయణ అరట్లకట్ల",
+    "correctedNameEn": "SATYANARAYANA ARAKATLA",
+    "correctedSurnameTe": "అరట్లకట్ల",
+    "correctedSurnameEn": "ARAKATLA",
+    "surnameTe": "అరట్లకట్ల",
+    "surnameEn": "ARAKATLA",
+    "updatedAt": "2026-11-20T15:28:17.676Z"
+  },
+  "2547": {
+    "customAlias": "మాణిక్యం కొమ్మూరి",
+    "correctedNameTe": "మాణిక్యం కొమ్మూరి",
+    "correctedNameEn": "MANIKYAM KOMURI",
+    "correctedSurnameTe": "కొమ్మూరి",
+    "correctedSurnameEn": "KOMURI",
+    "surnameTe": "కొమ్మూరి",
+    "surnameEn": "KOMURI",
+    "updatedAt": "2026-11-20T15:28:36.409Z"
+  },
   "2548": {
     "influencerId": "inf_1793694265008",
     "influencerName": "yaadala srinu",
     "influencerMobile": "9701453592"
   },
+  "2549": {
+    "customAlias": "అప్పారావు కాలిబొయిన",
+    "correctedNameTe": "అప్పారావు కాలిబొయిన",
+    "correctedNameEn": "APPARAO KANIBOYINA",
+    "correctedSurnameTe": "కాలిబొయిన",
+    "correctedSurnameEn": "KANIBOYINA",
+    "surnameTe": "కాలిబొయిన",
+    "surnameEn": "KANIBOYINA",
+    "updatedAt": "2026-11-20T15:29:29.091Z"
+  },
   "2550": {
     "influencerId": "inf_1793694265008",
     "influencerName": "yaadala srinu",
     "influencerMobile": "9701453592"
+  },
+  "2551": {
+    "customAlias": "సూర్య నారాయణ కాలిబొయిన",
+    "correctedNameTe": "సూర్య నారాయణ కాలిబొయిన",
+    "correctedNameEn": "SURYANARAIN KANIBOYINA",
+    "correctedSurnameTe": "కాలిబొయిన",
+    "correctedSurnameEn": "KANIBOYINA",
+    "surnameTe": "కాలిబొయిన",
+    "surnameEn": "KANIBOYINA",
+    "updatedAt": "2026-11-20T15:30:20.727Z"
   },
   "2555": {
     "supportPct": 100,
@@ -4783,6 +5687,66 @@
     "survey_status": "supporter",
     "influencerName": "Jyothula Srinivasu",
     "influencerPhone": "9949048940"
+  },
+  "2560": {
+    "customAlias": "సత్యవతి రాయుడు",
+    "correctedNameTe": "సత్యవతి రాయుడు",
+    "correctedNameEn": "SATYAVATHI RAMUDU",
+    "correctedSurnameTe": "రాయుడు",
+    "correctedSurnameEn": "RAMUDU",
+    "surnameTe": "రాయుడు",
+    "surnameEn": "RAMUDU",
+    "updatedAt": "2026-11-20T15:32:10.824Z"
+  },
+  "2563": {
+    "customAlias": "దుర్గ దేవి కొమ్మూరి",
+    "correctedNameTe": "దుర్గ దేవి కొమ్మూరి",
+    "correctedNameEn": "NANAJI NEMALA",
+    "correctedSurnameTe": "కొమ్మూరి",
+    "correctedSurnameEn": "NEMALA",
+    "surnameTe": "కొమ్మూరి",
+    "surnameEn": "NEMALA",
+    "updatedAt": "2026-11-20T15:33:36.924Z"
+  },
+  "2564": {
+    "customAlias": "నానాజీ నేమాల",
+    "correctedNameTe": "నానాజీ నేమాల",
+    "correctedNameEn": "NANAJI NEMALA",
+    "correctedSurnameTe": "నేమాల",
+    "correctedSurnameEn": "NEMALA",
+    "surnameTe": "నేమాల",
+    "surnameEn": "NEMALA",
+    "updatedAt": "2026-11-20T15:34:44.008Z"
+  },
+  "2566": {
+    "customAlias": "వీరబ్బాయి నేమాల",
+    "correctedNameTe": "వీరబ్బాయి నేమాల",
+    "correctedNameEn": "VEERABBAI NEMALA",
+    "correctedSurnameTe": "నేమాల",
+    "correctedSurnameEn": "NEMALA",
+    "surnameTe": "నేమాల",
+    "surnameEn": "NEMALA",
+    "updatedAt": "2026-11-20T15:35:11.590Z"
+  },
+  "2571": {
+    "customAlias": "శివ పార్వతి నేమాల",
+    "correctedNameTe": "శివ పార్వతి నేమాల",
+    "correctedNameEn": "SIVA PARVATHI NEMALA",
+    "correctedSurnameTe": "నేమాల",
+    "correctedSurnameEn": "NEMALA",
+    "surnameTe": "నేమాల",
+    "surnameEn": "NEMALA",
+    "updatedAt": "2026-11-20T15:35:43.307Z"
+  },
+  "2572": {
+    "customAlias": "వీరబాబు నేమాల",
+    "correctedNameTe": "వీరబాబు నేమాల",
+    "correctedNameEn": "VIRABABU NEMALA",
+    "correctedSurnameTe": "నేమాల",
+    "correctedSurnameEn": "NEMALA",
+    "surnameTe": "నేమాల",
+    "surnameEn": "NEMALA",
+    "updatedAt": "2026-11-20T15:36:03.661Z"
   },
   "2574": {
     "supportPct": 100,
@@ -4819,6 +5783,16 @@
     "survey_status": "supporter",
     "influencerName": "Nakka Srinu",
     "influencerPhone": "8341245339"
+  },
+  "2581": {
+    "customAlias": "నర్ష తుపాటి",
+    "correctedNameTe": "నర్ష తుపాటి",
+    "correctedNameEn": "NARSH TUPATI",
+    "correctedSurnameTe": "తుపాటి",
+    "correctedSurnameEn": "TUPATI",
+    "surnameTe": "తుపాటి",
+    "surnameEn": "TUPATI",
+    "updatedAt": "2026-11-20T15:36:57.359Z"
   },
   "2583": {
     "supportPct": 100,
@@ -4860,6 +5834,16 @@
     "influencerName": "Ummidi.Sivakrishna",
     "influencerPhone": "9391997932"
   },
+  "2590": {
+    "customAlias": "సుర్యకుమరి సఖునాల",
+    "correctedNameTe": "సుర్యకుమరి సఖునాల",
+    "correctedNameEn": "SURYAKUMARI SAKHUNALA",
+    "correctedSurnameTe": "సఖునాల",
+    "correctedSurnameEn": "SAKHUNALA",
+    "surnameTe": "సఖునాల",
+    "surnameEn": "SAKHUNALA",
+    "updatedAt": "2026-11-20T15:39:00.992Z"
+  },
   "2591": {
     "supportPct": 100,
     "survey_status": "supporter",
@@ -4871,6 +5855,16 @@
     "survey_status": "supporter",
     "influencerName": "Burra Divya Raj",
     "influencerPhone": "9701809999"
+  },
+  "2598": {
+    "customAlias": "ఆదిలక్ష్మీ దేశనీడి",
+    "correctedNameTe": "ఆదిలక్ష్మీ దేశనీడి",
+    "correctedNameEn": "AADILAKSHMII DESHANNIDI",
+    "correctedSurnameTe": "దేశనీడి",
+    "correctedSurnameEn": "DESHANNIDI",
+    "surnameTe": "దేశనీడి",
+    "surnameEn": "DESHANNIDI",
+    "updatedAt": "2026-11-20T15:40:48.203Z"
   },
   "2600": {
     "supportPct": 100,
@@ -4902,11 +5896,181 @@
     "influencerName": "Burra Divya Raj",
     "influencerPhone": "9701809999"
   },
+  "2613": {
+    "customAlias": "నాగ సత్య నారాయణ కుమ్మరి",
+    "correctedNameTe": "నాగ సత్య నారాయణ కుమ్మరి",
+    "correctedNameEn": "NAAGSATHYANARAYAN KUMMARI",
+    "correctedSurnameTe": "కుమ్మరి",
+    "correctedSurnameEn": "KUMMARI",
+    "surnameTe": "కుమ్మరి",
+    "surnameEn": "KUMMARI",
+    "updatedAt": "2026-11-20T15:45:45.203Z"
+  },
+  "2614": {
+    "customAlias": "వీర బాబు యనమల",
+    "correctedNameTe": "వీర బాబు యనమల",
+    "correctedNameEn": "VEERA BABU YANAMALA",
+    "correctedSurnameTe": "యనమల",
+    "correctedSurnameEn": "YANAMALA",
+    "surnameTe": "యనమల",
+    "surnameEn": "YANAMALA",
+    "updatedAt": "2026-11-20T15:45:51.839Z"
+  },
   "2617": {
     "supportPct": 100,
     "survey_status": "supporter",
     "influencerName": "Nakka Srinu",
     "influencerPhone": "8341245339"
+  },
+  "2618": {
+    "customAlias": "రమణ మచ్చర్ల",
+    "correctedNameTe": "రమణ మచ్చర్ల",
+    "correctedNameEn": "RAMANA MATCHERLA",
+    "correctedSurnameTe": "మచ్చర్ల",
+    "correctedSurnameEn": "MATCHERLA",
+    "surnameTe": "మచ్చర్ల",
+    "surnameEn": "MATCHERLA",
+    "updatedAt": "2026-11-20T15:47:01.522Z"
+  },
+  "2619": {
+    "customAlias": "లోవ లక్ష్మి మచ్చెర్ల",
+    "correctedNameTe": "లోవ లక్ష్మి మచ్చెర్ల",
+    "correctedNameEn": "LOVLAKSHMI MATCHERLA",
+    "correctedSurnameTe": "మచ్చెర్ల",
+    "correctedSurnameEn": "MATCHERLA",
+    "surnameTe": "మచ్చెర్ల",
+    "surnameEn": "MATCHERLA",
+    "updatedAt": "2026-11-20T15:47:40.189Z"
+  },
+  "2620": {
+    "customAlias": "రాణి మచ్చెర్ల",
+    "correctedNameTe": "రాణి మచ్చెర్ల",
+    "correctedNameEn": "RANI MATCHARLA",
+    "correctedSurnameTe": "మచ్చెర్ల",
+    "correctedSurnameEn": "MATCHARLA",
+    "surnameTe": "మచ్చెర్ల",
+    "surnameEn": "MATCHARLA",
+    "updatedAt": "2026-11-20T15:48:03.889Z"
+  },
+  "2621": {
+    "customAlias": "శ్రీనివాసరావు మచ్చెర్ల",
+    "correctedNameTe": "శ్రీనివాసరావు మచ్చెర్ల",
+    "correctedNameEn": "SRINIVASARAO MATCHARLA",
+    "correctedSurnameTe": "మచ్చెర్ల",
+    "correctedSurnameEn": "MATCHARLA",
+    "surnameTe": "మచ్చెర్ల",
+    "surnameEn": "MATCHARLA",
+    "updatedAt": "2026-11-20T15:48:23.972Z"
+  },
+  "2624": {
+    "customAlias": "సుబ్బారావు అరట్లకట్ల",
+    "correctedNameTe": "సుబ్బారావు అరట్లకట్ల",
+    "correctedNameEn": "SUBBARAO ARTIKATLA",
+    "correctedSurnameTe": "అరట్లకట్ల",
+    "correctedSurnameEn": "ARTIKATLA",
+    "surnameTe": "అరట్లకట్ల",
+    "surnameEn": "ARTIKATLA",
+    "updatedAt": "2026-11-20T15:48:43.840Z"
+  },
+  "2625": {
+    "customAlias": "అప్పలకొండ అరట్లకట్ల",
+    "correctedNameTe": "అప్పలకొండ అరట్లకట్ల",
+    "correctedNameEn": "APPALAKONDA అరట్లకట్ల",
+    "correctedSurnameTe": "అరట్లకట్ల",
+    "correctedSurnameEn": "అరట్లకట్ల",
+    "surnameTe": "అరట్లకట్ల",
+    "surnameEn": "అరట్లకట్ల",
+    "updatedAt": "2026-11-20T15:49:22.955Z"
+  },
+  "2628": {
+    "customAlias": "నాగ లక్ష్మి అరట్లకట్ల",
+    "correctedNameTe": "నాగ లక్ష్మి అరట్లకట్ల",
+    "correctedNameEn": "NAGA LAKSHMI ARTIKATLA",
+    "correctedSurnameTe": "అరట్లకట్ల",
+    "correctedSurnameEn": "ARTIKATLA",
+    "surnameTe": "అరట్లకట్ల",
+    "surnameEn": "ARTIKATLA",
+    "updatedAt": "2026-11-20T15:49:51.305Z"
+  },
+  "2631": {
+    "customAlias": "సుబ్బలక్ష్మి అరట్లకట్ల",
+    "correctedNameTe": "సుబ్బలక్ష్మి అరట్లకట్ల",
+    "correctedNameEn": "SUBBALAKSHMI ARATLAKATLA",
+    "correctedSurnameTe": "అరట్లకట్ల",
+    "correctedSurnameEn": "ARATLAKATLA",
+    "surnameTe": "అరట్లకట్ల",
+    "surnameEn": "ARATLAKATLA",
+    "updatedAt": "2026-11-20T15:51:05.018Z"
+  },
+  "2632": {
+    "customAlias": "లొవలమ్మ అరట్లకట్ల",
+    "correctedNameTe": "లొవలమ్మ అరట్లకట్ల",
+    "correctedNameEn": "LOVALAMMA ARATLAKATLA",
+    "correctedSurnameTe": "అరట్లకట్ల",
+    "correctedSurnameEn": "ARATLAKATLA",
+    "surnameTe": "అరట్లకట్ల",
+    "surnameEn": "ARATLAKATLA",
+    "updatedAt": "2026-11-20T15:51:34.121Z"
+  },
+  "2633": {
+    "customAlias": "వీర్రాజు అరట్లకట్ల",
+    "correctedNameTe": "వీర్రాజు అరట్లకట్ల",
+    "correctedNameEn": "VEERARAJU ARTIKATLA",
+    "correctedSurnameTe": "అరట్లకట్ల",
+    "correctedSurnameEn": "ARTIKATLA",
+    "surnameTe": "అరట్లకట్ల",
+    "surnameEn": "ARTIKATLA",
+    "updatedAt": "2026-11-20T15:52:38.020Z"
+  },
+  "2634": {
+    "customAlias": "చంద్రరావు అరట్లకట్ల",
+    "correctedNameTe": "చంద్రరావు అరట్లకట్ల",
+    "correctedNameEn": "CHANDRARAO ARATAKATLA",
+    "correctedSurnameTe": "అరట్లకట్ల",
+    "correctedSurnameEn": "ARATAKATLA",
+    "surnameTe": "అరట్లకట్ల",
+    "surnameEn": "ARATAKATLA",
+    "updatedAt": "2026-11-20T15:52:58.957Z"
+  },
+  "2635": {
+    "customAlias": "లోవకుమారీ అరట్లకట్ల",
+    "correctedNameTe": "లోవకుమారీ అరట్లకట్ల",
+    "correctedNameEn": "LOVAKOMARI ARTIKATLA",
+    "correctedSurnameTe": "అరట్లకట్ల",
+    "correctedSurnameEn": "ARTIKATLA",
+    "surnameTe": "అరట్లకట్ల",
+    "surnameEn": "ARTIKATLA",
+    "updatedAt": "2026-11-20T15:53:18.239Z"
+  },
+  "2640": {
+    "customAlias": "దొంగబ్బాయ్ అరట్లకట్ల",
+    "correctedNameTe": "దొంగబ్బాయ్ అరట్లకట్ల",
+    "correctedNameEn": "DONGABBAI ARTLAKATLA",
+    "correctedSurnameTe": "అరట్లకట్ల",
+    "correctedSurnameEn": "ARTLAKATLA",
+    "surnameTe": "అరట్లకట్ల",
+    "surnameEn": "ARTLAKATLA",
+    "updatedAt": "2026-11-20T15:54:37.204Z"
+  },
+  "2641": {
+    "customAlias": "సూర్యకాంతం అరట్లకట్ల",
+    "correctedNameTe": "సూర్యకాంతం అరట్లకట్ల",
+    "correctedNameEn": "SURYAKANTAM ARATLAKATLA",
+    "correctedSurnameTe": "అరట్లకట్ల",
+    "correctedSurnameEn": "ARATLAKATLA",
+    "surnameTe": "అరట్లకట్ల",
+    "surnameEn": "ARATLAKATLA",
+    "updatedAt": "2026-11-20T15:55:13.970Z"
+  },
+  "2642": {
+    "customAlias": "వీరన్న రాయుదు",
+    "correctedNameTe": "వీరన్న రాయుదు",
+    "correctedNameEn": "VEERANNA RAYUDU",
+    "correctedSurnameTe": "రాయుదు",
+    "correctedSurnameEn": "RAYUDU",
+    "surnameTe": "రాయుదు",
+    "surnameEn": "RAYUDU",
+    "updatedAt": "2026-11-20T15:56:11.455Z"
   },
   "2644": {
     "supportPct": 100,
@@ -4914,17 +6078,61 @@
     "influencerName": "Nakka Srinu",
     "influencerPhone": "8341245339"
   },
+  "2646": {
+    "customAlias": "లక్ష్మి సన్ని",
+    "correctedNameTe": "లక్ష్మి సన్ని",
+    "correctedNameEn": "LAKSHMI SANNA",
+    "correctedSurnameTe": "సన్ని",
+    "correctedSurnameEn": "SANNA",
+    "surnameTe": "సన్ని",
+    "surnameEn": "SANNA",
+    "updatedAt": "2026-11-20T15:57:16.205Z"
+  },
+  "2647": {
+    "customAlias": "రాజు సన్ని",
+    "correctedNameTe": "రాజు సన్ని",
+    "correctedNameEn": "RAJU SANNI",
+    "correctedSurnameTe": "సన్ని",
+    "correctedSurnameEn": "SANNI",
+    "surnameTe": "సన్ని",
+    "surnameEn": "SANNI",
+    "updatedAt": "2026-11-20T15:57:27.122Z"
+  },
   "2648": {
     "supportPct": 100,
     "survey_status": "supporter",
     "influencerName": "Kommuri.Krishna",
     "influencerPhone": "9989363507"
   },
+  "2649": {
+    "customAlias": "కోటేశ్వరరావు కొయ్యా",
+    "correctedNameTe": "కోటేశ్వరరావు కొయ్యా",
+    "correctedNameEn": "KOTESWARARAO KOYYA",
+    "correctedSurnameTe": "కొయ్యా",
+    "correctedSurnameEn": "KOYYA",
+    "surnameTe": "కొయ్యా",
+    "surnameEn": "KOYYA",
+    "updatedAt": "2026-11-20T15:58:34.757Z"
+  },
+  "2651": {
+    "supportPct": 50,
+    "survey_status": "out_of_city",
+    "updatedAt": "2026-11-20T12:12:25.326Z"
+  },
   "2652": {
-    "supportPct": 100,
-    "survey_status": "supporter",
+    "supportPct": 50,
+    "survey_status": "out_of_city",
     "influencerName": "Kaparapu.Kanaka Venkata Ramana",
-    "influencerPhone": "9848908886"
+    "influencerPhone": "9848908886",
+    "updatedAt": "2026-11-20T12:12:27.107Z"
+  },
+  "2653": {
+    "survey_status": "out_of_city",
+    "updatedAt": "2026-11-20T12:11:34.690Z"
+  },
+  "2654": {
+    "survey_status": "out_of_city",
+    "updatedAt": "2026-11-20T12:11:36.040Z"
   },
   "2655": {
     "supportPct": 100,
@@ -4967,6 +6175,10 @@
     "survey_status": "supporter",
     "influencerName": "Koyya.Naga Satyanarayana",
     "influencerPhone": "7396511960"
+  },
+  "2676": {
+    "survey_status": "out_of_city",
+    "updatedAt": "2026-11-20T12:13:34.573Z"
   },
   "2682": {
     "supportPct": 100,
@@ -5105,6 +6317,10 @@
     "survey_status": "supporter",
     "influencerName": "Koyya.Naga Satyanarayana",
     "influencerPhone": "7396511960"
+  },
+  "2770": {
+    "survey_status": "out_of_city",
+    "updatedAt": "2026-11-20T12:13:33.623Z"
   },
   "2773": {
     "supportPct": 100,
@@ -6780,17 +7996,117 @@
     "influencerName": "Mathina Ganesh",
     "influencerPhone": "8121112096"
   },
+  "4243": {
+    "customAlias": "దుర్గ దొడ్డి",
+    "correctedNameTe": "దుర్గ దొడ్డి",
+    "correctedNameEn": "NAGASU RYACHAKRAVENI PAMPANA",
+    "correctedSurnameTe": "దొడ్డి",
+    "correctedSurnameEn": "PAMPANA",
+    "surnameTe": "దొడ్డి",
+    "surnameEn": "PAMPANA",
+    "updatedAt": "2026-11-20T09:24:05.562Z"
+  },
+  "4248": {
+    "customAlias": "సత్తిబాబు కొల్లు",
+    "correctedNameTe": "సత్తిబాబు కొల్లు",
+    "correctedNameEn": "SATTIBABU KOLLU",
+    "correctedSurnameTe": "కొల్లు",
+    "correctedSurnameEn": "KOLLU",
+    "surnameTe": "కొల్లు",
+    "surnameEn": "KOLLU",
+    "updatedAt": "2026-11-20T09:24:41.498Z"
+  },
+  "4249": {
+    "customAlias": "సత్యనారాయణ చుక్కల",
+    "correctedNameTe": "సత్యనారాయణ చుక్కల",
+    "correctedNameEn": "SATYANARAYANA CHUKKALA",
+    "correctedSurnameTe": "చుక్కల",
+    "correctedSurnameEn": "CHUKKALA",
+    "surnameTe": "చుక్కల",
+    "surnameEn": "CHUKKALA",
+    "updatedAt": "2026-11-20T09:25:26.297Z"
+  },
   "4252": {
     "supportPct": 100,
     "survey_status": "supporter",
     "influencerName": "Chesetti.Veerabhadrao",
     "influencerPhone": "9951032710"
   },
+  "4254": {
+    "customAlias": "దొంగబ్బాయి వాయిలాటి",
+    "correctedNameTe": "దొంగబ్బాయి వాయిలాటి",
+    "correctedNameEn": "DONGABBAI VAYILATI",
+    "correctedSurnameTe": "వాయిలాటి",
+    "correctedSurnameEn": "VAYILATI",
+    "surnameTe": "వాయిలాటి",
+    "surnameEn": "VAYILATI",
+    "updatedAt": "2026-11-20T09:26:09.145Z"
+  },
+  "4256": {
+    "customAlias": "అప్పయమ్మ కొజ్జారపు",
+    "correctedNameTe": "అప్పయమ్మ కొజ్జారపు",
+    "correctedNameEn": "APPAYAMMA KOJARPU",
+    "correctedSurnameTe": "కొజ్జారపు",
+    "correctedSurnameEn": "KOJARPU",
+    "surnameTe": "కొజ్జారపు",
+    "surnameEn": "KOJARPU",
+    "updatedAt": "2026-11-20T09:26:51.245Z"
+  },
+  "4257": {
+    "customAlias": "ప్రసాద్ కొజ్జారపు",
+    "correctedNameTe": "ప్రసాద్ కొజ్జారపు",
+    "correctedNameEn": "PRASAD KOJARPU",
+    "correctedSurnameTe": "కొజ్జారపు",
+    "correctedSurnameEn": "KOJARPU",
+    "surnameTe": "కొజ్జారపు",
+    "surnameEn": "KOJARPU",
+    "updatedAt": "2026-11-20T09:27:09.114Z"
+  },
+  "4258": {
+    "customAlias": "జలగన్నిక కొజ్జారపు",
+    "correctedNameTe": "జలగన్నిక కొజ్జారపు",
+    "correctedNameEn": "JALGANNIKA KOJARPU",
+    "correctedSurnameTe": "కొజ్జారపు",
+    "correctedSurnameEn": "KOJARPU",
+    "surnameTe": "కొజ్జారపు",
+    "surnameEn": "KOJARPU",
+    "updatedAt": "2026-11-20T09:29:30.645Z"
+  },
+  "4259": {
+    "customAlias": "కొండ చింతలపూడి",
+    "correctedNameTe": "కొండ చింతలపూడి",
+    "correctedNameEn": "KONDA CHINTALAPUDI",
+    "correctedSurnameTe": "చింతలపూడి",
+    "correctedSurnameEn": "CHINTALAPUDI",
+    "surnameTe": "చింతలపూడి",
+    "surnameEn": "CHINTALAPUDI",
+    "updatedAt": "2026-11-20T09:29:55.447Z"
+  },
+  "4260": {
+    "customAlias": "నాగరాజు చింతలపూడి",
+    "correctedNameTe": "నాగరాజు చింతలపూడి",
+    "correctedNameEn": "నాగరాజు చింతలపూడి OTHER",
+    "correctedSurnameTe": "చింతలపూడి",
+    "correctedSurnameEn": "OTHER",
+    "surnameTe": "చింతలపూడి",
+    "surnameEn": "OTHER",
+    "updatedAt": "2026-11-20T09:30:15.913Z"
+  },
   "4261": {
     "supportPct": 100,
     "survey_status": "supporter",
     "influencerName": "Chesetti.Veerabhadrao",
     "influencerPhone": "9951032710"
+  },
+  "4264": {
+    "customAlias": "దుర్గాదేవి చింతలపూడి",
+    "correctedNameTe": "దుర్గాదేవి చింతలపూడి",
+    "correctedNameEn": "DURGADEVI CHINTALAPUDII",
+    "correctedSurnameTe": "చింతలపూడి",
+    "correctedSurnameEn": "CHINTALAPUDII",
+    "surnameTe": "చింతలపూడి",
+    "surnameEn": "CHINTALAPUDII",
+    "updatedAt": "2026-11-20T09:30:55.896Z"
   },
   "4265": {
     "supportPct": 100,
@@ -6804,6 +8120,26 @@
     "influencerName": "Jyothula Srinivasu",
     "influencerPhone": "9949048940"
   },
+  "4271": {
+    "customAlias": "మరిడయ్య బండారు",
+    "correctedNameTe": "మరిడయ్య బండారు",
+    "correctedNameEn": "MARIDAIAH BANDARU",
+    "correctedSurnameTe": "బండారు",
+    "correctedSurnameEn": "BANDARU",
+    "surnameTe": "బండారు",
+    "surnameEn": "BANDARU",
+    "updatedAt": "2026-11-20T09:31:37.013Z"
+  },
+  "4276": {
+    "customAlias": "సుబ్బాయమ్మ పచ్చారి",
+    "correctedNameTe": "సుబ్బాయమ్మ పచ్చారి",
+    "correctedNameEn": "SUBBAIANMMA PATCHARI",
+    "correctedSurnameTe": "పచ్చారి",
+    "correctedSurnameEn": "PATCHARI",
+    "surnameTe": "పచ్చారి",
+    "surnameEn": "PATCHARI",
+    "updatedAt": "2026-11-20T09:32:31.381Z"
+  },
   "4281": {
     "supportPct": 100,
     "survey_status": "supporter",
@@ -6815,6 +8151,96 @@
     "survey_status": "supporter",
     "influencerName": "Kaparapu.Venkataramana",
     "influencerPhone": "9177084343"
+  },
+  "4285": {
+    "customAlias": "మంగ దుళ్ల",
+    "correctedNameTe": "మంగ దుళ్ల",
+    "correctedNameEn": "MANGA DULLA",
+    "correctedSurnameTe": "దుళ్ల",
+    "correctedSurnameEn": "DULLA",
+    "surnameTe": "దుళ్ల",
+    "surnameEn": "DULLA",
+    "updatedAt": "2026-11-20T09:33:26.880Z"
+  },
+  "4286": {
+    "customAlias": "వెంకట సత్యనారాయణ బడిగంటి",
+    "correctedNameTe": "వెంకట సత్యనారాయణ బడిగంటి",
+    "correctedNameEn": "VENKATA SATYANARAYAN BADIGANTII",
+    "correctedSurnameTe": "బడిగంటి",
+    "correctedSurnameEn": "BADIGANTII",
+    "surnameTe": "బడిగంటి",
+    "surnameEn": "BADIGANTII",
+    "updatedAt": "2026-11-20T09:34:05.232Z"
+  },
+  "4289": {
+    "customAlias": "వట్టూరి సత్య",
+    "correctedNameTe": "వట్టూరి సత్య",
+    "correctedNameEn": "VATTURI SATYA",
+    "correctedSurnameTe": "సత్య",
+    "correctedSurnameEn": "SATYA",
+    "surnameTe": "సత్య",
+    "surnameEn": "SATYA",
+    "updatedAt": "2026-11-20T09:35:15.098Z"
+  },
+  "4297": {
+    "customAlias": "రామలింగేశ్వర రావు సూరిశెట్టి",
+    "correctedNameTe": "రామలింగేశ్వర రావు సూరిశెట్టి",
+    "correctedNameEn": "RAMALINGESWARARAO SURISHETTI",
+    "correctedSurnameTe": "సూరిశెట్టి",
+    "correctedSurnameEn": "SURISHETTI",
+    "surnameTe": "సూరిశెట్టి",
+    "surnameEn": "SURISHETTI",
+    "updatedAt": "2026-11-20T09:36:00.962Z"
+  },
+  "4298": {
+    "customAlias": "ఉమామహేశ్వర రావు చింతలపూడి",
+    "correctedNameTe": "ఉమామహేశ్వర రావు చింతలపూడి",
+    "correctedNameEn": "UMAMAHESWARA RAO CHINTALAPUDI",
+    "correctedSurnameTe": "చింతలపూడి",
+    "correctedSurnameEn": "CHINTALAPUDI",
+    "surnameTe": "చింతలపూడి",
+    "surnameEn": "CHINTALAPUDI",
+    "updatedAt": "2026-11-20T09:36:32.011Z"
+  },
+  "4303": {
+    "customAlias": "రాజమణి మాడెం",
+    "correctedNameTe": "రాజమణి మాడెం",
+    "correctedNameEn": "RAJAMANI MADEM",
+    "correctedSurnameTe": "మాడెం",
+    "correctedSurnameEn": "MADEM",
+    "surnameTe": "మాడెం",
+    "surnameEn": "MADEM",
+    "updatedAt": "2026-11-20T09:38:07.531Z"
+  },
+  "4309": {
+    "customAlias": "వీర్రాజు చేశెట్టి",
+    "correctedNameTe": "వీర్రాజు చేశెట్టి",
+    "correctedNameEn": "VEERRAJU CHESETTI",
+    "correctedSurnameTe": "చేశెట్టి",
+    "correctedSurnameEn": "CHESETTI",
+    "surnameTe": "చేశెట్టి",
+    "surnameEn": "CHESETTI",
+    "updatedAt": "2026-11-20T09:40:12.111Z"
+  },
+  "4310": {
+    "customAlias": "శివా సూర్య సత్యనారాయణ కోసూరి",
+    "correctedNameTe": "శివా సూర్య సత్యనారాయణ కోసూరి",
+    "correctedNameEn": "SIVA SURYA SATYA NARAYANA KOSURI",
+    "correctedSurnameTe": "కోసూరి",
+    "correctedSurnameEn": "KOSURI",
+    "surnameTe": "కోసూరి",
+    "surnameEn": "KOSURI",
+    "updatedAt": "2026-11-20T09:43:05.495Z"
+  },
+  "4311": {
+    "customAlias": "నాగేశ్వరరావు చేసెట్టి",
+    "correctedNameTe": "నాగేశ్వరరావు చేసెట్టి",
+    "correctedNameEn": "NAGESWARARAO CHESETTI",
+    "correctedSurnameTe": "చేసెట్టి",
+    "correctedSurnameEn": "CHESETTI",
+    "surnameTe": "చేసెట్టి",
+    "surnameEn": "CHESETTI",
+    "updatedAt": "2026-11-20T09:45:06.194Z"
   },
   "4315": {
     "supportPct": 100,

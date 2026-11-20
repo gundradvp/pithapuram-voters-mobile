@@ -1,4 +1,4 @@
-import { MobileVoter } from '../types';
+import { MobileVoter, VoterCampaignProfile } from '../types';
 import { extractSurname } from './surnameClassifier';
 
 export type DuplicateMatchLevel = 'exact' | 'high' | 'probable' | 'partial_50';
@@ -91,7 +91,10 @@ function getComparableRelNames(v: MobileVoter): { en: string; te: string } {
  * Fast, comprehensive duplicate voter analysis engine
  * Classifies both 100% exact duplicates and 50% suspected/probable duplicate votes
  */
-export function analyzeDuplicateVoters(voters: MobileVoter[]): DuplicateAnalysisResult {
+export function analyzeDuplicateVoters(
+  voters: MobileVoter[],
+  profiles?: Record<number, VoterCampaignProfile>
+): DuplicateAnalysisResult {
   const voterMap = new Map<number, MobileVoter>();
   voters.forEach(v => voterMap.set(v.s, v));
 
@@ -367,7 +370,7 @@ export function analyzeDuplicateVoters(voters: MobileVoter[]): DuplicateAnalysis
 
       const clusterId = `dup_cluster_${comp.sort((a, b) => a - b).join('_')}`;
       const firstVoter = clusterVoters[0];
-      const snObj = extractSurname(firstVoter);
+      const snObj = extractSurname(firstVoter, profiles ? profiles[firstVoter.s] : undefined);
       const surnameId = snObj.en || 'OTHER';
 
       const clusterObj: DuplicateCluster = {
@@ -395,7 +398,7 @@ export function analyzeDuplicateVoters(voters: MobileVoter[]): DuplicateAnalysis
           clusterId
         };
 
-        const vSn = extractSurname(v).en || 'OTHER';
+        const vSn = extractSurname(v, profiles ? profiles[v.s] : undefined).en || 'OTHER';
         surnameDupCountMap[vSn] = (surnameDupCountMap[vSn] || 0) + 1;
 
         if (bestConf >= 80) {

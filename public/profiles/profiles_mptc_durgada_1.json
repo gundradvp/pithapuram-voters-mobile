@@ -5,7 +5,8 @@
     "updatedAt": "2026-11-03T10:00:00.000Z",
     "supportPct": 50,
     "survey_status": null,
-    "customAlias": "SatyaNarayana Desineedi"
+    "customAlias": "SatyaNarayana Desineedi",
+    "notes": "మన ముఖ్య మద్దతుదారుడు, కుటుంబంలో 5 ఓట్లు ఉన్నాయి"
   },
   "2": {
     "supportPct": 50,
@@ -13,55 +14,225 @@
     "customAlias": "Manikyalamma Desineedi"
   },
   "3": {
-    "customAlias": "Venkata Ramana Gopisetty"
+    "customAlias": "Venkata Ramana Gopisetty",
+    "supportPct": 100,
+    "survey_status": "voted",
+    "customPhone": "9440123456",
+    "notes": "ఉదయమే వచ్చి ఓటు వేశారు"
   },
   "4": {
-    "customAlias": "Veera Lakshmi Gopisetty"
+    "customAlias": "Veera Lakshmi Gopisetty",
+    "supportPct": 100,
+    "survey_status": "supporter"
   },
   "5": {
-    "customAlias": "Lakshmi parvathi Gopisetty"
+    "customAlias": "Lakshmi parvathi Gopisetty",
+    "supportPct": 100,
+    "survey_status": "supporter"
   },
   "6": {
-    "customAlias": "Durga Venkata Nageswara Rao Gopisetty"
+    "customAlias": "Durga Venkata Nageswara Rao Gopisetty",
+    "supportPct": 100,
+    "survey_status": "supporter",
+    "notes": "పార్టీ యాక్టివ్ వాలంటీర్"
+  },
+  "7": {
+    "supportPct": 100,
+    "survey_status": "supporter"
   },
   "8": {
-    "customAlias": "gowri parvathi Gopisetty"
+    "customAlias": "gowri parvathi Gopisetty",
+    "supportPct": 100,
+    "survey_status": "supporter"
   },
   "9": {
-    "customAlias": "Manikyam Gopisetty"
+    "customAlias": "Manikyam Gopisetty",
+    "supportPct": 75
   },
   "10": {
-    "customAlias": "Naganna Inti"
+    "customAlias": "Naganna Inti",
+    "supportPct": 75,
+    "notes": "సానుకూల ఓటరు"
   },
   "11": {
-    "customAlias": "Satya Narayana Inti"
+    "customAlias": "Satya Narayana Inti",
+    "supportPct": 75
   },
   "12": {
-    "customAlias": "Venkata Rayudu Inti"
+    "customAlias": "Venkata Rayudu Inti",
+    "supportPct": 50,
+    "notes": "స్వింగ్ ఓటరు, యువత పథకాలపై ఆసక్తి"
   },
   "13": {
-    "customAlias": "Suryavathi Inti"
+    "customAlias": "Suryavathi Inti",
+    "supportPct": 50
   },
   "14": {
-    "customAlias": "Venkata Ramana Inti"
+    "customAlias": "Venkata Ramana Inti",
+    "supportPct": 100,
+    "survey_status": "supporter"
   },
   "15": {
-    "customAlias": "Padma Inti"
+    "customAlias": "Padma Inti",
+    "supportPct": 100,
+    "survey_status": "supporter"
   },
   "16": {
-    "customAlias": "Arju veni Inti"
+    "customAlias": "Arju veni Inti",
+    "supportPct": 100,
+    "survey_status": "voted",
+    "customPhone": "9866123456"
   },
   "17": {
-    "customAlias": "Veera venkata sarvarayudu Inti"
+    "customAlias": "Veera venkata sarvarayudu Inti",
+    "supportPct": 75
   },
   "18": {
-    "customAlias": "Srinivas Pasagadugula"
+    "customAlias": "Srinivas Pasagadugula",
+    "supportPct": 100,
+    "survey_status": "voted",
+    "customPhone": "9000273028",
+    "notes": "బూత్ కోఆర్డినేటర్"
   },
   "19": {
-    "customAlias": "Srinivas Pasagadugula"
+    "customAlias": "Srinivas Pasagadugula",
+    "supportPct": 100,
+    "survey_status": "voted"
+  },
+  "20": {
+    "supportPct": 100,
+    "survey_status": "supporter"
   },
   "21": {
-    "customAlias": "Ganga Raju Nemala"
+    "customAlias": "Ganga Raju Nemala",
+    "supportPct": 40,
+    "notes": "సానుకూల స్వింగ్ ఓటరు"
+  },
+  "22": {
+    "supportPct": 40
+  },
+  "23": {
+    "supportPct": 75,
+    "notes": "మొదటిసారి ఓటు వేసే యువకుడు"
+  },
+  "24": {
+    "supportPct": 0,
+    "notes": "ప్రత్యర్థి పార్టీ వైపు మొగ్గు"
+  },
+  "25": {
+    "supportPct": 0
+  },
+  "26": {
+    "influencerId": "inf_1793732645047",
+    "influencerName": "gadhi suryanrayana",
+    "influencerMobile": "9705888474",
+    "supportPct": 50,
+    "notes": "కుటుంబం ప్రత్యర్థి అయినా అబ్బాయి న్యూట్రల్"
+  },
+  "27": {
+    "influencerId": "inf_1793732645047",
+    "influencerName": "gadhi suryanrayana",
+    "influencerMobile": "9705888474",
+    "supportPct": 100,
+    "survey_status": "supporter"
+  },
+  "28": {
+    "influencerId": "inf_1793732645047",
+    "influencerName": "gadhi suryanrayana",
+    "influencerMobile": "9705888474",
+    "supportPct": 100,
+    "survey_status": "supporter"
+  },
+  "29": {
+    "influencerId": "inf_1793732645047",
+    "influencerName": "gadhi suryanrayana",
+    "influencerMobile": "9705888474",
+    "supportPct": 100,
+    "survey_status": "supporter"
+  },
+  "30": {
+    "influencerId": "inf_1793732645047",
+    "influencerName": "gadhi suryanrayana",
+    "influencerMobile": "9705888474",
+    "supportPct": 50,
+    "survey_status": "out_of_city",
+    "notes": "హైదరాబాద్‌లో ఉద్యోగం చేస్తున్నారు"
+  },
+  "31": {
+    "influencerId": "inf_1793732645047",
+    "influencerName": "gadhi suryanrayana",
+    "influencerMobile": "9705888474",
+    "supportPct": 50,
+    "survey_status": "out_of_city"
+  },
+  "32": {
+    "influencerId": "inf_1793732645047",
+    "influencerName": "gadhi suryanrayana",
+    "influencerMobile": "9705888474",
+    "supportPct": 75
+  },
+  "33": {
+    "supportPct": 75
+  },
+  "34": {
+    "influencerId": "inf_1793732645047",
+    "influencerName": "gadhi suryanrayana",
+    "influencerMobile": "9705888474",
+    "supportPct": 100,
+    "survey_status": "supporter"
+  },
+  "37": {
+    "supportPct": 50,
+    "survey_status": null
+  },
+  "38": {
+    "supportPct": 50,
+    "survey_status": null
+  },
+  "42": {
+    "influencerId": "inf_1793732645047",
+    "influencerName": "gadhi suryanrayana",
+    "influencerMobile": "9705888474"
+  },
+  "43": {
+    "influencerId": "inf_1793732645047",
+    "influencerName": "gadhi suryanrayana",
+    "influencerMobile": "9705888474"
+  },
+  "46": {
+    "supportPct": 100,
+    "survey_status": "deceased",
+    "notes": "గత ఏడాది కాలం చేశారు"
+  },
+  "69": {
+    "influencerId": "inf_1793735176936",
+    "influencerName": "mohan gundra",
+    "influencerMobile": "9182197466"
+  },
+  "73": {
+    "influencerId": "inf_1793735176936",
+    "influencerName": "mohan gundra",
+    "influencerMobile": "9182197466"
+  },
+  "104": {
+    "influencerId": "inf_1793735176936",
+    "influencerName": "mohan gundra",
+    "influencerMobile": "9182197466"
+  },
+  "105": {
+    "influencerId": "inf_1793735176936",
+    "influencerName": "mohan gundra",
+    "influencerMobile": "9182197466"
+  },
+  "108": {
+    "influencerId": "inf_1793735176936",
+    "influencerName": "mohan gundra",
+    "influencerMobile": "9182197466"
+  },
+  "115": {
+    "influencerId": "inf_1793732645047",
+    "influencerName": "gadhi suryanrayana",
+    "influencerMobile": "9705888474"
   },
   "151": {
     "supportPct": 75
@@ -90,6 +261,16 @@
   "170": {
     "supportPct": 75
   },
+  "171": {
+    "influencerId": "inf_1793785634261",
+    "influencerName": "naresh kona",
+    "influencerMobile": "6300263735"
+  },
+  "172": {
+    "influencerId": "inf_1793785634261",
+    "influencerName": "naresh kona",
+    "influencerMobile": "6300263735"
+  },
   "189": {
     "supportPct": 75
   },
@@ -101,6 +282,11 @@
     "influencerName": "yaadala srinu",
     "influencerMobile": "9701453592"
   },
+  "234": {
+    "influencerId": "inf_1793785634261",
+    "influencerName": "naresh kona",
+    "influencerMobile": "6300263735"
+  },
   "261": {
     "influencerId": "inf_1793718619377",
     "influencerName": "inti surya durga veeramanikanta",
@@ -108,6 +294,14 @@
   },
   "275": {
     "supportPct": 75
+  },
+  "306": {
+    "survey_status": "deceased"
+  },
+  "307": {
+    "influencerId": "inf_1793732645047",
+    "influencerName": "gadhi suryanrayana",
+    "influencerMobile": "9705888474"
   },
   "320": {
     "supportPct": 50,
@@ -131,14 +325,102 @@
   "478": {
     "supportPct": 75
   },
+  "491": {
+    "influencerId": "inf_1793735176936",
+    "influencerName": "mohan gundra",
+    "influencerMobile": "9182197466"
+  },
+  "529": {
+    "supportPct": 75,
+    "notes": "Akula ramya"
+  },
+  "530": {
+    "supportPct": 75,
+    "notes": "Akula ramya"
+  },
+  "531": {
+    "supportPct": 75,
+    "notes": "Akula ramya"
+  },
+  "636": {
+    "influencerId": "inf_1793732645047",
+    "influencerName": "gadhi suryanrayana",
+    "influencerMobile": "9705888474"
+  },
+  "637": {
+    "influencerId": "inf_1793732645047",
+    "influencerName": "gadhi suryanrayana",
+    "influencerMobile": "9705888474"
+  },
+  "639": {
+    "influencerId": "inf_1793732645047",
+    "influencerName": "gadhi suryanrayana",
+    "influencerMobile": "9705888474"
+  },
   "667": {
     "influencerId": "inf_1793694265008",
     "influencerName": "yaadala srinu",
     "influencerMobile": "9701453592"
   },
+  "672": {
+    "influencerId": "inf_1793732645047",
+    "influencerName": "gadhi suryanrayana",
+    "influencerMobile": "9705888474"
+  },
+  "689": {
+    "influencerId": "inf_1793732645047",
+    "influencerName": "gadhi suryanrayana",
+    "influencerMobile": "9705888474"
+  },
+  "690": {
+    "influencerId": "inf_1793732645047",
+    "influencerName": "gadhi suryanrayana",
+    "influencerMobile": "9705888474"
+  },
+  "691": {
+    "influencerId": "inf_1793732645047",
+    "influencerName": "gadhi suryanrayana",
+    "influencerMobile": "9705888474"
+  },
+  "692": {
+    "survey_status": "deceased"
+  },
+  "693": {
+    "influencerId": "inf_1793732645047",
+    "influencerName": "gadhi suryanrayana",
+    "influencerMobile": "9705888474"
+  },
+  "694": {
+    "survey_status": "deceased"
+  },
+  "695": {
+    "influencerId": "inf_1793732645047",
+    "influencerName": "gadhi suryanrayana",
+    "influencerMobile": "9705888474",
+    "survey_status": "out_of_city"
+  },
+  "696": {
+    "influencerId": "inf_1793732645047",
+    "influencerName": "gadhi suryanrayana",
+    "influencerMobile": "9705888474",
+    "survey_status": "out_of_city"
+  },
+  "698": {
+    "influencerId": "inf_1793732645047",
+    "influencerName": "gadhi suryanrayana",
+    "influencerMobile": "9705888474"
+  },
   "754": {
     "customPhone": "9553613392",
     "altPhone": ""
+  },
+  "771": {
+    "supportPct": 75,
+    "notes": "Akula ramya"
+  },
+  "772": {
+    "supportPct": 75,
+    "notes": "Akula ramya"
   },
   "800": {
     "supportPct": 75
@@ -164,16 +446,524 @@
   "808": {
     "supportPct": 75
   },
+  "815": {
+    "survey_status": "deceased"
+  },
+  "816": {
+    "survey_status": "out_of_city"
+  },
   "817": {
     "supportPct": 75
   },
+  "842": {
+    "survey_status": "deceased"
+  },
+  "843": {
+    "survey_status": "out_of_city",
+    "influencerId": "inf_1793785634261",
+    "influencerName": "naresh kona",
+    "influencerMobile": "6300263735"
+  },
+  "915": {
+    "supportPct": 75,
+    "notes": "Akula ramya"
+  },
+  "916": {
+    "supportPct": 75,
+    "notes": "Akula ramya"
+  },
+  "917": {
+    "supportPct": 75,
+    "notes": "Akula ramya"
+  },
+  "918": {
+    "supportPct": 75,
+    "notes": "Akula ramya"
+  },
+  "919": {
+    "survey_status": "deceased"
+  },
+  "944": {
+    "influencerId": "inf_1793732645047",
+    "influencerName": "gadhi suryanrayana",
+    "influencerMobile": "9705888474"
+  },
+  "948": {
+    "influencerId": "inf_1793732645047",
+    "influencerName": "gadhi suryanrayana",
+    "influencerMobile": "9705888474"
+  },
+  "963": {
+    "survey_status": "out_of_city"
+  },
+  "979": {
+    "survey_status": "deceased"
+  },
+  "980": {
+    "influencerId": "inf_1793732645047",
+    "influencerName": "gadhi suryanrayana",
+    "influencerMobile": "9705888474"
+  },
+  "982": {
+    "influencerId": "inf_1793732645047",
+    "influencerName": "gadhi suryanrayana",
+    "influencerMobile": "9705888474"
+  },
+  "1053": {
+    "survey_status": "deceased"
+  },
+  "1057": {
+    "influencerId": "inf_1793785634261",
+    "influencerName": "naresh kona",
+    "influencerMobile": "6300263735"
+  },
+  "1058": {
+    "influencerId": "inf_1793785634261",
+    "influencerName": "naresh kona",
+    "influencerMobile": "6300263735"
+  },
+  "1061": {
+    "influencerId": "inf_1793785634261",
+    "influencerName": "naresh kona",
+    "influencerMobile": "6300263735"
+  },
+  "1074": {
+    "influencerId": "inf_1793732645047",
+    "influencerName": "gadhi suryanrayana",
+    "influencerMobile": "9705888474"
+  },
+  "1075": {
+    "influencerId": "inf_1793732645047",
+    "influencerName": "gadhi suryanrayana",
+    "influencerMobile": "9705888474"
+  },
+  "1077": {
+    "supportPct": 75,
+    "notes": "Akula ramya"
+  },
+  "1078": {
+    "supportPct": 75,
+    "notes": "Akula ramya"
+  },
+  "1079": {
+    "supportPct": 75,
+    "notes": "Akula ramya"
+  },
+  "1115": {
+    "survey_status": "deceased"
+  },
+  "1163": {
+    "influencerId": "inf_1793732645047",
+    "influencerName": "gadhi suryanrayana",
+    "influencerMobile": "9705888474"
+  },
+  "1164": {
+    "influencerId": "inf_1793732645047",
+    "influencerName": "gadhi suryanrayana",
+    "influencerMobile": "9705888474"
+  },
+  "1167": {
+    "influencerId": "inf_1793732645047",
+    "influencerName": "gadhi suryanrayana",
+    "influencerMobile": "9705888474"
+  },
+  "1171": {
+    "influencerId": "inf_1793732645047",
+    "influencerName": "gadhi suryanrayana",
+    "influencerMobile": "9705888474"
+  },
+  "1172": {
+    "influencerId": "inf_1793732645047",
+    "influencerName": "gadhi suryanrayana",
+    "influencerMobile": "9705888474"
+  },
+  "1204": {
+    "influencerId": "inf_1793732645047",
+    "influencerName": "gadhi suryanrayana",
+    "influencerMobile": "9705888474"
+  },
+  "1205": {
+    "influencerId": "inf_1793732645047",
+    "influencerName": "gadhi suryanrayana",
+    "influencerMobile": "9705888474"
+  },
+  "1230": {
+    "supportPct": 75,
+    "notes": "Akula ramya"
+  },
+  "1234": {
+    "supportPct": 75,
+    "notes": "Akula ramya"
+  },
+  "1235": {
+    "supportPct": 75,
+    "notes": "Akula ramya"
+  },
+  "1237": {
+    "supportPct": 75,
+    "notes": "Akula ramya"
+  },
+  "1250": {
+    "supportPct": 75,
+    "notes": "Akula ramya"
+  },
+  "1251": {
+    "supportPct": 75,
+    "notes": "Akula ramya"
+  },
+  "1252": {
+    "influencerId": "inf_1793785634261",
+    "influencerName": "naresh kona",
+    "influencerMobile": "6300263735"
+  },
+  "1253": {
+    "supportPct": 75,
+    "notes": "Akula ramya"
+  },
+  "1254": {
+    "influencerId": "inf_1793785634261",
+    "influencerName": "naresh kona",
+    "influencerMobile": "6300263735"
+  },
+  "1255": {
+    "influencerId": "inf_1793785634261",
+    "influencerName": "naresh kona",
+    "influencerMobile": "6300263735"
+  },
+  "1256": {
+    "influencerId": "inf_1793785634261",
+    "influencerName": "naresh kona",
+    "influencerMobile": "6300263735"
+  },
+  "1257": {
+    "survey_status": "deceased"
+  },
+  "1258": {
+    "influencerId": "inf_1793785634261",
+    "influencerName": "naresh kona",
+    "influencerMobile": "6300263735"
+  },
+  "1263": {
+    "supportPct": 75,
+    "notes": "Akula ramya"
+  },
+  "1264": {
+    "supportPct": 75,
+    "notes": "Akula ramya"
+  },
+  "1266": {
+    "supportPct": 75,
+    "notes": "Akula ramya"
+  },
+  "1267": {
+    "supportPct": 75,
+    "notes": "Akula ramya"
+  },
+  "1271": {
+    "supportPct": 75,
+    "notes": "Akula ramya"
+  },
+  "1285": {
+    "influencerId": "inf_1793732645047",
+    "influencerName": "gadhi suryanrayana",
+    "influencerMobile": "9705888474"
+  },
+  "1287": {
+    "supportPct": 75,
+    "notes": "Akula ramya"
+  },
+  "1289": {
+    "supportPct": 75,
+    "notes": "Akula ramya"
+  },
+  "1290": {
+    "influencerId": "inf_1793732645047",
+    "influencerName": "gadhi suryanrayana",
+    "influencerMobile": "9705888474"
+  },
+  "1322": {
+    "supportPct": 75,
+    "notes": "Akula ramya"
+  },
+  "1323": {
+    "supportPct": 75,
+    "notes": "Akula ramya"
+  },
+  "1324": {
+    "supportPct": 75,
+    "notes": "Akula ramya"
+  },
+  "1325": {
+    "supportPct": 75,
+    "notes": "Akula ramya"
+  },
+  "1326": {
+    "supportPct": 75,
+    "notes": "Akula ramya"
+  },
+  "1327": {
+    "supportPct": 75,
+    "notes": "Akula ramya"
+  },
+  "1328": {
+    "supportPct": 75,
+    "notes": "Akula ramya"
+  },
+  "1329": {
+    "supportPct": 75,
+    "notes": "Akula ramya"
+  },
+  "1330": {
+    "supportPct": 75,
+    "notes": "Akula ramya"
+  },
+  "1331": {
+    "supportPct": 75,
+    "notes": "Akula ramya"
+  },
+  "1333": {
+    "supportPct": 75,
+    "notes": "Akula ramya"
+  },
+  "1334": {
+    "supportPct": 75,
+    "notes": "Akula ramya"
+  },
+  "1339": {
+    "influencerId": "inf_1793785634261",
+    "influencerName": "naresh kona",
+    "influencerMobile": "6300263735"
+  },
+  "1340": {
+    "influencerId": "inf_1793785634261",
+    "influencerName": "naresh kona",
+    "influencerMobile": "6300263735"
+  },
+  "1341": {
+    "influencerId": "inf_1793785634261",
+    "influencerName": "naresh kona",
+    "influencerMobile": "6300263735"
+  },
+  "1342": {
+    "influencerId": "inf_1793785634261",
+    "influencerName": "naresh kona",
+    "influencerMobile": "6300263735"
+  },
+  "1343": {
+    "influencerId": "inf_1793785634261",
+    "influencerName": "naresh kona",
+    "influencerMobile": "6300263735"
+  },
+  "1344": {
+    "influencerId": "inf_1793785634261",
+    "influencerName": "naresh kona",
+    "influencerMobile": "6300263735"
+  },
+  "1345": {
+    "influencerId": "inf_1793785634261",
+    "influencerName": "naresh kona",
+    "influencerMobile": "6300263735"
+  },
+  "1346": {
+    "influencerId": "inf_1793785634261",
+    "influencerName": "naresh kona",
+    "influencerMobile": "6300263735"
+  },
+  "1347": {
+    "influencerId": "inf_1793785634261",
+    "influencerName": "naresh kona",
+    "influencerMobile": "6300263735"
+  },
+  "1358": {
+    "influencerId": "inf_1793732645047",
+    "influencerName": "gadhi suryanrayana",
+    "influencerMobile": "9705888474"
+  },
+  "1361": {
+    "influencerId": "inf_1793732645047",
+    "influencerName": "gadhi suryanrayana",
+    "influencerMobile": "9705888474"
+  },
   "1365": {
     "supportPct": 75
+  },
+  "1388": {
+    "survey_status": "out_of_city"
+  },
+  "1389": {
+    "survey_status": "out_of_city"
+  },
+  "1390": {
+    "influencerId": "inf_1793732645047",
+    "influencerName": "gadhi suryanrayana",
+    "influencerMobile": "9705888474"
+  },
+  "1391": {
+    "survey_status": "deceased"
+  },
+  "1392": {
+    "influencerId": "inf_1793732645047",
+    "influencerName": "gadhi suryanrayana",
+    "influencerMobile": "9705888474"
+  },
+  "1393": {
+    "influencerId": "inf_1793732645047",
+    "influencerName": "gadhi suryanrayana",
+    "influencerMobile": "9705888474",
+    "survey_status": "out_of_city"
+  },
+  "1394": {
+    "influencerId": "inf_1793732645047",
+    "influencerName": "gadhi suryanrayana",
+    "influencerMobile": "9705888474",
+    "survey_status": "out_of_city"
+  },
+  "1395": {
+    "influencerId": "inf_1793732645047",
+    "influencerName": "gadhi suryanrayana",
+    "influencerMobile": "9705888474"
+  },
+  "1429": {
+    "influencerId": "inf_1793732645047",
+    "influencerName": "gadhi suryanrayana",
+    "influencerMobile": "9705888474"
+  },
+  "1430": {
+    "influencerId": "inf_1793732645047",
+    "influencerName": "gadhi suryanrayana",
+    "influencerMobile": "9705888474"
+  },
+  "1432": {
+    "survey_status": "out_of_city",
+    "influencerId": "inf_1793732645047",
+    "influencerName": "gadhi suryanrayana",
+    "influencerMobile": "9705888474"
+  },
+  "1433": {
+    "supportPct": 75,
+    "notes": "Akula ramya"
+  },
+  "1435": {
+    "supportPct": 75,
+    "notes": "Akula ramya"
+  },
+  "1436": {
+    "supportPct": 75,
+    "notes": "Akula ramya"
+  },
+  "1437": {
+    "supportPct": 75,
+    "notes": "Akula ramya"
+  },
+  "1438": {
+    "influencerId": "inf_1793732645047",
+    "influencerName": "gadhi suryanrayana",
+    "influencerMobile": "9705888474"
+  },
+  "1451": {
+    "supportPct": 75,
+    "notes": "Akula ramya"
+  },
+  "1452": {
+    "supportPct": 75,
+    "notes": "Akula ramya"
+  },
+  "1453": {
+    "supportPct": 75,
+    "notes": "Akula ramya"
+  },
+  "1454": {
+    "supportPct": 75,
+    "notes": "Akula ramya"
+  },
+  "1455": {
+    "supportPct": 75,
+    "notes": "Akula ramya"
+  },
+  "1456": {
+    "supportPct": 75,
+    "notes": "Akula ramya"
+  },
+  "1457": {
+    "supportPct": 75,
+    "notes": "Akula ramya"
+  },
+  "1458": {
+    "supportPct": 75,
+    "notes": "Akula ramya"
+  },
+  "1459": {
+    "supportPct": 75,
+    "notes": "Akula ramya"
   },
   "1472": {
     "influencerId": "inf_1793694265008",
     "influencerName": "yaadala srinu",
     "influencerMobile": "9701453592"
+  },
+  "1483": {
+    "supportPct": 75,
+    "notes": "Akula ramya"
+  },
+  "1487": {
+    "supportPct": 75,
+    "notes": "Akula ramya"
+  },
+  "1488": {
+    "supportPct": 75,
+    "notes": "Akula ramya"
+  },
+  "1490": {
+    "supportPct": 75,
+    "notes": "Akula ramya"
+  },
+  "1491": {
+    "supportPct": 75,
+    "notes": "Akula ramya"
+  },
+  "1492": {
+    "supportPct": 75,
+    "notes": "Akula ramya"
+  },
+  "1514": {
+    "customPhone": "7995761785",
+    "altPhone": ""
+  },
+  "1530": {
+    "supportPct": 75,
+    "notes": "Akula ramya"
+  },
+  "1531": {
+    "supportPct": 75,
+    "notes": "Akula ramya"
+  },
+  "1532": {
+    "supportPct": 75,
+    "notes": "Akula ramya"
+  },
+  "1533": {
+    "supportPct": 75,
+    "notes": "Akula ramya"
+  },
+  "1536": {
+    "supportPct": 75,
+    "notes": "Akula ramya"
+  },
+  "1537": {
+    "supportPct": 75,
+    "notes": "Akula ramya"
+  },
+  "1538": {
+    "supportPct": 75,
+    "notes": "Akula ramya"
+  },
+  "1539": {
+    "supportPct": 75,
+    "notes": "Akula ramya"
+  },
+  "1540": {
+    "supportPct": 75,
+    "notes": "Akula ramya"
   },
   "1550": {
     "supportPct": 75
@@ -188,10 +978,138 @@
     "influencerName": "satyanarayana chesetti",
     "influencerMobile": "7569169892"
   },
+  "1560": {
+    "supportPct": 75,
+    "notes": "Akula ramya"
+  },
+  "1562": {
+    "supportPct": 75,
+    "notes": "Akula ramya"
+  },
+  "1563": {
+    "supportPct": 75,
+    "notes": "Akula ramya"
+  },
+  "1565": {
+    "supportPct": 75,
+    "notes": "Akula ramya"
+  },
+  "1566": {
+    "supportPct": 75,
+    "notes": "Akula ramya"
+  },
+  "1567": {
+    "supportPct": 75,
+    "notes": "Akula ramya"
+  },
+  "1568": {
+    "supportPct": 75,
+    "notes": "Akula ramya"
+  },
+  "1569": {
+    "supportPct": 75,
+    "notes": "Akula ramya"
+  },
+  "1570": {
+    "supportPct": 75,
+    "notes": "Akula ramya"
+  },
+  "1571": {
+    "supportPct": 75,
+    "notes": "Akula ramya"
+  },
+  "1572": {
+    "supportPct": 75,
+    "notes": "Akula ramya"
+  },
+  "1573": {
+    "supportPct": 75,
+    "notes": "Akula ramya"
+  },
+  "1574": {
+    "supportPct": 75,
+    "notes": "Akula ramya"
+  },
+  "1585": {
+    "supportPct": 75,
+    "notes": "Akula ramya"
+  },
+  "1586": {
+    "supportPct": 75,
+    "notes": "Akula ramya"
+  },
+  "1587": {
+    "supportPct": 75,
+    "notes": "Akula ramya"
+  },
+  "1591": {
+    "customPhone": "8885432168",
+    "altPhone": ""
+  },
+  "1592": {
+    "supportPct": 75,
+    "notes": "Akula ramya"
+  },
+  "1593": {
+    "supportPct": 75,
+    "notes": "Akula ramya"
+  },
   "1638": {
     "influencerId": "inf_1793694265008",
     "influencerName": "yaadala srinu",
     "influencerMobile": "9701453592"
+  },
+  "1656": {
+    "supportPct": 75,
+    "notes": "Akula ramya"
+  },
+  "1657": {
+    "supportPct": 75,
+    "notes": "Akula ramya"
+  },
+  "1666": {
+    "supportPct": 75,
+    "notes": "Akula ramya"
+  },
+  "1667": {
+    "supportPct": 75,
+    "notes": "Akula ramya"
+  },
+  "1676": {
+    "supportPct": 75,
+    "notes": "Akula ramya"
+  },
+  "1677": {
+    "supportPct": 75,
+    "notes": "Akula ramya"
+  },
+  "1678": {
+    "supportPct": 75,
+    "notes": "Akula ramya"
+  },
+  "1679": {
+    "supportPct": 75,
+    "notes": "Akula ramya"
+  },
+  "1680": {
+    "supportPct": 75,
+    "notes": "Akula ramya"
+  },
+  "1717": {
+    "influencerId": "inf_1793732645047",
+    "influencerName": "gadhi suryanrayana",
+    "influencerMobile": "9705888474"
+  },
+  "1718": {
+    "influencerId": "",
+    "influencerName": "",
+    "influencerMobile": ""
+  },
+  "1740": {
+    "survey_status": "deceased"
+  },
+  "1757": {
+    "survey_status": "deceased"
   },
   "1811": {
     "influencerId": "inf_1793694265008",
@@ -206,11 +1124,65 @@
   "1814": {
     "supportPct": 75
   },
+  "1822": {
+    "influencerId": "inf_1793732645047",
+    "influencerName": "gadhi suryanrayana",
+    "influencerMobile": "9705888474"
+  },
   "1823": {
     "supportPct": 75
   },
+  "1832": {
+    "survey_status": "deceased"
+  },
+  "1833": {
+    "supportPct": 75,
+    "notes": "Akula ramya"
+  },
+  "1834": {
+    "supportPct": 75,
+    "notes": "Akula ramya"
+  },
+  "1835": {
+    "supportPct": 75,
+    "notes": "Akula ramya"
+  },
+  "1836": {
+    "supportPct": 75,
+    "notes": "Akula ramya"
+  },
+  "1837": {
+    "influencerId": "inf_1793734813841",
+    "influencerName": "gundra siva chakram",
+    "influencerMobile": "9553731023"
+  },
+  "1838": {
+    "influencerId": "inf_1793734813841",
+    "influencerName": "gundra siva chakram",
+    "influencerMobile": "9553731023"
+  },
+  "1839": {
+    "influencerId": "inf_1793734813841",
+    "influencerName": "gundra siva chakram",
+    "influencerMobile": "9553731023"
+  },
+  "1840": {
+    "influencerId": "inf_1793734813841",
+    "influencerName": "gundra siva chakram",
+    "influencerMobile": "9553731023"
+  },
+  "1841": {
+    "influencerId": "inf_1793734813841",
+    "influencerName": "gundra siva chakram",
+    "influencerMobile": "9553731023"
+  },
   "1848": {
     "supportPct": 75
+  },
+  "1867": {
+    "influencerId": "inf_1793732645047",
+    "influencerName": "gadhi suryanrayana",
+    "influencerMobile": "9705888474"
   },
   "1877": {
     "supportPct": 75
@@ -248,14 +1220,81 @@
   "1917": {
     "supportPct": 75
   },
+  "1918": {
+    "influencerId": "inf_1793734813841",
+    "influencerName": "gundra siva chakram",
+    "influencerMobile": "9553731023"
+  },
+  "1920": {
+    "influencerId": "inf_1793734813841",
+    "influencerName": "gundra siva chakram",
+    "influencerMobile": "9553731023"
+  },
+  "1921": {
+    "influencerId": "inf_1793734813841",
+    "influencerName": "gundra siva chakram",
+    "influencerMobile": "9553731023"
+  },
+  "1923": {
+    "influencerId": "inf_1793734813841",
+    "influencerName": "gundra siva chakram",
+    "influencerMobile": "9553731023"
+  },
   "1933": {
     "supportPct": 75
   },
   "1934": {
     "supportPct": 75
   },
+  "1936": {
+    "customPhone": "7396258935",
+    "altPhone": ""
+  },
+  "1960": {
+    "survey_status": "deceased"
+  },
+  "1961": {
+    "influencerId": "inf_1793732645047",
+    "influencerName": "gadhi suryanrayana",
+    "influencerMobile": "9705888474"
+  },
+  "1962": {
+    "influencerId": "inf_1793732645047",
+    "influencerName": "gadhi suryanrayana",
+    "influencerMobile": "9705888474"
+  },
+  "1963": {
+    "influencerId": "inf_1793732645047",
+    "influencerName": "gadhi suryanrayana",
+    "influencerMobile": "9705888474"
+  },
+  "1964": {
+    "influencerId": "inf_1793732645047",
+    "influencerName": "gadhi suryanrayana",
+    "influencerMobile": "9705888474"
+  },
+  "1965": {
+    "influencerId": "inf_1793732645047",
+    "influencerName": "gadhi suryanrayana",
+    "influencerMobile": "9705888474"
+  },
+  "1978": {
+    "survey_status": "out_of_city",
+    "influencerId": "inf_1793734813841",
+    "influencerName": "gundra siva chakram",
+    "influencerMobile": "9553731023"
+  },
+  "1979": {
+    "influencerId": "inf_1793732645047",
+    "influencerName": "gadhi suryanrayana",
+    "influencerMobile": "9705888474"
+  },
   "1986": {
     "supportPct": 75
+  },
+  "2012": {
+    "customPhone": "9849847450",
+    "altPhone": ""
   },
   "2019": {
     "supportPct": 75
@@ -366,6 +1405,11 @@
   "2150": {
     "supportPct": 75
   },
+  "2185": {
+    "influencerId": "inf_1793732645047",
+    "influencerName": "gadhi suryanrayana",
+    "influencerMobile": "9705888474"
+  },
   "2186": {
     "supportPct": 75
   },
@@ -404,6 +1448,14 @@
   },
   "2198": {
     "supportPct": 75
+  },
+  "2199": {
+    "survey_status": "deceased"
+  },
+  "2200": {
+    "influencerId": "inf_1793732645047",
+    "influencerName": "gadhi suryanrayana",
+    "influencerMobile": "9705888474"
   },
   "2257": {
     "influencerId": "inf_1793696044209",
@@ -493,10 +1545,38 @@
   "2441": {
     "supportPct": 75
   },
+  "2449": {
+    "supportPct": 75,
+    "notes": "Akula ramya"
+  },
   "2478": {
     "influencerId": "inf_1793694265008",
     "influencerName": "yaadala srinu",
     "influencerMobile": "9701453592"
+  },
+  "2509": {
+    "supportPct": 75,
+    "notes": "Akula ramya"
+  },
+  "2510": {
+    "supportPct": 75,
+    "notes": "Akula ramya"
+  },
+  "2511": {
+    "supportPct": 75,
+    "notes": "Akula ramya"
+  },
+  "2512": {
+    "supportPct": 75,
+    "notes": "Akula ramya"
+  },
+  "2513": {
+    "supportPct": 75,
+    "notes": "Akula ramya"
+  },
+  "2514": {
+    "supportPct": 75,
+    "notes": "Akula ramya"
   },
   "2532": {
     "influencerId": "inf_1793696044209",

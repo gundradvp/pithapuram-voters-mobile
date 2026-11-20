@@ -119,7 +119,7 @@ const SURNAME_ALIASES: Record<string, string> = {
   'KOMMU': 'KOMMURI'
 };
 
-const CANONICAL_TELUGU_SURNAMES: Record<string, string> = {
+export const CANONICAL_TELUGU_SURNAMES: Record<string, string> = {
   'UMMIDI': 'ఉమ్మిడి',
   'MUMMIDI': 'ముమ్మిడి',
   'BOMMIDI': 'బొమ్మిడి',
@@ -220,8 +220,26 @@ const CANONICAL_TELUGU_SURNAMES: Record<string, string> = {
   'REDDIM': 'రెడ్డిం',
   'PABBIREDDI': 'పబ్బిరెడ్డి',
   'VEGISETTI': 'వేగిశెట్టి',
-  'PASAGADUGULA': 'పసగడుగుల'
+  'PASAGADUGULA': 'పసగడుగుల',
+  'GOPISETTY': 'గోపిశెట్టి'
 };
+
+export const TELUGU_TO_CANONICAL_EN: Record<string, string> = {
+  'విప్పుర్తి': 'VIPPARTHI',
+  'శివకోతి': 'SHIVAKOTI',
+  'పెనుగండ': 'PENUGONDA',
+  'దేశినడి': 'DESINDI',
+  'గోపిశెట్టి': 'GOPISETTY',
+  'నాగర్పు': 'NAGARPU',
+  'చేశెట్టి': 'CHESHETTI'
+};
+
+// Populate reverse lookup from canonical map
+for (const [en, te] of Object.entries(CANONICAL_TELUGU_SURNAMES)) {
+  if (!TELUGU_TO_CANONICAL_EN[te]) {
+    TELUGU_TO_CANONICAL_EN[te] = en;
+  }
+}
 
 const STOP_WORDS = new Set([
   'SRI', 'KUMAR', 'KUMARI', 'RAO', 'RAVU', 'REDDY', 'REDDI', 'BABU',
@@ -232,9 +250,82 @@ const STOP_WORDS = new Set([
 
 /**
  * Extracts normalized surname in English and Telugu for a voter.
+ * Prioritizes manual user inputs (corrections, profile aliases, custom inputs) over OCR.
  */
-export function extractSurname(voter: MobileVoter): { en: string; te: string } {
-  // If voter object already has precomputed surname or explicit surname_te
+export function extractSurname(voter: MobileVoter, profile?: VoterCampaignProfile): { en: string; te: string } {
+  // 1. Direct user profile surname inputs (from Re-OCR Studio or profile edit)
+  const profSurnameEn = (profile?.correctedSurnameEn || profile?.surnameEn || '').trim().toUpperCase();
+  const profSurnameTe = (profile?.correctedSurnameTe || profile?.surnameTe || '').trim();
+
+  if (profSurnameEn || profSurnameTe) {
+    let canonEn = '';
+    let canonTe = profSurnameTe;
+
+    if (profSurnameEn) {
+      canonEn = SURNAME_ALIASES[profSurnameEn] || profSurnameEn;
+      if (!canonTe) {
+        canonTe = CANONICAL_TELUGU_SURNAMES[canonEn] || canonEn;
+      }
+    } else if (profSurnameTe) {
+      canonEn = TELUGU_TO_CANONICAL_EN[profSurnameTe] || profSurnameTe.toUpperCase();
+    }
+
+    if (canonEn) {
+      return {
+        en: canonEn,
+        te: canonTe || CANONICAL_TELUGU_SURNAMES[canonEn] || canonEn
+      };
+    }
+  }
+
+  // 2. Manual input alias (customAlias / corrected names from Excel grid "మీ ఇన్పుట్" / "నా ఇన్పుట్")
+  const manualInput = (profile?.customAlias || profile?.correctedNameTe || profile?.correctedNameEn || '').trim();
+  if (manualInput) {
+    // 2a. Check if any Telugu token in manualInput matches a known canonical Telugu surname
+    const teTokens = manualInput.split(/[\s,()\[\]\-_/]+/).map(t => t.trim()).filter(t => t.length >= 2);
+    for (const tok of teTokens) {
+      if (TELUGU_TO_CANONICAL_EN[tok]) {
+        const canonEn = TELUGU_TO_CANONICAL_EN[tok];
+        return {
+          en: canonEn,
+          te: CANONICAL_TELUGU_SURNAMES[canonEn] || tok
+        };
+      }
+    }
+
+    // 2b. Check if any English token in manualInput matches SURNAME_ALIASES or CANONICAL_TELUGU_SURNAMES
+    const enTokens = manualInput.toUpperCase().match(/[A-Z]+/g)?.filter(t => t.length > 2 && !STOP_WORDS.has(t)) || [];
+    for (const tok of enTokens) {
+      const aliasEn = SURNAME_ALIASES[tok] || tok;
+      if (CANONICAL_TELUGU_SURNAMES[aliasEn]) {
+        return {
+          en: aliasEn,
+          te: CANONICAL_TELUGU_SURNAMES[aliasEn]
+        };
+      }
+    }
+
+    // 2c. If manualInput is a single word explicitly typed and doesn't match stop words
+    if (teTokens.length === 1 && !STOP_WORDS.has(teTokens[0].toUpperCase())) {
+      const singleTok = teTokens[0];
+      if (/[\u0C00-\u0C7F]/.test(singleTok)) {
+        const canonEn = TELUGU_TO_CANONICAL_EN[singleTok] || singleTok;
+        return {
+          en: canonEn,
+          te: singleTok
+        };
+      } else {
+        const upper = singleTok.toUpperCase();
+        const canonEn = SURNAME_ALIASES[upper] || upper;
+        return {
+          en: canonEn,
+          te: CANONICAL_TELUGU_SURNAMES[canonEn] || canonEn
+        };
+      }
+    }
+  }
+
+  // 3. If voter object already has precomputed surname or explicit surname_te
   if ((voter as any).surname_te || (voter as any).surname) {
     const sEn = ((voter as any).surname_en || (voter as any).surname || '').toUpperCase();
     const canonEn = SURNAME_ALIASES[sEn] || sEn;
@@ -307,16 +398,18 @@ export function extractSurname(voter: MobileVoter): { en: string; te: string } {
 
 /**
  * Groups and classifies all voters in a booth by their Surname Clan.
+ * Accurately updates surname grouping, totals, and leaning counts based on manual inputs and profile corrections.
  */
 export function classifyBoothSurnames(
   voters: MobileVoter[],
-  profiles: Record<number, VoterCampaignProfile>,
+  profiles?: Record<number, VoterCampaignProfile>,
   voterDupMap?: Record<number, any>
 ): SurnameGroup[] {
   const clanMap = new Map<string, { en: string; te: string; list: MobileVoter[] }>();
 
   voters.forEach(v => {
-    const { en, te } = extractSurname(v);
+    const prof = profiles ? profiles[v.s] : undefined;
+    const { en, te } = extractSurname(v, prof);
     if (!clanMap.has(en)) {
       clanMap.set(en, { en, te, list: [] });
     }
@@ -358,7 +451,7 @@ export function classifyBoothSurnames(
         else if (ageNum >= 18 && ageNum <= 25) youth.push(v);
       }
 
-      const prof = profiles[v.s] || {};
+      const prof = (profiles && profiles[v.s]) || {};
       const hasEntry = prof.supportPct !== undefined;
       const pct = hasEntry ? prof.supportPct! : 50;
 
@@ -387,7 +480,7 @@ export function classifyBoothSurnames(
     youth.sort((a, b) => a.s - b.s);
 
     const headVoter = elders[0] || clanVoters[0];
-    const headProf = profiles[headVoter.s] || {};
+    const headProf = (profiles && profiles[headVoter.s]) || {};
 
     const isTop10 = idx < 10;
     const hasManyNeutral = (neutralCount + unvisitedCount) > (total * 0.3);
