@@ -38,7 +38,7 @@ interface VotersTabMobileProps {
   onOpenOutOfVillage?: () => void;
   onOpenFastPunch?: () => void;
   onOpenWardMargin?: () => void;
-  onOpenReOcrReview?: () => void;
+  onOpenReOcrReview?: (ward?: string, sno?: number) => void;
 }
 
 const INITIAL_VISIBLE_COUNT = 50;
@@ -2037,7 +2037,7 @@ _దయచేసి మీ ఓటు హక్కును వినియోగ
               {onOpenReOcrReview && (
                 <button
                   type="button"
-                  onClick={onOpenReOcrReview}
+                  onClick={() => onOpenReOcrReview(selectedWard)}
                   className="px-2 py-0.5 bg-gradient-to-r from-amber-600 via-orange-600 to-amber-700 hover:from-amber-500 hover:to-orange-500 text-white rounded-lg text-[10.5px] font-black flex items-center gap-1 shadow-sm active:scale-95 transition-all cursor-pointer ring-1 ring-amber-400/50"
                   title={language === 'te' ? 'కార్డుల OCR సరిచూసే సింగిల్-కార్డ్ స్టూడియో (Re-OCR Studio)' : 'Re-OCR Single Card Review Studio'}
                 >
@@ -3026,6 +3026,20 @@ _దయచేసి మీ ఓటు హక్కును వినియోగ
                     <span className="absolute bottom-2 right-2 bg-slate-950/90 text-amber-300 font-mono font-black text-[10px] px-1.5 py-0.5 rounded border border-amber-500/50 shadow">
                       #{v.s}
                     </span>
+                    {onOpenReOcrReview && (
+                      <button
+                        type="button"
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          onOpenReOcrReview(v.ward_no ? String(v.ward_no) : selectedWard, Number(v.s || v.sno));
+                        }}
+                        className="absolute top-2 right-2 bg-slate-950/90 hover:bg-amber-500 hover:text-slate-950 text-amber-300 font-black text-[10px] px-2 py-0.5 rounded border border-amber-500/40 shadow cursor-pointer flex items-center gap-1 z-10 transition-all active:scale-95"
+                        title="ఈ ఒక్క కార్డును రీ-ఓసీఆర్ స్టూడియోలో చూడండి"
+                      >
+                        <Sparkles className="w-2.5 h-2.5 text-amber-400" />
+                        <span>రీ-ఓసీఆర్</span>
+                      </button>
+                    )}
                   </div>
 
                   {/* Voter Name & Details (Full Width: Zero text clipping or overlapping) */}

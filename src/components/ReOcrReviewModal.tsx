@@ -29,7 +29,12 @@ import {
   FileText,
   Globe,
   Save,
-  CheckSquare
+  CheckSquare,
+  Building2,
+  Navigation,
+  ChevronsLeft,
+  ChevronsRight,
+  ArrowRight
 } from 'lucide-react';
 import {
   MobileVoter,
@@ -50,6 +55,8 @@ interface ReOcrReviewModalProps {
   voters: MobileVoter[];
   boothId?: string;
   language?: 'te' | 'en';
+  initialWard?: string;
+  initialSno?: number;
   onUpdateVoters?: (updatedVoters: MobileVoter[]) => void;
   profiles?: Record<number, VoterCampaignProfile>;
   boothInfo?: BoothInfo;
@@ -72,6 +79,8 @@ export const ReOcrReviewModal: React.FC<ReOcrReviewModalProps> = ({
   voters,
   boothId = 'gp_durgada',
   language = 'te',
+  initialWard,
+  initialSno,
   onUpdateVoters,
   profiles = {},
   boothInfo,
@@ -85,8 +94,12 @@ export const ReOcrReviewModal: React.FC<ReOcrReviewModalProps> = ({
   onOpenSlip,
   onUpdateProfile,
 }) => {
-  // Marked S.Nos state (persisted in localStorage)
+  // Storage keys for persistence
   const storageKey = `reocr_marked_snos_${boothId}`;
+  const lastWardKey = `reocr_last_ward_${boothId}`;
+  const lastSnoKey = `reocr_last_sno_${boothId}`;
+
+  // Marked S.Nos state (persisted in localStorage)
   const [markedSnos, setMarkedSnos] = useState<Set<number>>(() => {
     try {
       const saved = localStorage.getItem(storageKey);
@@ -100,6 +113,55 @@ export const ReOcrReviewModal: React.FC<ReOcrReviewModalProps> = ({
       // fallback
     }
     return new Set<number>();
+  });
+
+  // Compute available wards in this dataset
+  interface WardMeta {
+    wardNo: number;
+    count: number;
+    startSno: number;
+  }
+
+  const wardList: WardMeta[] = useMemo(() => {
+    const map = new Map<number, { count: number; startSno: number }>();
+    voters.forEach(v => {
+      const w = v.ward_no ?? (v as any).w;
+      if (w !== undefined && w !== null && w !== '') {
+        const num = Number(w);
+        if (!isNaN(num) && num > 0) {
+          const sno = Number(v.s || v.sno || 0);
+          const existing = map.get(num);
+          if (!existing) {
+            map.set(num, { count: 1, startSno: sno });
+          } else {
+            existing.count += 1;
+            if (sno > 0 && (existing.startSno === 0 || sno < existing.startSno)) {
+              existing.startSno = sno;
+            }
+          }
+        }
+      }
+    });
+
+    return Array.from(map.entries())
+      .map(([wardNo, meta]) => ({
+        wardNo,
+        count: meta.count,
+        startSno: meta.startSno,
+      }))
+      .sort((a, b) => a.wardNo - b.wardNo);
+  }, [voters]);
+
+  // Selected Ward State (initialized from initialWard or localStorage)
+  const [selectedWard, setSelectedWard] = useState<string>(() => {
+    if (initialWard && initialWard !== 'all') {
+      return initialWard;
+    }
+    try {
+      const saved = localStorage.getItem(lastWardKey);
+      if (saved) return saved;
+    } catch (e) {}
+    return 'all';
   });
 
   // Current view index in the filtered list
@@ -140,27 +202,87 @@ export const ReOcrReviewModal: React.FC<ReOcrReviewModalProps> = ({
     return false;
   }, []);
 
-  // Filtered list based on active tab
+  // Base list filtered by ward
+  const wardFilteredVoters = useMemo(() => {
+    if (selectedWard === 'all') return voters;
+    return voters.filter(v => {
+      const w = v.ward_no ?? (v as any).w;
+      return String(w) === selectedWard;
+    });
+  }, [voters, selectedWard]);
+
+  // Filtered list based on active tab and ward
   const activeList = useMemo(() => {
     if (filterMode === 'marked') {
-      return voters.filter(v => markedSnos.has(Number(v.s || v.sno)));
+      return wardFilteredVoters.filter(v => markedSnos.has(Number(v.s || v.sno)));
     }
     if (filterMode === 'suspected') {
-      return voters.filter(v => isSuspected(v));
+      return wardFilteredVoters.filter(v => isSuspected(v));
     }
-    return voters;
-  }, [voters, filterMode, markedSnos, isSuspected]);
+    return wardFilteredVoters;
+  }, [wardFilteredVoters, filterMode, markedSnos, isSuspected]);
 
-  // Total counts for badges
+  // Total counts for badges in the active ward
   const suspectedCount = useMemo(() => {
-    return voters.filter(v => isSuspected(v)).length;
-  }, [voters, isSuspected]);
+    return wardFilteredVoters.filter(v => isSuspected(v)).length;
+  }, [wardFilteredVoters, isSuspected]);
+
+  const markedInWardCount = useMemo(() => {
+    return wardFilteredVoters.filter(v => markedSnos.has(Number(v.s || v.sno))).length;
+  }, [wardFilteredVoters, markedSnos]);
 
   // Bound index safely
   const safeIndex = Math.min(Math.max(0, currentIndex), Math.max(0, activeList.length - 1));
   const currentVoter: MobileVoter | undefined = activeList[safeIndex];
   const currentSno = currentVoter ? Number(currentVoter.s || currentVoter.sno) : 0;
   const isCurrentMarked = currentSno > 0 && markedSnos.has(currentSno);
+
+  // Keep localStorage updated with current position
+  useEffect(() => {
+    if (currentSno > 0) {
+      try {
+        localStorage.setItem(lastSnoKey, String(currentSno));
+        localStorage.setItem(lastWardKey, selectedWard);
+      } catch (e) {}
+    }
+  }, [currentSno, selectedWard, lastSnoKey, lastWardKey]);
+
+  // Handle initialWard, initialSno, or restore last position on open
+  useEffect(() => {
+    if (!isOpen) return;
+
+    if (initialSno) {
+      const targetVoter = voters.find(v => Number(v.s || v.sno) === Number(initialSno));
+      if (targetVoter) {
+        const targetWard = targetVoter.ward_no ? String(targetVoter.ward_no) : 'all';
+        if (selectedWard !== targetWard && selectedWard !== 'all') {
+          setSelectedWard(targetWard);
+        }
+        const idx = activeList.findIndex(v => Number(v.s || v.sno) === Number(initialSno));
+        if (idx !== -1) {
+          setCurrentIndex(idx);
+          return;
+        }
+      }
+    }
+
+    if (initialWard && initialWard !== selectedWard) {
+      setSelectedWard(initialWard);
+      setCurrentIndex(0);
+      return;
+    }
+
+    // Restore last viewed S.No from localStorage
+    try {
+      const savedSno = Number(localStorage.getItem(lastSnoKey));
+      if (savedSno && !isNaN(savedSno)) {
+        const idx = activeList.findIndex(v => Number(v.s || v.sno) === savedSno);
+        if (idx !== -1) {
+          setCurrentIndex(idx);
+        }
+      }
+    } catch (e) {}
+  }, [isOpen, initialSno, initialWard]);
 
   // Campaign Profile for current voter
   const currentProf: VoterCampaignProfile = currentSno ? (profiles[currentSno] || {}) : {};
@@ -341,25 +463,105 @@ export const ReOcrReviewModal: React.FC<ReOcrReviewModalProps> = ({
     window.open(waUrl, '_blank');
   }, [currentVoter, currentSno, currentPhone, boothInfo]);
 
-  // Jump to specific S.No
-  const handleJumpToSno = (e: React.FormEvent) => {
-    e.preventDefault();
-    const target = parseInt(jumpInput.trim(), 10);
-    if (isNaN(target)) return;
+  // Handler: Select Ward
+  const handleSelectWard = (newWard: string) => {
+    setSelectedWard(newWard);
+    setCurrentIndex(0);
+    try {
+      localStorage.setItem(lastWardKey, newWard);
+    } catch (e) {}
+  };
 
-    const idx = activeList.findIndex(v => Number(v.s || v.sno) === target);
-    if (idx !== -1) {
-      setCurrentIndex(idx);
+  // Handler: Step jump (+10 / -10)
+  const handleStepJump = (offset: number) => {
+    setCurrentIndex(prev => Math.min(Math.max(0, prev + offset), Math.max(0, activeList.length - 1)));
+  };
+
+  // Handler: Jump to First / Last
+  const handleJumpToFirst = () => {
+    setCurrentIndex(0);
+  };
+
+  const handleJumpToLast = () => {
+    setCurrentIndex(Math.max(0, activeList.length - 1));
+  };
+
+  // Handler: Universal Jump (S.No, EPIC, or Name)
+  const handleSearchOrJump = (e?: React.FormEvent) => {
+    if (e) e.preventDefault();
+    const query = jumpInput.trim();
+    if (!query) return;
+
+    const queryNum = parseInt(query.replace(/^#+/, ''), 10);
+    const upperQuery = query.toUpperCase();
+
+    // 1. Check by S.No
+    let matchedVoter: MobileVoter | undefined;
+    if (!isNaN(queryNum)) {
+      matchedVoter = voters.find(v => Number(v.s || v.sno) === queryNum);
+    }
+
+    // 2. Check by EPIC
+    if (!matchedVoter) {
+      matchedVoter = voters.find(v => {
+        const epic = (v.epic || v.id || '').toUpperCase();
+        return epic === upperQuery || epic.includes(upperQuery);
+      });
+    }
+
+    // 3. Check by Name (Telugu or English)
+    if (!matchedVoter) {
+      matchedVoter = voters.find(v => {
+        const nTe = (v.name_te || v.n || '').toLowerCase();
+        const nEn = (v.name_en || '').toLowerCase();
+        const qLow = query.toLowerCase();
+        return nTe.includes(qLow) || nEn.includes(qLow);
+      });
+    }
+
+    if (matchedVoter) {
+      const vSno = Number(matchedVoter.s || matchedVoter.sno);
+      const vWard = matchedVoter.ward_no ? String(matchedVoter.ward_no) : 'all';
+
+      // Auto switch ward if the voter is in another ward
+      if (selectedWard !== 'all' && String(matchedVoter.ward_no) !== selectedWard) {
+        setSelectedWard(vWard);
+      }
+      if (filterMode !== 'all') {
+        setFilterMode('all');
+      }
+
+      setTimeout(() => {
+        const listToSearch = (selectedWard !== 'all' && String(matchedVoter!.ward_no) !== selectedWard)
+          ? voters.filter(v => String(v.ward_no ?? (v as any).w) === vWard)
+          : activeList;
+        
+        const idx = listToSearch.findIndex(v => Number(v.s || v.sno) === vSno);
+        if (idx !== -1) {
+          setCurrentIndex(idx);
+        } else {
+          const allIdx = voters.findIndex(v => Number(v.s || v.sno) === vSno);
+          if (allIdx !== -1) {
+            setSelectedWard('all');
+            setFilterMode('all');
+            setCurrentIndex(allIdx);
+          }
+        }
+      }, 50);
+
+      setProcessStatus(
+        language === 'te'
+          ? `✓ కార్డు #${vSno} వద్దకు జంప్ అయ్యారు (${matchedVoter.name_te || matchedVoter.n})`
+          : `✓ Jumped to card #${vSno} (${matchedVoter.name_en || matchedVoter.n})`
+      );
+      setTimeout(() => setProcessStatus(null), 3500);
       setJumpInput('');
     } else {
-      const allIdx = voters.findIndex(v => Number(v.s || v.sno) === target);
-      if (allIdx !== -1) {
-        setFilterMode('all');
-        setCurrentIndex(allIdx);
-        setJumpInput('');
-      } else {
-        alert(language === 'te' ? `క్రమ సంఖ్య #${target} కనుగొనబడలేదు` : `S.No #${target} not found`);
-      }
+      alert(
+        language === 'te'
+          ? `"${query}" తో ఏ ఓటరు లేదా కార్డు లభించలేదు`
+          : `No voter or card found matching "${query}"`
+      );
     }
   };
 
@@ -518,21 +720,21 @@ export const ReOcrReviewModal: React.FC<ReOcrReviewModalProps> = ({
   return (
     <div className="fixed inset-0 z-[120] bg-black/95 backdrop-blur-md flex flex-col justify-between text-slate-100 select-none">
       {/* 1. TOP HEADER BAR */}
-      <div className="bg-slate-900/98 border-b border-slate-800 px-4 py-2.5 flex items-center justify-between flex-wrap gap-2.5 shrink-0">
-        <div className="flex items-center gap-3">
-          <div className="w-8 h-8 rounded-xl bg-gradient-to-tr from-amber-500 via-orange-500 to-amber-600 flex items-center justify-center text-white shadow-lg shadow-amber-500/25">
+      <div className="bg-slate-900/98 border-b border-slate-800 px-3 sm:px-4 py-2.5 flex items-center justify-between flex-wrap gap-2.5 shrink-0">
+        <div className="flex items-center gap-2.5 sm:gap-3">
+          <div className="w-8 h-8 rounded-xl bg-gradient-to-tr from-amber-500 via-orange-500 to-amber-600 flex items-center justify-center text-white shadow-lg shadow-amber-500/25 shrink-0">
             <Sparkles className="w-4 h-4" />
           </div>
           <div>
             <div className="flex items-center gap-2">
               <h2 className="text-sm sm:text-base font-black tracking-wide text-white">
-                {language === 'te' ? 'రీ-ఓసీఆర్ రివ్యూ & ఓటర్ క్యాంపెయిన్ స్టూడియో' : 'Re-OCR Review & Voter Studio'}
+                {language === 'te' ? 'రీ-ఓసీఆర్ రివ్యూ & ఓటర్ స్టూడియో' : 'Re-OCR Review & Voter Studio'}
               </h2>
               <span className="text-[10px] bg-amber-500/20 border border-amber-500/40 text-amber-300 px-2 py-0.5 rounded font-mono font-black">
                 1 ITEM / SCREEN
               </span>
             </div>
-            <p className="text-[11px] text-slate-400 hidden sm:block">
+            <p className="text-[11px] text-slate-400 hidden md:block">
               {language === 'te'
                 ? 'స్పేస్ [Space]: రీ-ఓసీఆర్ ఎంపిక • ఎంటర్ [Enter]: తర్వాతి కార్డు • 1-ట్యాప్ మనవాళ్లే, ఫోన్, లీడర్, స్లిప్'
                 : 'Space: Toggle Re-OCR • Enter: Next Card • 1-Tap Support, Phone, Leader, WhatsApp Slip'}
@@ -540,27 +742,51 @@ export const ReOcrReviewModal: React.FC<ReOcrReviewModalProps> = ({
           </div>
         </div>
 
+        {/* WARD SELECTOR DROPDOWN */}
+        {wardList.length > 0 && (
+          <div className="flex items-center gap-1.5 bg-slate-950/90 px-2.5 py-1 rounded-xl border border-slate-800 shadow-inner">
+            <Building2 className="w-3.5 h-3.5 text-amber-400 shrink-0" />
+            <span className="text-xs text-slate-400 font-bold hidden sm:inline">
+              {language === 'te' ? 'వార్డు:' : 'Ward:'}
+            </span>
+            <select
+              value={selectedWard}
+              onChange={e => handleSelectWard(e.target.value)}
+              className="bg-slate-900 border border-slate-700 text-amber-300 font-bold text-xs rounded-lg px-2 py-1 focus:outline-none focus:border-amber-400 cursor-pointer"
+            >
+              <option value="all">
+                {language === 'te' ? `🏛️ మొత్తం గ్రామం (${voters.length})` : `🏛️ All Wards (${voters.length})`}
+              </option>
+              {wardList.map(w => (
+                <option key={w.wardNo} value={String(w.wardNo)}>
+                  🏛️ {language === 'te' ? `${w.wardNo}వ వార్డు (${w.count} ఓటర్లు • #${w.startSno} నుండి)` : `Ward #${w.wardNo} (${w.count} voters • from #${w.startSno})`}
+                </option>
+              ))}
+            </select>
+          </div>
+        )}
+
         {/* Filter Pills */}
-        <div className="flex items-center gap-1.5 bg-slate-950/90 p-1 rounded-xl border border-slate-800">
+        <div className="flex items-center gap-1 bg-slate-950/90 p-1 rounded-xl border border-slate-800">
           <button
             type="button"
             onClick={() => { setFilterMode('all'); setCurrentIndex(0); }}
-            className={`px-3 py-1 rounded-lg text-xs font-bold transition-all cursor-pointer ${
+            className={`px-2.5 sm:px-3 py-1 rounded-lg text-xs font-bold transition-all cursor-pointer ${
               filterMode === 'all'
                 ? 'bg-amber-500 text-slate-950 shadow-md font-black'
                 : 'text-slate-400 hover:text-slate-200'
             }`}
           >
-            {language === 'te' ? `అన్నీ (${voters.length})` : `All (${voters.length})`}
+            {language === 'te' ? `అన్నీ (${wardFilteredVoters.length})` : `All (${wardFilteredVoters.length})`}
           </button>
 
           <button
             type="button"
             onClick={() => { setFilterMode('marked'); setCurrentIndex(0); }}
-            className={`px-3 py-1 rounded-lg text-xs font-bold transition-all flex items-center gap-1.5 cursor-pointer ${
+            className={`px-2 sm:px-3 py-1 rounded-lg text-xs font-bold transition-all flex items-center gap-1 cursor-pointer ${
               filterMode === 'marked'
                 ? 'bg-amber-500 text-slate-950 shadow-md font-black'
-                : markedSnos.size > 0
+                : markedInWardCount > 0
                   ? 'text-amber-400 hover:text-amber-300'
                   : 'text-slate-500 hover:text-slate-300'
             }`}
@@ -569,14 +795,14 @@ export const ReOcrReviewModal: React.FC<ReOcrReviewModalProps> = ({
             <span className={`text-[10px] px-1.5 py-0.2 rounded-full font-black ${
               filterMode === 'marked' ? 'bg-slate-950 text-amber-300' : 'bg-amber-500/20 text-amber-300'
             }`}>
-              {markedSnos.size}
+              {markedInWardCount}
             </span>
           </button>
 
           <button
             type="button"
             onClick={() => { setFilterMode('suspected'); setCurrentIndex(0); }}
-            className={`px-3 py-1 rounded-lg text-xs font-bold transition-all flex items-center gap-1.5 cursor-pointer ${
+            className={`px-2 sm:px-3 py-1 rounded-lg text-xs font-bold transition-all flex items-center gap-1 cursor-pointer ${
               filterMode === 'suspected'
                 ? 'bg-red-500 text-white shadow-md font-black'
                 : 'text-red-400 hover:text-red-300'
@@ -592,21 +818,21 @@ export const ReOcrReviewModal: React.FC<ReOcrReviewModalProps> = ({
           </button>
         </div>
 
-        {/* Jump Box & Close */}
+        {/* Universal Jump / Search Box & Close */}
         <div className="flex items-center gap-2">
-          <form onSubmit={handleJumpToSno} className="flex items-center gap-1">
+          <form onSubmit={handleSearchOrJump} className="flex items-center gap-1">
             <input
-              type="number"
-              placeholder="S.No"
+              type="text"
+              placeholder={language === 'te' ? "S.No / EPIC / పేరు..." : "S.No / EPIC / Name..."}
               value={jumpInput}
               onChange={e => setJumpInput(e.target.value)}
-              className="w-20 px-2 py-1 bg-slate-950 border border-slate-700 rounded-lg text-xs text-white placeholder-slate-500 focus:outline-none focus:border-amber-400 text-center font-bold"
+              className="w-28 sm:w-36 px-2.5 py-1 bg-slate-950 border border-slate-700 rounded-lg text-xs text-white placeholder-slate-500 focus:outline-none focus:border-amber-400 font-bold"
             />
             <button
               type="submit"
-              className="px-2.5 py-1 bg-slate-800 hover:bg-slate-700 text-slate-200 border border-slate-700 rounded-lg text-xs font-bold cursor-pointer"
+              className="px-2.5 py-1 bg-gradient-to-r from-amber-600 to-orange-600 hover:from-amber-500 hover:to-orange-500 text-white rounded-lg text-xs font-black cursor-pointer shadow-sm active:scale-95"
             >
-              Go
+              {language === 'te' ? 'జంప్' : 'Go'}
             </button>
           </form>
 
@@ -620,6 +846,50 @@ export const ReOcrReviewModal: React.FC<ReOcrReviewModalProps> = ({
           </button>
         </div>
       </div>
+
+      {/* 1.5 SUB-BAR: QUICK WARD JUMP PILLS */}
+      {wardList.length > 1 && (
+        <div className="bg-slate-950/90 border-b border-slate-800/80 px-3 sm:px-4 py-1.5 flex items-center gap-1.5 overflow-x-auto no-scrollbar shrink-0 text-xs">
+          <span className="text-[11px] text-slate-400 font-bold shrink-0 flex items-center gap-1 pr-1">
+            <Navigation className="w-3 h-3 text-amber-400" />
+            <span>{language === 'te' ? 'వార్డు జంప్:' : 'Quick Ward:'}</span>
+          </span>
+
+          <button
+            type="button"
+            onClick={() => handleSelectWard('all')}
+            className={`px-2.5 py-0.5 rounded-lg font-bold text-xs transition-all whitespace-nowrap cursor-pointer ${
+              selectedWard === 'all'
+                ? 'bg-amber-500 text-slate-950 font-black shadow-md ring-1 ring-amber-300'
+                : 'bg-slate-900 hover:bg-slate-800 text-slate-300 border border-slate-800'
+            }`}
+          >
+            {language === 'te' ? `మొత్తం (${voters.length})` : `All (${voters.length})`}
+          </button>
+
+          {wardList.map(w => {
+            const isSel = selectedWard === String(w.wardNo);
+            return (
+              <button
+                key={w.wardNo}
+                type="button"
+                onClick={() => handleSelectWard(String(w.wardNo))}
+                className={`px-2.5 py-0.5 rounded-lg font-bold text-xs transition-all whitespace-nowrap cursor-pointer flex items-center gap-1 ${
+                  isSel
+                    ? 'bg-amber-500 text-slate-950 font-black shadow-md ring-1 ring-amber-300'
+                    : 'bg-slate-900 hover:bg-slate-800 text-slate-300 hover:text-white border border-slate-800'
+                }`}
+                title={`వార్డు #${w.wardNo}: ${w.count} ఓటర్లు (S.No #${w.startSno} నుండి)`}
+              >
+                <span>W-{w.wardNo}</span>
+                <span className={`text-[10px] ${isSel ? 'text-slate-950 font-black' : 'text-slate-500'}`}>
+                  ({w.count})
+                </span>
+              </button>
+            );
+          })}
+        </div>
+      )}
 
       {/* 2. MAIN CENTER: FULL SPACE UTILIZATION (WIDE CONTAINER & BIG CARD ZOOM) */}
       <div className="flex-1 overflow-y-auto p-2 sm:p-4 md:p-5 flex flex-col items-center justify-center">
@@ -654,13 +924,19 @@ export const ReOcrReviewModal: React.FC<ReOcrReviewModalProps> = ({
             <div className="lg:w-[58%] xl:w-[60%] bg-slate-950/95 p-3 sm:p-4 flex flex-col justify-between border-b lg:border-b-0 lg:border-r border-slate-800 relative">
               {/* Card Top Toolbar: S.No, EPIC, Zoom Level Controls */}
               <div className="w-full flex items-center justify-between mb-2 flex-wrap gap-2">
-                <div className="flex items-center gap-2">
+                <div className="flex items-center gap-2 flex-wrap">
                   <span className="px-2.5 py-1 rounded-lg bg-amber-500/20 text-amber-300 border border-amber-500/40 font-mono font-black text-sm shadow-sm">
                     #{currentSno}
                   </span>
                   <span className="px-2.5 py-1 rounded-lg bg-slate-800/90 text-slate-200 border border-slate-700 font-mono font-bold text-xs">
                     {currentVoter.epic || currentVoter.id || 'NO EPIC'}
                   </span>
+                  {currentVoter.ward_no && (
+                    <span className="px-2 py-0.5 rounded-lg bg-indigo-950/90 text-indigo-300 border border-indigo-700/60 font-bold text-xs flex items-center gap-1 shadow-sm">
+                      <Building2 className="w-3 h-3 text-indigo-400" />
+                      <span>{language === 'te' ? `వార్డు #${currentVoter.ward_no}` : `Ward #${currentVoter.ward_no}`}</span>
+                    </span>
+                  )}
                 </div>
 
                 {/* ZOOM CONTROLLER */}
@@ -1276,32 +1552,99 @@ export const ReOcrReviewModal: React.FC<ReOcrReviewModalProps> = ({
 
       {/* 3. BOTTOM ACTION BAR & KEYBOARD SHORTCUTS BAR */}
       <div className="bg-slate-900/98 border-t border-slate-800 px-4 py-2.5 flex items-center justify-between flex-wrap gap-2.5 shrink-0">
-        {/* Navigation Arrows & Counter */}
-        <div className="flex items-center gap-2.5">
+        {/* Navigation Steppers, Direct Counter & Jump */}
+        <div className="flex items-center gap-1.5 flex-wrap">
+          {/* Jump to First Card (#1) */}
+          <button
+            type="button"
+            onClick={handleJumpToFirst}
+            disabled={safeIndex === 0}
+            className="p-1.5 rounded-xl bg-slate-800 hover:bg-slate-700 text-slate-300 disabled:opacity-40 disabled:cursor-not-allowed border border-slate-700 cursor-pointer shadow-sm active:scale-95"
+            title={language === 'te' ? 'మొదటి కార్డు (#1)' : 'Jump to First Card (#1)'}
+          >
+            <ChevronsLeft className="w-4 h-4" />
+          </button>
+
+          {/* Jump -10 */}
+          <button
+            type="button"
+            onClick={() => handleStepJump(-10)}
+            disabled={safeIndex < 10}
+            className="px-2 py-1.5 rounded-xl bg-slate-800 hover:bg-slate-700 text-slate-300 disabled:opacity-40 disabled:cursor-not-allowed border border-slate-700 font-mono text-xs font-bold cursor-pointer shadow-sm active:scale-95"
+            title={language === 'te' ? '10 కార్డులు వెనక్కి' : '-10 Cards'}
+          >
+            -10
+          </button>
+
+          {/* Previous Card */}
           <button
             type="button"
             onClick={handlePrev}
-            disabled={activeList.length <= 1}
-            className="px-3 py-1.5 rounded-xl bg-slate-800 hover:bg-slate-700 text-white disabled:opacity-40 disabled:cursor-not-allowed border border-slate-700 flex items-center gap-1.5 font-bold text-xs cursor-pointer shadow-sm active:scale-95"
+            disabled={activeList.length <= 1 || safeIndex === 0}
+            className="px-2.5 sm:px-3 py-1.5 rounded-xl bg-slate-800 hover:bg-slate-700 text-white disabled:opacity-40 disabled:cursor-not-allowed border border-slate-700 flex items-center gap-1 font-bold text-xs cursor-pointer shadow-sm active:scale-95"
             title="Previous Card (Left Arrow)"
           >
             <ChevronLeft className="w-4 h-4" />
             <span>{language === 'te' ? 'మునుపటి' : 'Prev'}</span>
           </button>
 
-          <span className="text-xs font-mono font-black text-slate-200 px-2">
-            {safeIndex + 1} / {activeList.length}
-          </span>
+          {/* Interactive Direct Counter Input */}
+          <div className="flex items-center gap-1 bg-slate-950 border border-slate-800 px-2 py-1 rounded-xl shadow-inner">
+            <input
+              type="number"
+              value={safeIndex + 1}
+              onChange={e => {
+                const val = parseInt(e.target.value, 10);
+                if (!isNaN(val) && val >= 1 && val <= activeList.length) {
+                  setCurrentIndex(val - 1);
+                }
+              }}
+              className="w-14 bg-transparent text-center font-mono font-black text-amber-300 text-xs focus:outline-none focus:ring-1 focus:ring-amber-400 rounded"
+              title={language === 'te' ? 'కార్డు సంఖ్యను టైప్ చేసి నేరుగా జంప్ అవ్వండి' : 'Type index to jump directly'}
+            />
+            <span className="text-slate-500 font-mono text-xs">/</span>
+            <span className="font-mono font-bold text-slate-300 text-xs pr-1">
+              {activeList.length}
+            </span>
+            {selectedWard !== 'all' && (
+              <span className="text-[10px] bg-indigo-500/20 text-indigo-300 px-1.5 py-0.2 rounded font-mono font-bold border border-indigo-500/30">
+                W-{selectedWard}
+              </span>
+            )}
+          </div>
 
+          {/* Next Card */}
           <button
             type="button"
             onClick={handleNext}
-            disabled={activeList.length <= 1}
-            className="px-3 py-1.5 rounded-xl bg-slate-800 hover:bg-slate-700 text-white disabled:opacity-40 disabled:cursor-not-allowed border border-slate-700 flex items-center gap-1.5 font-bold text-xs cursor-pointer shadow-sm active:scale-95"
+            disabled={activeList.length <= 1 || safeIndex >= activeList.length - 1}
+            className="px-2.5 sm:px-3 py-1.5 rounded-xl bg-slate-800 hover:bg-slate-700 text-white disabled:opacity-40 disabled:cursor-not-allowed border border-slate-700 flex items-center gap-1 font-bold text-xs cursor-pointer shadow-sm active:scale-95"
             title="Next Card (Enter / Right Arrow)"
           >
             <span>{language === 'te' ? 'తర్వాతి' : 'Next'}</span>
             <ChevronRight className="w-4 h-4" />
+          </button>
+
+          {/* Jump +10 */}
+          <button
+            type="button"
+            onClick={() => handleStepJump(10)}
+            disabled={safeIndex + 10 >= activeList.length}
+            className="px-2 py-1.5 rounded-xl bg-slate-800 hover:bg-slate-700 text-slate-300 disabled:opacity-40 disabled:cursor-not-allowed border border-slate-700 font-mono text-xs font-bold cursor-pointer shadow-sm active:scale-95"
+            title={language === 'te' ? '10 కార్డులు ముందుకు' : '+10 Cards'}
+          >
+            +10
+          </button>
+
+          {/* Jump to Last Card */}
+          <button
+            type="button"
+            onClick={handleJumpToLast}
+            disabled={safeIndex >= activeList.length - 1}
+            className="p-1.5 rounded-xl bg-slate-800 hover:bg-slate-700 text-slate-300 disabled:opacity-40 disabled:cursor-not-allowed border border-slate-700 cursor-pointer shadow-sm active:scale-95"
+            title={language === 'te' ? 'చివరి కార్డు' : 'Jump to Last Card'}
+          >
+            <ChevronsRight className="w-4 h-4" />
           </button>
         </div>
 

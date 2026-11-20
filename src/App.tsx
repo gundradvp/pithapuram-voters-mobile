@@ -104,6 +104,8 @@ export function App() {
   const [isFastPunchModalOpen, setIsFastPunchModalOpen] = useState<boolean>(false);
   const [isWardMarginModalOpen, setIsWardMarginModalOpen] = useState<boolean>(false);
   const [isReOcrReviewOpen, setIsReOcrReviewOpen] = useState<boolean>(false);
+  const [reOcrInitialWard, setReOcrInitialWard] = useState<string>('all');
+  const [reOcrInitialSno, setReOcrInitialSno] = useState<number | undefined>(undefined);
   const [familySlipState, setFamilySlipState] = useState<{ open: boolean; family: FamilyCardData | null }>({
     open: false,
     family: null
@@ -1716,7 +1718,11 @@ export function App() {
                 onOpenOutOfVillage={() => setIsLogisticsModalOpen(true)}
                 onOpenFastPunch={() => setIsFastPunchModalOpen(true)}
                 onOpenWardMargin={() => setIsWardMarginModalOpen(true)}
-                onOpenReOcrReview={() => setIsReOcrReviewOpen(true)}
+                onOpenReOcrReview={(ward, sno) => {
+                  if (ward) setReOcrInitialWard(ward);
+                  setReOcrInitialSno(sno);
+                  setIsReOcrReviewOpen(true);
+                }}
               />
             )}
 
@@ -2120,6 +2126,8 @@ export function App() {
           voters={boothData.voters}
           boothId={String(currentPartNo).includes('durgada') ? 'gp_durgada' : `booth_${currentPartNo}`}
           language={lang}
+          initialWard={reOcrInitialWard}
+          initialSno={reOcrInitialSno}
           onUpdateVoters={handleUpdateReOcrVoters}
           profiles={profiles}
           boothInfo={boothData.booth_info}
