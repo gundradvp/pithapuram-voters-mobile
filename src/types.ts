@@ -188,6 +188,8 @@ export interface MobileVoter {
   age?: number | string;
   gender_en?: string;
   gender_te?: string;
+  surname_te?: string;
+  surname_en?: string;
 }
 
 export interface BoothData {

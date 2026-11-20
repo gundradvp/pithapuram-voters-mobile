@@ -7,7 +7,8 @@
     "altPhone": "",
     "influencerId": "",
     "influencerName": "",
-    "influencerMobile": ""
+    "influencerMobile": "",
+    "notes": "మన ముఖ్య మద్దతుదారుడు, కుటుంబంలో 5 ఓట్లు ఉన్నాయి"
   },
   "2": {
     "supportPct": 100,
@@ -18,7 +19,9 @@
     "survey_status": null,
     "influencerId": "inf_1",
     "influencerName": "Guddati Veerraju",
-    "influencerMobile": "9848596259"
+    "influencerMobile": "9848596259",
+    "customPhone": "9440123456",
+    "notes": "ఉదయమే వచ్చి ఓటు వేశారు"
   },
   "4": {
     "supportPct": 100,
@@ -42,7 +45,8 @@
     "influencerName": "Guddati Veerraju",
     "influencerPhone": "9705888474",
     "influencerId": "inf_1",
-    "influencerMobile": "9848596259"
+    "influencerMobile": "9848596259",
+    "notes": "పార్టీ యాక్టివ్ వాలంటీర్"
   },
   "7": {
     "supportPct": 100,
@@ -54,20 +58,23 @@
   },
   "9": {
     "supportPct": 100,
-    "survey_status": null,
+    "survey_status": "voted",
     "influencerName": "Koppula Siva Chakradharrao",
     "influencerPhone": "9493949669"
   },
   "10": {
     "supportPct": 100,
-    "survey_status": "voted"
+    "survey_status": "voted",
+    "notes": "సానుకూల ఓటరు"
   },
   "11": {
-    "survey_status": "out_of_city"
+    "survey_status": "out_of_city",
+    "supportPct": 75
   },
   "12": {
     "supportPct": 100,
-    "survey_status": "supporter"
+    "survey_status": "supporter",
+    "notes": "స్వింగ్ ఓటరు, యువత పథకాలపై ఆసక్తి"
   },
   "13": {
     "supportPct": 100,
@@ -85,7 +92,8 @@
   },
   "16": {
     "supportPct": 100,
-    "survey_status": "supporter"
+    "survey_status": "supporter",
+    "customPhone": "9866123456"
   },
   "17": {
     "supportPct": 100,
@@ -95,7 +103,9 @@
     "supportPct": 100,
     "survey_status": "supporter",
     "influencerName": "Jyothula Srinivasu",
-    "influencerPhone": "9949048940"
+    "influencerPhone": "9949048940",
+    "customPhone": "9000273028",
+    "notes": "బూత్ కోఆర్డినేటర్"
   },
   "19": {
     "supportPct": 100,
@@ -109,7 +119,8 @@
   },
   "21": {
     "supportPct": 100,
-    "survey_status": "supporter"
+    "survey_status": "supporter",
+    "notes": "సానుకూల స్వింగ్ ఓటరు"
   },
   "22": {
     "supportPct": 100,
@@ -119,11 +130,13 @@
   },
   "23": {
     "supportPct": 100,
-    "survey_status": "out_of_city"
+    "survey_status": "out_of_city",
+    "notes": "మొదటిసారి ఓటు వేసే యువకుడు"
   },
   "24": {
     "supportPct": 100,
-    "survey_status": "supporter"
+    "survey_status": "supporter",
+    "notes": "ప్రత్యర్థి పార్టీ వైపు మొగ్గు"
   },
   "25": {
     "supportPct": 100,
@@ -133,7 +146,8 @@
   },
   "26": {
     "supportPct": 100,
-    "survey_status": "supporter"
+    "survey_status": "supporter",
+    "notes": "కుటుంబం ప్రత్యర్థి అయినా అబ్బాయి న్యూట్రల్"
   },
   "27": {
     "supportPct": 100,
@@ -152,7 +166,9 @@
     "influencerPhone": "8331852555"
   },
   "30": {
-    "supportPct": 75
+    "supportPct": 75,
+    "survey_status": "out_of_city",
+    "notes": "హైదరాబాద్‌లో ఉద్యోగం చేస్తున్నారు"
   },
   "31": {
     "supportPct": 100,
@@ -160,8 +176,15 @@
     "influencerName": "Gollapalli.Krishnarjunarao",
     "influencerPhone": "8317693614"
   },
-  "34": {
+  "32": {
     "supportPct": 75
+  },
+  "33": {
+    "supportPct": 75
+  },
+  "34": {
+    "supportPct": 75,
+    "survey_status": "supporter"
   },
   "36": {
     "supportPct": 50,
@@ -201,7 +224,8 @@
     "supportPct": 100,
     "survey_status": "supporter",
     "influencerName": "Gollapalli.Sivababu",
-    "influencerPhone": "9666792006"
+    "influencerPhone": "9666792006",
+    "notes": "గత ఏడాది కాలం చేశారు"
   },
   "47": {
     "supportPct": 100,
@@ -1020,6 +1044,9 @@
     "influencerName": "Mathina Ganesh",
     "influencerPhone": "8121112096"
   },
+  "566": {
+    "survey_status": "voted"
+  },
   "567": {
     "supportPct": 100,
     "survey_status": "supporter",
@@ -1043,6 +1070,9 @@
     "survey_status": "supporter",
     "influencerName": "Yandapalli.Naresh",
     "influencerPhone": "9494953135"
+  },
+  "577": {
+    "survey_status": "voted"
   },
   "588": {
     "supportPct": 100,
@@ -6841,6 +6871,9 @@
     "survey_status": "supporter",
     "influencerName": "Katta Veera Swami",
     "influencerPhone": "9010884025"
+  },
+  "5688": {
+    "survey_status": "voted"
   },
   "5691": {
     "supportPct": 100,

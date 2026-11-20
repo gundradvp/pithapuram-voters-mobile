@@ -402,7 +402,7 @@ export const ReOcrReviewModal: React.FC<ReOcrReviewModalProps> = ({
     setIsEditingName(true);
   }, [parsedName]);
 
-  // Handler: Save & Sync Corrected Name Permanently
+  // Handler: Save & Sync Corrected Name Permanently (Works offline, on Bolt & on Dev Server)
   const handleSaveNameAndSync = async () => {
     if (!currentVoter || !currentSno) return;
     const cleanFirstTe = editFirstNameTe.trim();
@@ -419,6 +419,37 @@ export const ReOcrReviewModal: React.FC<ReOcrReviewModalProps> = ({
       : (cleanFirstEn || currentVoter.name_en || '');
 
     setIsSavingName(true);
+
+    // 1. Immediately apply to local in-memory voter list
+    const updatedVoter: MobileVoter = {
+      ...currentVoter,
+      n: fullTe,
+      name_te: fullTe,
+      name_en: fullEn,
+      surname_te: cleanSurnameTe,
+      surname_en: cleanSurnameEn
+    };
+    if (onUpdateVoters) {
+      onUpdateVoters([updatedVoter]);
+    }
+
+    // 2. Immediately save to campaign profile (persisted in safeStorage & disk)
+    const profileUpdates: Partial<VoterCampaignProfile> = {
+      customAlias: fullTe,
+      correctedNameTe: fullTe,
+      correctedNameEn: fullEn
+    };
+    saveVoterProfile(boothId, currentSno, profileUpdates);
+    if (onUpdateProfile) {
+      onUpdateProfile(currentSno, profileUpdates);
+    }
+
+    // 3. Update local review modal state
+    setNameSaveSuccess(true);
+    setIsEditingName(false);
+    setTimeout(() => setNameSaveSuccess(false), 3000);
+
+    // 4. If dev backend server is available, sync to disk files without crashing on static hosts (like Bolt)
     try {
       const res = await fetch('/api/update-voter-name', {
         method: 'POST',
@@ -433,26 +464,16 @@ export const ReOcrReviewModal: React.FC<ReOcrReviewModalProps> = ({
         })
       });
 
-      const data = await res.json();
-      if (data.success && data.updatedVoter) {
-        if (onUpdateVoters) {
+      const contentType = res.headers.get('content-type') || '';
+      if (res.ok && contentType.includes('application/json')) {
+        const data = await res.json();
+        if (data.success && data.updatedVoter && onUpdateVoters) {
           onUpdateVoters([data.updatedVoter]);
         }
-        if (onUpdateProfile) {
-          onUpdateProfile(currentSno, {
-            customAlias: fullTe,
-            correctedNameTe: fullTe,
-            correctedNameEn: fullEn
-          });
-        }
-        setNameSaveSuccess(true);
-        setIsEditingName(false);
-        setTimeout(() => setNameSaveSuccess(false), 3000);
-      } else {
-        alert(`Error: ${data.error || 'Failed to update voter name'}`);
       }
-    } catch (e: any) {
-      alert(`Network error: ${e?.message}`);
+    } catch (e) {
+      // Silently continue - local and profile storage persistence already succeeded
+      console.warn('API update not available on static host, saved locally:', e);
     } finally {
       setIsSavingName(false);
     }
@@ -730,6 +751,16 @@ export const ReOcrReviewModal: React.FC<ReOcrReviewModalProps> = ({
         body: JSON.stringify({ snos: targetSnos, booth: boothId })
       });
 
+      const contentType = res.headers.get('content-type') || '';
+      if (!res.ok || !contentType.includes('application/json')) {
+        setProcessStatus(
+          language === 'te'
+            ? 'ఈ క్లౌడ్/స్టాటిక్ హోస్ట్‌లో పైథాన్ రీ-ఓసీఆర్ అందుబాటులో లేదు. స్థానిక సిస్టమ్‌లో రన్ చేయండి.'
+            : 'Re-OCR engine requires local dev server with Python / Tesseract.'
+        );
+        return;
+      }
+
       const data = await res.json();
       if (data.success && data.updatedVoters && onUpdateVoters) {
         onUpdateVoters(data.updatedVoters);
@@ -747,7 +778,11 @@ export const ReOcrReviewModal: React.FC<ReOcrReviewModalProps> = ({
         setProcessStatus(`Error: ${data.error || 'Re-OCR failed'}`);
       }
     } catch (e: any) {
-      setProcessStatus(`Network/API error: ${e?.message}`);
+      setProcessStatus(
+        language === 'te'
+          ? 'రీ-ఓసీఆర్ స్థానిక డెవ్ సర్వర్‌లో మాత్రమే అందుబాటులో ఉంటుంది.'
+          : `Re-OCR requires local dev server: ${e?.message}`
+      );
     } finally {
       setIsProcessing(false);
       setTimeout(() => setProcessStatus(null), 4000);

@@ -7,12 +7,13 @@
     "altPhone": "",
     "influencerId": "",
     "influencerName": "",
-    "influencerMobile": ""
+    "influencerMobile": "",
+    "updatedAt": "2026-11-20T07:13:49.021Z"
   },
   "2": {
     "supportPct": 50,
     "survey_status": null,
-    "updatedAt": "2026-11-20T06:46:29.327Z"
+    "updatedAt": "2026-11-20T07:12:32.688Z"
   },
   "3": {
     "supportPct": 50,
@@ -20,23 +21,25 @@
     "influencerId": "inf_1",
     "influencerName": "Guddati Veerraju",
     "influencerMobile": "9848596259",
-    "updatedAt": "2026-11-20T06:46:30.209Z"
+    "updatedAt": "2026-11-20T07:12:43.422Z"
   },
   "4": {
-    "supportPct": 50,
-    "survey_status": null,
+    "supportPct": 100,
+    "survey_status": "supporter",
     "customAlias": "veera lakshmi gopisetti",
     "influencerId": "inf_1",
     "influencerName": "Guddati Veerraju",
-    "influencerMobile": "9848596259"
+    "influencerMobile": "9848596259",
+    "updatedAt": "2026-11-20T07:00:10.458Z"
   },
   "5": {
-    "supportPct": 50,
-    "survey_status": null,
+    "supportPct": 100,
+    "survey_status": "supporter",
     "influencerName": "Guddati Veerraju",
     "influencerPhone": "9493949669",
     "influencerId": "inf_1",
-    "influencerMobile": "9848596259"
+    "influencerMobile": "9848596259",
+    "updatedAt": "2026-11-20T07:08:36.522Z"
   },
   "6": {
     "supportPct": 50,
@@ -47,17 +50,18 @@
     "influencerMobile": "9848596259",
     "customAlias": "దుర్గ వెంకట నాగేశ్వర రావు గోపిశెట్టి",
     "correctedNameTe": "దుర్గ వెంకట నాగేశ్వర రావు గోపిశెట్టి",
-    "correctedNameEn": "DURGA VENKATA NAGESWARA RAO GOPISETTI"
+    "correctedNameEn": "DURGA VENKATA NAGESWARA RAO GOPISETTI",
+    "updatedAt": "2026-11-20T07:10:01.122Z"
   },
   "7": {
     "supportPct": 50,
     "survey_status": null,
-    "updatedAt": "2026-11-20T06:46:35.210Z"
+    "updatedAt": "2026-11-20T07:10:02.088Z"
   },
   "8": {
     "survey_status": null,
     "supportPct": 50,
-    "updatedAt": "2026-11-20T06:46:35.876Z"
+    "updatedAt": "2026-11-20T07:10:03.210Z"
   },
   "9": {
     "supportPct": 50,
@@ -67,13 +71,13 @@
     "customAlias": "మాణిక్యం గోపిశెట్టి",
     "correctedNameTe": "మాణిక్యం గోపిశెట్టి",
     "correctedNameEn": "MANIKYAM GOPISETTI",
-    "updatedAt": "2026-11-20T06:46:44.043Z"
+    "updatedAt": "2026-11-20T07:10:08.855Z"
   },
   "10": {
     "supportPct": 50,
     "survey_status": null,
     "customPhone": "",
-    "updatedAt": "2026-11-20T06:46:41.627Z"
+    "updatedAt": "2026-11-20T07:10:08.037Z"
   },
   "11": {
     "survey_status": null,
@@ -113,14 +117,16 @@
     "survey_status": null
   },
   "18": {
-    "supportPct": 100,
-    "survey_status": "supporter",
+    "supportPct": 50,
+    "survey_status": null,
     "influencerName": "Jyothula Srinivasu",
-    "influencerPhone": "9949048940"
+    "influencerPhone": "9949048940",
+    "updatedAt": "2026-11-20T07:14:31.203Z"
   },
   "19": {
-    "supportPct": 100,
-    "survey_status": "supporter"
+    "supportPct": 50,
+    "survey_status": null,
+    "updatedAt": "2026-11-20T07:14:32.989Z"
   },
   "20": {
     "supportPct": 100,
