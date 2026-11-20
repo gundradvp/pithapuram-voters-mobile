@@ -358,7 +358,7 @@ export const ReOcrReviewModal: React.FC<ReOcrReviewModalProps> = ({
     }
   }, [currentVoter, currentSno, quickPhoneInput, isEditingPhone, boothId, currentProf, onUpdateProfile, onSavePhone, language]);
 
-  const isOurs = currentPct === 100 || currentProf.survey_status === 'supporter';
+  const isOurs = (currentPct === 100 || currentProf.survey_status === 'supporter') && currentPct !== 50;
   const isVoted = currentProf.survey_status === 'voted';
   const isOutOfCity = currentProf.survey_status === 'out_of_city';
   const isDeceased = currentProf.survey_status === 'deceased';

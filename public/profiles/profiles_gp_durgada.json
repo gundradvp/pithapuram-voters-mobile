@@ -10,15 +10,17 @@
     "influencerMobile": ""
   },
   "2": {
-    "supportPct": 100,
-    "survey_status": "supporter"
+    "supportPct": 50,
+    "survey_status": null,
+    "updatedAt": "2026-11-20T06:46:29.327Z"
   },
   "3": {
-    "supportPct": 100,
-    "survey_status": "supporter",
+    "supportPct": 50,
+    "survey_status": null,
     "influencerId": "inf_1",
     "influencerName": "Guddati Veerraju",
-    "influencerMobile": "9848596259"
+    "influencerMobile": "9848596259",
+    "updatedAt": "2026-11-20T06:46:30.209Z"
   },
   "4": {
     "supportPct": 50,
@@ -49,55 +51,66 @@
   },
   "7": {
     "supportPct": 50,
-    "survey_status": "out_of_city"
+    "survey_status": null,
+    "updatedAt": "2026-11-20T06:46:35.210Z"
   },
   "8": {
     "survey_status": null,
-    "supportPct": 100
+    "supportPct": 50,
+    "updatedAt": "2026-11-20T06:46:35.876Z"
   },
   "9": {
-    "supportPct": 100,
-    "survey_status": "voted",
+    "supportPct": 50,
+    "survey_status": null,
     "influencerName": "Koppula Siva Chakradharrao",
     "influencerPhone": "9493949669",
     "customAlias": "మాణిక్యం గోపిశెట్టి",
     "correctedNameTe": "మాణిక్యం గోపిశెట్టి",
-    "correctedNameEn": "MANIKYAM GOPISETTI"
+    "correctedNameEn": "MANIKYAM GOPISETTI",
+    "updatedAt": "2026-11-20T06:46:44.043Z"
   },
   "10": {
-    "supportPct": 100,
-    "survey_status": "voted"
+    "supportPct": 50,
+    "survey_status": null,
+    "customPhone": "",
+    "updatedAt": "2026-11-20T06:46:41.627Z"
   },
   "11": {
-    "survey_status": "out_of_city",
+    "survey_status": null,
     "customAlias": "Satya Narayana Inti",
-    "supportPct": 75
+    "supportPct": 75,
+    "updatedAt": "2026-11-20T06:46:45.010Z"
   },
   "12": {
-    "supportPct": 100,
-    "survey_status": "supporter"
+    "supportPct": 50,
+    "survey_status": null,
+    "updatedAt": "2026-11-20T06:46:45.827Z"
   },
   "13": {
-    "supportPct": 100,
-    "survey_status": "supporter",
+    "supportPct": 50,
+    "survey_status": null,
     "influencerName": "Inti.Chinna Nookaraju",
-    "influencerPhone": "8331852555"
+    "influencerPhone": "8331852555",
+    "updatedAt": "2026-11-20T06:44:27.932Z"
   },
   "14": {
-    "supportPct": 100,
-    "survey_status": "supporter"
+    "supportPct": 50,
+    "survey_status": null,
+    "updatedAt": "2026-11-20T06:44:27.933Z"
   },
   "15": {
-    "supportPct": 100,
-    "survey_status": "supporter"
+    "supportPct": 50,
+    "survey_status": null,
+    "updatedAt": "2026-11-20T06:44:27.933Z"
   },
   "16": {
-    "supportPct": 100,
-    "survey_status": "supporter"
+    "supportPct": 50,
+    "survey_status": null,
+    "updatedAt": "2026-11-20T06:44:27.933Z"
   },
   "17": {
-    "supportPct": 100,
-    "survey_status": "supporter"
+    "supportPct": 50,
+    "survey_status": null
   },
   "18": {
     "supportPct": 100,
@@ -116,57 +129,79 @@
     "influencerPhone": "9059580595"
   },
   "21": {
-    "supportPct": 100,
-    "survey_status": "supporter"
+    "supportPct": 50,
+    "survey_status": null,
+    "updatedAt": "2026-11-20T06:46:49.510Z"
   },
   "22": {
-    "supportPct": 100,
-    "survey_status": "supporter",
+    "supportPct": 50,
+    "survey_status": null,
     "influencerName": "Jyothula Srinivasu",
-    "influencerPhone": "9949048940"
+    "influencerPhone": "9949048940",
+    "customAlias": "శివ ఇంటి",
+    "correctedNameTe": "శివ ఇంటి",
+    "correctedNameEn": "SIVA INTI",
+    "updatedAt": "2026-11-20T06:46:50.176Z"
   },
   "23": {
-    "supportPct": 100,
-    "survey_status": "supporter"
+    "supportPct": 50,
+    "survey_status": null,
+    "updatedAt": "2026-11-20T06:46:50.920Z"
   },
   "24": {
-    "supportPct": 100,
-    "survey_status": "supporter"
+    "supportPct": 50,
+    "survey_status": null,
+    "customAlias": "కన్నయ కాపు ఇంటి",
+    "correctedNameTe": "కన్నయ కాపు ఇంటి",
+    "correctedNameEn": "KANNAYAKAPU INTI",
+    "updatedAt": "2026-11-20T06:46:51.893Z"
   },
   "25": {
-    "supportPct": 100,
-    "survey_status": "supporter",
+    "supportPct": 50,
+    "survey_status": null,
     "influencerName": "Gollapalli.Sivababu",
-    "influencerPhone": "9666792006"
+    "influencerPhone": "9666792006",
+    "customAlias": "కన్నయ్య కాపు ఇంటి",
+    "correctedNameTe": "కన్నయ్య కాపు ఇంటి",
+    "correctedNameEn": "KANAYYA KAPU INTI",
+    "updatedAt": "2026-11-20T06:46:54.660Z"
   },
   "26": {
-    "supportPct": 100,
-    "survey_status": "supporter"
+    "supportPct": 50,
+    "survey_status": null,
+    "updatedAt": "2026-11-20T06:46:55.377Z"
   },
   "27": {
-    "supportPct": 100,
-    "survey_status": "supporter",
+    "supportPct": 50,
+    "survey_status": null,
     "influencerName": "Inti.Chinna Nookaraju",
-    "influencerPhone": "8331852555"
+    "influencerPhone": "8331852555",
+    "updatedAt": "2026-11-20T06:46:56.093Z"
   },
   "28": {
-    "supportPct": 100,
-    "survey_status": "supporter"
+    "supportPct": 50,
+    "survey_status": null,
+    "customAlias": "రుక్మిణి కందా",
+    "correctedNameTe": "రుక్మిణి కందా",
+    "correctedNameEn": "RUKHMINI KANDA",
+    "updatedAt": "2026-11-20T06:46:57.910Z"
   },
   "29": {
-    "supportPct": 100,
-    "survey_status": "supporter",
+    "supportPct": 50,
+    "survey_status": null,
     "influencerName": "Inti.Chinna Nookaraju",
-    "influencerPhone": "8331852555"
+    "influencerPhone": "8331852555",
+    "updatedAt": "2026-11-20T06:47:00.510Z"
   },
   "30": {
     "supportPct": 75
   },
   "31": {
-    "supportPct": 100,
-    "survey_status": "supporter",
+    "supportPct": 50,
+    "survey_status": null,
     "influencerName": "Gollapalli.Krishnarjunarao",
-    "influencerPhone": "8317693614"
+    "influencerPhone": "8317693614",
+    "updatedAt": "2026-11-20T06:47:01.361Z"
   },
   "32": {
     "influencerId": "inf_1793732645047",
@@ -185,12 +220,14 @@
     "survey_status": null
   },
   "37": {
-    "supportPct": 100,
-    "survey_status": "supporter"
+    "supportPct": 50,
+    "survey_status": null,
+    "updatedAt": "2026-11-20T06:47:43.726Z"
   },
   "38": {
-    "supportPct": 100,
-    "survey_status": "supporter"
+    "supportPct": 50,
+    "survey_status": null,
+    "updatedAt": "2026-11-20T06:47:44.678Z"
   },
   "39": {
     "supportPct": 50,
@@ -777,7 +814,7 @@
   "189": {
     "supportPct": 75,
     "customAlias": "వీరభద్రరావు వెలుగుల",
-    "correctedNameTe": "వీరభద్రరావు వెలుగుల",
+    "correctedNameTe": "వీరభద్రరావు ���ెలుగుల",
     "correctedNameEn": "VEERABHADRARAO VELUGULA"
   },
   "190": {

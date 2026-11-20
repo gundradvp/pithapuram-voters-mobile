@@ -233,7 +233,7 @@ export const VotersTabMobile: React.FC<VotersTabMobileProps> = ({
       return;
     }
     const prof = profiles[serialNo] || {};
-    const isOurs = prof.supportPct === 100 || prof.survey_status === 'supporter';
+    const isOurs = (prof.supportPct === 100 || prof.survey_status === 'supporter') && prof.supportPct !== 50;
     onUpdateSurveyMark(serialNo, isOurs ? null : 'supporter');
   };
 
@@ -658,7 +658,7 @@ _దయచేసి మీ ఓటు హక్కును వినియోగ
       if (filterMode === 'voted') return prof.survey_status === 'voted';
       if (filterMode === 'not_voted') return prof.survey_status !== 'voted' && prof.survey_status !== 'deceased';
       if (filterMode === 'ours_not_voted') {
-        const isOurs = pct === 100 || prof.survey_status === 'supporter';
+        const isOurs = (pct === 100 || prof.survey_status === 'supporter') && pct !== 50;
         return isOurs && prof.survey_status !== 'voted' && prof.survey_status !== 'deceased';
       }
       if (filterMode === 'has_phone') return !!phone;
@@ -703,7 +703,7 @@ _దయచేసి మీ ఓటు హక్కును వినియోగ
       const isVoted = prof.survey_status === 'voted';
       const isDeceased = prof.survey_status === 'deceased';
       const isOutOfCity = prof.survey_status === 'out_of_city';
-      const isOurs = pct === 100 || prof.survey_status === 'supporter';
+      const isOurs = (pct === 100 || prof.survey_status === 'supporter') && pct !== 50;
 
       if (isDeceased) deceased++;
       if (isOutOfCity) outOfCity++;
@@ -2536,13 +2536,13 @@ _దయచేసి మీ ఓటు హక్కును వినియోగ
                                     handleToggleOurs(m.s);
                                   }}
                                   className={`px-1.5 py-0.5 rounded text-[9.5px] font-bold border transition-all ${
-                                    pct === 100 || prof.survey_status === 'supporter'
+                                    (pct === 100 || prof.survey_status === 'supporter') && pct !== 50
                                       ? 'bg-gradient-to-r from-red-600 to-amber-600 text-white border-red-500 font-black shadow-sm'
                                       : 'bg-slate-900 text-slate-400 border-slate-700 hover:text-white'
                                   }`}
                                   title="మనవాళ్లేనా? (Toggle Ours)"
                                 >
-                                  ⭐ {pct === 100 || prof.survey_status === 'supporter' ? 'మనవాళ్లే' : 'మనవాళ్లు?'}
+                                  ⭐ {(pct === 100 || prof.survey_status === 'supporter') && pct !== 50 ? 'మనవాళ్లే' : 'మనవాళ్లు?'}
                                 </button>
                                 <button
                                   type="button"
@@ -2675,7 +2675,7 @@ _దయచేసి మీ ఓటు హక్కును వినియోగ
             const photoPath = v.photo_url || v.photo;
             const isDeceased = prof.survey_status === 'deceased';
             const isOutOfCity = prof.survey_status === 'out_of_city';
-            const isOurs = pct === 100 || prof.survey_status === 'supporter';
+            const isOurs = (pct === 100 || prof.survey_status === 'supporter') && pct !== 50;
             const isVoted = prof.survey_status === 'voted';
 
             return (
@@ -3416,7 +3416,7 @@ _దయచేసి మీ ఓటు హక్కును వినియోగ
 
                 {/* ⚡ Quick Action Switches: 1-Tap Controls on Main Card */}
                 {(() => {
-                  const isOurs = pct === 100 || prof.survey_status === 'supporter';
+                  const isOurs = (pct === 100 || prof.survey_status === 'supporter') && pct !== 50;
                   const isVoted = prof.survey_status === 'voted';
                   const isOutOfCity = prof.survey_status === 'out_of_city';
                   const isDeceased = prof.survey_status === 'deceased';

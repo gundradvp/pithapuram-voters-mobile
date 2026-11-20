@@ -768,9 +768,9 @@
       "sno": 22,
       "id": "YOU1335736",
       "epic": "YOU1335736",
-      "n": "Siva Inti (శివఇంటి)",
-      "name_te": "శివఇంటి",
-      "name_en": "Siva Inti",
+      "n": "SIVA INTI (శివ ఇంటి)",
+      "name_te": "శివ ఇంటి",
+      "name_en": "SIVA INTI",
       "r": "Suribabu Inti (సురిబాబు ఇంటి) (Father)",
       "rel_name_te": "సురిబాబు ఇంటి",
       "rel_name_en": "Suribabu Inti",
@@ -796,7 +796,9 @@
       "ac_sno": 3,
       "booth_no": 45,
       "ps_no": 45,
-      "polling_station_en": "Booth #45: Mandal Praja Parishad Primary School, Inti Kaasulu gaari School, Durgada"
+      "polling_station_en": "Booth #45: Mandal Praja Parishad Primary School, Inti Kaasulu gaari School, Durgada",
+      "surname_te": "ఇంటి",
+      "surname": "INTI"
     },
     {
       "s": 23,
@@ -838,9 +840,9 @@
       "sno": 24,
       "id": "YOU1373083",
       "epic": "YOU1373083",
-      "n": "Kannayakapu Inti (కన్నాయకపూ ఇంటి)",
-      "name_te": "కన్నాయకపూ ఇంటి",
-      "name_en": "Kannayakapu Inti",
+      "n": "KANNAYAKAPU INTI (కన్నయ కాపు ఇంటి)",
+      "name_te": "కన్నయ కాపు ఇంటి",
+      "name_en": "KANNAYAKAPU INTI",
       "r": "Suribabu Inti (సురిబాబు ఇంటి) (Father)",
       "rel_name_te": "సురిబాబు ఇంటి",
       "rel_name_en": "Suribabu Inti",
@@ -866,15 +868,17 @@
       "ac_sno": 863,
       "booth_no": 45,
       "ps_no": 45,
-      "polling_station_en": "Booth #45: Mandal Praja Parishad Primary School, Inti Kaasulu gaari School, Durgada"
+      "polling_station_en": "Booth #45: Mandal Praja Parishad Primary School, Inti Kaasulu gaari School, Durgada",
+      "surname_te": "ఇంటి",
+      "surname": "INTI"
     },
     {
       "s": 25,
       "sno": 25,
       "id": "YOU1373646",
       "epic": "YOU1373646",
-      "n": "KANAYYA KAPU INTI (కానయ్య కాపు ఇంటి)",
-      "name_te": "కానయ్య కాపు ఇంటి",
+      "n": "KANAYYA KAPU INTI (కన్నయ్య కాపు ఇంటి)",
+      "name_te": "కన్నయ్య కాపు ఇంటి",
       "name_en": "KANAYYA KAPU INTI",
       "r": "SURIBABU INTI (సురిబాబు ఇంటి) (Father)",
       "rel_name_te": "సురిబాబు ఇంటి",
@@ -901,7 +905,9 @@
       "ac_sno": 880,
       "booth_no": 45,
       "ps_no": 45,
-      "polling_station_en": "Booth #45: Mandal Praja Parishad Primary School, Inti Kaasulu gaari School, Durgada"
+      "polling_station_en": "Booth #45: Mandal Praja Parishad Primary School, Inti Kaasulu gaari School, Durgada",
+      "surname_te": "ఇంటి",
+      "surname": "INTI"
     },
     {
       "s": 26,
@@ -978,9 +984,9 @@
       "sno": 28,
       "id": "YOU1607118",
       "epic": "YOU1607118",
-      "n": "Rukhmini Kanda (రుక్నిణికందా)",
-      "name_te": "రుక్నిణికందా",
-      "name_en": "Rukhmini Kanda",
+      "n": "RUKHMINI KANDA (రుక్మిణి కందా)",
+      "name_te": "రుక్మిణి కందా",
+      "name_en": "RUKHMINI KANDA",
       "r": "Manikyam (మాణిక్యం) (Husband)",
       "rel_name_te": "మాణిక్యం",
       "rel_name_en": "Manikyam",
@@ -1006,7 +1012,9 @@
       "ac_sno": 17,
       "booth_no": 45,
       "ps_no": 45,
-      "polling_station_en": "Booth #45: Mandal Praja Parishad Primary School, Inti Kaasulu gaari School, Durgada"
+      "polling_station_en": "Booth #45: Mandal Praja Parishad Primary School, Inti Kaasulu gaari School, Durgada",
+      "surname_te": "కందా",
+      "surname": "KANDA"
     },
     {
       "s": 29,

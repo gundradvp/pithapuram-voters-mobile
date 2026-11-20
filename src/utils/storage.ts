@@ -208,7 +208,11 @@ export async function fetchFreshProfiles(partNo: number | string): Promise<Recor
 
 export function saveVoterProfile(partNo: number | string, sno: number, updates: Partial<VoterCampaignProfile>): void {
   const profiles = getVoterProfiles(partNo);
-  profiles[sno] = { ...profiles[sno], ...updates };
+  profiles[sno] = {
+    ...profiles[sno],
+    ...updates,
+    updatedAt: new Date().toISOString()
+  };
   try {
     safeStorage.setItem(getVoterProfilesKey(partNo), JSON.stringify(profiles));
     persistProfilesToDisk(partNo, profiles);
@@ -223,8 +227,13 @@ export function saveBatchVoterProfiles(
   updates: Partial<VoterCampaignProfile>
 ): Record<number, VoterCampaignProfile> {
   const profiles = getVoterProfiles(partNo);
+  const now = new Date().toISOString();
   snoList.forEach(sno => {
-    profiles[sno] = { ...profiles[sno], ...updates };
+    profiles[sno] = {
+      ...profiles[sno],
+      ...updates,
+      updatedAt: now
+    };
   });
   try {
     safeStorage.setItem(getVoterProfilesKey(partNo), JSON.stringify(profiles));

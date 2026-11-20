@@ -63,6 +63,7 @@ import {
   calculateWinningScore,
   fetchFreshProfiles,
   savePreloadedProfiles,
+  persistProfilesToDisk,
   CampaignSyncBundle,
   bustAllCache,
   formatBytes,
@@ -656,31 +657,29 @@ export function App() {
     fetchFreshProfiles(partNo).then(diskProfiles => {
       if (diskProfiles && Object.keys(diskProfiles).length > 0) {
         const currentLocal = getVoterProfiles(partNo);
-        // Merge: local modifications + disk pre-committed profiles
-        const merged: Record<number, VoterCampaignProfile> = { ...diskProfiles, ...currentLocal };
-        
-        for (const [snoStr, dp] of Object.entries(diskProfiles)) {
+        // Base is diskProfiles, overlay local user profiles on top so user edits ALWAYS take precedence!
+        const merged: Record<number, VoterCampaignProfile> = {
+          ...diskProfiles,
+          ...currentLocal
+        };
+
+        // For each voter in currentLocal, preserve user's explicit values (including null status or 50% neutral)
+        for (const [snoStr, localProf] of Object.entries(currentLocal)) {
           const sno = Number(snoStr);
-          if (!currentLocal[sno]) {
-            merged[sno] = dp;
+          const diskProf = diskProfiles[sno];
+          if (diskProf) {
+            merged[sno] = {
+              ...diskProf,
+              ...localProf
+            };
           } else {
-            // If disk has supporter status or 100% and local is unassigned, adopt disk
-            if (dp.survey_status && !currentLocal[sno].survey_status) {
-              merged[sno] = { ...merged[sno], ...dp };
-            }
-            if (dp.supportPct !== undefined && currentLocal[sno].supportPct === undefined) {
-              merged[sno] = { ...merged[sno], supportPct: dp.supportPct };
-            }
+            merged[sno] = localProf;
           }
         }
-        
-        // If disk has more entries than local, adopt disk as base
-        const finalProfiles = Object.keys(diskProfiles).length >= Object.keys(currentLocal).length
-          ? { ...currentLocal, ...diskProfiles }
-          : merged;
 
-        savePreloadedProfiles(partNo, finalProfiles);
-        setProfiles(finalProfiles);
+        savePreloadedProfiles(partNo, merged);
+        setProfiles(merged);
+        persistProfilesToDisk(partNo, merged);
       }
     }).catch(() => {});
 
@@ -1244,19 +1243,19 @@ export function App() {
   // Quick Switch 1: Toggle Ours (100% Supporter)
   const handleQuickToggleOurs = (serialNo: number) => {
     const existing = profiles[serialNo] || {};
-    const isCurrentlyOurs = existing.supportPct === 100 || existing.survey_status === 'supporter';
+    const isCurrentlyOurs = (existing.supportPct === 100 || existing.survey_status === 'supporter') && existing.supportPct !== 50;
 
     if (isCurrentlyOurs) {
       saveVoterProfile(currentPartNo, serialNo, {
         supportPct: 50,
-        survey_status: existing.survey_status === 'supporter' ? null : existing.survey_status
+        survey_status: null
       });
       setProfiles(getVoterProfiles(currentPartNo));
       triggerScoreNotice(lang === 'te' ? `⚪ #${serialNo} మద్దతు రీసెట్ చేయబడింది` : `⚪ S.No #${serialNo} support reset`);
     } else {
       saveVoterProfile(currentPartNo, serialNo, {
         supportPct: 100,
-        survey_status: existing.survey_status || 'supporter'
+        survey_status: 'supporter'
       });
       setProfiles(getVoterProfiles(currentPartNo));
       triggerScoreNotice(
