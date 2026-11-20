@@ -2131,6 +2131,7 @@ export function App() {
           onUpdateVoters={handleUpdateReOcrVoters}
           profiles={profiles}
           boothInfo={boothData.booth_info}
+          onSavePhone={handleSavePhone}
           onOpenPhoneEditor={v => setSelectedVoterForPhone(v)}
           onOpenSupportPicker={(title, currentPct, currentNotes, voterSno) => {
             setSupportPickerState({

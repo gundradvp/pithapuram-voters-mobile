@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useMemo, useCallback } from 'react';
+import React, { useState, useEffect, useMemo, useCallback, useRef } from 'react';
 import {
   X,
   ChevronLeft,
@@ -43,6 +43,7 @@ import {
   VoterCampaignProfile
 } from '../types';
 import { resolveCardUrl } from '../utils/photoResolver';
+import { saveVoterProfile } from '../utils/storage';
 import {
   parseNameAndSurname,
   transliterateEnglishToTelugu,
@@ -60,6 +61,7 @@ interface ReOcrReviewModalProps {
   onUpdateVoters?: (updatedVoters: MobileVoter[]) => void;
   profiles?: Record<number, VoterCampaignProfile>;
   boothInfo?: BoothInfo;
+  onSavePhone?: (voter: MobileVoter, phone: string, altPhone?: string) => void;
   onOpenPhoneEditor?: (voter: MobileVoter) => void;
   onOpenSupportPicker?: (title: string, currentPct: number, currentNotes?: string, voterSno?: number) => void;
   onOpenLogVisit?: (voter: MobileVoter) => void;
@@ -84,6 +86,7 @@ export const ReOcrReviewModal: React.FC<ReOcrReviewModalProps> = ({
   onUpdateVoters,
   profiles = {},
   boothInfo,
+  onSavePhone,
   onOpenPhoneEditor,
   onOpenSupportPicker,
   onOpenLogVisit,
@@ -286,8 +289,74 @@ export const ReOcrReviewModal: React.FC<ReOcrReviewModalProps> = ({
 
   // Campaign Profile for current voter
   const currentProf: VoterCampaignProfile = currentSno ? (profiles[currentSno] || {}) : {};
-  const currentPhone = currentProf.customPhone || currentVoter?.k_m;
   const currentPct = currentProf.supportPct;
+
+  // Quick Phone Edit & Entry State
+  const phoneInputRef = useRef<HTMLInputElement>(null);
+  const [localPhones, setLocalPhones] = useState<Record<number, string>>({});
+  const [isEditingPhone, setIsEditingPhone] = useState<boolean>(false);
+  const [quickPhoneInput, setQuickPhoneInput] = useState<string>('');
+  const [phoneSaveNotice, setPhoneSaveNotice] = useState<string | null>(null);
+
+  // Effective Phone for current voter (local override > saved customPhone > original k_m)
+  const effectivePhone = currentSno && localPhones[currentSno] !== undefined
+    ? localPhones[currentSno]
+    : (currentProf.customPhone || currentVoter?.k_m || '');
+
+  // Reset phone edit state on voter change
+  useEffect(() => {
+    setIsEditingPhone(false);
+    setQuickPhoneInput('');
+    setPhoneSaveNotice(null);
+  }, [currentSno]);
+
+  // Handler: Quick Save Phone (Inline)
+  const handleQuickSavePhone = useCallback(async () => {
+    if (!currentVoter || !currentSno) return;
+    const cleanDigits = quickPhoneInput.replace(/\D/g, '').slice(-10);
+
+    // If input was empty and not editing, nothing to save
+    if (!cleanDigits && !isEditingPhone) return;
+
+    try {
+      // 1. Local component override for instant UI feedback
+      setLocalPhones(prev => ({
+        ...prev,
+        [currentSno]: cleanDigits
+      }));
+
+      // 2. Persist to storage & disk
+      saveVoterProfile(boothId, currentSno, { customPhone: cleanDigits || undefined });
+
+      // 3. Inform parent component
+      onUpdateProfile?.(currentSno, { customPhone: cleanDigits || undefined });
+      onSavePhone?.(currentVoter, cleanDigits);
+
+      // 4. API sync to dev server if available
+      if (typeof fetch !== 'undefined') {
+        fetch('/api/save-profiles', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            partNo: boothId,
+            profiles: {
+              [currentSno]: {
+                ...currentProf,
+                customPhone: cleanDigits || undefined
+              }
+            }
+          })
+        }).catch(() => {});
+      }
+
+      setIsEditingPhone(false);
+      setQuickPhoneInput('');
+      setPhoneSaveNotice(cleanDigits ? (language === 'te' ? '✓ ఫోన్ సేవ్ అయ్యింది' : '✓ Phone Saved') : (language === 'te' ? '✓ ఫోన్ తొలగించబడింది' : '✓ Cleared'));
+      setTimeout(() => setPhoneSaveNotice(null), 2500);
+    } catch (err) {
+      console.error('Failed to save quick phone:', err);
+    }
+  }, [currentVoter, currentSno, quickPhoneInput, isEditingPhone, boothId, currentProf, onUpdateProfile, onSavePhone, language]);
 
   const isOurs = currentPct === 100 || currentProf.survey_status === 'supporter';
   const isVoted = currentProf.survey_status === 'voted';
@@ -456,12 +525,12 @@ export const ReOcrReviewModal: React.FC<ReOcrReviewModalProps> = ({
 
     const text = `🗳️ *ఓటర్ సమాచార పత్రం — పిఠాపురం నియోజకవర్గం (AC #37)*\n\nనమస్తే *${currentVoter.n}* గారు,\n\nమీ అధికారిక ఓటర్ సమాచారం:\n🔢 *క్రమ సంఖ్య (S.No):* #${currentSno}\n🆔 *ఓటర్ ఐడీ (EPIC):* ${epic}\n🏠 *ఇంటి నెం:* ${doorNo}\n🏛️ *పోలింగ్ కేంద్రం:* ${station}\n⏰ *పోలింగ్ సమయం:* ఉదయం 7:00 నుండి సాయంత్రం 5:00 వరకు\n\n_దయచేసి మీ ఓటు హక్కును సద్వినియోగం చేసుకోండి!_`;
 
-    const cleanPhone = (currentPhone || '').replace(/\D/g, '').slice(-10);
+    const cleanPhone = (effectivePhone || '').replace(/\D/g, '').slice(-10);
     const waUrl = cleanPhone
       ? `https://wa.me/91${cleanPhone}?text=${encodeURIComponent(text)}`
       : `https://wa.me/?text=${encodeURIComponent(text)}`;
     window.open(waUrl, '_blank');
-  }, [currentVoter, currentSno, currentPhone, boothInfo]);
+  }, [currentVoter, currentSno, effectivePhone, boothInfo]);
 
   // Handler: Select Ward
   const handleSelectWard = (newWard: string) => {
@@ -576,6 +645,13 @@ export const ReOcrReviewModal: React.FC<ReOcrReviewModalProps> = ({
       if (e.code === 'Space') {
         e.preventDefault();
         handleToggleCurrentMark();
+      } else if (e.code === 'KeyP' || e.key === 'p' || e.key === 'P') {
+        e.preventDefault();
+        if (effectivePhone && !isEditingPhone) {
+          setQuickPhoneInput(effectivePhone);
+          setIsEditingPhone(true);
+        }
+        setTimeout(() => phoneInputRef.current?.focus(), 50);
       } else if (e.code === 'Enter' || e.code === 'ArrowRight') {
         e.preventDefault();
         handleNext();
@@ -590,7 +666,7 @@ export const ReOcrReviewModal: React.FC<ReOcrReviewModalProps> = ({
 
     window.addEventListener('keydown', handleKeyDown);
     return () => window.removeEventListener('keydown', handleKeyDown);
-  }, [isOpen, handleToggleCurrentMark, handleNext, handlePrev, onClose]);
+  }, [isOpen, handleToggleCurrentMark, handleNext, handlePrev, onClose, effectivePhone, isEditingPhone]);
 
   // Card image candidates with fallbacks
   const cardImageUrls = useMemo(() => {
@@ -1448,41 +1524,144 @@ export const ReOcrReviewModal: React.FC<ReOcrReviewModalProps> = ({
 
                   {/* CONTACT & SUB-MODAL ACTIONS: Phone, Call, WhatsApp, Leader, Visit, Slip */}
                   <div className="pt-2.5 border-t border-slate-800/80 space-y-2.5 text-xs">
-                    {/* Phone Number & WhatsApp Slip Row */}
+                    {/* Phone Number & WhatsApp Slip Row with Quick Edit & Quick Entry */}
                     <div className="flex items-center justify-between gap-2 flex-wrap">
-                      <div className="flex items-center gap-2 flex-wrap">
-                        {currentPhone ? (
-                          <div className="inline-flex items-center gap-1.5 bg-blue-950/60 border border-blue-500/40 px-2.5 py-1 rounded-xl text-xs shadow-sm">
-                            <span className="text-xs">📞</span>
-                            <a
-                              href={`tel:${currentPhone}`}
-                              className="font-mono font-bold text-cyan-200 hover:text-white hover:underline"
-                              title="Click to Call"
-                            >
-                              {currentPhone}
-                            </a>
-                            <button
-                              type="button"
-                              onClick={() => handleCopy(currentPhone, 'phone')}
-                              className="p-1 text-slate-400 hover:text-white"
-                              title="Copy Phone"
-                            >
-                              {copiedField === 'phone' ? <Check className="w-3 h-3 text-emerald-400" /> : <Copy className="w-3 h-3" />}
-                            </button>
-                          </div>
-                        ) : (
-                          <span className="text-slate-500 text-xs italic">ఫోన్ నంబర్ లేదు</span>
+                      <div className="flex items-center gap-2 flex-1 min-w-[260px] flex-wrap">
+                        {/* Status feedback badge */}
+                        {phoneSaveNotice && (
+                          <span className="px-2.5 py-1 rounded-xl bg-emerald-500/20 text-emerald-300 border border-emerald-500/40 text-xs font-bold flex items-center gap-1.5 animate-pulse shadow-sm">
+                            <Check className="w-3.5 h-3.5 text-emerald-400" />
+                            <span>{phoneSaveNotice}</span>
+                          </span>
                         )}
 
-                        {onOpenPhoneEditor && (
-                          <button
-                            type="button"
-                            onClick={() => onOpenPhoneEditor(currentVoter)}
-                            className="px-2.5 py-1 bg-amber-500/10 hover:bg-amber-500/20 text-amber-300 border border-amber-500/30 rounded-xl font-bold text-xs flex items-center gap-1 cursor-pointer transition-all active:scale-95 shadow-sm"
-                          >
-                            <Phone className="w-3 h-3" />
-                            <span>{currentPhone ? 'నంబర్ మార్చు' : '+ ఫోన్ ఇవ్వండి'}</span>
-                          </button>
+                        {/* CASE 1: In Inline Quick Edit Mode */}
+                        {isEditingPhone ? (
+                          <div className="flex items-center gap-1.5 flex-1 max-w-[340px]">
+                            <div className="relative flex-1">
+                              <Phone className="w-3.5 h-3.5 text-cyan-400 absolute left-2.5 top-1/2 -translate-y-1/2 pointer-events-none" />
+                              <input
+                                ref={phoneInputRef}
+                                type="tel"
+                                inputMode="numeric"
+                                pattern="[0-9]*"
+                                maxLength={10}
+                                value={quickPhoneInput}
+                                autoFocus
+                                onChange={e => {
+                                  const val = e.target.value.replace(/\D/g, '').slice(0, 10);
+                                  setQuickPhoneInput(val);
+                                }}
+                                onKeyDown={e => {
+                                  if (e.key === 'Enter') handleQuickSavePhone();
+                                  if (e.key === 'Escape') setIsEditingPhone(false);
+                                }}
+                                placeholder={language === 'te' ? '10-అంకెల ఫోన్ నెం...' : '10-digit mobile...'}
+                                className="w-full pl-8 pr-2 py-1.5 bg-slate-950 border border-cyan-400 rounded-xl text-cyan-200 font-mono text-xs font-bold focus:outline-none ring-2 ring-cyan-500/30 shadow-inner"
+                              />
+                            </div>
+                            <button
+                              type="button"
+                              onClick={handleQuickSavePhone}
+                              disabled={quickPhoneInput.length > 0 && quickPhoneInput.length !== 10}
+                              className="px-3 py-1.5 bg-gradient-to-r from-emerald-600 to-teal-600 hover:from-emerald-500 text-white font-bold rounded-xl text-xs flex items-center gap-1 cursor-pointer shadow-md active:scale-95 disabled:opacity-40"
+                              title={language === 'te' ? 'సేవ్ చేయండి (Enter)' : 'Save (Enter)'}
+                            >
+                              <Check className="w-3.5 h-3.5" />
+                              <span>{language === 'te' ? 'ఓకే' : 'Save'}</span>
+                            </button>
+                            <button
+                              type="button"
+                              onClick={() => {
+                                setIsEditingPhone(false);
+                                setQuickPhoneInput('');
+                              }}
+                              className="px-2.5 py-1.5 bg-slate-800 hover:bg-slate-700 text-slate-300 font-bold rounded-xl text-xs cursor-pointer"
+                              title={language === 'te' ? 'రద్దు (Esc)' : 'Cancel (Esc)'}
+                            >
+                              {language === 'te' ? 'రద్దు' : 'Cancel'}
+                            </button>
+                          </div>
+                        ) : effectivePhone ? (
+                          /* CASE 2: Phone Number Already Exists -> Display Chip with Click-to-Call, Copy & Inline Edit */
+                          <div className="flex items-center gap-1.5 flex-wrap">
+                            <div className="inline-flex items-center gap-1.5 bg-blue-950/70 border border-blue-500/40 px-2.5 py-1 rounded-xl text-xs shadow-sm">
+                              <span className="text-xs">📞</span>
+                              <a
+                                href={`tel:${effectivePhone}`}
+                                className="font-mono font-bold text-cyan-200 hover:text-white hover:underline text-xs"
+                                title="Click to Call"
+                              >
+                                {effectivePhone}
+                              </a>
+                              <button
+                                type="button"
+                                onClick={() => handleCopy(effectivePhone, 'phone')}
+                                className="p-1 text-slate-400 hover:text-white cursor-pointer"
+                                title="Copy Phone"
+                              >
+                                {copiedField === 'phone' ? <Check className="w-3 h-3 text-emerald-400" /> : <Copy className="w-3 h-3" />}
+                              </button>
+                              <button
+                                type="button"
+                                onClick={() => {
+                                  setQuickPhoneInput(effectivePhone);
+                                  setIsEditingPhone(true);
+                                  setTimeout(() => phoneInputRef.current?.focus(), 50);
+                                }}
+                                className="px-2 py-0.5 bg-cyan-500/20 hover:bg-cyan-500/30 text-cyan-300 border border-cyan-500/30 rounded-lg text-[11px] font-bold flex items-center gap-1 cursor-pointer transition-all active:scale-95 ml-1"
+                                title={language === 'te' ? 'ఫోన్ నంబర్ మార్చండి / Edit' : 'Edit Phone'}
+                              >
+                                <Edit3 className="w-3 h-3" />
+                                <span>{language === 'te' ? 'మార్చు' : 'Edit'}</span>
+                              </button>
+                            </div>
+
+                            {onOpenPhoneEditor && (
+                              <button
+                                type="button"
+                                onClick={() => onOpenPhoneEditor(currentVoter)}
+                                className="px-2 py-1 bg-slate-800/80 hover:bg-slate-700 text-slate-400 hover:text-slate-200 rounded-lg text-[11px] font-medium cursor-pointer"
+                                title={language === 'te' ? 'అదనపు నంబర్ లేదా నోట్స్' : 'Alt phone or notes'}
+                              >
+                                + అదనపు నెం.
+                              </button>
+                            )}
+                          </div>
+                        ) : (
+                          /* CASE 3: No Phone Number -> Direct Quick Entry Input Field Right Here */
+                          <div className="flex items-center gap-1.5 flex-1 max-w-[320px]">
+                            <div className="relative flex-1">
+                              <Phone className="w-3.5 h-3.5 text-cyan-400 absolute left-2.5 top-1/2 -translate-y-1/2 pointer-events-none" />
+                              <input
+                                ref={phoneInputRef}
+                                type="tel"
+                                inputMode="numeric"
+                                pattern="[0-9]*"
+                                maxLength={10}
+                                value={quickPhoneInput}
+                                onChange={e => {
+                                  const val = e.target.value.replace(/\D/g, '').slice(0, 10);
+                                  setQuickPhoneInput(val);
+                                }}
+                                onKeyDown={e => {
+                                  if (e.key === 'Enter') handleQuickSavePhone();
+                                }}
+                                placeholder={language === 'te' ? 'ఫోన్ నెం. [P]...' : '10-digit phone [P]...'}
+                                className="w-full pl-8 pr-2 py-1.5 bg-slate-900/90 border border-slate-700 hover:border-cyan-500/50 focus:border-cyan-400 rounded-xl text-cyan-200 font-mono text-xs font-bold focus:outline-none placeholder:text-slate-500 transition-colors shadow-inner"
+                              />
+                            </div>
+                            <button
+                              type="button"
+                              onClick={handleQuickSavePhone}
+                              disabled={quickPhoneInput.length !== 10}
+                              className="px-3 py-1.5 bg-gradient-to-r from-cyan-600 to-blue-600 hover:from-cyan-500 hover:to-blue-500 disabled:opacity-30 disabled:cursor-not-allowed text-white font-bold rounded-xl text-xs flex items-center gap-1 cursor-pointer shadow-md active:scale-95 transition-all"
+                              title={language === 'te' ? 'సేవ్ చేయండి (Enter)' : 'Save Phone (Enter)'}
+                            >
+                              <Save className="w-3.5 h-3.5" />
+                              <span>{language === 'te' ? 'సేవ్' : 'Save'}</span>
+                            </button>
+                          </div>
                         )}
                       </div>
 
