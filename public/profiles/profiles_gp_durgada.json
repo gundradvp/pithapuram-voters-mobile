@@ -126,7 +126,12 @@
   "19": {
     "supportPct": 50,
     "survey_status": null,
-    "updatedAt": "2026-11-20T07:14:32.989Z"
+    "updatedAt": "2026-11-20T07:32:47.027Z",
+    "customAlias": "శ్రీనివాస్ పసగడుగుల",
+    "correctedNameTe": "శ్రీనివాస్ పసగడుగుల",
+    "correctedNameEn": "SRINIVAS PASAGADUGULA",
+    "correctedSurnameTe": "పసగడుగుల",
+    "correctedSurnameEn": "PASAGADUGULA"
   },
   "20": {
     "supportPct": 100,
@@ -207,7 +212,14 @@
     "survey_status": null,
     "influencerName": "Gollapalli.Krishnarjunarao",
     "influencerPhone": "8317693614",
-    "updatedAt": "2026-11-20T06:47:01.361Z"
+    "updatedAt": "2026-11-20T07:55:18.008Z",
+    "customAlias": "రాంబాబు కందా",
+    "correctedNameTe": "రాంబాబు కందా",
+    "correctedNameEn": "RAMBABU KANDA",
+    "correctedSurnameTe": "కందా",
+    "correctedSurnameEn": "KANDA",
+    "surnameTe": "కందా",
+    "surnameEn": "KANDA"
   },
   "32": {
     "influencerId": "inf_1793732645047",

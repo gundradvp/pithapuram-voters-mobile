@@ -372,13 +372,22 @@ export const ReOcrReviewModal: React.FC<ReOcrReviewModalProps> = ({
   const [isSavingName, setIsSavingName] = useState<boolean>(false);
   const [nameSaveSuccess, setNameSaveSuccess] = useState<boolean>(false);
 
-  // Compute parsed name details for current voter
-  const parsedName: ParsedNameDetails | null = useMemo(() => {
-    if (!currentVoter) return null;
-    return parseNameAndSurname(currentVoter);
-  }, [currentVoter]);
+  // Local voter overrides to ensure instantaneous UI updates without waiting for parent/server
+  const [localNameOverrides, setLocalNameOverrides] = useState<Record<number, Partial<MobileVoter>>>({});
 
-  // Sync edit form fields whenever current voter changes
+  const effectiveVoter: MobileVoter | undefined = useMemo(() => {
+    if (!currentVoter) return undefined;
+    const overrides = localNameOverrides[currentSno];
+    return overrides ? { ...currentVoter, ...overrides } : currentVoter;
+  }, [currentVoter, localNameOverrides, currentSno]);
+
+  // Compute parsed name details for current voter (incorporating campaign profile corrections)
+  const parsedName: ParsedNameDetails | null = useMemo(() => {
+    if (!effectiveVoter) return null;
+    return parseNameAndSurname(effectiveVoter, currentProf);
+  }, [effectiveVoter, currentProf]);
+
+  // Sync edit form fields whenever current voter changes or when modal loads a new voter
   useEffect(() => {
     if (parsedName) {
       setEditFirstNameTe(parsedName.firstNameTe);
@@ -388,7 +397,7 @@ export const ReOcrReviewModal: React.FC<ReOcrReviewModalProps> = ({
       setIsEditingName(false);
       setNameSaveSuccess(false);
     }
-  }, [currentSno, parsedName]);
+  }, [currentSno]);
 
   // Handler: "Select English as Correct" (1-Click Auto-Fix Telugu from English)
   const handleSelectEnglishAsCorrect = useCallback(() => {
@@ -420,15 +429,26 @@ export const ReOcrReviewModal: React.FC<ReOcrReviewModalProps> = ({
 
     setIsSavingName(true);
 
-    // 1. Immediately apply to local in-memory voter list
-    const updatedVoter: MobileVoter = {
-      ...currentVoter,
-      n: fullTe,
+    const voterPatch: Partial<MobileVoter> = {
+      n: `${cleanFirstEn} ${cleanSurnameEn} (${fullTe})`,
       name_te: fullTe,
       name_en: fullEn,
-      surname_te: cleanSurnameTe,
-      surname_en: cleanSurnameEn
+      surname: cleanSurnameEn,
+      surname_en: cleanSurnameEn,
+      surname_te: cleanSurnameTe
     };
+
+    // 1. Immediately apply to local in-memory voter list & modal overrides
+    const updatedVoter: MobileVoter = {
+      ...currentVoter,
+      ...voterPatch
+    };
+
+    setLocalNameOverrides(prev => ({
+      ...prev,
+      [currentSno]: voterPatch
+    }));
+
     if (onUpdateVoters) {
       onUpdateVoters([updatedVoter]);
     }
@@ -437,7 +457,11 @@ export const ReOcrReviewModal: React.FC<ReOcrReviewModalProps> = ({
     const profileUpdates: Partial<VoterCampaignProfile> = {
       customAlias: fullTe,
       correctedNameTe: fullTe,
-      correctedNameEn: fullEn
+      correctedNameEn: fullEn,
+      correctedSurnameTe: cleanSurnameTe,
+      correctedSurnameEn: cleanSurnameEn,
+      surnameTe: cleanSurnameTe,
+      surnameEn: cleanSurnameEn
     };
     saveVoterProfile(boothId, currentSno, profileUpdates);
     if (onUpdateProfile) {
@@ -1218,10 +1242,10 @@ export const ReOcrReviewModal: React.FC<ReOcrReviewModalProps> = ({
                           {language === 'te' ? 'ప్రస్తుత పూర్తి పేరు (Full Display Name):' : 'Full Name:'}
                         </span>
                         <div className="text-base font-black text-white mt-0.5 leading-snug">
-                          {currentVoter.name_te || '—'}
+                          {(effectiveVoter || currentVoter).name_te || '—'}
                         </div>
                         <div className="text-xs font-bold text-amber-300 font-mono">
-                          {currentVoter.name_en || '—'}
+                          {(effectiveVoter || currentVoter).name_en || '—'}
                         </div>
                       </div>
 

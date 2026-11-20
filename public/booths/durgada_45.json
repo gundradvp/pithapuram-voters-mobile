@@ -657,11 +657,11 @@
       "sno": 19,
       "id": "YOU0859746",
       "epic": "YOU0859746",
-      "n": "SRINIVAS PASAGADUGULA (శ్రీనివాస్‌ పన్ర్రడుగుల)",
-      "name_te": "శ్రీనివాస్‌ పన్ర్రడుగుల",
+      "n": "SRINIVAS PASAGADUGULA (శ్రీనివాస్ పసగడుగుల)",
+      "name_te": "శ్రీనివాస్ పసగడుగుల",
       "name_en": "SRINIVAS PASAGADUGULA",
-      "r": "CHINNARAO PASAGADUGULA (చిన్నారావు పనగడుగుల,) (Father)",
-      "rel_name_te": "చిన్నారావు పనగడుగుల,",
+      "r": "CHINNARAO PASAGADUGULA (చిన్నారావు పసగడుగుల,) (Father)",
+      "rel_name_te": "చిన్నారావు పసగడుగుల,",
       "rel_name_en": "CHINNARAO PASAGADUGULA",
       "rel_type_te": "తండ్రి",
       "rel_type_en": "Father",
@@ -685,7 +685,10 @@
       "ac_sno": 1110,
       "booth_no": 45,
       "ps_no": 45,
-      "polling_station_en": "Booth #45: Mandal Praja Parishad Primary School, Inti Kaasulu gaari School, Durgada"
+      "polling_station_en": "Booth #45: Mandal Praja Parishad Primary School, Inti Kaasulu gaari School, Durgada",
+      "surname_te": "పసగడుగుల",
+      "surname": "PASAGADUGULA",
+      "surname_en": "PASAGADUGULA"
     },
     {
       "s": 20,

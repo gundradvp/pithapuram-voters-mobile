@@ -3,11 +3,12 @@
  * Converts English voter names and surnames into authentic, grammatically correct Telugu script.
  */
 
-import { MobileVoter } from '../types';
+import { MobileVoter, VoterCampaignProfile } from '../types';
 import { extractSurname } from './surnameClassifier';
 
 // Canonical Telugu Surnames Map
 export const TELUGU_SURNAMES_MAP: Record<string, string> = {
+  'PASAGADUGULA': 'పసగడుగుల',
   'GUNDRA': 'గుండ్ర',
   'KAKI': 'కాకి',
   'DASAM': 'దాసం',
@@ -264,17 +265,30 @@ export interface ParsedNameDetails {
 
 /**
  * Parses voter name into First Name & Surname in English & Telugu.
+ * Respects user corrections saved in VoterCampaignProfile over raw OCR strings.
  */
-export function parseNameAndSurname(voter: MobileVoter): ParsedNameDetails {
-  const nameEn = (voter.name_en || '').trim();
-  const nameTe = (voter.name_te || '').trim();
+export function parseNameAndSurname(voter: MobileVoter, profile?: VoterCampaignProfile): ParsedNameDetails {
+  // 1. Resolve full names prioritizing user campaign profile corrections
+  const profileTe = (profile?.correctedNameTe || profile?.customAlias || '').trim();
+  const profileEn = (profile?.correctedNameEn || '').trim();
+  const profileSurnameTe = (profile?.correctedSurnameTe || profile?.surnameTe || '').trim();
+  const profileSurnameEn = (profile?.correctedSurnameEn || profile?.surnameEn || '').trim().toUpperCase();
 
-  // Extract surname using existing robust surname classifier
-  const extracted = extractSurname(voter);
-  const surnameEn = extracted.en.trim().toUpperCase();
-  const surnameTe = extracted.te.trim();
+  const nameEn = (profileEn || voter.name_en || '').trim();
+  const nameTe = (profileTe || voter.name_te || '').trim();
 
-  // Extract first name in English
+  // 2. Resolve surnames prioritizing user corrections and direct voter surname properties
+  let surnameEn = profileSurnameEn || (voter.surname_en || (voter as any).surname || '').trim().toUpperCase();
+  let surnameTe = profileSurnameTe || (voter.surname_te || '').trim();
+
+  // If not explicitly defined, fall back to classifier
+  if (!surnameEn || !surnameTe) {
+    const extracted = extractSurname(voter);
+    if (!surnameEn) surnameEn = extracted.en.trim().toUpperCase();
+    if (!surnameTe) surnameTe = extracted.te.trim();
+  }
+
+  // 3. Extract first name in English
   let firstNameEn = nameEn;
   if (surnameEn && nameEn.toUpperCase().includes(surnameEn)) {
     firstNameEn = nameEn
@@ -286,7 +300,7 @@ export function parseNameAndSurname(voter: MobileVoter): ParsedNameDetails {
     firstNameEn = nameEn;
   }
 
-  // Extract first name in Telugu
+  // 4. Extract first name in Telugu
   let firstNameTe = nameTe;
   if (surnameTe && nameTe.includes(surnameTe)) {
     firstNameTe = nameTe
@@ -295,15 +309,18 @@ export function parseNameAndSurname(voter: MobileVoter): ParsedNameDetails {
       .trim();
   }
 
-  // Fallback transliteration if Telugu is missing or noisy
-  if (!firstNameTe || /[.:;,?\/#!@$%^*_=+<>|~`0-9]/.test(firstNameTe)) {
+  // Fallback transliteration if Telugu first name is missing or noisy
+  if (!firstNameTe || (!profileTe && /[.:;,?\/#!@$%^*_=+<>|~`0-9]/.test(firstNameTe))) {
     firstNameTe = transliterateEnglishToTelugu(firstNameEn);
   }
 
-  const isTeluguSuspected = 
+  // Suspicion check: only flag if not already corrected by user
+  const isCorrected = !!(profile?.correctedNameTe || profile?.correctedSurnameTe || voter.surname_te);
+  const isTeluguSuspected = !isCorrected && (
     /[.:;,?\/#!@$%^*_=+<>|~`0-9]/.test(nameTe) || 
     nameTe.length < 3 ||
-    !nameTe.includes(' ') && nameEn.includes(' ');
+    (!nameTe.includes(' ') && nameEn.includes(' '))
+  );
 
   return {
     firstNameEn,

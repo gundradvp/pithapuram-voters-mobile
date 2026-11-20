@@ -127,6 +127,8 @@ export interface VoterCampaignProfile {
   correctedNameEn?: string;
   surnameTe?: string;
   surnameEn?: string;
+  correctedSurnameTe?: string;
+  correctedSurnameEn?: string;
   supportPct?: number; // 100, 75, 50, 40, 25, 0
   influencerId?: string;
   influencerName?: string;
@@ -190,6 +192,7 @@ export interface MobileVoter {
   gender_te?: string;
   surname_te?: string;
   surname_en?: string;
+  surname?: string;
 }
 
 export interface BoothData {

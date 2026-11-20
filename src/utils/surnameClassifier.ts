@@ -219,7 +219,8 @@ const CANONICAL_TELUGU_SURNAMES: Record<string, string> = {
   'TALABATTULA': 'తాళాబత్తుల',
   'REDDIM': 'రెడ్డిం',
   'PABBIREDDI': 'పబ్బిరెడ్డి',
-  'VEGISETTI': 'వేగిశెట్టి'
+  'VEGISETTI': 'వేగిశెట్టి',
+  'PASAGADUGULA': 'పసగడుగుల'
 };
 
 const STOP_WORDS = new Set([
@@ -233,9 +234,9 @@ const STOP_WORDS = new Set([
  * Extracts normalized surname in English and Telugu for a voter.
  */
 export function extractSurname(voter: MobileVoter): { en: string; te: string } {
-  // If voter object already has precomputed surname
-  if ((voter as any).surname) {
-    const sEn = (voter as any).surname.toUpperCase();
+  // If voter object already has precomputed surname or explicit surname_te
+  if ((voter as any).surname_te || (voter as any).surname) {
+    const sEn = ((voter as any).surname_en || (voter as any).surname || '').toUpperCase();
     const canonEn = SURNAME_ALIASES[sEn] || sEn;
     return {
       en: canonEn,

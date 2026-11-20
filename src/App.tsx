@@ -1317,12 +1317,14 @@ export function App() {
         const sno = Number(v.s || v.sno);
         return updateMap.has(sno) ? { ...v, ...updateMap.get(sno) } : v;
       });
-      return {
+      const nextBooth = {
         ...prev,
         voters: nextVoters
       };
+      saveCachedBoothData(currentPartNo, nextBooth);
+      return nextBooth;
     });
-  }, []);
+  }, [currentPartNo]);
 
   // Handle Custom JSON file import
   const handleImportCustomJson = (customData: BoothData) => {
