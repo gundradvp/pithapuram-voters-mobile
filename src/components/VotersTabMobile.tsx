@@ -11,6 +11,7 @@ import { SpeedDialModal } from './SpeedDialModal';
 import { HourlyTurnoutModal } from './HourlyTurnoutModal';
 import { VotersExcelGrid } from './VotersExcelGrid';
 import { ExportSurnamesModal } from './ExportSurnamesModal';
+import { exportVotersToExcelCsv } from '../utils/voterExcelExporter';
 import { Download, FileSpreadsheet } from 'lucide-react';
 
 interface VotersTabMobileProps {
@@ -359,6 +360,48 @@ export const VotersTabMobile: React.FC<VotersTabMobileProps> = ({
       layout
     );
   };
+
+  const handleExportSelectedToExcel = () => {
+    if (selectedVoterSnos.size === 0) return;
+    const selected = voters.filter(v => selectedVoterSnos.has(v.s));
+    exportVotersToExcelCsv({
+      voters: selected,
+      profiles,
+      boothInfo,
+      scopeTitle: language === 'te'
+        ? `ఎంపిక చేసిన ${selected.length} మంది ఓటర్లు (ఫోన్ నంబర్లతో)`
+        : `Selected ${selected.length} Electors with Phone Numbers`,
+      filePrefix: `Selected_${selected.length}`
+    });
+  };
+
+  const handleExportFilteredToExcel = () => {
+    if (filteredVoters.length === 0) return;
+    let filterLabel = '';
+    if (selectedSurname !== 'all') {
+      const grp = surnameGroups.find(g => g.id === selectedSurname);
+      filterLabel = `${grp?.nameEn || selectedSurname}_Surname`;
+    } else if (selectedStreet !== 'all') {
+      filterLabel = `${selectedStreet.replace(/[^a-zA-Z0-9]/g, '_').slice(0, 15)}_Street`;
+    } else if (selectedWard !== 'all') {
+      filterLabel = `Ward_${selectedWard}`;
+    } else if (filterMode !== 'all') {
+      filterLabel = `${filterMode}`;
+    } else if (searchQuery.trim()) {
+      filterLabel = `Search_${searchQuery.trim().replace(/[^a-zA-Z0-9]/g, '_').slice(0, 10)}`;
+    }
+
+    exportVotersToExcelCsv({
+      voters: filteredVoters,
+      profiles,
+      boothInfo,
+      scopeTitle: language === 'te'
+        ? (filterLabel ? `${filterLabel} ఫిల్టర్ చేసిన ఓటర్లు (మొత్తం: ${filteredVoters.length})` : `ఫిల్టర్ చేసిన ${filteredVoters.length} మంది ఓటర్లు (ఫోన్ నంబర్లతో)`)
+        : `Filtered ${filteredVoters.length} Electors with Phone Numbers`,
+      filePrefix: filterLabel ? `Filtered_${filterLabel}` : 'Filtered'
+    });
+  };
+
   const [selectedDuplicateCluster, setSelectedDuplicateCluster] = useState<{
     voters: MobileVoter[];
     reasonTe: string;
@@ -1348,7 +1391,21 @@ _దయచేసి మీ ఓటు హక్కును వినియోగ
                   className="px-2 py-0.5 rounded-md text-[10px] font-bold transition-all cursor-pointer flex items-center gap-1 border bg-slate-950 text-emerald-300 border-slate-800 hover:border-emerald-500/50 hover:text-emerald-200"
                 >
                   <Download className="w-2.5 h-2.5 text-emerald-400" />
-                  <span>{language === 'te' ? 'S.No ఎగుమతి' : 'Export S.Nos'}</span>
+                  <span>{language === 'te' ? 'వంశాలు' : 'Clans'}</span>
+                </button>
+
+                <button
+                  type="button"
+                  onClick={selectedVoterSnos.size > 0 ? handleExportSelectedToExcel : handleExportFilteredToExcel}
+                  title={language === 'te' ? 'ఎంపిక చేసిన లేదా ఫిల్టర్ చేసిన ఓటర్లను ఫోన్ నంబర్లతో సహా ఎక్సెల్ ఫైల్ (CSV) డౌన్‌లోడ్ చేయండి' : 'Export selection/filtered electors with phone numbers to Excel CSV'}
+                  className="px-2 py-0.5 rounded-md text-[10px] font-bold transition-all cursor-pointer flex items-center gap-1 border bg-emerald-950/50 text-emerald-300 border-emerald-500/40 hover:bg-emerald-900/60 hover:text-white"
+                >
+                  <FileSpreadsheet className="w-2.5 h-2.5 text-emerald-400" />
+                  <span>
+                    {selectedVoterSnos.size > 0
+                      ? (language === 'te' ? `ఎక్సెల్ (${selectedVoterSnos.size})` : `Excel (${selectedVoterSnos.size})`)
+                      : (language === 'te' ? `ఎక్సెల్ (${filteredVoters.length})` : `Excel (${filteredVoters.length})`)}
+                  </span>
                 </button>
               </div>
 
@@ -2119,6 +2176,17 @@ _దయచేసి మీ ఓటు హక్కును వినియోగ
               >
                 <Users className="w-3 h-3 text-teal-400" />
                 <span>{language === 'te' ? `📋 జాబితా (${filteredVoters.length})` : `📋 Roster (${filteredVoters.length})`}</span>
+              </button>
+
+              {/* Export Filtered Result to Excel with Phone Numbers */}
+              <button
+                type="button"
+                onClick={handleExportFilteredToExcel}
+                className="px-2 py-0.5 bg-gradient-to-r from-emerald-700 via-teal-700 to-emerald-700 hover:from-emerald-600 hover:to-teal-600 text-white rounded-lg text-[10.5px] font-black flex items-center gap-1 shadow-sm active:scale-95 transition-all cursor-pointer"
+                title={language === 'te' ? 'ఫిల్టర్ చేసిన ఓటర్లందరినీ ఫోన్ నంబర్లతో సహా ఎక్సెల్ ఫైల్ (CSV) డౌన్‌లోడ్ చేయండి' : 'Export filtered electors with phone numbers to Excel CSV'}
+              >
+                <FileSpreadsheet className="w-3 h-3 text-emerald-200" />
+                <span>{language === 'te' ? `📥 ఎక్సెల్ (${filteredVoters.length})` : `📥 Excel (${filteredVoters.length})`}</span>
               </button>
 
               {/* Toggle Show Cards / Off Cards */}
@@ -3921,6 +3989,18 @@ _దయచేసి మీ ఓటు హక్కును వినియోగ
             >
               <Users className="w-3.5 h-3.5 text-teal-400" />
               <span>{language === 'te' ? `జాబితా (${selectedVoterSnos.size})` : `Roster (${selectedVoterSnos.size})`}</span>
+            </button>
+
+            {/* Export Selected to Excel with Phone Numbers */}
+            <button
+              type="button"
+              onClick={handleExportSelectedToExcel}
+              disabled={selectedVoterSnos.size === 0}
+              className="px-2.5 py-1.5 rounded-xl bg-gradient-to-r from-emerald-600 to-teal-600 hover:from-emerald-500 hover:to-teal-500 text-white font-black text-[11px] flex items-center gap-1 shadow-md disabled:opacity-40 disabled:cursor-not-allowed active:scale-95 transition-all cursor-pointer"
+              title={language === 'te' ? 'ఎంపిక చేసిన ఓటర్లను ఫోన్ నంబర్లతో సహా ఎక్సెల్ ఫైల్ (CSV) డౌన్‌లోడ్ చేయండి' : 'Export selected electors with phone numbers to Excel CSV'}
+            >
+              <FileSpreadsheet className="w-3.5 h-3.5 text-emerald-200" />
+              <span>{language === 'te' ? `📥 ఎక్సెల్ (${selectedVoterSnos.size})` : `📥 Excel (${selectedVoterSnos.size})`}</span>
             </button>
             {onOpenBulkAssign && (
               <button
