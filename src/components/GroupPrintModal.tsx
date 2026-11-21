@@ -606,7 +606,7 @@ export const GroupPrintModal: React.FC<GroupPrintModalProps> = ({
             height: 100% !important;
             max-height: 100% !important;
             border-radius: 6px !important;
-            border-style: dotted !important;
+            border-style: dashed !important;
             border-width: 1.5px !important;
             margin: 0 !important;
             box-sizing: border-box !important;
@@ -691,8 +691,8 @@ export const GroupPrintModal: React.FC<GroupPrintModalProps> = ({
             page-break-inside: avoid !important;
             break-inside: avoid !important;
             background: #ffffff !important;
-            border-width: 2px !important;
-            border-style: dotted !important;
+            border-width: 1.5px !important;
+            border-style: dashed !important;
             border-radius: 6px !important;
             box-shadow: none !important;
             color: #000000 !important;
@@ -1691,14 +1691,14 @@ export const GroupPrintModal: React.FC<GroupPrintModalProps> = ({
                       return (
                         <div
                           key={voterSno || vIdx}
-                          className={`voter-card-print border-2 border-dotted ${activeTheme.slipBorder} rounded-lg bg-white flex flex-col justify-between shadow-none relative ${
+                          className={`voter-card-print border-[1.5px] border-dashed ${activeTheme.slipBorder} rounded-lg bg-white flex flex-col justify-between shadow-none relative ${
                             is8Cards ? 'p-1 h-full' : 'p-1.5 h-full'
                           }`}
                           style={{
                             pageBreakInside: 'avoid',
                             breakInside: 'avoid',
                             borderColor: getThemeBorderColor(colorTheme),
-                            borderStyle: 'dotted'
+                            borderStyle: 'dashed'
                           }}
                         >
                           {/* Card Top Banner: Serial Number in RED, NO EPIC ID (No border-b so voter card image doesn't get a double line) */}
