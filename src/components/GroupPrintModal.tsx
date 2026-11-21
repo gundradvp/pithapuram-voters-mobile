@@ -38,6 +38,7 @@ export type ColorTheme = 'blue' | 'tricolor' | 'emerald' | 'crimson' | 'bw';
 type BrandingMode = 'neutral' | 'party';
 type PhoneFilter = 'all' | 'with_phone' | 'without_phone';
 export type CategoryFilter = 'all' | 'out_of_city' | 'supporter' | 'neutral' | 'opponent' | 'not_voted' | 'voted' | 'deceased';
+export type DarknessMode = 'extra_dark' | 'dark' | 'normal';
 
 interface ThemeDefinition {
   id: ColorTheme;
@@ -201,6 +202,14 @@ export const GroupPrintModal: React.FC<GroupPrintModalProps> = ({
   const [genderFilter, setGenderFilter] = useState<'all' | 'M' | 'F'>('all');
   // Filter by Phone Number availability ('all' | 'with_phone' | 'without_phone')
   const [phoneFilter, setPhoneFilter] = useState<PhoneFilter>('all');
+  // Text Darkness / Contrast Mode for photo cards & slips ('extra_dark' | 'dark' | 'normal')
+  const [darknessMode, setDarknessMode] = useState<DarknessMode>('extra_dark');
+
+  const getCardImageFilter = () => {
+    if (darknessMode === 'extra_dark') return 'contrast(240%) brightness(80%)';
+    if (darknessMode === 'dark') return 'contrast(180%) brightness(85%)';
+    return 'none';
+  };
 
   const activeTheme = useMemo(() => {
     return COLOR_THEMES.find(t => t.id === colorTheme) || COLOR_THEMES[0];
@@ -534,14 +543,51 @@ export const GroupPrintModal: React.FC<GroupPrintModalProps> = ({
             color-adjust: exact !important;
           }
 
+          .voter-slip-card .text-slate-500,
+          .voter-slip-card .text-slate-600,
+          .voter-slip-card .text-slate-700 {
+            color: #000000 !important;
+            font-weight: 700 !important;
+          }
+
           .voter-card-print {
             page-break-inside: avoid !important;
             break-inside: avoid !important;
             background: #ffffff !important;
+            border: 2px solid #000000 !important;
             box-shadow: none !important;
             -webkit-print-color-adjust: exact !important;
             print-color-adjust: exact !important;
             color-adjust: exact !important;
+          }
+
+          /* Force all card text and borders to print in solid pitch black, avoiding faint gray dots */
+          .voter-card-print,
+          .voter-card-print p,
+          .voter-card-print span,
+          .voter-card-print div {
+            color: #000000 !important;
+            text-shadow: none !important;
+          }
+
+          /* Contrast and sharpness boost for voter card image during print */
+          .print-darkness-extra_dark .voter-card-img {
+            -webkit-filter: contrast(240%) brightness(80%) !important;
+            filter: contrast(240%) brightness(80%) !important;
+            image-rendering: -webkit-optimize-contrast !important;
+            image-rendering: crisp-edges !important;
+          }
+
+          .print-darkness-dark .voter-card-img {
+            -webkit-filter: contrast(180%) brightness(85%) !important;
+            filter: contrast(180%) brightness(85%) !important;
+            image-rendering: -webkit-optimize-contrast !important;
+            image-rendering: crisp-edges !important;
+          }
+
+          .print-darkness-normal .voter-card-img {
+            -webkit-filter: none !important;
+            filter: none !important;
           }
 
           .print-header-bg {
@@ -674,26 +720,71 @@ export const GroupPrintModal: React.FC<GroupPrintModalProps> = ({
               ))}
             </div>
           ) : printLayout === 'cards' ? (
-            /* Cards per page options (2, 4, 6 cards) */
-            <div className="flex items-center gap-1 bg-slate-800/90 p-1 rounded-xl border border-slate-700 flex-wrap">
-              <span className="text-amber-400 font-bold px-1.5 text-[10.5px] flex items-center gap-1">
-                <Layers className="w-3.5 h-3.5" /> పేజీకి కార్డులు:
-              </span>
-              {([2, 4, 6] as CardsPerPage[]).map(num => (
+            /* Cards per page options (2, 4, 6 cards) & Text Darkness Selector */
+            <div className="flex items-center gap-1.5 flex-wrap">
+              <div className="flex items-center gap-1 bg-slate-800/90 p-1 rounded-xl border border-slate-700 flex-wrap">
+                <span className="text-amber-400 font-bold px-1.5 text-[10.5px] flex items-center gap-1">
+                  <Layers className="w-3.5 h-3.5" /> పేజీకి కార్డులు:
+                </span>
+                {([2, 4, 6] as CardsPerPage[]).map(num => (
+                  <button
+                    key={num}
+                    type="button"
+                    onClick={() => setCardsPerPage(num)}
+                    className={`px-2.5 py-1 rounded-lg text-xs font-black transition-all cursor-pointer ${
+                      cardsPerPage === num
+                        ? 'bg-amber-500 text-slate-950 shadow-md scale-105'
+                        : 'text-slate-300 hover:text-white hover:bg-slate-700/60'
+                    }`}
+                    title={`A4 పేజీకి ${num} కార్డులు`}
+                  >
+                    {num === 4 ? `4 (సిఫార్సు 2x2)` : num === 6 ? `6 (కాంపాక్ట్ 2x3)` : `2 (పెద్దవి)`}
+                  </button>
+                ))}
+              </div>
+
+              {/* Text Darkness / High Contrast Selector */}
+              <div className="flex items-center gap-1 bg-slate-800/90 p-1 rounded-xl border border-slate-700 flex-wrap">
+                <span className="text-amber-400 font-bold px-1.5 text-[10.5px] flex items-center gap-1">
+                  <Sparkles className="w-3.5 h-3.5" /> అక్షరాలు:
+                </span>
                 <button
-                  key={num}
                   type="button"
-                  onClick={() => setCardsPerPage(num)}
-                  className={`px-2.5 py-1 rounded-lg text-xs font-black transition-all cursor-pointer ${
-                    cardsPerPage === num
+                  onClick={() => setDarknessMode('extra_dark')}
+                  className={`px-2 py-1 rounded-lg text-[10.5px] font-black transition-all cursor-pointer ${
+                    darknessMode === 'extra_dark'
                       ? 'bg-amber-500 text-slate-950 shadow-md scale-105'
                       : 'text-slate-300 hover:text-white hover:bg-slate-700/60'
                   }`}
-                  title={`A4 పేజీకి ${num} కార్డులు`}
+                  title="స్పష్టమైన ప్రింట్ కోసం అక్షరాలు అత్యంత ముదురు నలుపులో వస్తాయి (హై-కాంట్రాస్ట్)"
                 >
-                  {num === 4 ? `4 (సిఫార్సు 2x2)` : num === 6 ? `6 (కాంపాక్ట్ 2x3)` : `2 (పెద్దవి)`}
+                  ⚫ ఎక్కువ ముదురు (Darkest)
                 </button>
-              ))}
+                <button
+                  type="button"
+                  onClick={() => setDarknessMode('dark')}
+                  className={`px-2 py-1 rounded-lg text-[10.5px] font-bold transition-all cursor-pointer ${
+                    darknessMode === 'dark'
+                      ? 'bg-amber-500 text-slate-950 shadow-md scale-105'
+                      : 'text-slate-300 hover:text-white hover:bg-slate-700/60'
+                  }`}
+                  title="ముదురు రంగు అక్షరాలు"
+                >
+                  ముదురు (Dark)
+                </button>
+                <button
+                  type="button"
+                  onClick={() => setDarknessMode('normal')}
+                  className={`px-2 py-1 rounded-lg text-[10.5px] font-bold transition-all cursor-pointer ${
+                    darknessMode === 'normal'
+                      ? 'bg-amber-500 text-slate-950 shadow-md scale-105'
+                      : 'text-slate-300 hover:text-white hover:bg-slate-700/60'
+                  }`}
+                  title="సాధారణం (Normal)"
+                >
+                  సాధారణం
+                </button>
+              </div>
             </div>
           ) : (
             /* Table Mode Columns */
@@ -1030,7 +1121,7 @@ export const GroupPrintModal: React.FC<GroupPrintModalProps> = ({
           PRINTABLE CONTAINER
           Multi-page discrete A4 sheets: Each sheet is calibrated to 1 exact A4 page.
           ========================================================================= */}
-      <div id="group-printable-content" className="w-full max-w-4xl space-y-4">
+      <div id="group-printable-content" className={`w-full max-w-4xl space-y-4 print-darkness-${darknessMode}`}>
         {printLayout === 'slips' ? (
           /* =======================================================================
              VOTER SLIPS VIEW: Discrete A4 Pages (2, 4, 6, 8, 10 slips per page)
@@ -1397,31 +1488,31 @@ export const GroupPrintModal: React.FC<GroupPrintModalProps> = ({
                       return (
                         <div
                           key={voterSno || vIdx}
-                          className="voter-card-print border-2 border-slate-300 rounded-xl p-2 bg-white flex flex-col justify-between shadow-none relative"
+                          className="voter-card-print border-2 border-slate-900 rounded-xl p-2 bg-white flex flex-col justify-between shadow-none relative"
                           style={{ pageBreakInside: 'avoid', breakInside: 'avoid' }}
                         >
                           {/* Card Top Banner with S.No & Badges */}
-                          <div className="flex items-center justify-between pb-1 mb-1 border-b border-slate-200 text-[10px]">
+                          <div className="flex items-center justify-between pb-1 mb-1 border-b-2 border-slate-900 text-[10px]">
                             <div className="flex items-center gap-1.5 min-w-0">
-                              <span className="font-mono font-black bg-slate-900 text-white px-2 py-0.5 rounded text-[11px] shrink-0">
+                              <span className="font-mono font-black bg-black text-white px-2 py-0.5 rounded text-[11.5px] shrink-0 badge-sno">
                                 #{voterSno}
                               </span>
-                              <span className="font-mono font-bold bg-amber-100 text-amber-950 px-1.5 py-0.5 rounded border border-amber-300 text-[10px] truncate">
+                              <span className="font-mono font-black bg-amber-100 text-black px-1.5 py-0.5 rounded border border-black text-[10.5px] truncate badge-epic">
                                 {v.id || (v as any).epic}
                               </span>
-                              <span className="text-slate-600 font-bold text-[9px] shrink-0">
+                              <span className="text-black font-black text-[10px] shrink-0">
                                 వార్డు #{v.ward_no || (v as any).w || boothInfo.ward_no}
                               </span>
                             </div>
 
                             <div className="flex items-center gap-1 shrink-0">
                               {isOutOfCity && (
-                                <span className="bg-blue-600 text-white font-black px-1.5 py-0.5 rounded text-[9px] uppercase tracking-wider shadow-sm">
+                                <span className="bg-blue-700 text-white font-black px-1.5 py-0.5 rounded text-[9px] uppercase tracking-wider shadow-sm">
                                   ✈️ ఊరిలో లేరు
                                 </span>
                               )}
                               {isSupporter && (
-                                <span className="bg-emerald-600 text-white font-black px-1.5 py-0.5 rounded text-[9px]">
+                                <span className="bg-emerald-700 text-white font-black px-1.5 py-0.5 rounded text-[9px]">
                                   ⭐ 100%
                                 </span>
                               )}
@@ -1430,11 +1521,16 @@ export const GroupPrintModal: React.FC<GroupPrintModalProps> = ({
 
                           {/* Official Voter Card Image or Structured Fallback */}
                           {cardPath ? (
-                            <div className="rounded-lg overflow-hidden border border-slate-300 bg-slate-50 p-1 flex items-center justify-center my-auto min-h-[120px] max-h-[175px]">
+                            <div className="rounded-lg overflow-hidden border-2 border-slate-900 bg-white p-1 flex items-center justify-center my-auto min-h-[120px] max-h-[175px]">
                               <img
                                 src={resolvePhotoUrl(cardPath)}
                                 alt={`Official Voter Card ${voterSno}`}
-                                className="w-full h-auto max-h-[165px] object-contain mx-auto"
+                                className="w-full h-auto max-h-[165px] object-contain mx-auto voter-card-img"
+                                style={{
+                                  filter: getCardImageFilter(),
+                                  WebkitFilter: getCardImageFilter(),
+                                  imageRendering: 'crisp-edges'
+                                }}
                                 onError={(e) => {
                                   const target = e.currentTarget as HTMLImageElement;
                                   const currentSrc = target.src;
@@ -1450,45 +1546,45 @@ export const GroupPrintModal: React.FC<GroupPrintModalProps> = ({
                               />
                             </div>
                           ) : (
-                            <div className="border border-slate-300 rounded-lg p-2 bg-slate-50 flex items-start gap-2.5 my-auto">
+                            <div className="border-2 border-slate-900 rounded-lg p-2 bg-white flex items-start gap-2.5 my-auto">
                               {photoPath && (
                                 <img
                                   src={resolvePhotoUrl(photoPath)}
                                   alt={v.n}
-                                  className="w-14 h-18 object-cover rounded border border-slate-400 bg-white shrink-0"
+                                  className="w-14 h-18 object-cover rounded border-2 border-slate-900 bg-white shrink-0"
                                   onError={(e) => {
                                     (e.currentTarget as HTMLElement).style.display = 'none';
                                   }}
                                 />
                               )}
                               <div className="min-w-0 flex-1 text-[11px] leading-tight space-y-0.5">
-                                <p className="font-black text-slate-900 text-xs">{v.n}</p>
-                                {v.r && <p className="text-slate-600 text-[10px]">సంబంధం: {v.r}</p>}
-                                <p className="text-slate-700 font-bold">
+                                <p className="font-black text-black text-xs">{v.n}</p>
+                                {v.r && <p className="text-black font-bold text-[10px]">సంబంధం: {v.r}</p>}
+                                <p className="text-black font-black">
                                   వయస్సు: {v.a} • {isMale ? 'పురుషుడు' : 'స్త్రీ'}
                                 </p>
-                                <p className="text-slate-600 font-medium">
-                                  ఇంటి నెం: <strong className="font-mono text-slate-900">{v.hn || '—'}</strong>
+                                <p className="text-black font-bold">
+                                  ఇంటి నెం: <strong className="font-mono text-black font-black">{v.hn || '—'}</strong>
                                 </p>
                               </div>
                             </div>
                           )}
 
                           {/* Card Footer with Location, Phone & Cut Line */}
-                          <div className="mt-1 pt-1 border-t border-slate-200 text-[8.5px] text-slate-600 space-y-0.5">
+                          <div className="mt-1 pt-1 border-t-2 border-slate-800 text-[9px] text-black font-bold space-y-0.5">
                             <div className="flex items-center justify-between gap-1">
-                              <span className="truncate max-w-[70%]">
+                              <span className="truncate max-w-[70%] text-black font-black">
                                 📍 {boothInfo.ps_address || boothInfo.clean_village || 'పిఠాపురం నియోజకవర్గం'}
                               </span>
                               {showPhone && phone && (
-                                <span className="font-mono font-bold text-slate-950 bg-emerald-50 px-1 py-0.2 rounded border border-emerald-300">
+                                <span className="font-mono font-black text-black bg-emerald-100 px-1 py-0.2 rounded border border-black">
                                   📞 {phone}
                                 </span>
                               )}
                             </div>
-                            <div className="border-t border-dashed border-slate-300 pt-0.5 flex items-center justify-between text-[7.5px] text-slate-400">
+                            <div className="border-t border-dashed border-slate-700 pt-0.5 flex items-center justify-between text-[8px] text-slate-800 font-bold">
                               <span>✂️ కట్ చేసుకోండి • అధికారిక ఓటరు గుర్తింపు కార్డు</span>
-                              <span className="font-mono">ECI Card #{voterSno}</span>
+                              <span className="font-mono font-black text-black">ECI Card #{voterSno}</span>
                             </div>
                           </div>
                         </div>
