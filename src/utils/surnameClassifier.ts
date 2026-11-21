@@ -32,6 +32,15 @@ export interface SurnameGroup {
   targetPriority: 'high' | 'medium' | 'low';
   duplicateCount?: number;
   duplicateVoters?: MobileVoter[];
+  similarVariants?: SurnameVariantInfo[];
+  variantIds?: string[];
+}
+
+export interface SurnameVariantInfo {
+  id: string;
+  nameEn: string;
+  nameTe: string;
+  count: number;
 }
 
 export interface WinningFormulaSummary {
@@ -473,15 +482,157 @@ export function extractSurname(voter: MobileVoter, profile?: VoterCampaignProfil
   };
 }
 
+function levenshtein(a: string, b: string): number {
+  if (a === b) return 0;
+  if (!a.length) return b.length;
+  if (!b.length) return a.length;
+  const matrix: number[][] = [];
+  for (let i = 0; i <= b.length; i++) matrix[i] = [i];
+  for (let j = 0; j <= a.length; j++) matrix[0][j] = j;
+  for (let i = 1; i <= b.length; i++) {
+    for (let j = 1; j <= a.length; j++) {
+      if (b.charAt(i - 1) === a.charAt(j - 1)) {
+        matrix[i][j] = matrix[i - 1][j - 1];
+      } else {
+        matrix[i][j] = Math.min(
+          matrix[i - 1][j - 1] + 1,
+          matrix[i][j - 1] + 1,
+          matrix[i - 1][j] + 1
+        );
+      }
+    }
+  }
+  return matrix[b.length][a.length];
+}
+
+export function areClanGroupsSimilar(g1: SurnameGroup, g2: SurnameGroup): boolean {
+  if (g1.id === g2.id) return true;
+  const en1 = (g1.nameEn || '').toUpperCase().trim();
+  const en2 = (g2.nameEn || '').toUpperCase().trim();
+  const te1 = (g1.nameTe || '').trim();
+  const te2 = (g2.nameTe || '').trim();
+
+  // If identical in either English or Telugu
+  if (en1 && en2 && en1 === en2) return true;
+  if (te1 && te2 && te1 === te2) return true;
+
+  // First letter of English must match
+  if (en1 && en2 && en1[0] !== en2[0]) return false;
+
+  // English distance
+  if (en1 && en2) {
+    const eDist = levenshtein(en1, en2);
+    if (eDist <= 1 && Math.min(en1.length, en2.length) >= 4) return true;
+    if (eDist <= 2 && Math.min(en1.length, en2.length) >= 7) return true;
+  }
+
+  // Telugu distance
+  if (te1 && te2) {
+    const tDist = levenshtein(te1, te2);
+    if (tDist <= 1 && Math.min(te1.length, te2.length) >= 3) return true;
+    if (tDist <= 2 && Math.min(te1.length, te2.length) >= 5) return true;
+  }
+
+  return false;
+}
+
+export function clusterSimilarSurnameGroups(
+  rawGroups: SurnameGroup[],
+  totalElectors: number
+): SurnameGroup[] {
+  const merged: SurnameGroup[] = [];
+  const visited = new Set<string>();
+
+  for (let i = 0; i < rawGroups.length; i++) {
+    const g = rawGroups[i];
+    if (visited.has(g.id)) continue;
+    visited.add(g.id);
+
+    const primary: SurnameGroup = {
+      ...g,
+      voters: [...g.voters],
+      houseNumbers: [...g.houseNumbers],
+      topElders: [...g.topElders],
+      topYouth: [...g.topYouth],
+      similarVariants: [],
+      variantIds: [g.id]
+    };
+
+    let totalScore = g.supportPct * g.totalVoters;
+
+    for (let j = i + 1; j < rawGroups.length; j++) {
+      const other = rawGroups[j];
+      if (visited.has(other.id)) continue;
+
+      if (areClanGroupsSimilar(primary, other)) {
+        visited.add(other.id);
+        primary.totalVoters += other.totalVoters;
+        primary.maleCount += other.maleCount;
+        primary.femaleCount += other.femaleCount;
+        primary.kriyaCount += other.kriyaCount;
+        primary.fullCount += other.fullCount;
+        primary.strongCount += other.strongCount;
+        primary.neutralCount += other.neutralCount;
+        primary.opponentCount += other.opponentCount;
+        primary.unvisitedCount += other.unvisitedCount;
+        if (other.duplicateCount) {
+          primary.duplicateCount = (primary.duplicateCount || 0) + other.duplicateCount;
+        }
+
+        totalScore += other.supportPct * other.totalVoters;
+
+        primary.voters.push(...other.voters);
+        for (const hn of other.houseNumbers) {
+          if (!primary.houseNumbers.includes(hn)) {
+            primary.houseNumbers.push(hn);
+          }
+        }
+        primary.topElders.push(...other.topElders);
+        primary.topYouth.push(...other.topYouth);
+
+        primary.variantIds!.push(other.id);
+        primary.similarVariants!.push({
+          id: other.id,
+          nameEn: other.nameEn,
+          nameTe: other.nameTe,
+          count: other.totalVoters
+        });
+      }
+    }
+
+    primary.supportPct = Math.round(totalScore / Math.max(1, primary.totalVoters));
+    primary.pctOfBooth = Number(((primary.totalVoters / totalElectors) * 100).toFixed(1));
+
+    // Re-sort elders and youth
+    primary.topElders.sort((a, b) => (parseInt(b.a, 10) || 0) - (parseInt(a.a, 10) || 0));
+    primary.topYouth.sort((a, b) => a.s - b.s);
+
+    merged.push(primary);
+  }
+
+  // Re-sort descending by total voters and re-assign ranks
+  merged.sort((a, b) => b.totalVoters - a.totalVoters);
+  merged.forEach((item, idx) => {
+    item.rank = idx + 1;
+    const isTop10 = idx < 10;
+    const hasManyNeutral = (item.neutralCount + item.unvisitedCount) > (item.totalVoters * 0.3);
+    item.targetPriority = (isTop10 && hasManyNeutral) ? 'high' : (isTop10 || item.totalVoters >= 15) ? 'medium' : 'low';
+  });
+
+  return merged;
+}
+
 /**
  * Groups and classifies all voters in a booth by their Surname Clan.
  * Accurately updates surname grouping, totals, and leaning counts based on manual inputs and profile corrections.
  * Merges phonetic and spelling variations of the same Telugu surname so no clan is duplicated in the UI.
+ * When groupSimilar is true, clusters similar-sounding surnames into unified clans.
  */
 export function classifyBoothSurnames(
   voters: MobileVoter[],
   profiles?: Record<number, VoterCampaignProfile>,
-  voterDupMap?: Record<number, any>
+  voterDupMap?: Record<number, any>,
+  groupSimilar: boolean = false
 ): SurnameGroup[] {
   const clanMap = new Map<string, { en: string; te: string; list: MobileVoter[] }>();
   const teToKeyMap = new Map<string, string>();
@@ -611,6 +762,10 @@ export function classifyBoothSurnames(
       duplicateVoters: voterDupMap ? clanVoters.filter(v => voterDupMap[v.s]) : []
     };
   });
+
+  if (groupSimilar) {
+    return clusterSimilarSurnameGroups(groups, totalElectors);
+  }
 
   return groups;
 }

@@ -1133,7 +1133,11 @@ export function App() {
     notes?: string
   ) => {
     if (!boothData) return;
-    const clans = classifyBoothSurnames(boothData.voters, profiles);
+    const boothKey = String(boothData?.booth_info?.part_no || boothData?.booth_info?.ward_no || 'default');
+    const isGroupSimilar = (() => {
+      try { return localStorage.getItem(`jsp_group_similar_${boothKey}`) === 'true'; } catch { return false; }
+    })();
+    const clans = classifyBoothSurnames(boothData.voters, profiles, undefined, isGroupSimilar);
     const clan = clans.find(c => c.id === surnameId);
     if (!clan) return;
 
@@ -2034,7 +2038,13 @@ export function App() {
       {surnameLeaningState.open && boothData && (
         <SurnameLeaningModal
           isOpen={surnameLeaningState.open}
-          surnames={classifyBoothSurnames(boothData.voters, profiles)}
+          surnames={(() => {
+            const boothKey = String(boothData?.booth_info?.part_no || boothData?.booth_info?.ward_no || 'default');
+            const isGroupSimilar = (() => {
+              try { return localStorage.getItem(`jsp_group_similar_${boothKey}`) === 'true'; } catch { return false; }
+            })();
+            return classifyBoothSurnames(boothData.voters, profiles, undefined, isGroupSimilar);
+          })()}
           initialSurnameId={surnameLeaningState.initialClanId}
           language={lang}
           onApply={handleApplySurnameLeaning}

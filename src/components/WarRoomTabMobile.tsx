@@ -89,10 +89,14 @@ export const WarRoomTabMobile: React.FC<WarRoomTabMobileProps> = ({
 
   // Top Surnames Winning Blueprint calculation
   const { clanGroups, winningFormula } = useMemo(() => {
-    const groups = classifyBoothSurnames(boothData.voters, profiles);
+    const boothKey = String(boothData.booth_info?.part_no || boothData.booth_info?.ward_no || 'default');
+    const isGroupSimilar = (() => {
+      try { return localStorage.getItem(`jsp_group_similar_${boothKey}`) === 'true'; } catch { return false; }
+    })();
+    const groups = classifyBoothSurnames(boothData.voters, profiles, undefined, isGroupSimilar);
     const formula = calculateWinningFormula(groups, boothData.voters.length);
     return { clanGroups: groups, winningFormula: formula };
-  }, [boothData.voters, profiles]);
+  }, [boothData.voters, profiles, boothData.booth_info?.part_no, boothData.booth_info?.ward_no]);
 
   // Target Majority Simulator Calculation
   const marginSim = useMemo(() => {

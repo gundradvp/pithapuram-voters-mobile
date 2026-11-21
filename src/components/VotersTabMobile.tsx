@@ -115,7 +115,27 @@ export const VotersTabMobile: React.FC<VotersTabMobileProps> = ({
   const [isSnoFilterOpen, setIsSnoFilterOpen] = useState(false);
   const [selectedWard, setSelectedWard] = useState<string>('all');
   const [selectedStreet, setSelectedStreet] = useState<string>('all');
-  const [selectedSurname, setSelectedSurname] = useState<string>('all');
+    const [selectedSurname, setSelectedSurname] = useState<string>('all');
+  const [isGroupSimilarSurnames, setIsGroupSimilarSurnames] = useState<boolean>(() => {
+    try {
+      const boothKey = String(boothInfo?.part_no || boothInfo?.ward_no || 'default');
+      const saved = localStorage.getItem(`jsp_group_similar_${boothKey}`);
+      return saved !== null ? saved === 'true' : false;
+    } catch {
+      return false;
+    }
+  });
+
+  const handleToggleGroupSimilarSurnames = () => {
+    setIsGroupSimilarSurnames(prev => {
+      const nextVal = !prev;
+      try {
+        const boothKey = String(boothInfo?.part_no || boothInfo?.ward_no || 'default');
+        localStorage.setItem(`jsp_group_similar_${boothKey}`, String(nextVal));
+      } catch {}
+      return nextVal;
+    });
+  };
   const [internalViewMode, setInternalViewMode] = useState<'list' | 'surnames' | 'excel'>(() => {
     try {
       const saved = localStorage.getItem('jsp_voter_view_mode') as 'list' | 'surnames' | 'excel';
@@ -559,8 +579,8 @@ _దయచేసి మీ ఓటు హక్కును వినియోగ
   // Precomputed Surnames Grouping with Duplicate counts (scoped to selected ward)
   const surnameGroups = useMemo(() => {
     const base = selectedWard !== 'all' ? voters.filter(v => String(v.ward_no ?? '') === selectedWard) : voters;
-    return classifyBoothSurnames(base, profiles, dupAnalysis.voterDupMap);
-  }, [voters, selectedWard, profiles, dupAnalysis.voterDupMap]);
+    return classifyBoothSurnames(base, profiles, dupAnalysis.voterDupMap, isGroupSimilarSurnames);
+  }, [voters, selectedWard, profiles, dupAnalysis.voterDupMap, isGroupSimilarSurnames]);
 
   // Unique streets list for chips
   const streetsList = useMemo(() => {
@@ -630,14 +650,19 @@ _దయచేసి మీ ఓటు హక్కును వినియోగ
         }
       }
 
-      // Surname Filter (Strictly respects manual user input corrections & aliases)
+      // Surname Filter (Strictly respects manual user input corrections & aliases + clustered variants)
       if (selectedSurname !== 'all') {
+        const activeGroup = surnameGroups.find(g => g.id === selectedSurname);
         const { en, te } = extractSurname(v, prof);
         const cleanTe = (te || '').trim();
         const vClanKey = (cleanTe && TELUGU_TO_CANONICAL_EN[cleanTe])
           ? TELUGU_TO_CANONICAL_EN[cleanTe]
           : en;
-        if (vClanKey !== selectedSurname && en !== selectedSurname) return false;
+        if (activeGroup?.variantIds && activeGroup.variantIds.length > 0) {
+          if (!activeGroup.variantIds.includes(vClanKey) && !activeGroup.variantIds.includes(en) && !activeGroup.voters.some(gv => gv.s === v.s)) return false;
+        } else {
+          if (vClanKey !== selectedSurname && en !== selectedSurname) return false;
+        }
       }
 
       // Street Filter
@@ -1297,6 +1322,20 @@ _దయచేసి మీ ఓటు హక్కును వినియోగ
                     {language === 'te' ? '🏷️ చిప్స్ (పూర్తి)' : '🏷️ Chips (Full)'}
                   </button>
                 </div>
+
+                <button
+                  type="button"
+                  onClick={handleToggleGroupSimilarSurnames}
+                  title={isGroupSimilarSurnames ? (language === 'te' ? 'సారూప్య ఇంటిపేర్లు వేరు చేయండి' : 'Ungroup similar surnames') : (language === 'te' ? 'సారూప్య/ఒకేలాంటి ఇంటిపేర్లను కలపండి' : 'Group similar surnames')}
+                  className={`px-2 py-0.5 rounded-md text-[10px] font-bold transition-all cursor-pointer flex items-center gap-1 border ${
+                    isGroupSimilarSurnames
+                      ? 'bg-amber-500/20 text-amber-300 border-amber-500/60 shadow-xs'
+                      : 'bg-slate-950 text-slate-400 border-slate-800 hover:text-white'
+                  }`}
+                >
+                  <span>🔀</span>
+                  <span>{isGroupSimilarSurnames ? (language === 'te' ? 'సారూప్యాలు: ఆన్' : 'Similar: ON') : (language === 'te' ? 'సారూప్యాలు' : 'Similar')}</span>
+                </button>
               </div>
 
               <div className="flex items-center gap-2">
@@ -1527,6 +1566,19 @@ _దయచేసి మీ ఓటు హక్కును వినియోగ
                 <span>⚡ మొగ్గు సెట్</span>
               </button>
             )}
+            <button
+              type="button"
+              onClick={handleToggleGroupSimilarSurnames}
+              title={isGroupSimilarSurnames ? (language === 'te' ? 'సారూప్య ఇంటిపేర్లు వేరు చేయండి' : 'Ungroup similar surnames') : (language === 'te' ? 'సారూప్య/ఒకేలాంటి ఇంటిపేర్లను కలపండి' : 'Group similar surnames')}
+              className={`px-2 py-0.5 rounded-md font-bold whitespace-nowrap transition-all flex items-center gap-1 text-[10px] border ${
+                isGroupSimilarSurnames
+                  ? 'bg-amber-500 text-slate-950 font-black border-amber-400 shadow-sm'
+                  : 'bg-slate-900 text-slate-300 border-slate-700 hover:text-white'
+              }`}
+            >
+              <span>🔀</span>
+              <span>{isGroupSimilarSurnames ? (language === 'te' ? 'సారూప్యాలు కలిపాం' : 'Similar Grouped') : (language === 'te' ? 'సారూప్యాలు కలపండి' : 'Group Similar')}</span>
+            </button>
             <button
               onClick={() => { setSelectedSurname('all'); setVisibleCount(INITIAL_VISIBLE_COUNT); }}
               className={`px-2 py-0.5 rounded-md font-bold whitespace-nowrap transition-all ${
@@ -2312,9 +2364,23 @@ _దయచేసి మీ ఓటు హక్కును వినియోగ
                   : `${surnameGroups.length} unique surnames in this booth. Top clans hold key to victory.`}
               </p>
             </div>
-            <span className="px-2 py-1 bg-amber-500/20 text-amber-300 border border-amber-500/40 rounded-lg font-mono font-black text-xs">
-              {displayedSurnameGroups.length} Clans
-            </span>
+            <div className="flex items-center gap-2">
+              <button
+                type="button"
+                onClick={handleToggleGroupSimilarSurnames}
+                className={`px-2 py-1 rounded-xl text-[10.5px] font-bold transition-all cursor-pointer flex items-center gap-1 border ${
+                  isGroupSimilarSurnames
+                    ? 'bg-amber-500 text-slate-950 font-black border-amber-400 shadow-md'
+                    : 'bg-slate-800 text-slate-300 border-slate-700 hover:text-white'
+                }`}
+              >
+                <span>🔀</span>
+                <span>{isGroupSimilarSurnames ? (language === 'te' ? 'సారూప్యాలు: కలిపి ఉన్నాయి' : 'Similar: Grouped') : (language === 'te' ? 'సారూప్యాలు కలపండి' : 'Group Similar')}</span>
+              </button>
+              <span className="px-2 py-1 bg-amber-500/20 text-amber-300 border border-amber-500/40 rounded-lg font-mono font-black text-xs">
+                {displayedSurnameGroups.length} Clans
+              </span>
+            </div>
           </div>
 
           {displayedSurnameGroups.map((clan) => {
@@ -2368,6 +2434,22 @@ _దయచేసి మీ ఓటు హక్కును వినియోగ
                         <span>•</span>
                         <span>🏠 {clan.houseNumbers.length} ఇళ్లు</span>
                       </div>
+                      {clan.similarVariants && clan.similarVariants.length > 0 && (
+                        <div className="flex items-center gap-1 flex-wrap pt-0.5">
+                          <span className="text-[10px] text-amber-400/90 font-bold flex items-center gap-0.5">
+                            🔀 {language === 'te' ? 'కలిపిన సారూప్యాలు:' : 'Merged:'}
+                          </span>
+                          {clan.similarVariants.map(v => (
+                            <span
+                              key={v.id}
+                              className="px-1.5 py-0.2 bg-amber-950/60 text-amber-300 border border-amber-500/40 rounded text-[9px] font-mono"
+                              title={`${v.nameEn} (${v.count} ఓట్లు)`}
+                            >
+                              {v.nameTe || v.nameEn} ({v.count})
+                            </span>
+                          ))}
+                        </div>
+                      )}
                     </div>
 
                     {/* Support Leaning Badge */}

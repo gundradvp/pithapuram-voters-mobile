@@ -64,7 +64,27 @@ export const FamiliesTabMobile: React.FC<FamiliesTabMobileProps> = ({
   onOpenGroupPrint,
   onOpenFamilySlip
 }) => {
-  const [tabMode, setTabMode] = useState<TabMode>('surnames');
+    const [tabMode, setTabMode] = useState<TabMode>('surnames');
+  const [isGroupSimilarSurnames, setIsGroupSimilarSurnames] = useState<boolean>(() => {
+    try {
+      const boothKey = String(boothInfo?.part_no || boothInfo?.ward_no || 'default');
+      const saved = localStorage.getItem(`jsp_group_similar_${boothKey}`);
+      return saved !== null ? saved === 'true' : false;
+    } catch {
+      return false;
+    }
+  });
+
+  const handleToggleGroupSimilarSurnames = () => {
+    setIsGroupSimilarSurnames(prev => {
+      const nextVal = !prev;
+      try {
+        const boothKey = String(boothInfo?.part_no || boothInfo?.ward_no || 'default');
+        localStorage.setItem(`jsp_group_similar_${boothKey}`, String(nextVal));
+      } catch {}
+      return nextVal;
+    });
+  };
   const [searchQuery, setSearchQuery] = useState('');
   const [filterMode, setFilterMode] = useState<'all' | 'full' | 'strong' | 'soft' | 'neutral' | 'opponent'>('all');
   const [surnameFilter, setSurnameFilter] = useState<SurnameFilter>('all');
@@ -96,10 +116,10 @@ export const FamiliesTabMobile: React.FC<FamiliesTabMobileProps> = ({
 
   // 1. Surname Clans & Winning Blueprint Memos
   const { clanGroups, winningFormula } = useMemo(() => {
-    const groups = classifyBoothSurnames(voters, profiles, dupAnalysis.voterDupMap);
+    const groups = classifyBoothSurnames(voters, profiles, dupAnalysis.voterDupMap, isGroupSimilarSurnames);
     const formula = calculateWinningFormula(groups, voters.length);
     return { clanGroups: groups, winningFormula: formula };
-  }, [voters, profiles, dupAnalysis.voterDupMap]);
+  }, [voters, profiles, dupAnalysis.voterDupMap, isGroupSimilarSurnames]);
 
   // Count of clans containing duplicates
   const clansWithDuplicatesCount = useMemo(() => {
@@ -348,6 +368,20 @@ export const FamiliesTabMobile: React.FC<FamiliesTabMobileProps> = ({
             {/* Filter Pills */}
             <div className="flex items-center gap-1.5 overflow-x-auto py-1 scrollbar-none text-[11px]">
               <button
+                type="button"
+                onClick={handleToggleGroupSimilarSurnames}
+                title={isGroupSimilarSurnames ? (language === 'te' ? 'సారూప్య ఇంటిపేర్లు వేరు చేయండి' : 'Ungroup similar surnames') : (language === 'te' ? 'సారూప్య/ఒకేలాంటి ఇంటిపేర్లను కలపండి' : 'Group similar surnames')}
+                className={`px-2.5 py-1 rounded-lg font-bold whitespace-nowrap transition-all flex items-center gap-1 border ${
+                  isGroupSimilarSurnames
+                    ? 'bg-amber-500 text-slate-950 font-black border-amber-400 shadow-sm'
+                    : 'bg-slate-900 text-slate-300 border-slate-700 hover:text-white'
+                }`}
+              >
+                <span>🔀</span>
+                <span>{isGroupSimilarSurnames ? (language === 'te' ? 'సారూప్యాలు: ఆన్' : 'Similar: ON') : (language === 'te' ? 'సారూప్యాలు కలపండి' : 'Group Similar')}</span>
+              </button>
+
+              <button
                 onClick={() => setSurnameFilter('all')}
                 className={`px-2.5 py-1 rounded-lg font-bold whitespace-nowrap transition-all ${
                   surnameFilter === 'all'
@@ -512,6 +546,22 @@ export const FamiliesTabMobile: React.FC<FamiliesTabMobileProps> = ({
                             <span>•</span>
                             <span>🏠 {clan.houseNumbers.length} {language === 'te' ? 'ఇళ్లు' : 'houses'}</span>
                           </div>
+                          {clan.similarVariants && clan.similarVariants.length > 0 && (
+                            <div className="flex items-center gap-1 flex-wrap pt-1 text-[10.5px]">
+                              <span className="text-amber-400 font-bold flex items-center gap-0.5">
+                                🔀 {language === 'te' ? 'కలిపిన సారూప్యాలు:' : 'Merged:'}
+                              </span>
+                              {clan.similarVariants.map(v => (
+                                <span
+                                  key={v.id}
+                                  className="px-1.5 py-0.2 bg-amber-950/70 text-amber-300 border border-amber-500/40 rounded text-[9.5px] font-mono"
+                                  title={`${v.nameEn} (${v.count} ఓట్లు)`}
+                                >
+                                  {v.nameTe || v.nameEn} ({v.count})
+                                </span>
+                              ))}
+                            </div>
+                          )}
                         </div>
                       </div>
 
