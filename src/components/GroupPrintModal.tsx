@@ -579,6 +579,12 @@ export const GroupPrintModal: React.FC<GroupPrintModalProps> = ({
           }
 
           /* Contrast and sharpness boost for voter card image during print */
+          .voter-card-img {
+            width: 100% !important;
+            max-width: 100% !important;
+            height: auto !important;
+          }
+
           .print-darkness-extra_dark .voter-card-img {
             -webkit-filter: contrast(240%) brightness(80%) !important;
             filter: contrast(240%) brightness(80%) !important;
@@ -1534,14 +1540,14 @@ export const GroupPrintModal: React.FC<GroupPrintModalProps> = ({
                             </div>
                           </div>
 
-                          {/* Official Voter Card Image (Edge-to-edge, clean without double box) */}
+                          {/* Official Voter Card Image (Edge-to-edge, fills the box cleanly) */}
                           {cardPath ? (
-                            <div className="flex-1 flex items-center justify-center p-0.5 my-auto overflow-hidden">
+                            <div className="flex-1 flex items-center justify-center w-full px-0 py-0.5 overflow-hidden my-auto">
                               <img
                                 src={resolvePhotoUrl(cardPath)}
                                 alt={`Official Voter Card ${voterSno}`}
                                 className={`w-full h-auto object-contain mx-auto voter-card-img ${
-                                  is8Cards ? 'max-h-[108px]' : is6Cards ? 'max-h-[135px]' : 'max-h-[175px]'
+                                  is8Cards ? 'max-h-[148px]' : is6Cards ? 'max-h-[175px]' : 'max-h-[220px]'
                                 }`}
                                 style={{
                                   filter: getCardImageFilter(),
