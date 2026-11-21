@@ -4,7 +4,7 @@ import { MobileVoter, BoothInfo, VoterSurveyStatus, VoterCampaignProfile } from 
 import { Language, translations } from '../utils/i18n';
 import { resolvePhotoUrl } from '../utils/photoResolver';
 import { matchesPhoneticSearch } from '../utils/phoneticSearch';
-import { classifyBoothSurnames, extractSurname, SurnameGroup } from '../utils/surnameClassifier';
+import { classifyBoothSurnames, extractSurname, SurnameGroup, TELUGU_TO_CANONICAL_EN } from '../utils/surnameClassifier';
 import { analyzeDuplicateVoters, DuplicateMatchInfo } from '../utils/duplicateDetector';
 import { DuplicateCompareModal } from './DuplicateCompareModal';
 import { SpeedDialModal } from './SpeedDialModal';
@@ -632,8 +632,12 @@ _దయచేసి మీ ఓటు హక్కును వినియోగ
 
       // Surname Filter (Strictly respects manual user input corrections & aliases)
       if (selectedSurname !== 'all') {
-        const { en } = extractSurname(v, prof);
-        if (en !== selectedSurname) return false;
+        const { en, te } = extractSurname(v, prof);
+        const cleanTe = (te || '').trim();
+        const vClanKey = (cleanTe && TELUGU_TO_CANONICAL_EN[cleanTe])
+          ? TELUGU_TO_CANONICAL_EN[cleanTe]
+          : en;
+        if (vClanKey !== selectedSurname && en !== selectedSurname) return false;
       }
 
       // Street Filter

@@ -116,10 +116,53 @@ const SURNAME_ALIASES: Record<string, string> = {
   'KAMEDI': 'KARNIDI',
   'KAMIDI': 'KARNIDI',
   'KUMMA': 'KUMMARI',
-  'KOMMU': 'KOMMURI'
+  'KOMMU': 'KOMMURI',
+  'ARATAKATLA': 'ARATLAKATLA',
+  'ARATKATLA': 'ARATLAKATLA',
+  'ARTKATLA': 'ARATLAKATLA',
+  'ARTIKATLA': 'ARATLAKATLA',
+  'ARATIKATLA': 'ARATLAKATLA',
+  'ARAKATLA': 'ARATLAKATLA',
+  'ARTLAKATLA': 'ARATLAKATLA',
+  'ARATLAKATTA': 'ARATLAKATLA',
+  'ARATHAKATLA': 'ARATLAKATLA',
+  'ARATHA KATLA': 'ARATLAKATLA',
+  'ARATA KATLA': 'ARATLAKATLA',
+  'KANIGIAI': 'KANIGIRI',
+  'KANAGIRI': 'KANIGIRI',
+  'GOLLAPALLL': 'GOLLAPALLI',
+  'GOLLAPAILLI': 'GOLLAPALLI',
+  'GOLLAPALL': 'GOLLAPALLI',
+  'GOLLPALLI': 'GOLLAPALLI',
+  'TEAD': 'TEEDA',
+  'THEEDA': 'TEEDA',
+  'TIDA': 'TEEDA',
+  'AYINVILL': 'AINAVILLI',
+  'AYINMILLI': 'AINAVILLI',
+  'AYINVILLI': 'AINAVILLI',
+  'MATCHERLA': 'MATCHARLA',
+  'MACHARLA': 'MATCHARLA',
+  'DESANEEDI': 'DESINIDI',
+  'DESHANNIDI': 'DESINIDI',
+  'YANMAL': 'YANAMALA',
+  'KOMURI': 'KOMMURI',
+  'PENUGOMDA': 'PENUGONDA',
+  'JAAGU': 'JAGU',
+  'MUTTUMILLI': 'MUTHIMILLI',
+  'MADDA': 'MADDALA'
 };
 
 export const CANONICAL_TELUGU_SURNAMES: Record<string, string> = {
+  'ARATLAKATLA': 'అరట్లకట్ల',
+  'KANIGIRI': 'కనిగిరి',
+  'TEEDA': 'తీడ',
+  'AINAVILLI': 'అయినవిల్లి',
+  'MATCHARLA': 'మచ్చర్ల',
+  'DESINIDI': 'దేశినీడి',
+  'YANAMALA': 'యనమల',
+  'JAGU': 'జాగు',
+  'MUTHIMILLI': 'ముత్తిమిల్లి',
+  'CHINTALAPUDI': 'చింతలపూడి',
   'UMMIDI': 'ఉమ్మిడి',
   'MUMMIDI': 'ముమ్మిడి',
   'BOMMIDI': 'బొమ్మిడి',
@@ -225,10 +268,27 @@ export const CANONICAL_TELUGU_SURNAMES: Record<string, string> = {
 };
 
 export const TELUGU_TO_CANONICAL_EN: Record<string, string> = {
+  'అరట్లకట్ల': 'ARATLAKATLA',
+  'అరటకట్ల': 'ARATLAKATLA',
+  'అరటకాట్ల': 'ARATLAKATLA',
+  'ఆరాతకత్తా': 'ARATLAKATLA',
+  'అరతాకట్ల': 'ARATLAKATLA',
+  'అరటికట్ల': 'ARATLAKATLA',
+  'అరత కాట్ల': 'ARATLAKATLA',
+  'కనిగిరి': 'KANIGIRI',
+  'కనిగిరై': 'KANIGIRI',
+  'తీడ': 'TEEDA',
+  'అయినవిల్లి': 'AINAVILLI',
+  'మచ్చర్ల': 'MATCHARLA',
+  'దేశినీడి': 'DESINIDI',
+  'యనమల': 'YANAMALA',
+  'జాగు': 'JAGU',
+  'ముత్తిమిల్లి': 'MUTHIMILLI',
+  'చింతలపూడి': 'CHINTALAPUDI',
   'విప్పుర్తి': 'VIPPARTHI',
   'శివకోతి': 'SHIVAKOTI',
   'పెనుగండ': 'PENUGONDA',
-  'దేశినడి': 'DESINDI',
+  'దేశినడి': 'DESINIDI',
   'గోపిశెట్టి': 'GOPISETTY',
   'నాగర్పు': 'NAGARPU',
   'చేశెట్టి': 'CHESHETTI'
@@ -256,6 +316,15 @@ export function extractSurname(voter: MobileVoter, profile?: VoterCampaignProfil
   // 1. Direct user profile surname inputs (from Re-OCR Studio or profile edit)
   const profSurnameEn = (profile?.correctedSurnameEn || profile?.surnameEn || '').trim().toUpperCase();
   const profSurnameTe = (profile?.correctedSurnameTe || profile?.surnameTe || '').trim();
+
+  // If user corrected Telugu surname is known in canonical map, resolve canonical English directly
+  if (profSurnameTe && TELUGU_TO_CANONICAL_EN[profSurnameTe]) {
+    const canonEn = TELUGU_TO_CANONICAL_EN[profSurnameTe];
+    return {
+      en: canonEn,
+      te: CANONICAL_TELUGU_SURNAMES[canonEn] || profSurnameTe
+    };
+  }
 
   if (profSurnameEn || profSurnameTe) {
     let canonEn = '';
@@ -390,15 +459,24 @@ export function extractSurname(voter: MobileVoter, profile?: VoterCampaignProfil
     }
   }
 
+  let finalEn = canonEn;
+  let finalTe = canonTe || canonEn;
+
+  if (canonTe && TELUGU_TO_CANONICAL_EN[canonTe]) {
+    finalEn = TELUGU_TO_CANONICAL_EN[canonTe];
+    finalTe = CANONICAL_TELUGU_SURNAMES[finalEn] || canonTe;
+  }
+
   return {
-    en: canonEn,
-    te: canonTe || canonEn
+    en: finalEn,
+    te: finalTe
   };
 }
 
 /**
  * Groups and classifies all voters in a booth by their Surname Clan.
  * Accurately updates surname grouping, totals, and leaning counts based on manual inputs and profile corrections.
+ * Merges phonetic and spelling variations of the same Telugu surname so no clan is duplicated in the UI.
  */
 export function classifyBoothSurnames(
   voters: MobileVoter[],
@@ -406,14 +484,29 @@ export function classifyBoothSurnames(
   voterDupMap?: Record<number, any>
 ): SurnameGroup[] {
   const clanMap = new Map<string, { en: string; te: string; list: MobileVoter[] }>();
+  const teToKeyMap = new Map<string, string>();
 
   voters.forEach(v => {
     const prof = profiles ? profiles[v.s] : undefined;
-    const { en, te } = extractSurname(v, prof);
-    if (!clanMap.has(en)) {
-      clanMap.set(en, { en, te, list: [] });
+    let { en, te } = extractSurname(v, prof);
+    const cleanTe = (te || '').trim();
+
+    let key = en;
+    if (cleanTe && TELUGU_TO_CANONICAL_EN[cleanTe]) {
+      key = TELUGU_TO_CANONICAL_EN[cleanTe];
+      en = key;
+      te = CANONICAL_TELUGU_SURNAMES[key] || cleanTe;
+    } else if (cleanTe && teToKeyMap.has(cleanTe)) {
+      key = teToKeyMap.get(cleanTe)!;
     }
-    clanMap.get(en)!.list.push(v);
+
+    if (!clanMap.has(key)) {
+      clanMap.set(key, { en, te, list: [] });
+      if (cleanTe) {
+        teToKeyMap.set(cleanTe, key);
+      }
+    }
+    clanMap.get(key)!.list.push(v);
   });
 
   const totalElectors = voters.length || 1;
