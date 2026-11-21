@@ -1,5 +1,5 @@
 import React from 'react';
-import { Lock, Unlock, Wifi, WifiOff, Languages, Palette, LogOut, Crown, UserCheck, RefreshCw, ArrowRightLeft, ChevronDown, Clock, Monitor, Smartphone, Users, Home, Trophy, DownloadCloud } from 'lucide-react';
+import { Lock, Unlock, Wifi, WifiOff, Languages, Palette, LogOut, Crown, UserCheck, RefreshCw, ArrowRightLeft, ChevronDown, Clock, Monitor, Smartphone, Users, Home, Trophy, DownloadCloud, MapPin } from 'lucide-react';
 import { BoothInfo, TabType } from '../types';
 import { Language } from '../utils/i18n';
 import { ThemeId, THEMES } from '../utils/theme';
@@ -27,6 +27,7 @@ interface HeaderMobileProps {
   onToggleLanguage: () => void;
   onOpenThemeSelector: () => void;
   onOpenBoothSelector: () => void;
+  onOpenBoothDirectory?: () => void;
   onOpenAdminHub?: () => void;
   onLogout: () => void;
   onUnload?: () => void;
@@ -54,6 +55,7 @@ export const HeaderMobile: React.FC<HeaderMobileProps> = ({
   onToggleLanguage,
   onOpenThemeSelector,
   onOpenBoothSelector,
+  onOpenBoothDirectory,
   onOpenAdminHub,
   onLogout,
   onUnload,
@@ -161,6 +163,19 @@ export const HeaderMobile: React.FC<HeaderMobileProps> = ({
             <span>🏡</span>
             <span className="hidden xs:inline">{language === 'te' ? 'పూర్తి గ్రామం:' : 'Full GP:'}</span>
             <span className="font-bold underline">{parentVillageLabel || (language === 'te' ? 'పూర్తి గ్రామం' : 'Full GP')}</span>
+          </button>
+        )}
+
+        {/* Polling Booth Directory & GPS Navigation Button */}
+        {onOpenBoothDirectory && (
+          <button
+            type="button"
+            onClick={onOpenBoothDirectory}
+            className="flex items-center gap-1 px-2 py-1 rounded-lg text-[10px] font-bold bg-amber-500/20 hover:bg-amber-500/30 text-amber-300 border border-amber-500/40 transition-all shadow-sm active:scale-95 cursor-pointer"
+            title={language === 'te' ? 'పోలింగ్ కేంద్రాల డైరెక్టరీ & GPS నావిగేషన్' : 'Polling Booth Directory & GPS Navigation'}
+          >
+            <MapPin className="w-3 h-3 text-amber-400" />
+            <span className="hidden xs:inline">{language === 'te' ? 'కేంద్రాలు' : 'Booths'}</span>
           </button>
         )}
 

@@ -8,7 +8,7 @@
     "mandal": "GOLLAPROLU",
     "assembly": "37 - పిఠాపురం",
     "local_body": "దుర్గడ గ్రామ పంచాయతీ (Durgada Gram Panchayat)",
-    "ps_address": "దుర్గడ గ్రామ పంచాయతీ 16వ వార్డు",
+    "ps_address": "ఎస్సీ పేట పోలింగ్ కేంద్రం (SC peta), దుర్గడ",
     "sections": "దుర్గడ 16వ వార్డు పరిధి (537 ఓటర్లు)",
     "total_voters": 537,
     "male_count": 239,
@@ -20,7 +20,11 @@
     "election_type": "panchayat",
     "type": "ward",
     "view_level": "ward",
-    "is_loaded": true
+    "is_loaded": true,
+    "ps_name": "ఎస్సీ పేట పోలింగ్ కేంద్రం (SC peta), దుర్గడ",
+    "latitude": 17.21667739,
+    "longitude": 82.34225698,
+    "google_maps_url": "https://www.google.com/maps?q=17.21667739,82.34225698"
   },
   "volunteers": [],
   "voters": [

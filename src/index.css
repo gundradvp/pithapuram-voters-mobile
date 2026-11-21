@@ -504,3 +504,254 @@ body {
   background-color: #081222 !important;
   border-color: #142b4d !important;
 }
+
+/* =============================================================
+   A4 PRINT STYLESHEET (Official Electoral Cards & Slips)
+   Symmetrically calibrated: Fold in half = exactly 4 cards.
+   ============================================================= */
+@media print {
+  @page {
+    size: A4 portrait;
+    margin: 0mm !important;
+  }
+
+  html, body {
+    width: 210mm !important;
+    min-width: 210mm !important;
+    max-width: 210mm !important;
+    height: auto !important;
+    min-height: 100% !important;
+    margin: 0 !important;
+    padding: 0 !important;
+    background: #ffffff !important;
+    color: #000000 !important;
+    overflow: visible !important;
+    -webkit-print-color-adjust: exact !important;
+    print-color-adjust: exact !important;
+    color-adjust: exact !important;
+  }
+
+  /* Hide app navigation, headers, footers and screen-only elements */
+  header, nav, main, footer, .no-print, [role="navigation"] {
+    display: none !important;
+  }
+
+  /* When printing with GroupPrintModal open, hide ALL other siblings */
+  body > #root > div > *:not(.group-print-modal-overlay) {
+    display: none !important;
+  }
+
+  /* Reset modal overlay */
+  .group-print-modal-overlay {
+    position: static !important;
+    inset: auto !important;
+    display: block !important;
+    width: 210mm !important;
+    min-width: 210mm !important;
+    max-width: 210mm !important;
+    height: auto !important;
+    padding: 0 !important;
+    margin: 0 !important;
+    background: transparent !important;
+    overflow: visible !important;
+    backdrop-filter: none !important;
+  }
+
+  #group-printable-content {
+    position: static !important;
+    display: block !important;
+    width: 210mm !important;
+    min-width: 210mm !important;
+    max-width: 210mm !important;
+    margin: 0 auto !important;
+    padding: 0 !important;
+    background: #ffffff !important;
+    border: none !important;
+    box-shadow: none !important;
+  }
+
+  #group-printable-content > * + * {
+    margin-top: 0 !important;
+  }
+
+  /* Discrete A4 sheet: Exactly 210mm wide x 297mm high (fold in half = exactly 4 cards) */
+  .a4-print-page {
+    width: 210mm !important;
+    max-width: 210mm !important;
+    min-width: 210mm !important;
+    height: 297mm !important;
+    max-height: 297mm !important;
+    min-height: 297mm !important;
+    box-sizing: border-box !important;
+    margin: 0 auto !important;
+    padding: 6mm 5.5mm !important;
+    border: none !important;
+    border-radius: 0 !important;
+    box-shadow: none !important;
+    display: flex !important;
+    flex-direction: column !important;
+    justify-content: flex-start !important;
+    align-items: center !important;
+    page-break-after: always !important;
+    break-after: page !important;
+    page-break-inside: avoid !important;
+    break-inside: avoid !important;
+    overflow: hidden !important;
+    background: #ffffff !important;
+  }
+
+  .a4-print-page:last-child {
+    page-break-after: auto !important;
+    break-after: auto !important;
+  }
+
+  /* 8 CARDS GRID (2x4): Width 199mm, Height 285mm.
+     Generous 6mm cutting space between rows, 5mm between columns.
+     Eliminates double lines completely.
+     Fold line at y = 148.5mm falls cleanly in the middle channel. */
+  .a4-print-page .cards-grid-8 {
+    width: 199mm !important;
+    max-width: 199mm !important;
+    min-width: 199mm !important;
+    height: 285mm !important;
+    max-height: 285mm !important;
+    min-height: 285mm !important;
+    display: grid !important;
+    grid-template-columns: 97mm 97mm !important;
+    grid-template-rows: 63.5mm 63.5mm 63.5mm 63.5mm !important;
+    row-gap: 6mm !important;
+    column-gap: 5mm !important;
+    box-sizing: border-box !important;
+    margin: 0 auto !important;
+    padding: 0 !important;
+  }
+
+  .a4-print-page .cards-grid-8 .voter-card-print {
+    width: 100% !important;
+    height: 100% !important;
+    max-height: 100% !important;
+    border-radius: 6px !important;
+    border-style: dotted !important;
+    border-width: 1.5px !important;
+    margin: 0 !important;
+    box-sizing: border-box !important;
+  }
+
+  /* 6 CARDS GRID (2x3) */
+  .a4-print-page .cards-grid-6 {
+    width: 200mm !important;
+    max-width: 200mm !important;
+    min-width: 200mm !important;
+    height: 285mm !important;
+    max-height: 285mm !important;
+    min-height: 285mm !important;
+    display: grid !important;
+    grid-template-columns: 98mm 98mm !important;
+    grid-template-rows: 90mm 90mm 90mm !important;
+    gap: 7.5mm 4mm !important;
+    box-sizing: border-box !important;
+    margin: 0 auto !important;
+    padding: 0 !important;
+  }
+
+  /* 4 CARDS GRID (2x2) */
+  .a4-print-page .cards-grid-4 {
+    width: 200mm !important;
+    max-width: 200mm !important;
+    min-width: 200mm !important;
+    height: 285mm !important;
+    max-height: 285mm !important;
+    min-height: 285mm !important;
+    display: grid !important;
+    grid-template-columns: 98mm 98mm !important;
+    grid-template-rows: 137.5mm 137.5mm !important;
+    gap: 10mm 4mm !important;
+    box-sizing: border-box !important;
+    margin: 0 auto !important;
+    padding: 0 !important;
+  }
+
+  /* 2 CARDS GRID (1x2) */
+  .a4-print-page .cards-grid-2 {
+    width: 200mm !important;
+    max-width: 200mm !important;
+    min-width: 200mm !important;
+    height: 285mm !important;
+    max-height: 285mm !important;
+    min-height: 285mm !important;
+    display: grid !important;
+    grid-template-columns: 200mm !important;
+    grid-template-rows: 137.5mm 137.5mm !important;
+    gap: 10mm 0 !important;
+    box-sizing: border-box !important;
+    margin: 0 auto !important;
+    padding: 0 !important;
+  }
+
+  /* Hide page footer in print */
+  .a4-print-page .page-print-footer,
+  .page-print-footer {
+    display: none !important;
+  }
+
+  /* Card Individual Container with Dotted Color Border */
+  .voter-card-print {
+    page-break-inside: avoid !important;
+    break-inside: avoid !important;
+    background: #ffffff !important;
+    border-width: 2px !important;
+    border-style: dotted !important;
+    border-radius: 6px !important;
+    box-shadow: none !important;
+    color: #000000 !important;
+    width: 100% !important;
+    height: 100% !important;
+    max-height: 100% !important;
+    display: flex !important;
+    flex-direction: column !important;
+    justify-content: space-between !important;
+    padding: 1mm 1.5mm !important;
+    box-sizing: border-box !important;
+    overflow: hidden !important;
+    -webkit-print-color-adjust: exact !important;
+    print-color-adjust: exact !important;
+    color-adjust: exact !important;
+  }
+
+  .voter-card-print p,
+  .voter-card-print span {
+    color: #000000 !important;
+  }
+
+  .badge-sno-red {
+    border: 1.5px solid #dc2626 !important;
+    background-color: #fef2f2 !important;
+    color: #dc2626 !important;
+    font-weight: 900 !important;
+    -webkit-print-color-adjust: exact !important;
+    print-color-adjust: exact !important;
+    color-adjust: exact !important;
+  }
+
+  .voter-card-img-container {
+    flex: 1 1 auto !important;
+    width: 100% !important;
+    height: 46mm !important;
+    max-height: 46mm !important;
+    min-height: 0 !important;
+    display: flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    overflow: hidden !important;
+    padding: 0 !important;
+    margin: auto 0 !important;
+  }
+
+  .voter-card-img {
+    width: 100% !important;
+    max-width: 100% !important;
+    height: 100% !important;
+    max-height: none !important;
+    object-fit: contain !important;
+  }
+}

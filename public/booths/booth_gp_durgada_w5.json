@@ -2,7 +2,7 @@
   "booth_info": {
     "booth_no": "gp_durgada_w5",
     "village": "దుర్గడ — వార్డు #5",
-    "ps_name": "దుర్గడ గ్రామ పంచాయతీ 5వ వార్డు",
+    "ps_name": "కొత్తపేట ఎంపీపీ ప్రాథమిక పాఠశాల (Kothapeta MPP), దుర్గడ",
     "total_voters": 530,
     "male_count": 284,
     "female_count": 246,
@@ -10,7 +10,11 @@
     "assembly": "37 - పిఠాపురం",
     "election_type": "panchayat",
     "ward_no": 5,
-    "clean_village": "దుర్గడ వార్డు 5"
+    "clean_village": "దుర్గడ వార్డు 5",
+    "ps_address": "కొత్తపేట ఎంపీపీ ప్రాథమిక పాఠశాల (Kothapeta MPP), దుర్గడ",
+    "latitude": 17.21705785,
+    "longitude": 82.34811288,
+    "google_maps_url": "https://www.google.com/maps?q=17.21705785,82.34811288"
   },
   "voters": [
     {

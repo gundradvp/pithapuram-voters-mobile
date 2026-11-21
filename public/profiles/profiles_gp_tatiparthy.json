@@ -24,12 +24,13 @@
     "notes": "ఉదయమే వచ్చి ఓటు వేశారు"
   },
   "4": {
-    "supportPct": 100,
-    "survey_status": null,
+    "supportPct": 50,
+    "survey_status": "deceased",
     "customAlias": "veera lakshmi gopisetti",
     "influencerId": "inf_1",
     "influencerName": "Guddati Veerraju",
-    "influencerMobile": "9848596259"
+    "influencerMobile": "9848596259",
+    "updatedAt": "2026-11-21T12:21:05.504Z"
   },
   "5": {
     "supportPct": 50,
@@ -130,7 +131,7 @@
   },
   "23": {
     "supportPct": 100,
-    "survey_status": "supporter",
+    "survey_status": "out_of_city",
     "notes": "మొదటిసారి ఓటు వేసే యువకుడు"
   },
   "24": {
@@ -140,7 +141,7 @@
   },
   "25": {
     "supportPct": 100,
-    "survey_status": "supporter",
+    "survey_status": "voted",
     "influencerName": "Gollapalli.Sivababu",
     "influencerPhone": "9666792006"
   },
@@ -267,7 +268,7 @@
   },
   "56": {
     "supportPct": 100,
-    "survey_status": "supporter",
+    "survey_status": "voted",
     "influencerName": "Gollapalli.Sivababu",
     "influencerPhone": "9666792006"
   },

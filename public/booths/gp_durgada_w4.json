@@ -2,7 +2,7 @@
   "booth_info": {
     "booth_no": "gp_durgada_w4",
     "village": "దుర్గడ — వార్డు #4",
-    "ps_name": "దుర్గడ గ్రామ పంచాయతీ 4వ వార్డు",
+    "ps_name": "ఈబీసీ కాలనీ పోలింగ్ కేంద్రం (EBC colony), దుర్గడ",
     "total_voters": 530,
     "male_count": 276,
     "female_count": 254,
@@ -10,7 +10,11 @@
     "assembly": "37 - పిఠాపురం",
     "election_type": "panchayat",
     "ward_no": 4,
-    "clean_village": "దుర్గడ వార్డు 4"
+    "clean_village": "దుర్గడ వార్డు 4",
+    "ps_address": "ఈబీసీ కాలనీ పోలింగ్ కేంద్రం (EBC colony), దుర్గడ",
+    "latitude": 17.21239233,
+    "longitude": 82.34119277,
+    "google_maps_url": "https://www.google.com/maps?q=17.21239233,82.34119277"
   },
   "voters": [
     {

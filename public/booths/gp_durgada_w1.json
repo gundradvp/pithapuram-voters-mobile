@@ -2,7 +2,7 @@
   "booth_info": {
     "booth_no": "gp_durgada_w1",
     "village": "దుర్గడ — వార్డు #1",
-    "ps_name": "దుర్గడ గ్రామ పంచాయతీ 1వ వార్డు",
+    "ps_name": "పాలపు వీధి పోలింగ్ కేంద్రం (Palapu veedhi), దుర్గడ",
     "total_voters": 530,
     "male_count": 277,
     "female_count": 253,
@@ -10,7 +10,11 @@
     "assembly": "37 - పిఠాపురం",
     "election_type": "panchayat",
     "ward_no": 1,
-    "clean_village": "దుర్గడ వార్డు 1"
+    "clean_village": "దుర్గడ వార్డు 1",
+    "ps_address": "పాలపు వీధి పోలింగ్ కేంద్రం (Palapu veedhi), దుర్గడ",
+    "latitude": 17.2117922,
+    "longitude": 82.3455958,
+    "google_maps_url": "https://www.google.com/maps?q=17.2117922,82.3455958"
   },
   "voters": [
     {

@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { X, Share2, Printer, MapPin, Home, User, Copy, CheckCircle2 } from 'lucide-react';
 import { MobileVoter, BoothInfo } from '../types';
 import { resolvePhotoUrl } from '../utils/photoResolver';
+import { resolveWardPollingStation } from '../utils/boothDirectoryHelper';
 
 interface VoterSlipModalProps {
   voter: MobileVoter | null;
@@ -72,7 +73,7 @@ export const VoterSlipModal: React.FC<VoterSlipModalProps> = ({
 
   const handleShareWhatsApp = () => {
     const isMunicipal = boothInfo.election_type === 'municipal';
-    const psLocation = voter.polling_station_name || boothInfo.ps_address;
+    const psLocation = resolveWardPollingStation(voter, boothInfo);
     const text = isMunicipal
       ? `*🗳️ ${boothInfo.local_body || 'పురపాలక సంఘం'} (${boothInfo.ward_no ? `${boothInfo.ward_no}వ వార్డు` : ''})*
 *ఓటరు సమాచార స్లిప్పు (VOTER SLIP)*
@@ -248,7 +249,7 @@ _దయచేసి మీ ఓటు హక్కును వినియోగ
               <MapPin className="w-3 h-3 text-red-400" /> Polling Station Location
             </span>
             <span className="text-slate-300 text-[11px] block mt-0.5 leading-snug">
-              {voter.polling_station_name || boothInfo.ps_address}
+              {resolveWardPollingStation(voter, boothInfo)}
             </span>
           </div>
         </div>

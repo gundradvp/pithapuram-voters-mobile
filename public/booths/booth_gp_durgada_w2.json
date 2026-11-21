@@ -2,7 +2,7 @@
   "booth_info": {
     "booth_no": "gp_durgada_w2",
     "village": "దుర్గడ — వార్డు #2",
-    "ps_name": "దుర్గడ గ్రామ పంచాయతీ 2వ వార్డు",
+    "ps_name": "పాలపు వీధి పోలింగ్ కేంద్రం (Palapu veedhi), దుర్గడ",
     "total_voters": 530,
     "male_count": 266,
     "female_count": 264,
@@ -10,7 +10,11 @@
     "assembly": "37 - పిఠాపురం",
     "election_type": "panchayat",
     "ward_no": 2,
-    "clean_village": "దుర్గడ వార్డు 2"
+    "clean_village": "దుర్గడ వార్డు 2",
+    "ps_address": "పాలపు వీధి పోలింగ్ కేంద్రం (Palapu veedhi), దుర్గడ",
+    "latitude": 17.2117922,
+    "longitude": 82.3455958,
+    "google_maps_url": "https://www.google.com/maps?q=17.2117922,82.3455958"
   },
   "voters": [
     {

@@ -17,6 +17,7 @@ import {
 import { MobileVoter, BoothInfo, VoterCampaignProfile } from '../types';
 import { Language } from '../utils/i18n';
 import { resolvePhotoUrl } from '../utils/photoResolver';
+import { resolveWardPollingStation, resolveWardPollingStationDetails } from '../utils/boothDirectoryHelper';
 
 interface GroupPrintModalProps {
   isOpen: boolean;
@@ -216,6 +217,17 @@ export const GroupPrintModal: React.FC<GroupPrintModalProps> = ({
   const activeTheme = useMemo(() => {
     return COLOR_THEMES.find(t => t.id === colorTheme) || COLOR_THEMES[0];
   }, [colorTheme]);
+
+  const getThemeBorderColor = (themeId: ColorTheme): string => {
+    switch (themeId) {
+      case 'blue': return '#1d4ed8'; // Royal Blue
+      case 'tricolor': return '#047857'; // Emerald Green
+      case 'emerald': return '#047857'; // Emerald Green
+      case 'crimson': return '#be123c'; // Ruby Crimson
+      case 'bw': return '#1e293b'; // Slate 800
+      default: return '#1d4ed8';
+    }
+  };
 
   // Helper to extract phone number from voter or campaign profile
   const getVoterPhone = (v: MobileVoter): string => {
@@ -448,6 +460,10 @@ export const GroupPrintModal: React.FC<GroupPrintModalProps> = ({
     ? `${boothInfo.local_body || 'పురపాలక సంఘం'} — ${boothInfo.ward_no ? `${boothInfo.ward_no}వ వార్డు` : ''} (బూత్ Part #${boothInfo.part_no})`
     : `పిఠాపురం శాసనసభ నియోజకవర్గం (AC #37) — బూత్ Part #${boothInfo.part_no}`;
 
+  const getVoterPollingStation = (v: MobileVoter): string => {
+    return resolveWardPollingStation(v, boothInfo);
+  };
+
   const todayDate = new Date().toLocaleDateString('te-IN', {
     day: '2-digit',
     month: 'short',
@@ -461,7 +477,7 @@ export const GroupPrintModal: React.FC<GroupPrintModalProps> = ({
         @media print {
           @page {
             size: A4 portrait;
-            margin: 6mm 5mm;
+            margin: 0mm !important;
           }
 
           html, body {
@@ -469,8 +485,11 @@ export const GroupPrintModal: React.FC<GroupPrintModalProps> = ({
             padding: 0 !important;
             background: #ffffff !important;
             color: #000000 !important;
+            width: 210mm !important;
+            min-width: 210mm !important;
+            max-width: 210mm !important;
             height: auto !important;
-            min-height: 0 !important;
+            min-height: 100% !important;
             overflow: visible !important;
             -webkit-print-color-adjust: exact !important;
             print-color-adjust: exact !important;
@@ -482,12 +501,29 @@ export const GroupPrintModal: React.FC<GroupPrintModalProps> = ({
             display: none !important;
           }
 
+          #root, #root > div {
+            width: 210mm !important;
+            min-width: 210mm !important;
+            max-width: 210mm !important;
+            margin: 0 !important;
+            padding: 0 !important;
+            background: transparent !important;
+            display: block !important;
+          }
+
+          /* When printing with GroupPrintModal open, hide ALL other siblings */
+          body > #root > div > *:not(.group-print-modal-overlay) {
+            display: none !important;
+          }
+
           /* Unfix modal overlay to standard block flow so all pages paginate properly */
           .group-print-modal-overlay {
             position: static !important;
             inset: auto !important;
             display: block !important;
-            width: 100% !important;
+            width: 210mm !important;
+            min-width: 210mm !important;
+            max-width: 210mm !important;
             height: auto !important;
             padding: 0 !important;
             margin: 0 !important;
@@ -499,29 +535,38 @@ export const GroupPrintModal: React.FC<GroupPrintModalProps> = ({
           #group-printable-content {
             position: static !important;
             display: block !important;
-            width: 100% !important;
-            max-width: 100% !important;
-            margin: 0 !important;
+            width: 210mm !important;
+            min-width: 210mm !important;
+            max-width: 210mm !important;
+            margin: 0 auto !important;
             padding: 0 !important;
             background: #ffffff !important;
             border: none !important;
             box-shadow: none !important;
           }
 
-          /* Each A4 Page is an isolated print sheet that breaks cleanly */
+          #group-printable-content > * + * {
+            margin-top: 0 !important;
+          }
+
+          /* Discrete A4 sheet: Exactly 210mm wide x 297mm high (fold in half = exactly 4 cards) */
           .a4-print-page {
-            width: 198mm !important;
-            max-width: 198mm !important;
-            min-height: 280mm !important;
-            height: 280mm !important;
+            width: 210mm !important;
+            max-width: 210mm !important;
+            min-width: 210mm !important;
+            height: 297mm !important;
+            max-height: 297mm !important;
+            min-height: 297mm !important;
             box-sizing: border-box !important;
             margin: 0 auto !important;
-            padding: 2mm 0 !important;
+            padding: 6mm 5.5mm !important;
             border: none !important;
+            border-radius: 0 !important;
             box-shadow: none !important;
             display: flex !important;
             flex-direction: column !important;
-            justify-content: space-between !important;
+            justify-content: flex-start !important;
+            align-items: center !important;
             page-break-after: always !important;
             break-after: page !important;
             page-break-inside: avoid !important;
@@ -533,6 +578,95 @@ export const GroupPrintModal: React.FC<GroupPrintModalProps> = ({
           .a4-print-page:last-child {
             page-break-after: auto !important;
             break-after: auto !important;
+          }
+
+          /* 8 CARDS GRID (2x4): Width 199mm, Height 285mm.
+             Generous 6mm cutting space between rows, 5mm between columns.
+             Eliminates double lines completely.
+             Fold line at y = 148.5mm falls cleanly in the middle channel. */
+          .a4-print-page .cards-grid-8 {
+            width: 199mm !important;
+            max-width: 199mm !important;
+            min-width: 199mm !important;
+            height: 285mm !important;
+            max-height: 285mm !important;
+            min-height: 285mm !important;
+            display: grid !important;
+            grid-template-columns: 97mm 97mm !important;
+            grid-template-rows: 63.5mm 63.5mm 63.5mm 63.5mm !important;
+            row-gap: 6mm !important;
+            column-gap: 5mm !important;
+            box-sizing: border-box !important;
+            margin: 0 auto !important;
+            padding: 0 !important;
+          }
+
+          .a4-print-page .cards-grid-8 .voter-card-print {
+            width: 100% !important;
+            height: 100% !important;
+            max-height: 100% !important;
+            border-radius: 6px !important;
+            border-style: dotted !important;
+            border-width: 1.5px !important;
+            margin: 0 !important;
+            box-sizing: border-box !important;
+          }
+
+          /* 6 CARDS GRID (2x3) */
+          .a4-print-page .cards-grid-6 {
+            width: 200mm !important;
+            max-width: 200mm !important;
+            min-width: 200mm !important;
+            height: 285mm !important;
+            max-height: 285mm !important;
+            min-height: 285mm !important;
+            display: grid !important;
+            grid-template-columns: 98mm 98mm !important;
+            grid-template-rows: 90mm 90mm 90mm !important;
+            gap: 7.5mm 4mm !important;
+            box-sizing: border-box !important;
+            margin: 0 auto !important;
+            padding: 0 !important;
+          }
+
+          /* 4 CARDS GRID (2x2) */
+          .a4-print-page .cards-grid-4 {
+            width: 200mm !important;
+            max-width: 200mm !important;
+            min-width: 200mm !important;
+            height: 285mm !important;
+            max-height: 285mm !important;
+            min-height: 285mm !important;
+            display: grid !important;
+            grid-template-columns: 98mm 98mm !important;
+            grid-template-rows: 137.5mm 137.5mm !important;
+            gap: 10mm 4mm !important;
+            box-sizing: border-box !important;
+            margin: 0 auto !important;
+            padding: 0 !important;
+          }
+
+          /* 2 CARDS GRID (1x2) */
+          .a4-print-page .cards-grid-2 {
+            width: 200mm !important;
+            max-width: 200mm !important;
+            min-width: 200mm !important;
+            height: 285mm !important;
+            max-height: 285mm !important;
+            min-height: 285mm !important;
+            display: grid !important;
+            grid-template-columns: 200mm !important;
+            grid-template-rows: 137.5mm 137.5mm !important;
+            gap: 10mm 0 !important;
+            box-sizing: border-box !important;
+            margin: 0 auto !important;
+            padding: 0 !important;
+          }
+
+          /* Completely suppress page footer in print so fold is 100% symmetrical */
+          .a4-print-page .page-print-footer,
+          .page-print-footer {
+            display: none !important;
           }
 
           .voter-slip-card {
@@ -552,13 +686,25 @@ export const GroupPrintModal: React.FC<GroupPrintModalProps> = ({
             font-weight: 700 !important;
           }
 
+          /* Card Individual Container with Dotted Color Border */
           .voter-card-print {
             page-break-inside: avoid !important;
             break-inside: avoid !important;
             background: #ffffff !important;
-            border: 1.5px solid #000000 !important;
+            border-width: 2px !important;
+            border-style: dotted !important;
+            border-radius: 6px !important;
             box-shadow: none !important;
             color: #000000 !important;
+            width: 100% !important;
+            height: 100% !important;
+            max-height: 100% !important;
+            display: flex !important;
+            flex-direction: column !important;
+            justify-content: space-between !important;
+            padding: 1mm 1.5mm !important;
+            box-sizing: border-box !important;
+            overflow: hidden !important;
             -webkit-print-color-adjust: exact !important;
             print-color-adjust: exact !important;
             color-adjust: exact !important;
@@ -569,20 +715,37 @@ export const GroupPrintModal: React.FC<GroupPrintModalProps> = ({
             color: #000000 !important;
           }
 
-          .badge-sno {
-            border: 1.5px solid #000000 !important;
-            background-color: #f1f5f9 !important;
-            color: #000000 !important;
+          .badge-sno-red {
+            border: 1.5px solid #dc2626 !important;
+            background-color: #fef2f2 !important;
+            color: #dc2626 !important;
             font-weight: 900 !important;
             -webkit-print-color-adjust: exact !important;
             print-color-adjust: exact !important;
+            color-adjust: exact !important;
           }
 
-          /* Contrast and sharpness boost for voter card image during print */
+          .voter-card-img-container {
+            flex: 1 1 auto !important;
+            width: 100% !important;
+            height: 46mm !important;
+            max-height: 46mm !important;
+            min-height: 0 !important;
+            display: flex !important;
+            align-items: center !important;
+            justify-content: center !important;
+            overflow: hidden !important;
+            padding: 0 !important;
+            margin: auto 0 !important;
+          }
+
+          /* Full height responsive expansion for voter card image */
           .voter-card-img {
             width: 100% !important;
             max-width: 100% !important;
-            height: auto !important;
+            height: 100% !important;
+            max-height: none !important;
+            object-fit: contain !important;
           }
 
           .print-darkness-extra_dark .voter-card-img {
@@ -1390,18 +1553,23 @@ export const GroupPrintModal: React.FC<GroupPrintModalProps> = ({
                           )}
                         </div>
 
-                        {/* Polling Station Address Box */}
-                        <div className={`${activeTheme.psBoxBg} border ${activeTheme.psBoxBorder} rounded-lg p-1 mb-1 text-[8.5px] leading-tight`}>
-                          <div className="truncate font-medium">
-                            <strong className="font-bold">📍 కేంద్రం:</strong> {boothInfo.ps_address || 'స్థానిక పోలింగ్ కేంద్రం'}
-                          </div>
-                          {!isCompact && (
-                            <div className="text-[7.5px] opacity-80 mt-0.5 flex justify-between gap-1 flex-wrap">
-                              <span>⏰ ఉ॥ 7:00 – సా॥ 6:00</span>
-                              <span className="font-bold text-slate-900">గుర్తింపు కార్డు తప్పనిసరి</span>
+                        {/* Polling Station Address Box (In color like attached, with Coordinates, NO time mentioned) */}
+                        {(() => {
+                          const station = resolveWardPollingStationDetails(v, boothInfo);
+                          return (
+                            <div className={`${activeTheme.psBoxBg} border ${activeTheme.psBoxBorder} rounded-lg p-1 mb-1 text-[8.5px] leading-tight`}>
+                              <div className="truncate font-medium flex items-center gap-1 min-w-0">
+                                <strong className="font-bold shrink-0">📍 కేంద్రం:</strong>
+                                <span className="truncate">{station.name}</span>
+                                {station.coordinates && (
+                                  <span className="font-mono text-[7px] bg-black/10 px-1 py-0.2 rounded shrink-0 font-bold">
+                                    GPS: {station.coordinates}
+                                  </span>
+                                )}
+                              </div>
                             </div>
-                          )}
-                        </div>
+                          );
+                        })()}
 
                         {/* Bottom Cut Line */}
                         <div className={`border-t border-dashed ${activeTheme.cutLineBorder} pt-0.5 flex items-center justify-between text-[7.5px] ${activeTheme.cutLineText}`}>
@@ -1430,7 +1598,7 @@ export const GroupPrintModal: React.FC<GroupPrintModalProps> = ({
                 </div>
 
                 {/* Page Footer */}
-                <div className="mt-1.5 pt-1 border-t border-slate-300 flex items-center justify-between text-[8px] text-slate-500 leading-none">
+                <div className="page-print-footer mt-1.5 pt-1 border-t border-slate-300 flex items-center justify-between text-[8px] text-slate-500 leading-none">
                   {brandingMode === 'party' ? (
                     <>
                       <p className="font-bold text-slate-700">
@@ -1468,16 +1636,19 @@ export const GroupPrintModal: React.FC<GroupPrintModalProps> = ({
             cardPages.map((pageVoters, pageIndex) => {
               const is8Cards = cardsPerPage === 8;
               const is6Cards = cardsPerPage === 6;
-              const gridCols = cardsPerPage === 2 ? 'grid-cols-1' : 'grid-cols-2';
+              const is4Cards = cardsPerPage === 4;
+              const is2Cards = cardsPerPage === 2;
+              const gridCols = is2Cards ? 'grid-cols-1' : 'grid-cols-2';
               const gridRows = is8Cards ? 'grid-rows-4' : is6Cards ? 'grid-rows-3' : 'grid-rows-2';
-              const gridGap = is8Cards ? 'gap-1.5 sm:gap-2' : is6Cards ? 'gap-2' : 'gap-3';
+              const gridGap = is8Cards ? 'gap-x-[5mm] gap-y-[6mm]' : is6Cards ? 'gap-2.5' : 'gap-3';
+              const specificGridClass = is8Cards ? 'cards-grid-8' : is6Cards ? 'cards-grid-6' : is4Cards ? 'cards-grid-4' : 'cards-grid-2';
 
               return (
                 <div
                   key={pageIndex}
                   className={`a4-print-page w-full bg-white text-slate-900 rounded-xl shadow-2xl ${
-                    is8Cards ? 'p-1.5 sm:p-2.5 min-h-[920px]' : is6Cards ? 'p-2 sm:p-3 min-h-[960px]' : 'p-3 sm:p-5 min-h-[1000px]'
-                  } border border-slate-300 mx-auto flex flex-col justify-between`}
+                    is8Cards ? 'p-1 min-h-[1020px]' : is6Cards ? 'p-1.5 min-h-[1020px]' : 'p-2 min-h-[1020px]'
+                  } border border-slate-300 mx-auto flex flex-col justify-start`}
                 >
                   {/* Page Top Header (Only if showPageHeader is true) */}
                   {showPageHeader && (
@@ -1508,7 +1679,7 @@ export const GroupPrintModal: React.FC<GroupPrintModalProps> = ({
                   )}
 
                   {/* Cards Grid: Perfectly distributed 2x4 grid filling A4 page */}
-                  <div className={`grid ${gridCols} ${gridRows} ${gridGap} flex-1 h-full content-between my-auto`}>
+                  <div className={`cards-grid ${specificGridClass} grid ${gridCols} ${gridRows} ${gridGap} flex-1 h-full w-full`}>
                     {pageVoters.map((v, vIdx) => {
                       const voterSno = v.s ?? (v as any).sno;
                       const prof = voterSno ? profiles[voterSno] : undefined;
@@ -1520,19 +1691,21 @@ export const GroupPrintModal: React.FC<GroupPrintModalProps> = ({
                       return (
                         <div
                           key={voterSno || vIdx}
-                          className={`voter-card-print border border-slate-900 rounded-lg bg-white flex flex-col justify-between shadow-none relative ${
-                            is8Cards ? 'p-1.5 h-full' : 'p-2'
+                          className={`voter-card-print border-2 border-dotted ${activeTheme.slipBorder} rounded-lg bg-white flex flex-col justify-between shadow-none relative ${
+                            is8Cards ? 'p-1 h-full' : 'p-1.5 h-full'
                           }`}
-                          style={{ pageBreakInside: 'avoid', breakInside: 'avoid' }}
+                          style={{
+                            pageBreakInside: 'avoid',
+                            breakInside: 'avoid',
+                            borderColor: getThemeBorderColor(colorTheme),
+                            borderStyle: 'dotted'
+                          }}
                         >
-                          {/* Card Top Banner: Clean official numbers, NO internal badges */}
-                          <div className="flex items-center justify-between pb-0.5 border-b border-slate-800 leading-tight">
-                            <div className="flex items-center gap-1.5 min-w-0">
-                              <span className="font-mono font-black border border-black bg-slate-100 text-black px-1.5 py-0.2 rounded text-[10px] shrink-0 badge-sno">
-                                #{voterSno}
-                              </span>
-                              <span className="font-mono font-black text-black text-[10.5px] tracking-wide truncate">
-                                {v.id || (v as any).epic}
+                          {/* Card Top Banner: Serial Number in RED, NO EPIC ID (No border-b so voter card image doesn't get a double line) */}
+                          <div className="flex items-center justify-between pb-0.5 leading-tight">
+                            <div className="flex items-center gap-1 min-w-0">
+                              <span className="font-mono font-black border border-red-600 bg-red-50 text-red-600 px-1.5 py-0.2 rounded text-[10.5px] shrink-0 badge-sno-red">
+                                S.No: #{voterSno}
                               </span>
                             </div>
                             <div className="flex items-center gap-1 shrink-0 text-black font-extrabold text-[9.5px]">
@@ -1542,12 +1715,12 @@ export const GroupPrintModal: React.FC<GroupPrintModalProps> = ({
 
                           {/* Official Voter Card Image (Edge-to-edge, fills the box cleanly) */}
                           {cardPath ? (
-                            <div className="flex-1 flex items-center justify-center w-full px-0 py-0.5 overflow-hidden my-auto">
+                            <div className="voter-card-img-container flex-1 flex items-center justify-center w-full px-0 py-0.5 overflow-hidden my-auto h-full min-h-0">
                               <img
                                 src={resolvePhotoUrl(cardPath)}
                                 alt={`Official Voter Card ${voterSno}`}
-                                className={`w-full h-auto object-contain mx-auto voter-card-img ${
-                                  is8Cards ? 'max-h-[148px]' : is6Cards ? 'max-h-[175px]' : 'max-h-[220px]'
+                                className={`w-full h-full object-contain mx-auto voter-card-img ${
+                                  is8Cards ? 'max-h-[190px]' : is6Cards ? 'max-h-[235px]' : 'max-h-[310px]'
                                 }`}
                                 style={{
                                   filter: getCardImageFilter(),
@@ -1599,18 +1772,36 @@ export const GroupPrintModal: React.FC<GroupPrintModalProps> = ({
                             </div>
                           )}
 
-                          {/* Card Footer: 1 Clean Line */}
-                          <div className="mt-0.5 pt-0.5 border-t border-dashed border-slate-500 flex items-center justify-between text-[7.5px] text-slate-900 font-bold leading-none">
-                            <span className="truncate max-w-[68%] font-black text-black">
-                              📍 {boothInfo.clean_village || boothInfo.ps_address || 'పిఠాపురం నియోజకవర్గం'}
+                          {/* Polling Station Address Box in Color with Coordinates (NO duplicate gurthimpu card text) */}
+                          {(() => {
+                            const station = resolveWardPollingStationDetails(v, boothInfo);
+                            return (
+                              <div className="bg-[#fffbeb] border border-[#f59e0b] rounded px-1.5 py-0.5 my-0.5 text-[8px] leading-tight text-slate-950">
+                                <div className="truncate font-bold text-slate-950 flex items-center gap-1 min-w-0">
+                                  <strong className="font-black text-[#b45309] shrink-0">📍 కేంద్రం:</strong>
+                                  <span className="truncate">{station.name}</span>
+                                  {station.coordinates && (
+                                    <span className="font-mono text-[7px] text-amber-950 bg-amber-200/90 px-1 py-0.2 rounded border border-amber-400 shrink-0 font-bold">
+                                      GPS: {station.coordinates}
+                                    </span>
+                                  )}
+                                </div>
+                              </div>
+                            );
+                          })()}
+
+                          {/* Card Footer: Clean Cut Line with minimal spacing (no duplicate internal border) */}
+                          <div className="mt-0.5 pt-0.5 flex items-center justify-between text-[7px] text-slate-900 font-bold leading-none">
+                            <span className="truncate max-w-[70%] font-black text-black">
+                              ✂️ కట్ చేసుకోండి • గుర్తింపు కార్డు వెంట తీసుకురండి
                               {showPhone && phone && (
                                 <span className="font-mono font-black text-black ml-1 bg-emerald-100 px-1 py-0.2 rounded border border-black">
                                   📞 {phone}
                                 </span>
                               )}
                             </span>
-                            <span className="text-slate-600 font-bold shrink-0">
-                              ✂️ కట్ చేసుకోండి • ECI #{voterSno}
+                            <span className="text-red-600 font-black shrink-0 font-mono text-[7.5px]">
+                              S.No: #{voterSno}
                             </span>
                           </div>
                         </div>
@@ -1618,15 +1809,17 @@ export const GroupPrintModal: React.FC<GroupPrintModalProps> = ({
                     })}
                   </div>
 
-                  {/* Page Footer */}
-                  <div className="mt-2 pt-1 border-t border-slate-300 flex items-center justify-between text-[8px] text-slate-500 leading-none">
-                    <p className="font-bold text-slate-700">
-                      అధికారిక ఓటరు కార్డుల ముద్రణ • పిఠాపురం నియోజకవర్గం (AC #37)
-                    </p>
-                    <div className="text-right font-mono font-bold text-slate-600">
-                      పేజీ {pageIndex + 1} / {cardPages.length} • మొత్తం కార్డులు: {sortedVoters.length}
+                  {/* Page Footer (Only when showPageHeader is checked, and hidden in print so A4 fold is 100% symmetrical) */}
+                  {showPageHeader && (
+                    <div className="no-print print:hidden page-print-footer mt-0.5 pt-0.5 border-t border-slate-300 flex items-center justify-between text-[7.5px] text-slate-500 leading-none">
+                      <p className="font-bold text-slate-700">
+                        అధికారిక ఓటరు కార్డుల ముద్రణ • పిఠాపురం నియోజకవర్గం (AC #37)
+                      </p>
+                      <div className="text-right font-mono font-bold text-slate-600">
+                        పేజీ {pageIndex + 1} / {cardPages.length} • మొత్తం కార్డులు: {sortedVoters.length}
+                      </div>
                     </div>
-                  </div>
+                  )}
                 </div>
               );
             })

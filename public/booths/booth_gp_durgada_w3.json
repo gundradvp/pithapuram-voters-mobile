@@ -2,7 +2,7 @@
   "booth_info": {
     "booth_no": "gp_durgada_w3",
     "village": "దుర్గడ — వార్డు #3",
-    "ps_name": "దుర్గడ గ్రామ పంచాయతీ 3వ వార్డు",
+    "ps_name": "ఎస్సీ పేట అంగన్‌వాడీ కేంద్రం (SC peta Anganwadi), దుర్గడ",
     "total_voters": 530,
     "male_count": 282,
     "female_count": 248,
@@ -10,7 +10,11 @@
     "assembly": "37 - పిఠాపురం",
     "election_type": "panchayat",
     "ward_no": 3,
-    "clean_village": "దుర్గడ వార్డు 3"
+    "clean_village": "దుర్గడ వార్డు 3",
+    "ps_address": "ఎస్సీ పేట అంగన్‌వాడీ కేంద్రం (SC peta Anganwadi), దుర్గడ",
+    "latitude": 17.21651676,
+    "longitude": 82.34307714,
+    "google_maps_url": "https://www.google.com/maps?q=17.21651676,82.34307714"
   },
   "voters": [
     {

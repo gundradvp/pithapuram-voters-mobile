@@ -8,6 +8,7 @@ import { WarRoomTabMobile } from './components/WarRoomTabMobile';
 import { OfflineTabMobile } from './components/OfflineTabMobile';
 import { WinningScoreBanner } from './components/WinningScoreBanner';
 import { BoothAssignmentModal } from './components/BoothAssignmentModal';
+import { BoothDirectoryModal } from './components/BoothDirectoryModal';
 import { VoterSlipModal } from './components/VoterSlipModal';
 import { PhoneEditorModal } from './components/PhoneEditorModal';
 import { SupportLeaningPicker } from './components/SupportLeaningPicker';
@@ -303,6 +304,7 @@ export function App() {
 
   // Modals State
   const [isBoothSelectorOpen, setIsBoothSelectorOpen] = useState<boolean>(false);
+  const [isBoothDirectoryOpen, setIsBoothDirectoryOpen] = useState<boolean>(false);
   const [isSyncModalOpen, setIsSyncModalOpen] = useState<boolean>(false);
   const [cloudSyncState, setCloudSyncState] = useState<SyncState>('idle');
   const [selectedVoterForSlip, setSelectedVoterForSlip] = useState<MobileVoter | null>(null);
@@ -1387,6 +1389,7 @@ export function App() {
         onToggleLanguage={toggleLanguage}
         onOpenThemeSelector={() => setIsThemeModalOpen(true)}
         onOpenBoothSelector={() => setIsBoothSelectorOpen(true)}
+        onOpenBoothDirectory={() => setIsBoothDirectoryOpen(true)}
         onOpenAdminHub={() => setIsAdminModalOpen(true)}
         onUnload={boothData ? handleUnloadList : undefined}
         onSwitchToFullVillage={handleSwitchToFullVillage}
@@ -1873,6 +1876,19 @@ export function App() {
           assignedAssemblyBooths={assignedAssemblyBooths}
           assignedMunicipalWards={assignedMunicipalWards}
           onOpenAdminHub={() => setIsAdminModalOpen(true)}
+          onOpenBoothDirectory={() => setIsBoothDirectoryOpen(true)}
+        />
+      )}
+
+      {/* Polling Booth Directory & GPS Navigation Modal */}
+      {isBoothDirectoryOpen && (
+        <BoothDirectoryModal
+          onClose={() => setIsBoothDirectoryOpen(false)}
+          language={lang}
+          onSelectWard={(wardNo) => {
+            setIsBoothDirectoryOpen(false);
+            handleSelectBooth(`gp_durgada_w${wardNo}`, false);
+          }}
         />
       )}
 

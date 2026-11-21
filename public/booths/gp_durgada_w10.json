@@ -2,10 +2,14 @@
   "booth_info": {
     "booth_no": "gp_durgada_w10",
     "village": "దుర్గడ — వార్డు #10",
-    "ps_name": "దుర్గడ గ్రామ పంచాయతీ 10వ వార్డు",
+    "ps_name": "జెడ్పీహెచ్ఎస్ ఉన్నత పాఠశాల (ZPHS High), దుర్గడ",
     "total_voters": 530,
     "mandal": "GOLLAPROLU",
-    "assembly": "37 - పిఠాపురం"
+    "assembly": "37 - పిఠాపురం",
+    "ps_address": "జెడ్పీహెచ్ఎస్ ఉన్నత పాఠశాల (ZPHS High), దుర్గడ",
+    "latitude": 17.2146095,
+    "longitude": 82.3358968,
+    "google_maps_url": "https://www.google.com/maps?q=17.2146095,82.3358968"
   },
   "voters": [
     {

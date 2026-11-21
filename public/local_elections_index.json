@@ -1019,7 +1019,7 @@
     "mandal": "GOLLAPROLU",
     "village": "దుర్గడ గ్రామ పంచాయతీ (సమగ్ర గ్రామం — వార్డులు 1-16)",
     "clean_village": "దుర్గడ సమగ్ర పంచాయతీ (8487 ఓటర్లు)",
-    "ps_address": "దుర్గడ గ్రామ పంచాయతీ పరిధి (MPTC 1 & 3 సమగ్ర నియోజకవర్గం)",
+    "ps_address": "దుర్గడ 1-16 వార్డుల పోలింగ్ కేంద్రాలు (పాలపు వీధి, ఎస్సీ పేట అంగన్‌వాడీ, ఈబీసీ కాలనీ, కొత్తపేట ఎంపీపీ, ZPHS హైస్కూల్, ఎస్సీ పేట)",
     "sections": "వార్డు 1 నుండి 16 వరకు (మొత్తం గ్రామం)",
     "total_voters": 8487,
     "male_count": 4458,
@@ -1909,7 +1909,7 @@
     "mandal": "GOLLAPROLU",
     "village": "దుర్గడ — వార్డు #1",
     "clean_village": "దుర్గడ వార్డు 1",
-    "ps_address": "దుర్గడ గ్రామ పంచాయతీ 1వ వార్డు",
+    "ps_address": "పాలపు వీధి పోలింగ్ కేంద్రం (Palapu veedhi), దుర్గడ",
     "sections": "దుర్గడ వార్డు 1 విభాగాలు (530 ఓటర్లు)",
     "total_voters": 530,
     "male_count": 0,
@@ -1921,7 +1921,10 @@
     "volunteers_count": 0,
     "is_loaded": true,
     "type": "ward",
-    "view_level": "ward"
+    "view_level": "ward",
+    "latitude": 17.2117922,
+    "longitude": 82.3455958,
+    "google_maps_url": "https://www.google.com/maps?q=17.2117922,82.3455958"
   },
   {
     "id": "gp_durgada_w2",
@@ -1933,7 +1936,7 @@
     "mandal": "GOLLAPROLU",
     "village": "దుర్గడ — వార్డు #2",
     "clean_village": "దుర్గడ వార్డు 2",
-    "ps_address": "దుర్గడ గ్రామ పంచాయతీ 2వ వార్డు",
+    "ps_address": "పాలపు వీధి పోలింగ్ కేంద్రం (Palapu veedhi), దుర్గడ",
     "sections": "దుర్గడ వార్డు 2 విభాగాలు (530 ఓటర్లు)",
     "total_voters": 530,
     "male_count": 0,
@@ -1945,7 +1948,10 @@
     "volunteers_count": 0,
     "is_loaded": true,
     "type": "ward",
-    "view_level": "ward"
+    "view_level": "ward",
+    "latitude": 17.2117922,
+    "longitude": 82.3455958,
+    "google_maps_url": "https://www.google.com/maps?q=17.2117922,82.3455958"
   },
   {
     "id": "gp_durgada_w3",
@@ -1957,7 +1963,7 @@
     "mandal": "GOLLAPROLU",
     "village": "దుర్గడ — వార్డు #3",
     "clean_village": "దుర్గడ వార్డు 3",
-    "ps_address": "దుర్గడ గ్రామ పంచాయతీ 3వ వార్డు",
+    "ps_address": "ఎస్సీ పేట అంగన్‌వాడీ కేంద్రం (SC peta Anganwadi), దుర్గడ",
     "sections": "దుర్గడ వార్డు 3 విభాగాలు (530 ఓటర్లు)",
     "total_voters": 530,
     "male_count": 0,
@@ -1969,7 +1975,10 @@
     "volunteers_count": 0,
     "is_loaded": true,
     "type": "ward",
-    "view_level": "ward"
+    "view_level": "ward",
+    "latitude": 17.21651676,
+    "longitude": 82.34307714,
+    "google_maps_url": "https://www.google.com/maps?q=17.21651676,82.34307714"
   },
   {
     "id": "gp_durgada_w4",
@@ -1981,7 +1990,7 @@
     "mandal": "GOLLAPROLU",
     "village": "దుర్గడ — వార్డు #4",
     "clean_village": "దుర్గడ వార్డు 4",
-    "ps_address": "దుర్గడ గ్రామ పంచాయతీ 4వ వార్డు",
+    "ps_address": "ఈబీసీ కాలనీ పోలింగ్ కేంద్రం (EBC colony), దుర్గడ",
     "sections": "దుర్గడ వార్డు 4 విభాగాలు (530 ఓటర్లు)",
     "total_voters": 530,
     "male_count": 0,
@@ -1993,7 +2002,10 @@
     "volunteers_count": 0,
     "is_loaded": true,
     "type": "ward",
-    "view_level": "ward"
+    "view_level": "ward",
+    "latitude": 17.21239233,
+    "longitude": 82.34119277,
+    "google_maps_url": "https://www.google.com/maps?q=17.21239233,82.34119277"
   },
   {
     "id": "gp_durgada_w5",
@@ -2005,7 +2017,7 @@
     "mandal": "GOLLAPROLU",
     "village": "దుర్గడ — వార్డు #5",
     "clean_village": "దుర్గడ వార్డు 5",
-    "ps_address": "దుర్గడ గ్రామ పంచాయతీ 5వ వార్డు",
+    "ps_address": "కొత్తపేట ఎంపీపీ ప్రాథమిక పాఠశాల (Kothapeta MPP), దుర్గడ",
     "sections": "దుర్గడ వార్డు 5 విభాగాలు (530 ఓటర్లు)",
     "total_voters": 530,
     "male_count": 0,
@@ -2017,7 +2029,10 @@
     "volunteers_count": 0,
     "is_loaded": true,
     "type": "ward",
-    "view_level": "ward"
+    "view_level": "ward",
+    "latitude": 17.21705785,
+    "longitude": 82.34811288,
+    "google_maps_url": "https://www.google.com/maps?q=17.21705785,82.34811288"
   },
   {
     "id": "gp_durgada_w6",
@@ -2029,7 +2044,7 @@
     "mandal": "GOLLAPROLU",
     "village": "దుర్గడ — వార్డు #6",
     "clean_village": "దుర్గడ వార్డు 6",
-    "ps_address": "దుర్గడ గ్రామ పంచాయతీ 6వ వార్డు",
+    "ps_address": "కొత్తపేట ఎంపీపీ ప్రాథమిక పాఠశాల (Kothapeta MPP), దుర్గడ",
     "sections": "దుర్గడ వార్డు 6 వీధులు",
     "total_voters": 530,
     "male_count": 286,
@@ -2041,7 +2056,10 @@
     "volunteers_count": 0,
     "is_loaded": true,
     "type": "ward",
-    "view_level": "ward"
+    "view_level": "ward",
+    "latitude": 17.21705785,
+    "longitude": 82.34811288,
+    "google_maps_url": "https://www.google.com/maps?q=17.21705785,82.34811288"
   },
   {
     "id": "gp_durgada_w7",
@@ -2053,7 +2071,7 @@
     "mandal": "GOLLAPROLU",
     "village": "దుర్గడ — వార్డు #7",
     "clean_village": "దుర్గడ వార్డు 7",
-    "ps_address": "దుర్గడ గ్రామ పంచాయతీ 7వ వార్డు",
+    "ps_address": "కొత్తపేట ఎంపీపీ ప్రాథమిక పాఠశాల (Kothapeta MPP), దుర్గడ",
     "sections": "దుర్గడ వార్డు 7 వీధులు",
     "total_voters": 530,
     "male_count": 284,
@@ -2065,7 +2083,10 @@
     "volunteers_count": 0,
     "is_loaded": true,
     "type": "ward",
-    "view_level": "ward"
+    "view_level": "ward",
+    "latitude": 17.21705785,
+    "longitude": 82.34811288,
+    "google_maps_url": "https://www.google.com/maps?q=17.21705785,82.34811288"
   },
   {
     "id": "gp_durgada_w8",
@@ -2077,7 +2098,7 @@
     "mandal": "GOLLAPROLU",
     "village": "దుర్గడ — వార్డు #8",
     "clean_village": "దుర్గడ వార్డు 8",
-    "ps_address": "దుర్గడ గ్రామ పంచాయతీ 8వ వార్డు",
+    "ps_address": "జెడ్పీహెచ్ఎస్ ఉన్నత పాఠశాల (ZPHS High), దుర్గడ",
     "sections": "దుర్గడ వార్డు 8 వీధులు",
     "total_voters": 530,
     "male_count": 263,
@@ -2089,7 +2110,10 @@
     "volunteers_count": 0,
     "is_loaded": true,
     "type": "ward",
-    "view_level": "ward"
+    "view_level": "ward",
+    "latitude": 17.2146095,
+    "longitude": 82.3358968,
+    "google_maps_url": "https://www.google.com/maps?q=17.2146095,82.3358968"
   },
   {
     "id": "gp_durgada_w9",
@@ -2101,7 +2125,7 @@
     "mandal": "GOLLAPROLU",
     "village": "దుర్గడ — వార్డు #9",
     "clean_village": "దుర్గడ వార్డు 9",
-    "ps_address": "దుర్గడ గ్రామ పంచాయతీ 9వ వార్డు",
+    "ps_address": "జెడ్పీహెచ్ఎస్ ఉన్నత పాఠశాల (ZPHS High), దుర్గడ",
     "sections": "దుర్గడ వార్డు 9 వీధులు",
     "total_voters": 530,
     "male_count": 314,
@@ -2113,7 +2137,10 @@
     "volunteers_count": 0,
     "is_loaded": true,
     "type": "ward",
-    "view_level": "ward"
+    "view_level": "ward",
+    "latitude": 17.2146095,
+    "longitude": 82.3358968,
+    "google_maps_url": "https://www.google.com/maps?q=17.2146095,82.3358968"
   },
   {
     "id": "gp_durgada_w10",
@@ -2125,7 +2152,7 @@
     "mandal": "GOLLAPROLU",
     "village": "దుర్గడ — వార్డు #10",
     "clean_village": "దుర్గడ వార్డు 10",
-    "ps_address": "దుర్గడ గ్రామ పంచాయతీ 10వ వార్డు",
+    "ps_address": "జెడ్పీహెచ్ఎస్ ఉన్నత పాఠశాల (ZPHS High), దుర్గడ",
     "sections": "దుర్గడ వార్డు 10 వీధులు",
     "total_voters": 530,
     "male_count": 312,
@@ -2137,7 +2164,10 @@
     "volunteers_count": 0,
     "is_loaded": true,
     "type": "ward",
-    "view_level": "ward"
+    "view_level": "ward",
+    "latitude": 17.2146095,
+    "longitude": 82.3358968,
+    "google_maps_url": "https://www.google.com/maps?q=17.2146095,82.3358968"
   },
   {
     "id": "gp_durgada_w11",
@@ -2149,7 +2179,7 @@
     "mandal": "GOLLAPROLU",
     "village": "దుర్గడ — వార్డు #11",
     "clean_village": "దుర్గడ వార్డు 11",
-    "ps_address": "దుర్గడ గ్రామ పంచాయతీ 11వ వార్డు",
+    "ps_address": "జెడ్పీహెచ్ఎస్ ఉన్నత పాఠశాల (ZPHS High), దుర్గడ",
     "sections": "దుర్గడ వార్డు 11 వీధులు",
     "total_voters": 530,
     "male_count": 290,
@@ -2161,7 +2191,10 @@
     "volunteers_count": 0,
     "is_loaded": true,
     "type": "ward",
-    "view_level": "ward"
+    "view_level": "ward",
+    "latitude": 17.2146095,
+    "longitude": 82.3358968,
+    "google_maps_url": "https://www.google.com/maps?q=17.2146095,82.3358968"
   },
   {
     "id": "gp_durgada_w12",
@@ -2173,7 +2206,7 @@
     "mandal": "GOLLAPROLU",
     "village": "దుర్గడ — వార్డు #12",
     "clean_village": "దుర్గడ వార్డు 12",
-    "ps_address": "దుర్గడ గ్రామ పంచాయతీ 12వ వార్డు",
+    "ps_address": "ఎస్సీ పేట పోలింగ్ కేంద్రం (SC peta), దుర్గడ",
     "sections": "దుర్గడ వార్డు 12 వీధులు",
     "total_voters": 530,
     "male_count": 290,
@@ -2185,7 +2218,10 @@
     "volunteers_count": 0,
     "is_loaded": true,
     "type": "ward",
-    "view_level": "ward"
+    "view_level": "ward",
+    "latitude": 17.21667739,
+    "longitude": 82.34225698,
+    "google_maps_url": "https://www.google.com/maps?q=17.21667739,82.34225698"
   },
   {
     "id": "gp_durgada_w13",
@@ -2197,7 +2233,7 @@
     "mandal": "GOLLAPROLU",
     "village": "దుర్గడ — వార్డు #13",
     "clean_village": "దుర్గడ వార్డు 13",
-    "ps_address": "దుర్గడ గ్రామ పంచాయతీ 13వ వార్డు",
+    "ps_address": "ఎస్సీ పేట పోలింగ్ కేంద్రం (SC peta), దుర్గడ",
     "sections": "దుర్గడ వార్డు 13 వీధులు",
     "total_voters": 530,
     "male_count": 282,
@@ -2209,7 +2245,10 @@
     "volunteers_count": 0,
     "is_loaded": true,
     "type": "ward",
-    "view_level": "ward"
+    "view_level": "ward",
+    "latitude": 17.21667739,
+    "longitude": 82.34225698,
+    "google_maps_url": "https://www.google.com/maps?q=17.21667739,82.34225698"
   },
   {
     "id": "gp_durgada_w14",
@@ -2221,7 +2260,7 @@
     "mandal": "GOLLAPROLU",
     "village": "దుర్గడ — వార్డు #14",
     "clean_village": "దుర్గడ వార్డు 14",
-    "ps_address": "దుర్గడ గ్రామ పంచాయతీ 14వ వార్డు",
+    "ps_address": "ఎస్సీ పేట పోలింగ్ కేంద్రం (SC peta), దుర్గడ",
     "sections": "దుర్గడ వార్డు 14 వీధులు",
     "total_voters": 530,
     "male_count": 295,
@@ -2233,7 +2272,10 @@
     "volunteers_count": 0,
     "is_loaded": true,
     "type": "ward",
-    "view_level": "ward"
+    "view_level": "ward",
+    "latitude": 17.21667739,
+    "longitude": 82.34225698,
+    "google_maps_url": "https://www.google.com/maps?q=17.21667739,82.34225698"
   },
   {
     "id": "gp_vannepudi_w1",
@@ -7184,7 +7226,7 @@
     "mandal": "GOLLAPROLU",
     "village": "దుర్గడ — వార్డు #15",
     "clean_village": "దుర్గడ వార్డు 15",
-    "ps_address": "దుర్గడ గ్రామ పంచాయతీ 15వ వార్డు",
+    "ps_address": "ఎస్సీ పేట పోలింగ్ కేంద్రం (SC peta), దుర్గడ",
     "sections": "దుర్గడ 15వ వార్డు పరిధి (530 ఓటర్లు)",
     "total_voters": 530,
     "voter_count": 530,
@@ -7193,7 +7235,10 @@
     "is_loaded": true,
     "type": "ward",
     "view_level": "ward",
-    "name": "దుర్గడ — వార్డు #15"
+    "name": "దుర్గడ — వార్డు #15",
+    "latitude": 17.21667739,
+    "longitude": 82.34225698,
+    "google_maps_url": "https://www.google.com/maps?q=17.21667739,82.34225698"
   },
   {
     "id": "gp_durgada_w16",
@@ -7205,7 +7250,7 @@
     "mandal": "GOLLAPROLU",
     "village": "దుర్గడ — వార్డు #16",
     "clean_village": "దుర్గడ వార్డు 16",
-    "ps_address": "దుర్గడ గ్రామ పంచాయతీ 16వ వార్డు",
+    "ps_address": "ఎస్సీ పేట పోలింగ్ కేంద్రం (SC peta), దుర్గడ",
     "sections": "దుర్గడ 16వ వార్డు పరిధి (537 ఓటర్లు)",
     "total_voters": 537,
     "voter_count": 537,
@@ -7214,7 +7259,10 @@
     "is_loaded": true,
     "type": "ward",
     "view_level": "ward",
-    "name": "దుర్గడ — వార్డు #16"
+    "name": "దుర్గడ — వార్డు #16",
+    "latitude": 17.21667739,
+    "longitude": 82.34225698,
+    "google_maps_url": "https://www.google.com/maps?q=17.21667739,82.34225698"
   },
   {
     "id": "gp_tatiparthy_w8",

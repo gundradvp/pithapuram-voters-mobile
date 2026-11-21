@@ -32,6 +32,7 @@ interface BoothAssignmentModalProps {
   assignedAssemblyBooths?: number[];
   assignedMunicipalWards?: string[];
   onOpenAdminHub?: () => void;
+  onOpenBoothDirectory?: () => void;
 }
 
 export const BoothAssignmentModal: React.FC<BoothAssignmentModalProps> = ({
@@ -45,7 +46,8 @@ export const BoothAssignmentModal: React.FC<BoothAssignmentModalProps> = ({
   userRole = 'volunteer',
   assignedAssemblyBooths = [],
   assignedMunicipalWards = [],
-  onOpenAdminHub
+  onOpenAdminHub,
+  onOpenBoothDirectory
 }) => {
   const isCurrentlyLocal = typeof currentPartNo === 'string' && (currentPartNo.startsWith('ward_') || currentPartNo.startsWith('gp_') || currentPartNo.startsWith('mptc_') || currentPartNo.startsWith('zptc_'));
   
@@ -184,6 +186,20 @@ export const BoothAssignmentModal: React.FC<BoothAssignmentModalProps> = ({
             </p>
           </div>
           <div className="flex items-center gap-1.5">
+            {onOpenBoothDirectory && (
+              <button
+                type="button"
+                onClick={() => {
+                  onClose();
+                  onOpenBoothDirectory();
+                }}
+                className="px-2 py-1 bg-amber-500/20 hover:bg-amber-500/30 text-amber-300 border border-amber-500/40 rounded-lg text-[10px] font-bold flex items-center gap-1 cursor-pointer transition active:scale-95"
+                title="Open Polling Booth Directory & GPS"
+              >
+                <MapPin className="w-3 h-3 text-amber-400" />
+                <span>కేంద్రాలు</span>
+              </button>
+            )}
             {userRole === 'admin' && onOpenAdminHub && (
               <button
                 onClick={() => {
