@@ -33,7 +33,7 @@ interface GroupPrintModalProps {
 type SortField = 'sno' | 'hn' | 'age_desc' | 'name';
 export type PrintLayout = 'slips' | 'table' | 'cards';
 export type SlipsPerPage = 2 | 4 | 6 | 8 | 10;
-export type CardsPerPage = 2 | 4 | 6;
+export type CardsPerPage = 2 | 4 | 6 | 8;
 export type ColorTheme = 'blue' | 'tricolor' | 'emerald' | 'crimson' | 'bw';
 type BrandingMode = 'neutral' | 'party';
 type PhoneFilter = 'all' | 'with_phone' | 'without_phone';
@@ -190,6 +190,8 @@ export const GroupPrintModal: React.FC<GroupPrintModalProps> = ({
   }, [isOpen, initialLayout]);
   const [slipsPerPage, setSlipsPerPage] = useState<SlipsPerPage>(4);
   const [cardsPerPage, setCardsPerPage] = useState<CardsPerPage>(4);
+  // Default to FALSE (do NOT print header on every page by default, print only when checked)
+  const [showPageHeader, setShowPageHeader] = useState<boolean>(false);
   const [categoryFilter, setCategoryFilter] = useState<CategoryFilter>('all');
   const [colorTheme, setColorTheme] = useState<ColorTheme>('blue');
   const [brandingMode, setBrandingMode] = useState<BrandingMode>('neutral');
@@ -720,13 +722,13 @@ export const GroupPrintModal: React.FC<GroupPrintModalProps> = ({
               ))}
             </div>
           ) : printLayout === 'cards' ? (
-            /* Cards per page options (2, 4, 6 cards) & Text Darkness Selector */
+            /* Cards per page options (2, 4, 6, 8 cards), Text Darkness & Header Toggle */
             <div className="flex items-center gap-1.5 flex-wrap">
               <div className="flex items-center gap-1 bg-slate-800/90 p-1 rounded-xl border border-slate-700 flex-wrap">
                 <span className="text-amber-400 font-bold px-1.5 text-[10.5px] flex items-center gap-1">
                   <Layers className="w-3.5 h-3.5" /> పేజీకి కార్డులు:
                 </span>
-                {([2, 4, 6] as CardsPerPage[]).map(num => (
+                {([2, 4, 6, 8] as CardsPerPage[]).map(num => (
                   <button
                     key={num}
                     type="button"
@@ -738,10 +740,25 @@ export const GroupPrintModal: React.FC<GroupPrintModalProps> = ({
                     }`}
                     title={`A4 పేజీకి ${num} కార్డులు`}
                   >
-                    {num === 4 ? `4 (సిఫార్సు 2x2)` : num === 6 ? `6 (కాంపాక్ట్ 2x3)` : `2 (పెద్దవి)`}
+                    {num === 8 ? `8 (కాంపాక్ట్ 2x4)` : num === 4 ? `4 (సిఫార్సు 2x2)` : num === 6 ? `6 (కాంపాక్ట్ 2x3)` : `2 (పెద్దవి)`}
                   </button>
                 ))}
               </div>
+
+              {/* Show/Hide Page Header Toggle (Default unchecked) */}
+              <label className={`flex items-center gap-1.5 px-2.5 py-1 rounded-xl border text-[11px] font-bold cursor-pointer transition-all select-none shadow-sm ${
+                showPageHeader 
+                  ? 'bg-amber-500 text-slate-950 border-amber-400 font-black' 
+                  : 'bg-slate-800/80 text-slate-400 border-slate-700 hover:text-slate-200'
+              }`}>
+                <input
+                  type="checkbox"
+                  checked={showPageHeader}
+                  onChange={e => setShowPageHeader(e.target.checked)}
+                  className="w-3.5 h-3.5 rounded accent-amber-500 cursor-pointer"
+                />
+                <span>పేజీ హెడర్ చూపించు</span>
+              </label>
 
               {/* Text Darkness / High Contrast Selector */}
               <div className="flex items-center gap-1 bg-slate-800/90 p-1 rounded-xl border border-slate-700 flex-wrap">
@@ -1437,41 +1454,47 @@ export const GroupPrintModal: React.FC<GroupPrintModalProps> = ({
             </div>
           ) : (
             cardPages.map((pageVoters, pageIndex) => {
+              const is8Cards = cardsPerPage === 8;
+              const is6Cards = cardsPerPage === 6;
               const gridCols = cardsPerPage === 2 ? 'grid-cols-1' : 'grid-cols-2';
-              const gridGap = cardsPerPage === 6 ? 'gap-2' : 'gap-3';
+              const gridGap = is8Cards ? 'gap-1.5' : is6Cards ? 'gap-2' : 'gap-3';
 
               return (
                 <div
                   key={pageIndex}
-                  className="a4-print-page w-full bg-white text-slate-900 rounded-xl shadow-2xl p-3 sm:p-5 border border-slate-300 mx-auto flex flex-col justify-between"
+                  className={`a4-print-page w-full bg-white text-slate-900 rounded-xl shadow-2xl ${
+                    is8Cards ? 'p-1.5 sm:p-2' : 'p-3 sm:p-5'
+                  } border border-slate-300 mx-auto flex flex-col justify-between`}
                 >
-                  {/* Page Top Header */}
-                  <div className={`rounded-xl p-2.5 mb-2 border shadow-sm ${activeTheme.headerGrad} print-header-bg`}>
-                    <div className="flex items-center justify-between gap-2">
-                      <div className="flex items-center gap-2 min-w-0">
-                        <span className="text-xl shrink-0">📇</span>
-                        <div className="min-w-0">
-                          <h1 className="text-xs sm:text-sm font-black tracking-tight uppercase leading-tight truncate">
-                            అధికారిక ఓటరు కార్డులు • OFFICIAL ELECTORAL PHOTO CARDS
-                          </h1>
-                          <p className="text-[10px] font-bold opacity-90 leading-tight truncate">
-                            {boothHeaderLabel}
-                            {categoryFilter === 'out_of_city' && ' • ✈️ ఊరిలో లేని ఓటర్లు (Out of Village)'}
-                            {categoryFilter === 'supporter' && ' • ⭐ 100% మద్దతుదారులు'}
-                          </p>
+                  {/* Page Top Header (Only if showPageHeader is true) */}
+                  {showPageHeader && (
+                    <div className={`rounded-xl p-2.5 mb-2 border shadow-sm ${activeTheme.headerGrad} print-header-bg`}>
+                      <div className="flex items-center justify-between gap-2">
+                        <div className="flex items-center gap-2 min-w-0">
+                          <span className="text-xl shrink-0">📇</span>
+                          <div className="min-w-0">
+                            <h1 className="text-xs sm:text-sm font-black tracking-tight uppercase leading-tight truncate">
+                              అధికారిక ఓటరు కార్డులు • OFFICIAL ELECTORAL PHOTO CARDS
+                            </h1>
+                            <p className="text-[10px] font-bold opacity-90 leading-tight truncate">
+                              {boothHeaderLabel}
+                              {categoryFilter === 'out_of_city' && ' • ✈️ ఊరిలో లేని ఓటర్లు (Out of Village)'}
+                              {categoryFilter === 'supporter' && ' • ⭐ 100% మద్దతుదారులు'}
+                            </p>
+                          </div>
                         </div>
-                      </div>
 
-                      <div className="text-right flex flex-col items-end shrink-0">
-                        <div className="inline-flex items-center gap-1 bg-white/20 backdrop-blur-sm border border-white/40 px-2 py-0.5 rounded-full font-bold text-[9.5px] text-white">
-                          <span>SIR Draft Electoral Roll</span>
+                        <div className="text-right flex flex-col items-end shrink-0">
+                          <div className="inline-flex items-center gap-1 bg-white/20 backdrop-blur-sm border border-white/40 px-2 py-0.5 rounded-full font-bold text-[9.5px] text-white">
+                            <span>SIR Draft Electoral Roll</span>
+                          </div>
+                          <span className="text-[9px] text-white/90 font-mono mt-0.5">
+                            పేజీ {pageIndex + 1} / {cardPages.length} • తేదీ: {todayDate}
+                          </span>
                         </div>
-                        <span className="text-[9px] text-white/90 font-mono mt-0.5">
-                          పేజీ {pageIndex + 1} / {cardPages.length} • తేదీ: {todayDate}
-                        </span>
                       </div>
                     </div>
-                  </div>
+                  )}
 
                   {/* Cards Grid */}
                   <div className={`grid ${gridCols} ${gridGap} flex-1 content-start`}>
@@ -1481,51 +1504,50 @@ export const GroupPrintModal: React.FC<GroupPrintModalProps> = ({
                       const cardPath = v.card_url || v.card;
                       const photoPath = v.photo_url || v.photo;
                       const phone = getVoterPhone(v);
-                      const isOutOfCity = prof?.survey_status === 'out_of_city';
-                      const isSupporter = (prof?.supportPct !== undefined && prof.supportPct >= 75) || prof?.survey_status === 'supporter';
                       const isMale = v.g === 'M' || (v as any).gender_en === 'Male' || (v as any).gender_te === 'పురుషుడు';
 
                       return (
                         <div
                           key={voterSno || vIdx}
-                          className="voter-card-print border-2 border-slate-900 rounded-xl p-2 bg-white flex flex-col justify-between shadow-none relative"
+                          className={`voter-card-print border-2 border-slate-900 rounded-xl bg-white flex flex-col justify-between shadow-none relative ${
+                            is8Cards ? 'p-1' : 'p-2'
+                          }`}
                           style={{ pageBreakInside: 'avoid', breakInside: 'avoid' }}
                         >
-                          {/* Card Top Banner with S.No & Badges */}
-                          <div className="flex items-center justify-between pb-1 mb-1 border-b-2 border-slate-900 text-[10px]">
+                          {/* Card Top Banner with S.No & Badges (Clean, NO survey/migration tags) */}
+                          <div className={`flex items-center justify-between border-b-2 border-slate-900 ${
+                            is8Cards ? 'pb-0.5 mb-0.5 text-[9px]' : 'pb-1 mb-1 text-[10px]'
+                          }`}>
                             <div className="flex items-center gap-1.5 min-w-0">
-                              <span className="font-mono font-black bg-black text-white px-2 py-0.5 rounded text-[11.5px] shrink-0 badge-sno">
+                              <span className={`font-mono font-black bg-black text-white rounded shrink-0 badge-sno ${
+                                is8Cards ? 'text-[9.5px] px-1 py-0' : 'text-[11.5px] px-2 py-0.5'
+                              }`}>
                                 #{voterSno}
                               </span>
-                              <span className="font-mono font-black bg-amber-100 text-black px-1.5 py-0.5 rounded border border-black text-[10.5px] truncate badge-epic">
+                              <span className={`font-mono font-black bg-amber-100 text-black rounded border border-black truncate badge-epic ${
+                                is8Cards ? 'text-[9px] px-1 py-0' : 'text-[10.5px] px-1.5 py-0.5'
+                              }`}>
                                 {v.id || (v as any).epic}
                               </span>
-                              <span className="text-black font-black text-[10px] shrink-0">
+                              <span className={`text-black font-black shrink-0 ${
+                                is8Cards ? 'text-[8.5px]' : 'text-[10px]'
+                              }`}>
                                 వార్డు #{v.ward_no || (v as any).w || boothInfo.ward_no}
                               </span>
-                            </div>
-
-                            <div className="flex items-center gap-1 shrink-0">
-                              {isOutOfCity && (
-                                <span className="bg-blue-700 text-white font-black px-1.5 py-0.5 rounded text-[9px] uppercase tracking-wider shadow-sm">
-                                  ✈️ ఊరిలో లేరు
-                                </span>
-                              )}
-                              {isSupporter && (
-                                <span className="bg-emerald-700 text-white font-black px-1.5 py-0.5 rounded text-[9px]">
-                                  ⭐ 100%
-                                </span>
-                              )}
                             </div>
                           </div>
 
                           {/* Official Voter Card Image or Structured Fallback */}
                           {cardPath ? (
-                            <div className="rounded-lg overflow-hidden border-2 border-slate-900 bg-white p-1 flex items-center justify-center my-auto min-h-[120px] max-h-[175px]">
+                            <div className={`rounded-lg overflow-hidden border-2 border-slate-900 bg-white flex items-center justify-center my-auto ${
+                              is8Cards ? 'min-h-[75px] max-h-[96px] p-0.5' : is6Cards ? 'min-h-[100px] max-h-[135px] p-1' : 'min-h-[120px] max-h-[175px] p-1'
+                            }`}>
                               <img
                                 src={resolvePhotoUrl(cardPath)}
                                 alt={`Official Voter Card ${voterSno}`}
-                                className="w-full h-auto max-h-[165px] object-contain mx-auto voter-card-img"
+                                className={`w-full h-auto object-contain mx-auto voter-card-img ${
+                                  is8Cards ? 'max-h-[88px]' : is6Cards ? 'max-h-[125px]' : 'max-h-[165px]'
+                                }`}
                                 style={{
                                   filter: getCardImageFilter(),
                                   WebkitFilter: getCardImageFilter(),
@@ -1546,20 +1568,26 @@ export const GroupPrintModal: React.FC<GroupPrintModalProps> = ({
                               />
                             </div>
                           ) : (
-                            <div className="border-2 border-slate-900 rounded-lg p-2 bg-white flex items-start gap-2.5 my-auto">
+                            <div className={`border-2 border-slate-900 rounded-lg bg-white flex items-start gap-2 my-auto ${
+                              is8Cards ? 'p-1' : 'p-2'
+                            }`}>
                               {photoPath && (
                                 <img
                                   src={resolvePhotoUrl(photoPath)}
                                   alt={v.n}
-                                  className="w-14 h-18 object-cover rounded border-2 border-slate-900 bg-white shrink-0"
+                                  className={`object-cover rounded border-2 border-slate-900 bg-white shrink-0 ${
+                                    is8Cards ? 'w-10 h-13' : 'w-14 h-18'
+                                  }`}
                                   onError={(e) => {
                                     (e.currentTarget as HTMLElement).style.display = 'none';
                                   }}
                                 />
                               )}
-                              <div className="min-w-0 flex-1 text-[11px] leading-tight space-y-0.5">
-                                <p className="font-black text-black text-xs">{v.n}</p>
-                                {v.r && <p className="text-black font-bold text-[10px]">సంబంధం: {v.r}</p>}
+                              <div className={`min-w-0 flex-1 leading-tight space-y-0.5 ${
+                                is8Cards ? 'text-[9.5px]' : 'text-[11px]'
+                              }`}>
+                                <p className={`font-black text-black ${is8Cards ? 'text-[10.5px]' : 'text-xs'}`}>{v.n}</p>
+                                {v.r && <p className="text-black font-bold text-[9px]">సంబంధం: {v.r}</p>}
                                 <p className="text-black font-black">
                                   వయస్సు: {v.a} • {isMale ? 'పురుషుడు' : 'స్త్రీ'}
                                 </p>
@@ -1571,7 +1599,9 @@ export const GroupPrintModal: React.FC<GroupPrintModalProps> = ({
                           )}
 
                           {/* Card Footer with Location, Phone & Cut Line */}
-                          <div className="mt-1 pt-1 border-t-2 border-slate-800 text-[9px] text-black font-bold space-y-0.5">
+                          <div className={`border-t-2 border-slate-800 text-black font-bold space-y-0.5 ${
+                            is8Cards ? 'mt-0.5 pt-0.5 text-[7.5px]' : 'mt-1 pt-1 text-[9px]'
+                          }`}>
                             <div className="flex items-center justify-between gap-1">
                               <span className="truncate max-w-[70%] text-black font-black">
                                 📍 {boothInfo.ps_address || boothInfo.clean_village || 'పిఠాపురం నియోజకవర్గం'}
@@ -1582,7 +1612,9 @@ export const GroupPrintModal: React.FC<GroupPrintModalProps> = ({
                                 </span>
                               )}
                             </div>
-                            <div className="border-t border-dashed border-slate-700 pt-0.5 flex items-center justify-between text-[8px] text-slate-800 font-bold">
+                            <div className={`border-t border-dashed border-slate-700 pt-0.5 flex items-center justify-between text-slate-800 font-bold ${
+                              is8Cards ? 'text-[6.5px]' : 'text-[8px]'
+                            }`}>
                               <span>✂️ కట్ చేసుకోండి • అధికారిక ఓటరు గుర్తింపు కార్డు</span>
                               <span className="font-mono font-black text-black">ECI Card #{voterSno}</span>
                             </div>

@@ -1,14 +1,14 @@
 {
   "1": {
     "supportPct": 100,
-    "survey_status": "deceased",
+    "survey_status": null,
     "customAlias": "satya narayana desineedi",
     "customPhone": "9000273028",
     "altPhone": "",
     "influencerId": "",
     "influencerName": "",
     "influencerMobile": "",
-    "updatedAt": "2026-11-20T12:09:29.291Z"
+    "updatedAt": "2026-11-21T08:42:50.350Z"
   },
   "2": {
     "supportPct": 50,
@@ -4701,6 +4701,19 @@
     "survey_status": "supporter",
     "influencerName": "Surisetti Jaya Krishna",
     "influencerPhone": "9866496665"
+  },
+  "2317": {
+    "survey_status": "out_of_city",
+    "updatedAt": "2026-11-21T11:38:07.053Z"
+  },
+  "2318": {
+    "supportPct": 100,
+    "survey_status": "out_of_city",
+    "updatedAt": "2026-11-21T11:37:59.153Z"
+  },
+  "2319": {
+    "survey_status": "out_of_city",
+    "updatedAt": "2026-11-21T11:38:00.470Z"
   },
   "2320": {
     "supportPct": 100,
