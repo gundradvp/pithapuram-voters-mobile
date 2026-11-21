@@ -10,6 +10,8 @@ import { DuplicateCompareModal } from './DuplicateCompareModal';
 import { SpeedDialModal } from './SpeedDialModal';
 import { HourlyTurnoutModal } from './HourlyTurnoutModal';
 import { VotersExcelGrid } from './VotersExcelGrid';
+import { ExportSurnamesModal } from './ExportSurnamesModal';
+import { Download, FileSpreadsheet } from 'lucide-react';
 
 interface VotersTabMobileProps {
   voters: MobileVoter[];
@@ -116,6 +118,8 @@ export const VotersTabMobile: React.FC<VotersTabMobileProps> = ({
   const [selectedWard, setSelectedWard] = useState<string>('all');
   const [selectedStreet, setSelectedStreet] = useState<string>('all');
     const [selectedSurname, setSelectedSurname] = useState<string>('all');
+  const [isExportSurnamesModalOpen, setIsExportSurnamesModalOpen] = useState(false);
+  const [exportInitialClanId, setExportInitialClanId] = useState<string | undefined>(undefined);
   const [isGroupSimilarSurnames, setIsGroupSimilarSurnames] = useState<boolean>(() => {
     try {
       const boothKey = String(boothInfo?.part_no || boothInfo?.ward_no || 'default');
@@ -1336,6 +1340,16 @@ _దయచేసి మీ ఓటు హక్కును వినియోగ
                   <span>🔀</span>
                   <span>{isGroupSimilarSurnames ? (language === 'te' ? 'సారూప్యాలు: ఆన్' : 'Similar: ON') : (language === 'te' ? 'సారూప్యాలు' : 'Similar')}</span>
                 </button>
+
+                <button
+                  type="button"
+                  onClick={() => { setExportInitialClanId(undefined); setIsExportSurnamesModalOpen(true); }}
+                  title={language === 'te' ? 'ఇంటిపేర్లు & వాటి క్రమ సంఖ్యల (S.Nos) ఎగుమతి' : 'Export Surnames & Serial Numbers'}
+                  className="px-2 py-0.5 rounded-md text-[10px] font-bold transition-all cursor-pointer flex items-center gap-1 border bg-slate-950 text-emerald-300 border-slate-800 hover:border-emerald-500/50 hover:text-emerald-200"
+                >
+                  <Download className="w-2.5 h-2.5 text-emerald-400" />
+                  <span>{language === 'te' ? 'S.No ఎగుమతి' : 'Export S.Nos'}</span>
+                </button>
               </div>
 
               <div className="flex items-center gap-2">
@@ -1578,6 +1592,15 @@ _దయచేసి మీ ఓటు హక్కును వినియోగ
             >
               <span>🔀</span>
               <span>{isGroupSimilarSurnames ? (language === 'te' ? 'సారూప్యాలు కలిపాం' : 'Similar Grouped') : (language === 'te' ? 'సారూప్యాలు కలపండి' : 'Group Similar')}</span>
+            </button>
+            <button
+              type="button"
+              onClick={() => { setExportInitialClanId(selectedSurname !== 'all' ? selectedSurname : undefined); setIsExportSurnamesModalOpen(true); }}
+              title={language === 'te' ? 'ఇంటిపేర్లు & వాటి క్రమ సంఖ్యల (S.Nos) ఎగుమతి' : 'Export Surnames & Serial Numbers'}
+              className="px-2 py-0.5 rounded-md font-bold whitespace-nowrap transition-all flex items-center gap-1 text-[10px] border bg-slate-900 text-emerald-300 border-slate-700 hover:border-emerald-500/40 hover:text-white"
+            >
+              <Download className="w-2.5 h-2.5 text-emerald-400" />
+              <span>{language === 'te' ? 'S.No ఎగుమతి' : 'Export S.Nos'}</span>
             </button>
             <button
               onClick={() => { setSelectedSurname('all'); setVisibleCount(INITIAL_VISIBLE_COUNT); }}
@@ -2367,6 +2390,15 @@ _దయచేసి మీ ఓటు హక్కును వినియోగ
             <div className="flex items-center gap-2">
               <button
                 type="button"
+                onClick={() => { setExportInitialClanId(undefined); setIsExportSurnamesModalOpen(true); }}
+                className="px-2.5 py-1 rounded-xl text-[10.5px] font-bold transition-all cursor-pointer flex items-center gap-1 border bg-slate-800 hover:bg-slate-700 text-emerald-300 border-emerald-500/40 shadow-sm"
+                title={language === 'te' ? 'ఇంటిపేర్లు & క్రమ సంఖ్యల ఎగుమతి' : 'Export Surnames & Serial Numbers'}
+              >
+                <Download className="w-3 h-3 text-emerald-400" />
+                <span>📥 S.No ఎగుమతి</span>
+              </button>
+              <button
+                type="button"
                 onClick={handleToggleGroupSimilarSurnames}
                 className={`px-2 py-1 rounded-xl text-[10.5px] font-bold transition-all cursor-pointer flex items-center gap-1 border ${
                   isGroupSimilarSurnames
@@ -2452,8 +2484,8 @@ _దయచేసి మీ ఓటు హక్కును వినియోగ
                       )}
                     </div>
 
-                    {/* Support Leaning Badge */}
-                    <div className="text-right">
+                    {/* Support Leaning Badge & S.No Export */}
+                    <div className="text-right flex flex-col items-end gap-1">
                       <span className={`px-2 py-0.5 rounded-full text-[10px] font-black inline-block border ${
                         clan.supportPct >= 75
                           ? 'bg-emerald-600/30 text-emerald-300 border-emerald-500/40'
@@ -2463,6 +2495,19 @@ _దయచేసి మీ ఓటు హక్కును వినియోగ
                       }`}>
                         🚩 {clan.supportPct}% {language === 'te' ? 'మద్దతు' : 'Support'}
                       </span>
+                      <button
+                        type="button"
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          setExportInitialClanId(clan.id);
+                          setIsExportSurnamesModalOpen(true);
+                        }}
+                        className="px-2 py-0.5 bg-slate-800 hover:bg-slate-700 text-emerald-300 border border-emerald-500/30 rounded text-[9.5px] font-bold flex items-center gap-1 active:scale-95 transition-all shadow-xs"
+                        title={language === 'te' ? 'ఈ వంశం S.No లు ఎగుమతి/కాపీ చేయండి' : 'Export this clan S.Nos'}
+                      >
+                        <Download className="w-2.5 h-2.5 text-emerald-400" />
+                        <span>S.No ఎగుమతి</span>
+                      </button>
                     </div>
                   </div>
 
@@ -3939,6 +3984,19 @@ _దయచేసి మీ ఓటు హక్కును వినియోగ
           profiles={profiles}
           language={language}
           onClose={() => setIsHourlyTurnoutOpen(false)}
+        />
+      )}
+
+      {/* Export Surnames and Serial Numbers Modal */}
+      {isExportSurnamesModalOpen && (
+        <ExportSurnamesModal
+          isOpen={isExportSurnamesModalOpen}
+          boothInfo={boothInfo}
+          clans={surnameGroups}
+          profiles={profiles}
+          initialClanId={exportInitialClanId}
+          language={language}
+          onClose={() => setIsExportSurnamesModalOpen(false)}
         />
       )}
     </div>

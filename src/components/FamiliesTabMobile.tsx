@@ -27,6 +27,8 @@ import {
 } from '../utils/surnameClassifier';
 import { analyzeDuplicateVoters, DuplicateMatchInfo } from '../utils/duplicateDetector';
 import { DuplicateCompareModal } from './DuplicateCompareModal';
+import { ExportSurnamesModal } from './ExportSurnamesModal';
+import { Download } from 'lucide-react';
 
 interface FamiliesTabMobileProps {
   families: Record<string, FamilyGroup>;
@@ -91,6 +93,8 @@ export const FamiliesTabMobile: React.FC<FamiliesTabMobileProps> = ({
   const [expandedFamId, setExpandedFamId] = useState<string | null>(null);
   const [expandedSurname, setExpandedSurname] = useState<string | null>(null);
   const [copiedPhoneId, setCopiedPhoneId] = useState<string | null>(null);
+  const [isExportSurnamesModalOpen, setIsExportSurnamesModalOpen] = useState(false);
+  const [exportInitialClanId, setExportInitialClanId] = useState<string | undefined>(undefined);
   const [selectedDuplicateCluster, setSelectedDuplicateCluster] = useState<{
     voters: MobileVoter[];
     reasonTe: string;
@@ -489,6 +493,15 @@ export const FamiliesTabMobile: React.FC<FamiliesTabMobileProps> = ({
               <span className="font-mono text-amber-400">
                 {filteredClans.reduce((acc, c) => acc + c.totalVoters, 0)} {language === 'te' ? 'ఓటర్లు' : 'voters'}
               </span>
+              <button
+                type="button"
+                onClick={() => { setExportInitialClanId(undefined); setIsExportSurnamesModalOpen(true); }}
+                className="px-2 py-0.5 bg-slate-900 hover:bg-slate-800 text-emerald-300 border border-emerald-500/40 rounded-lg text-[10.5px] font-bold flex items-center gap-1 shadow-sm transition-all"
+                title={language === 'te' ? 'ఇంటిపేర్లు & క్రమ సంఖ్యల ఎగుమతి' : 'Export Surnames & Serial Numbers'}
+              >
+                <Download className="w-3 h-3 text-emerald-400" />
+                <span>📥 S.No ఎగుమతి</span>
+              </button>
               {onOpenGroupPrint && filteredClans.length > 0 && (
                 <button
                   onClick={() => {
@@ -569,9 +582,19 @@ export const FamiliesTabMobile: React.FC<FamiliesTabMobileProps> = ({
                         <span className="px-2.5 py-1 bg-gradient-to-r from-emerald-600/30 to-amber-600/30 border border-amber-500/40 text-amber-300 font-mono font-black rounded-lg text-xs">
                           {jspPercent}% {language === 'te' ? 'మద్దతు' : 'Support'}
                         </span>
-                        {onOpenGroupPrint && (
+                        <div className="flex items-center gap-1">
                           <button
-                            onClick={() => onOpenGroupPrint(
+                            type="button"
+                            onClick={() => { setExportInitialClanId(clan.id); setIsExportSurnamesModalOpen(true); }}
+                            className="px-2 py-0.5 bg-slate-800 hover:bg-slate-700 text-emerald-300 border border-emerald-500/30 rounded-md text-[10px] font-bold flex items-center gap-1 shadow-sm transition-all"
+                            title={language === 'te' ? 'ఈ వంశం S.No లు ఎగుమతి/కాపీ చేయండి' : 'Export this clan S.Nos'}
+                          >
+                            <Download className="w-2.5 h-2.5 text-emerald-400" />
+                            <span>S.No ఎగుమతి</span>
+                          </button>
+                          {onOpenGroupPrint && (
+                            <button
+                              onClick={() => onOpenGroupPrint(
                               `${clan.nameTe || clan.nameEn} (${clan.nameEn}) వంశ ఓటర్ల జాబితా`,
                               `బూత్ #${boothInfo.part_no} — ${clan.totalVoters} మంది ఓటర్లు (${clan.pctOfBooth}%)`,
                               clan.voters
@@ -583,6 +606,7 @@ export const FamiliesTabMobile: React.FC<FamiliesTabMobileProps> = ({
                             <span>ప్రింట్</span>
                           </button>
                         )}
+                        </div>
                       </div>
                     </div>
 
@@ -1367,6 +1391,17 @@ export const FamiliesTabMobile: React.FC<FamiliesTabMobileProps> = ({
           language={language}
           onClose={() => setSelectedDuplicateCluster(null)}
           onOpenSlip={onOpenSlip}
+        />
+      )}
+      {isExportSurnamesModalOpen && (
+        <ExportSurnamesModal
+          isOpen={isExportSurnamesModalOpen}
+          boothInfo={boothInfo}
+          clans={clanGroups}
+          profiles={profiles}
+          initialClanId={exportInitialClanId}
+          language={language}
+          onClose={() => setIsExportSurnamesModalOpen(false)}
         />
       )}
     </div>
