@@ -37,7 +37,6 @@ const filesToSync = [
   "src/components/BulkAssignModal.tsx",
   "src/components/CreateFamilyModal.tsx",
   "src/components/DuplicateCompareModal.tsx",
-  "src/components/ExportExcelModal.tsx",
   "src/components/ExportSurnamesModal.tsx",
   "src/components/FamiliesTabMobile.tsx",
   "src/components/FamilyWhatsAppCardModal.tsx",
