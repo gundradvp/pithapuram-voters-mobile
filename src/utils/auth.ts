@@ -284,6 +284,11 @@ export function generateAssignmentWhatsAppMessage(
         if (w === 'mptc_durgada_3') return `• దుర్గడ MPTC-3 (డోర్ నెం. 4-9 - 1,874 ఓటర్లు)${desc}`;
         if (w === 'gp_durgada') return `• దుర్గడ సమగ్ర గ్రామ పంచాయతీ (Durgada GP - 7,420 ఓటర్లు)${desc}`;
         if (w === 'gp_tatiparthy') return `• తాటిపర్తి సమగ్ర గ్రామ పంచాయతీ (Tatiparthy GP - 3,493 ఓటర్లు)${desc}`;
+        if (w === 'gp_veeravasaram') return `• వీరవాసరం సమగ్ర గ్రామ పంచాయతీ (Veeravasaram GP - 10,907 ఓటర్లు)${desc}`;
+        if (w.startsWith('gp_veeravasaram_w')) {
+          const wNum = w.replace('gp_veeravasaram_w', '');
+          return `• వీరవాసరం పంచాయతీ — వార్డు #${wNum}${desc}`;
+        }
         if (w === 'gp_raparthy') return `• రాపర్తి సమగ్ర గ్రామ పంచాయతీ (Raparthi GP - 2,878 ఓటర్లు)${desc}`;
         if (w.startsWith('gp_raparthy_w')) {
           const wNum = w.replace('gp_raparthy_w', '');
