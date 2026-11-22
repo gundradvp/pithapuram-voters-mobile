@@ -10,7 +10,8 @@ import {
   Award,
   Sparkles,
   Share2,
-  Check
+  Check,
+  ArrowUpDown
 } from 'lucide-react';
 import { BoothInfo, VoterCampaignProfile } from '../types';
 import { Language } from '../utils/i18n';
@@ -22,6 +23,7 @@ import {
   generateSingleClanWhatsAppText,
   formatSnoRanges
 } from '../utils/surnameExporter';
+import { exportVotersBySurnameExcel } from '../utils/voterExcelExporter';
 
 export interface ExportSurnamesModalProps {
   isOpen: boolean;
@@ -70,6 +72,18 @@ export const ExportSurnamesModal: React.FC<ExportSurnamesModalProps> = ({
 
   const handleExportSummary = () => {
     exportSurnamesSummaryCsv(boothInfo, targetClans);
+  };
+
+  const handleExportSurname9 = () => {
+    const clanVoters = targetClans.flatMap(c => c.voters);
+    exportVotersBySurnameExcel({
+      voters: clanVoters,
+      profiles,
+      boothInfo,
+      scopeTitle: `ఇంటిపేర్ల క్రమంలో ఓటర్ల జాబితా (${targetClans.length} వంశాలు)`,
+      filePrefix: 'Clans_By_Surname',
+      format: 'surname_9_fields'
+    });
   };
 
   const handleExportDetailed = () => {
@@ -217,6 +231,33 @@ export const ExportSurnamesModal: React.FC<ExportSurnamesModalProps> = ({
             <label className="text-[11px] font-bold text-slate-300 block">
               ⚡ {language === 'te' ? 'ఎగుమతి ఎంపికలు (Download & Copy):' : 'Export Actions:'}
             </label>
+
+            {/* 0. Order by Surname 9 Fields CSV (Exact Match to Request) */}
+            <button
+              type="button"
+              onClick={handleExportSurname9}
+              className="w-full p-3.5 bg-gradient-to-r from-emerald-950/70 via-slate-900 to-slate-900 border-2 border-emerald-500 hover:border-emerald-400 rounded-2xl flex items-center justify-between text-left transition-all active:scale-[0.99] shadow-lg shadow-emerald-950/50 group cursor-pointer"
+            >
+              <div className="flex items-center gap-3">
+                <div className="w-10 h-10 rounded-xl bg-emerald-500 text-slate-950 flex items-center justify-center font-black shrink-0 shadow-md">
+                  <ArrowUpDown className="w-5 h-5 text-slate-950" />
+                </div>
+                <div>
+                  <h4 className="text-xs font-black text-white flex items-center gap-1.5 group-hover:text-amber-300 transition-colors">
+                    <span>{language === 'te' ? 'ఇంటిపేర్ల క్రమంలో ఎక్సెల్ (9 కాలమ్‌లు)' : 'Order by Surname CSV (9 Columns)'}</span>
+                    <span className="px-1.5 py-0.2 bg-emerald-500 text-slate-950 text-[9px] rounded font-mono font-black">
+                      RECOMMENDED
+                    </span>
+                  </h4>
+                  <p className="text-[10.5px] text-slate-300">
+                    {language === 'te'
+                      ? 'S.No, ఓటరు పేరు, ఇంటి పేరు, సంబంధీకుడు, House No, Age, Gender, EPIC ID, PHONE'
+                      : 'Exact 9 fields sorted alphabetically by Surname (Telugu A-Z)'}
+                  </p>
+                </div>
+              </div>
+              <Download className="w-4 h-4 text-emerald-400 group-hover:translate-y-0.5 transition-transform shrink-0" />
+            </button>
 
             {/* 1. Summary CSV */}
             <button

@@ -1,12 +1,15 @@
 import { BoothInfo, MobileVoter, VoterCampaignProfile } from '../types';
 import { extractSurname } from './surnameClassifier';
 
+export type ExcelExportFormat = 'surname_9_fields' | 'sno_9_fields' | 'full_22_fields';
+
 export interface ExportVotersToExcelOptions {
   voters: MobileVoter[];
   profiles: Record<number, VoterCampaignProfile>;
   boothInfo: BoothInfo;
   scopeTitle?: string; // e.g. "ఎంపిక చేసిన ఓటర్లు" or "ఫిల్టర్ చేసిన ఓటర్లు"
   filePrefix?: string; // e.g. "Selected_Voters" or "Filtered_Voters"
+  format?: ExcelExportFormat; // Defaults to 'surname_9_fields'
 }
 
 function escapeCsv(val: any): string {
@@ -22,13 +25,130 @@ function formatPhoneForExcel(phone: string): string {
   return `="${clean.replace(/"/g, '""')}"`;
 }
 
+/**
+ * 1. Export 9-field Excel CSV (Order by Surname or S.No)
+ * Fields: S.No, ఓటరు పేరు (Voter Name), ఇంటి పేరు, సంబంధం / బంధువు పేరు (Relative Name), House No, AGE, లింగం (Gender), ఓటరు గుర్తింపు కార్డు (EPIC ID), PHONE
+ */
+export function exportVotersBySurnameExcel({
+  voters,
+  profiles,
+  boothInfo,
+  scopeTitle,
+  filePrefix = 'Voters',
+  format = 'surname_9_fields'
+}: ExportVotersToExcelOptions): void {
+  if (!voters || voters.length === 0) return;
+
+  const partNo = boothInfo.part_no || boothInfo.ward_no || 'booth';
+  const village = (boothInfo.clean_village || boothInfo.ps_address || 'Pithapuram').replace(/\s+/g, '_');
+
+  // Exact 9 fields requested
+  const headers = [
+    'S.No',
+    'ఓటరు పేరు (Voter Name)',
+    'ఇంటి పేరు',
+    'సంబంధం / బంధువు పేరు (Relative Name)',
+    'House No',
+    'AGE',
+    'లింగం (Gender)',
+    'ఓటరు గుర్తింపు కార్డు (EPIC ID)',
+    'PHONE'
+  ];
+
+  // Prepare & Sort voters
+  const prepared = voters.map(v => {
+    const prof = profiles[v.s] || {};
+    const { en: surnameEn, te: surnameTe } = extractSurname(v, prof);
+    const customPhone = (prof.customPhone || '').trim();
+    const kriyaPhone = (v.k_m || '').trim();
+    const volunteerPhone = (v.v_mob || '').trim();
+    const primaryPhone = customPhone || kriyaPhone || volunteerPhone;
+    const gender = v.g === 'M' ? 'పురుషుడు (M)' : v.g === 'F' ? 'స్త్రీ (F)' : v.g || '';
+
+    return {
+      sno: v.s,
+      voterName: v.n || '',
+      surnameTe: surnameTe || surnameEn || '',
+      surnameEn: surnameEn || '',
+      relName: v.r || '',
+      houseNo: v.hn || '',
+      age: v.a || '',
+      gender: gender,
+      epicId: v.id || '',
+      phone: primaryPhone
+    };
+  });
+
+  if (format === 'surname_9_fields') {
+    // Sort by Surname ascending (Telugu alphabetical order), then secondary by S.No
+    prepared.sort((a, b) => {
+      const cmp = a.surnameTe.localeCompare(b.surnameTe, 'te-IN');
+      if (cmp !== 0) return cmp;
+      return a.sno - b.sno;
+    });
+  } else {
+    // Sort by S.No ascending
+    prepared.sort((a, b) => a.sno - b.sno);
+  }
+
+  const rows = prepared.map(item => [
+    item.sno,
+    escapeCsv(item.voterName),
+    escapeCsv(item.surnameTe),
+    escapeCsv(item.relName),
+    escapeCsv(item.houseNo),
+    item.age,
+    escapeCsv(item.gender),
+    escapeCsv(item.epicId),
+    formatPhoneForExcel(item.phone)
+  ].join(','));
+
+  const phoneCount = prepared.filter(p => !!p.phone).length;
+  const sortLabel = format === 'surname_9_fields' ? 'ఇంటిపేర్ల క్రమంలో (Order by Surname)' : 'క్రమ సంఖ్యల క్రమంలో (S.No Order)';
+  const titleText = scopeTitle || `బూత్ #${partNo} ఓటర్ల జాబితా (${sortLabel} - మొత్తం: ${prepared.length} మంది)`;
+
+  const headerMeta1 = escapeCsv(`పిఠాపురం నియోజకవర్గం - బూత్ #${partNo} (${boothInfo.clean_village || boothInfo.ps_address || 'గ్రామం'}) - ${titleText}`);
+  const headerMeta2 = escapeCsv(`మొత్తం ఓటర్లు: ${prepared.length} మంది | ఫోన్ నంబర్లు ఉన్నవారు: ${phoneCount} మంది (${Math.round((phoneCount / prepared.length) * 100)}%) | క్రమపద్ధతి: ${sortLabel} | తేదీ: ${new Date().toLocaleDateString('te-IN')}`);
+
+  // \uFEFF Byte Order Mark ensures Microsoft Excel & Google Sheets render Telugu fonts properly
+  const csvContent = '\uFEFF' + [
+    headerMeta1,
+    headerMeta2,
+    '',
+    headers.join(','),
+    ...rows
+  ].join('\r\n');
+
+  const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
+  const url = URL.createObjectURL(blob);
+  const link = document.createElement('a');
+  link.href = url;
+  const dateStr = new Date().toISOString().slice(0, 10);
+  const suffix = format === 'surname_9_fields' ? 'By_Surname_9Fields' : 'By_SNo_9Fields';
+  link.download = `Booth_${partNo}_${village}_${filePrefix}_${prepared.length}_Voters_${suffix}_${dateStr}.csv`;
+  document.body.appendChild(link);
+  link.click();
+  document.body.removeChild(link);
+  URL.revokeObjectURL(url);
+}
+
+/**
+ * 2. Full 22-field Excel CSV Export (Complete Analysis)
+ */
 export function exportVotersToExcelCsv({
   voters,
   profiles,
   boothInfo,
   scopeTitle,
-  filePrefix = 'Voters'
+  filePrefix = 'Voters',
+  format = 'surname_9_fields'
 }: ExportVotersToExcelOptions): void {
+  // If user selected 9-field format, delegate directly
+  if (format === 'surname_9_fields' || format === 'sno_9_fields') {
+    exportVotersBySurnameExcel({ voters, profiles, boothInfo, scopeTitle, filePrefix, format });
+    return;
+  }
+
   if (!voters || voters.length === 0) return;
 
   const partNo = boothInfo.part_no || boothInfo.ward_no || 'booth';
@@ -139,7 +259,7 @@ export function exportVotersToExcelCsv({
   const link = document.createElement('a');
   link.href = url;
   const dateStr = new Date().toISOString().slice(0, 10);
-  link.download = `Booth_${partNo}_${village}_${filePrefix}_${voters.length}_Voters_With_Phones_${dateStr}.csv`;
+  link.download = `Booth_${partNo}_${village}_${filePrefix}_${voters.length}_Voters_Full_Analysis_${dateStr}.csv`;
   document.body.appendChild(link);
   link.click();
   document.body.removeChild(link);

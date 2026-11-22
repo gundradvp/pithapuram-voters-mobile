@@ -11,6 +11,7 @@ import { SpeedDialModal } from './SpeedDialModal';
 import { HourlyTurnoutModal } from './HourlyTurnoutModal';
 import { VotersExcelGrid } from './VotersExcelGrid';
 import { ExportSurnamesModal } from './ExportSurnamesModal';
+import { ExportExcelModal } from './ExportExcelModal';
 import { exportVotersToExcelCsv } from '../utils/voterExcelExporter';
 import { Download, FileSpreadsheet } from 'lucide-react';
 
@@ -121,6 +122,8 @@ export const VotersTabMobile: React.FC<VotersTabMobileProps> = ({
     const [selectedSurname, setSelectedSurname] = useState<string>('all');
   const [isExportSurnamesModalOpen, setIsExportSurnamesModalOpen] = useState(false);
   const [exportInitialClanId, setExportInitialClanId] = useState<string | undefined>(undefined);
+  const [isExportExcelModalOpen, setIsExportExcelModalOpen] = useState(false);
+  const [exportExcelScope, setExportExcelScope] = useState<'selected' | 'filtered'>('filtered');
   const [isGroupSimilarSurnames, setIsGroupSimilarSurnames] = useState<boolean>(() => {
     try {
       const boothKey = String(boothInfo?.part_no || boothInfo?.ward_no || 'default');
@@ -363,43 +366,14 @@ export const VotersTabMobile: React.FC<VotersTabMobileProps> = ({
 
   const handleExportSelectedToExcel = () => {
     if (selectedVoterSnos.size === 0) return;
-    const selected = voters.filter(v => selectedVoterSnos.has(v.s));
-    exportVotersToExcelCsv({
-      voters: selected,
-      profiles,
-      boothInfo,
-      scopeTitle: language === 'te'
-        ? `ఎంపిక చేసిన ${selected.length} మంది ఓటర్లు (ఫోన్ నంబర్లతో)`
-        : `Selected ${selected.length} Electors with Phone Numbers`,
-      filePrefix: `Selected_${selected.length}`
-    });
+    setExportExcelScope('selected');
+    setIsExportExcelModalOpen(true);
   };
 
   const handleExportFilteredToExcel = () => {
     if (filteredVoters.length === 0) return;
-    let filterLabel = '';
-    if (selectedSurname !== 'all') {
-      const grp = surnameGroups.find(g => g.id === selectedSurname);
-      filterLabel = `${grp?.nameEn || selectedSurname}_Surname`;
-    } else if (selectedStreet !== 'all') {
-      filterLabel = `${selectedStreet.replace(/[^a-zA-Z0-9]/g, '_').slice(0, 15)}_Street`;
-    } else if (selectedWard !== 'all') {
-      filterLabel = `Ward_${selectedWard}`;
-    } else if (filterMode !== 'all') {
-      filterLabel = `${filterMode}`;
-    } else if (searchQuery.trim()) {
-      filterLabel = `Search_${searchQuery.trim().replace(/[^a-zA-Z0-9]/g, '_').slice(0, 10)}`;
-    }
-
-    exportVotersToExcelCsv({
-      voters: filteredVoters,
-      profiles,
-      boothInfo,
-      scopeTitle: language === 'te'
-        ? (filterLabel ? `${filterLabel} ఫిల్టర్ చేసిన ఓటర్లు (మొత్తం: ${filteredVoters.length})` : `ఫిల్టర్ చేసిన ${filteredVoters.length} మంది ఓటర్లు (ఫోన్ నంబర్లతో)`)
-        : `Filtered ${filteredVoters.length} Electors with Phone Numbers`,
-      filePrefix: filterLabel ? `Filtered_${filterLabel}` : 'Filtered'
-    });
+    setExportExcelScope('filtered');
+    setIsExportExcelModalOpen(true);
   };
 
   const [selectedDuplicateCluster, setSelectedDuplicateCluster] = useState<{
@@ -4077,6 +4051,28 @@ _దయచేసి మీ ఓటు హక్కును వినియోగ
           initialClanId={exportInitialClanId}
           language={language}
           onClose={() => setIsExportSurnamesModalOpen(false)}
+        />
+      )}
+
+      {/* Export to Excel Modal (Exact 9 Fields & Order by Surname) */}
+      {isExportExcelModalOpen && (
+        <ExportExcelModal
+          isOpen={isExportExcelModalOpen}
+          voters={exportExcelScope === 'selected' ? voters.filter(v => selectedVoterSnos.has(v.s)) : filteredVoters}
+          profiles={profiles}
+          boothInfo={boothInfo}
+          scopeTitle={
+            language === 'te'
+              ? (exportExcelScope === 'selected'
+                  ? `ఎంపిక చేసిన ${selectedVoterSnos.size} మంది ఓటర్లు`
+                  : `ఫిల్టర్ చేసిన ${filteredVoters.length} మంది ఓటర్లు`)
+              : (exportExcelScope === 'selected'
+                  ? `Selected ${selectedVoterSnos.size} Electors`
+                  : `Filtered ${filteredVoters.length} Electors`)
+          }
+          filePrefix={exportExcelScope === 'selected' ? `Selected_${selectedVoterSnos.size}` : 'Filtered'}
+          language={language}
+          onClose={() => setIsExportExcelModalOpen(false)}
         />
       )}
     </div>
