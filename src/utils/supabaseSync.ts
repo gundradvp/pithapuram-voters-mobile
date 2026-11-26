@@ -1,5 +1,6 @@
 import { safeStorage } from './safeStorage';
 import { VoterCampaignProfile, Influencer, FamilyGroup } from '../types';
+import { WhatsAppSlipConfig, loadWhatsAppSlipConfig, saveWhatsAppSlipConfig } from './slipConfig';
 
 export interface BoothSyncBundle {
   version: number;
@@ -218,6 +219,90 @@ export async function pushBoothToSupabaseImmediate(
     console.warn('Failed to push to Supabase:', err);
   }
   return false;
+}
+
+const SLIP_CONFIG_REMOTE_KEY = '__whatsapp_slip_config__';
+
+export async function pushSlipConfigToSupabase(config: WhatsAppSlipConfig): Promise<boolean> {
+  const token = await getSupabaseToken();
+  if (!token) return false;
+
+  const payload = {
+    tenant_id: TENANT_ID,
+    category: SYNC_CATEGORY,
+    value: SLIP_CONFIG_REMOTE_KEY,
+    display_label: 'WhatsApp Slip & Ward Candidate Config',
+    description: JSON.stringify({
+      ...config,
+      updatedAt: config.updatedAt || Date.now(),
+    }),
+    is_active: true,
+  };
+
+  try {
+    const res = await fetch(
+      `${SUPABASE_URL}/rest/v1/lookup_values?on_conflict=tenant_id,category,value`,
+      {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          apikey: SUPABASE_ANON_KEY,
+          Authorization: `Bearer ${token}`,
+          Prefer: 'resolution=merge-duplicates,return=minimal',
+        },
+        body: JSON.stringify(payload),
+      }
+    );
+    return res.ok || res.status === 201 || res.status === 204;
+  } catch (err) {
+    console.warn('Failed to push slip config to Supabase:', err);
+    return false;
+  }
+}
+
+export async function pullSlipConfigFromSupabase(): Promise<WhatsAppSlipConfig | null> {
+  const token = await getSupabaseToken();
+  if (!token) return null;
+
+  try {
+    const res = await fetch(
+      `${SUPABASE_URL}/rest/v1/lookup_values?category=eq.${SYNC_CATEGORY}&value=eq.${encodeURIComponent(
+        SLIP_CONFIG_REMOTE_KEY
+      )}&select=description`,
+      {
+        headers: {
+          apikey: SUPABASE_ANON_KEY,
+          Authorization: `Bearer ${token}`,
+        },
+      }
+    );
+    if (!res.ok) return null;
+    const rows = await res.json();
+    if (Array.isArray(rows) && rows.length > 0 && rows[0].description) {
+      const remote = JSON.parse(rows[0].description) as WhatsAppSlipConfig;
+      if (remote && typeof remote === 'object' && remote.wardCandidates) {
+        const local = loadWhatsAppSlipConfig();
+        const localCount = Object.values(local.wardCandidates).filter(
+          (c) => c.memberName?.trim() || c.symbol?.trim() || c.serialNo?.trim()
+        ).length;
+        const remoteCount = Object.values(remote.wardCandidates).filter(
+          (c) => c.memberName?.trim() || c.symbol?.trim() || c.serialNo?.trim()
+        ).length;
+
+        const remoteIsNewer =
+          (remote.updatedAt && (!local.updatedAt || remote.updatedAt > local.updatedAt)) ||
+          (localCount === 0 && remoteCount > 0);
+
+        if (remoteIsNewer) {
+          saveWhatsAppSlipConfig(remote);
+          return remote;
+        }
+      }
+    }
+  } catch (err) {
+    console.warn('Failed to pull slip config from Supabase:', err);
+  }
+  return null;
 }
 
 /**

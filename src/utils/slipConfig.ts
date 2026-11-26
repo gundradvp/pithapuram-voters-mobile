@@ -11,6 +11,7 @@ export interface WardCandidateConfig {
 export interface WhatsAppSlipConfig {
   template: string;
   wardCandidates: Record<string, WardCandidateConfig>;
+  updatedAt?: number;
 }
 
 export const SLIP_CONFIG_STORAGE_KEY = 'jsp_whatsapp_slip_config_v1';
@@ -58,6 +59,7 @@ export function loadWhatsAppSlipConfig(): WhatsAppSlipConfig {
           wardCandidates: parsed.wardCandidates && typeof parsed.wardCandidates === 'object'
             ? parsed.wardCandidates
             : {},
+          updatedAt: typeof parsed.updatedAt === 'number' ? parsed.updatedAt : undefined,
         };
       }
     }
@@ -70,14 +72,19 @@ export function loadWhatsAppSlipConfig(): WhatsAppSlipConfig {
   };
 }
 
-export function saveWhatsAppSlipConfig(config: WhatsAppSlipConfig): void {
+export function saveWhatsAppSlipConfig(config: WhatsAppSlipConfig): WhatsAppSlipConfig {
+  const next: WhatsAppSlipConfig = {
+    ...config,
+    updatedAt: config.updatedAt || Date.now(),
+  };
   try {
     if (typeof window !== 'undefined' && window.localStorage) {
-      window.localStorage.setItem(SLIP_CONFIG_STORAGE_KEY, JSON.stringify(config));
+      window.localStorage.setItem(SLIP_CONFIG_STORAGE_KEY, JSON.stringify(next));
     }
   } catch (err) {
     console.error('Failed to save WhatsApp slip config:', err);
   }
+  return next;
 }
 
 export function buildWhatsAppSlipMessage(

@@ -14,6 +14,7 @@ import { ExportSurnamesModal } from './ExportSurnamesModal';
 import { exportVotersBySurnameExcel, exportVotersToExcelCsv } from '../utils/voterExcelExporter';
 import { Download, FileSpreadsheet, Settings } from 'lucide-react';
 import { openWhatsAppSlip } from '../utils/slipConfig';
+import { pullSlipConfigFromSupabase } from '../utils/supabaseSync';
 import { SlipConfigModal } from './SlipConfigModal';
 
 interface VotersTabMobileProps {
@@ -446,6 +447,10 @@ export const VotersTabMobile: React.FC<VotersTabMobileProps> = ({
     });
   };
   const [isSlipConfigOpen, setIsSlipConfigOpen] = useState(false);
+
+  useEffect(() => {
+    pullSlipConfigFromSupabase();
+  }, []);
 
   const [internalViewMode, setInternalViewMode] = useState<'list' | 'surnames' | 'excel'>(() => {
     try {

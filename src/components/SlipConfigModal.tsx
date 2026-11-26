@@ -9,6 +9,7 @@ import {
   Eye,
   CheckCircle2,
   Sparkles,
+  Cloud,
 } from 'lucide-react';
 import { BoothInfo, MobileVoter } from '../types';
 import { Language } from '../utils/i18n';
@@ -21,6 +22,10 @@ import {
   loadWhatsAppSlipConfig,
   saveWhatsAppSlipConfig,
 } from '../utils/slipConfig';
+import {
+  pullSlipConfigFromSupabase,
+  pushSlipConfigToSupabase,
+} from '../utils/supabaseSync';
 
 interface SlipConfigModalProps {
   isOpen: boolean;
@@ -57,6 +62,7 @@ export const SlipConfigModal: React.FC<SlipConfigModalProps> = ({
   const [newWardNo, setNewWardNo] = useState<string>('');
   const [previewWardNo, setPreviewWardNo] = useState<string>('4');
   const [savedBanner, setSavedBanner] = useState(false);
+  const [cloudStatus, setCloudStatus] = useState<string>('');
   const textareaRef = useRef<HTMLTextAreaElement>(null);
 
   useEffect(() => {
@@ -64,6 +70,12 @@ export const SlipConfigModal: React.FC<SlipConfigModalProps> = ({
       setConfig(loadWhatsAppSlipConfig());
       setActiveTab(initialTab);
       setSavedBanner(false);
+      setCloudStatus('');
+      pullSlipConfigFromSupabase().then((remote) => {
+        if (remote) {
+          setConfig(remote);
+        }
+      });
     }
   }, [isOpen, initialTab]);
 
@@ -167,14 +179,35 @@ export const SlipConfigModal: React.FC<SlipConfigModalProps> = ({
     setConfig((prev) => ({ ...prev, template: DEFAULT_WHATSAPP_SLIP_TEMPLATE }));
   };
 
-  const handleSave = () => {
-    saveWhatsAppSlipConfig(config);
+  const handleSave = async () => {
+    const saved = saveWhatsAppSlipConfig({ ...config, updatedAt: Date.now() });
     setSavedBanner(true);
+    setCloudStatus(language === 'te' ? 'క్లౌడ్‌కు సింక్ అవుతోంది...' : 'Syncing to cloud...');
+    await pushSlipConfigToSupabase(saved);
+    setCloudStatus('');
     onSaved?.();
     setTimeout(() => {
       setSavedBanner(false);
       onClose();
-    }, 650);
+    }, 550);
+  };
+
+  const handleCloudSyncNow = async () => {
+    setCloudStatus(language === 'te' ? 'సింక్ అవుతోంది...' : 'Syncing...');
+    const remote = await pullSlipConfigFromSupabase();
+    if (remote) {
+      setConfig(remote);
+      setCloudStatus(language === 'te' ? 'క్లౌడ్ నుండి లోడ్ అయింది!' : 'Pulled from cloud!');
+    } else {
+      const saved = saveWhatsAppSlipConfig({ ...config, updatedAt: Date.now() });
+      const ok = await pushSlipConfigToSupabase(saved);
+      setCloudStatus(
+        ok
+          ? (language === 'te' ? 'క్లౌడ్‌కు సేవ్ అయింది!' : 'Synced to cloud!')
+          : (language === 'te' ? 'సింక్ విఫలమైంది' : 'Sync failed')
+      );
+    }
+    setTimeout(() => setCloudStatus(''), 2500);
   };
 
   const configuredCount = Object.values(config.wardCandidates).filter(
@@ -491,14 +524,25 @@ export const SlipConfigModal: React.FC<SlipConfigModalProps> = ({
         </div>
 
         {/* Footer */}
-        <div className="p-3 bg-slate-950/90 border-t border-slate-800 flex items-center justify-between gap-2 shrink-0">
-          <div className="text-[11px] text-emerald-400 font-bold">
-            {savedBanner && (
-              <span className="flex items-center gap-1">
+        <div className="p-3 bg-slate-950/90 border-t border-slate-800 flex items-center justify-between gap-2 shrink-0 flex-wrap">
+          <div className="flex items-center gap-2 text-[11px] font-bold">
+            <button
+              type="button"
+              onClick={handleCloudSyncNow}
+              className="px-2.5 py-1.5 rounded-xl bg-slate-800 hover:bg-slate-700 text-sky-300 border border-sky-500/40 text-[11px] font-bold flex items-center gap-1 cursor-pointer"
+              title="Sync ward candidates & template with Supabase cloud"
+            >
+              <Cloud className="w-3.5 h-3.5" />
+              <span>{language === 'te' ? 'క్లౌడ్ సింక్' : 'Cloud Sync'}</span>
+            </button>
+            {savedBanner ? (
+              <span className="flex items-center gap-1 text-emerald-400">
                 <CheckCircle2 className="w-4 h-4" />
                 {language === 'te' ? 'సెట్టింగ్స్ సేవ్ అయ్యాయి!' : 'Settings saved!'}
               </span>
-            )}
+            ) : cloudStatus ? (
+              <span className="text-sky-300">{cloudStatus}</span>
+            ) : null}
           </div>
           <div className="flex items-center gap-2">
             <button
