@@ -292,24 +292,28 @@ function fetchWithHttps(url, maxRedirects = 5) {
   });
 }
 
+const downloadedInThisRun = new Set();
+
 async function syncFile(file, index, total) {
   const dir = path.dirname(file);
   if (!fs.existsSync(dir)) {
     fs.mkdirSync(dir, { recursive: true });
   }
 
-  // Fast duplicate copy check to avoid re-downloading large identical booth files
+  // Fast duplicate copy check to avoid re-downloading large identical booth files (only if downloaded in this run)
   if (file.startsWith('public/booths/booth_')) {
     const counterpart = file.replace('public/booths/booth_', 'public/booths/');
-    if (fs.existsSync(counterpart)) {
+    if (downloadedInThisRun.has(counterpart) && fs.existsSync(counterpart)) {
       fs.copyFileSync(counterpart, file);
+      downloadedInThisRun.add(file);
       console.log('✅ [' + index + '/' + total + '] Linked from counterpart: ' + file);
       return true;
     }
   } else if (file.startsWith('public/booths/gp_') || file.startsWith('public/booths/mptc_') || file.startsWith('public/booths/ward_')) {
     const counterpart = file.replace('public/booths/', 'public/booths/booth_');
-    if (fs.existsSync(counterpart)) {
+    if (downloadedInThisRun.has(counterpart) && fs.existsSync(counterpart)) {
       fs.copyFileSync(counterpart, file);
+      downloadedInThisRun.add(file);
       console.log('✅ [' + index + '/' + total + '] Linked from counterpart: ' + file);
       return true;
     }
@@ -334,6 +338,7 @@ async function syncFile(file, index, total) {
   }
 
   fs.writeFileSync(file, content, 'utf8');
+  downloadedInThisRun.add(file);
   console.log('✅ [' + index + '/' + total + '] Updated ' + file);
   return true;
 }
