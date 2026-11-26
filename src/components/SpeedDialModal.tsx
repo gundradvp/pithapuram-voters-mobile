@@ -2,6 +2,7 @@ import React, { useState, useMemo } from 'react';
 import { X, Phone, PhoneCall, MessageSquare, CheckCircle2, Search, Zap, AlertCircle, UserCheck } from 'lucide-react';
 import { MobileVoter, BoothInfo, VoterCampaignProfile } from '../types';
 import { Language } from '../utils/i18n';
+import { openWhatsAppSlip } from '../utils/slipConfig';
 
 interface SpeedDialModalProps {
   voters: MobileVoter[];
@@ -73,23 +74,7 @@ export const SpeedDialModal: React.FC<SpeedDialModalProps> = ({
   }, [pendingOurs, profiles]);
 
   const handleSendWhatsAppSlip = (v: MobileVoter, phone: string) => {
-    const cleanPhone = phone.replace(/[^0-9]/g, '');
-    const text = `🗳️ *పిఠాపురం నియోజకవర్గం (AC #37)*
-*ఓటరు సమాచార స్లిప్పు (VOTER SLIP)*
-
-నమస్తే *${v.n}* గారు,
-
-మీ ఓటర్ సమాచారం:
-🔢 *క్రమ సంఖ్య (S.No):* #${v.s}
-🆔 *ఓటర్ ఐడీ (EPIC):* ${v.id}
-🏠 *ఇంటి నెం:* ${v.hn || '-'}
-🏛️ *పోలింగ్ కేంద్రం:* ${boothInfo.ps_address}
-⏰ *పోలింగ్ సమయం:* ఉదయం 7:00 నుండి సాయంత్రం 5:00 వరకు
-
-_దయచేసి వెంటనే మీ ఓటు హక్కును వినియోగించుకోండి! ప్రతి ఓటూ అమూల్యం._ 🗳️`;
-
-    const url = `https://wa.me/${cleanPhone.startsWith('91') ? cleanPhone : '91' + cleanPhone}?text=${encodeURIComponent(text)}`;
-    window.open(url, '_blank');
+    openWhatsAppSlip(v, boothInfo, phone);
   };
 
   return (

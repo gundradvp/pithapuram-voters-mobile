@@ -43,6 +43,7 @@ import {
   VoterCampaignProfile
 } from '../types';
 import { resolveCardUrl } from '../utils/photoResolver';
+import { openWhatsAppSlip } from '../utils/slipConfig';
 import { saveVoterProfile } from '../utils/storage';
 import {
   parseNameAndSurname,
@@ -564,18 +565,8 @@ export const ReOcrReviewModal: React.FC<ReOcrReviewModalProps> = ({
 
   const handleSendWhatsAppSlip = useCallback(() => {
     if (!currentVoter) return;
-    const epic = currentVoter.epic || currentVoter.id || '-';
-    const doorNo = currentVoter.house_no || currentVoter.door_no || currentVoter.hn || '-';
-    const station = currentVoter.sec || currentVoter.polling_station_name || boothInfo?.ps_address || '-';
-
-    const text = `🗳️ *ఓటర్ సమాచార పత్రం — పిఠాపురం నియోజకవర్గం (AC #37)*\n\nనమస్తే *${currentVoter.n}* గారు,\n\nమీ అధికారిక ఓటర్ సమాచారం:\n🔢 *క్రమ సంఖ్య (S.No):* #${currentSno}\n🆔 *ఓటర్ ఐడీ (EPIC):* ${epic}\n🏠 *ఇంటి నెం:* ${doorNo}\n🏛️ *పోలింగ్ కేంద్రం:* ${station}\n⏰ *పోలింగ్ సమయం:* ఉదయం 7:00 నుండి సాయంత్రం 5:00 వరకు\n\n_దయచేసి మీ ఓటు హక్కును సద్వినియోగం చేసుకోండి!_`;
-
-    const cleanPhone = (effectivePhone || '').replace(/\D/g, '').slice(-10);
-    const waUrl = cleanPhone
-      ? `https://wa.me/91${cleanPhone}?text=${encodeURIComponent(text)}`
-      : `https://wa.me/?text=${encodeURIComponent(text)}`;
-    window.open(waUrl, '_blank');
-  }, [currentVoter, currentSno, effectivePhone, boothInfo]);
+    openWhatsAppSlip(currentVoter as MobileVoter, boothInfo || ({} as BoothInfo), effectivePhone || undefined);
+  }, [currentVoter, effectivePhone, boothInfo]);
 
   // Handler: Select Ward
   const handleSelectWard = (newWard: string) => {

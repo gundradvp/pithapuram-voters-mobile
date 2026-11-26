@@ -27,6 +27,7 @@ import { MobileVoter, BoothInfo, VoterSurveyStatus, VoterCampaignProfile } from 
 import { Language, translations } from '../utils/i18n';
 import { resolvePhotoUrl } from '../utils/photoResolver';
 import { matchesPhoneticSearch } from '../utils/phoneticSearch';
+import { openWhatsAppSlip } from '../utils/slipConfig';
 
 interface VotersExcelGridProps {
   voters: MobileVoter[];
@@ -151,26 +152,7 @@ export const VotersExcelGrid: React.FC<VotersExcelGridProps> = ({
   const handleSendWhatsAppSlip = (v: MobileVoter) => {
     const prof = profiles[v.s] || {};
     const phone = prof.customPhone || v.k_m || '';
-    const cleanPhone = phone.replace(/[^0-9]/g, '');
-
-    const text = `🗳️ *పిఠాపురం నియోజకవర్గం (AC #37)*
-*ఓటరు సమాచార స్లిప్పు (VOTER SLIP)*
-
-నమస్తే *${v.n}* గారు,
-${prof.customAlias ? `(మన రిఫరెన్స్: ${prof.customAlias})\n` : ''}
-మీ ఓటర్ సమాచారం:
-🔢 *క్రమ సంఖ్య (S.No):* #${v.s}
-🆔 *ఓటర్ ఐడీ (EPIC):* ${v.id}
-🏠 *ఇంటి నెం:* ${v.hn || '-'}
-🏛️ *పోలింగ్ కేంద్రం:* ${v.polling_station_name || boothInfo.ps_address}
-⏰ *పోలింగ్ సమయం:* ఉదయం 7:00 నుండి సాయంత్రం 5:00 వరకు
-
-_దయచేసి వెంటనే మీ ఓటు హక్కును వినియోగించుకోండి! ప్రతి ఓటూ అమూల్యం._ 🗳️`;
-
-    const targetUrl = cleanPhone
-      ? `https://wa.me/${cleanPhone.startsWith('91') ? cleanPhone : '91' + cleanPhone}?text=${encodeURIComponent(text)}`
-      : `https://wa.me/?text=${encodeURIComponent(text)}`;
-    window.open(targetUrl, '_blank');
+    openWhatsAppSlip(v, boothInfo, phone);
   };
 
   // Filter & Search Logic (Dual Match: Parsed Name OR Custom Alias OR S.No/EPIC/Phone)

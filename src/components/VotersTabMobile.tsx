@@ -12,7 +12,9 @@ import { HourlyTurnoutModal } from './HourlyTurnoutModal';
 import { VotersExcelGrid } from './VotersExcelGrid';
 import { ExportSurnamesModal } from './ExportSurnamesModal';
 import { exportVotersBySurnameExcel, exportVotersToExcelCsv } from '../utils/voterExcelExporter';
-import { Download, FileSpreadsheet } from 'lucide-react';
+import { Download, FileSpreadsheet, Settings } from 'lucide-react';
+import { openWhatsAppSlip } from '../utils/slipConfig';
+import { SlipConfigModal } from './SlipConfigModal';
 
 interface VotersTabMobileProps {
   voters: MobileVoter[];
@@ -443,6 +445,8 @@ export const VotersTabMobile: React.FC<VotersTabMobileProps> = ({
       return nextVal;
     });
   };
+  const [isSlipConfigOpen, setIsSlipConfigOpen] = useState(false);
+
   const [internalViewMode, setInternalViewMode] = useState<'list' | 'surnames' | 'excel'>(() => {
     try {
       const saved = localStorage.getItem('jsp_voter_view_mode') as 'list' | 'surnames' | 'excel';
@@ -835,26 +839,7 @@ export const VotersTabMobile: React.FC<VotersTabMobileProps> = ({
   };
 
   const handleSendWhatsAppSlip = (v: MobileVoter, phone?: string) => {
-    const text = `🗳️ *ఓటర్ సమాచార పత్రం — పిఠాపురం నియోజకవర్గం (AC #37)*
-
-నమస్తే *${v.n}* గారు,
-
-మీ అధికారిక ఓటర్ సమాచారం:
-🔢 *క్రమ సంఖ్య (S.No):* #${v.s}
-🆔 *ఓటర్ ఐడీ (EPIC):* ${v.id || '-'}
-🏠 *ఇంటి నెం:* ${v.hn || '-'}
-🏛️ *పోలింగ్ కేంద్రం:* ${boothInfo.ps_address || '-'}
-⏰ *పోలింగ్ సమయం:* ఉదయం 7:00 నుండి సాయంత్రం 5:00 వరకు
-
-_దయచేసి మీ ఓటు హక్కును వినియోగించుకోండి! ప్రతి ఓటూ అమూల్యం._ 🗳️`;
-
-    if (phone) {
-      const cleanPhone = phone.replace(/[^0-9]/g, '');
-      const fullPhone = cleanPhone.startsWith('91') ? cleanPhone : '91' + cleanPhone;
-      window.open(`https://wa.me/${fullPhone}?text=${encodeURIComponent(text)}`, '_blank');
-    } else {
-      window.open(`https://wa.me/?text=${encodeURIComponent(text)}`, '_blank');
-    }
+    openWhatsAppSlip(v, boothInfo, phone);
   };
 
   const t = translations[language];
@@ -1347,6 +1332,17 @@ _దయచేసి మీ ఓటు హక్కును వినియోగ
               <span className="hidden sm:inline font-bold">{language === 'te' ? 'విక్టరీ' : 'Victory'}</span>
             </button>
           )}
+
+          {/* Slip & Ward Candidate Config Button */}
+          <button
+            type="button"
+            onClick={() => setIsSlipConfigOpen(true)}
+            className="px-2 py-2 rounded-xl text-[10px] font-bold border bg-slate-900 border-slate-800 text-emerald-300 hover:text-white hover:border-emerald-500/50 transition-all flex items-center gap-1 shrink-0 cursor-pointer"
+            title={language === 'te' ? 'ఓటర్ స్లిప్ టెంప్లేట్ & వార్డ్ అభ్యర్థుల సెట్టింగ్స్' : 'Configure Voter Slip Template & Ward Candidates'}
+          >
+            <Settings className="w-3.5 h-3.5 text-emerald-400" />
+            <span className="hidden sm:inline font-bold">{language === 'te' ? 'స్లిప్ సెట్టింగ్స్' : 'Slip Config'}</span>
+          </button>
 
           {/* Filter Display Mode / Collapsible Toggle Button */}
           <button
@@ -4374,6 +4370,15 @@ _దయచేసి మీ ఓటు హక్కును వినియోగ
           onClose={() => setIsExportExcelModalOpen(false)}
         />
       )}
+
+      {/* WhatsApp Slip & Ward Candidate Config Modal */}
+      <SlipConfigModal
+        isOpen={isSlipConfigOpen}
+        onClose={() => setIsSlipConfigOpen(false)}
+        boothInfo={boothInfo}
+        voters={voters}
+        language={language}
+      />
     </div>
   );
 };

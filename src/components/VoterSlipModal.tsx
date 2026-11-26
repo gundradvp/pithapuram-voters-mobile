@@ -1,8 +1,10 @@
 import React, { useState, useEffect } from 'react';
-import { X, Share2, Printer, MapPin, Home, User, Copy, CheckCircle2 } from 'lucide-react';
+import { X, Share2, Printer, MapPin, Home, User, Copy, CheckCircle2, Settings, Image as ImageIcon } from 'lucide-react';
 import { MobileVoter, BoothInfo } from '../types';
 import { resolvePhotoUrl } from '../utils/photoResolver';
 import { resolveWardPollingStation } from '../utils/boothDirectoryHelper';
+import { openWhatsAppSlip, buildWhatsAppSlipMessage } from '../utils/slipConfig';
+import { SlipConfigModal } from './SlipConfigModal';
 
 interface VoterSlipModalProps {
   voter: MobileVoter | null;
@@ -18,6 +20,10 @@ export const VoterSlipModal: React.FC<VoterSlipModalProps> = ({
   if (!voter || !boothInfo) return null;
 
   const [copiedEpic, setCopiedEpic] = useState(false);
+  const [copiedSlipText, setCopiedSlipText] = useState(false);
+  const [copiedCardImg, setCopiedCardImg] = useState(false);
+  const [isSharingCard, setIsSharingCard] = useState(false);
+  const [showSlipConfig, setShowSlipConfig] = useState(false);
 
   // Close on Escape key press
   useEffect(() => {
@@ -72,55 +78,110 @@ export const VoterSlipModal: React.FC<VoterSlipModalProps> = ({
   };
 
   const handleShareWhatsApp = () => {
-    const isMunicipal = boothInfo.election_type === 'municipal';
-    const psLocation = resolveWardPollingStation(voter, boothInfo);
-    const text = isMunicipal
-      ? `*🗳️ ${boothInfo.local_body || 'పురపాలక సంఘం'} (${boothInfo.ward_no ? `${boothInfo.ward_no}వ వార్డు` : ''})*
-*ఓటరు సమాచార స్లిప్పు (VOTER SLIP)*
+    openWhatsAppSlip(voter, boothInfo);
+  };
 
-*ఓటరు పేరు:* ${voter.n}
-*సంబంధీకుడు:* ${voter.r}
-*EPIC ID:* ${voter.id}
-*వార్డు క్రమ సంఖ్య:* #${voter.s}
-*శాసనసభ బూత్:* Part #${voter.ac_part || ''} (క్రమం #${voter.ac_sno || ''})
-*ఇంటి నెంబర్:* ${voter.hn}
-*వీధి / ప్రాంతం:* ${voter.sec || ''}
-*వయస్సు / లింగం:* ${voter.a} Yrs / ${voter.g === 'M' ? 'Male' : 'Female'}
-*పోలింగ్ కేంద్రం:* ${psLocation}
+  const handleCopySlipText = () => {
+    const text = buildWhatsAppSlipMessage(voter, boothInfo);
+    if (navigator?.clipboard?.writeText) {
+      navigator.clipboard.writeText(text);
+    }
+    setCopiedSlipText(true);
+    setTimeout(() => setCopiedSlipText(false), 2000);
+  };
 
-_దయచేసి మీ ఓటు హక్కును వినియోగించుకోండి! ప్రతి ఓటూ అమూల్యం._ 🗳️`
-      : `*🗳️ పిఠాపురం నియోజకవర్గం (AC #37)*
-*ఓటరు సమాచార స్లిప్పు (VOTER SLIP)*
+  const fetchCardPngBlob = async (): Promise<Blob | null> => {
+    const rawCard = voter.card_url || voter.card;
+    if (!rawCard) return null;
+    const url = resolvePhotoUrl(rawCard) || rawCard;
+    try {
+      const res = await fetch(url);
+      if (!res.ok) return null;
+      const blob = await res.blob();
+      const imgUrl = URL.createObjectURL(blob);
+      try {
+        const img = await new Promise<HTMLImageElement>((resolve, reject) => {
+          const el = new Image();
+          el.onload = () => resolve(el);
+          el.onerror = reject;
+          el.src = imgUrl;
+        });
+        const canvas = document.createElement('canvas');
+        canvas.width = img.naturalWidth || img.width;
+        canvas.height = img.naturalHeight || img.height;
+        const ctx = canvas.getContext('2d');
+        if (!ctx) return blob;
+        ctx.drawImage(img, 0, 0);
+        return await new Promise<Blob | null>((resolve) =>
+          canvas.toBlob((b) => resolve(b || blob), 'image/png')
+        );
+      } finally {
+        URL.revokeObjectURL(imgUrl);
+      }
+    } catch {
+      return null;
+    }
+  };
 
-*ఓటరు పేరు:* ${voter.n}
-*సంబంధీకుడు:* ${voter.r}
-*EPIC ID:* ${voter.id}
-*క్రమ సంఖ్య (S.No):* #${voter.s}
-*పోలింగ్ బూత్:* Part #${boothInfo.part_no} - ${boothInfo.clean_village}
-*ఇంటి నెంబర్:* ${voter.hn}
-*వయస్సు / లింగం:* ${voter.a} Yrs / ${voter.g === 'M' ? 'Male' : 'Female'}
-*పోలింగ్ కేంద్రం:* ${psLocation}
+  const handleCopyCardImage = async () => {
+    try {
+      const pngBlob = await fetchCardPngBlob();
+      if (pngBlob && navigator?.clipboard && typeof ClipboardItem !== 'undefined') {
+        await navigator.clipboard.write([new ClipboardItem({ 'image/png': pngBlob })]);
+        setCopiedCardImg(true);
+        setTimeout(() => setCopiedCardImg(false), 2000);
+      }
+    } catch (err) {
+      console.error('Failed to copy card image:', err);
+    }
+  };
 
-_దయచేసి మీ ఓటు హక్కును వినియోగించుకోండి! ప్రతి ఓటూ అమూల్యం._ 🗳️`;
-
-    const url = `https://wa.me/?text=${encodeURIComponent(text)}`;
-    window.open(url, '_blank');
+  const handleShareCardAndText = async () => {
+    setIsSharingCard(true);
+    try {
+      const text = buildWhatsAppSlipMessage(voter, boothInfo);
+      const pngBlob = await fetchCardPngBlob();
+      if (pngBlob && navigator.share) {
+        const file = new File([pngBlob], `voter_card_${voter.s}.png`, { type: 'image/png' });
+        if (navigator.canShare && navigator.canShare({ files: [file] })) {
+          await navigator.share({
+            files: [file],
+            text,
+            title: `Voter Slip #${voter.s}`,
+          });
+          return;
+        }
+      }
+      // Fallback: copy card image if possible and open WhatsApp with text
+      if (pngBlob && navigator?.clipboard && typeof ClipboardItem !== 'undefined') {
+        try {
+          await navigator.clipboard.write([new ClipboardItem({ 'image/png': pngBlob })]);
+        } catch {}
+      }
+      openWhatsAppSlip(voter, boothInfo);
+    } catch (err) {
+      if ((err as any)?.name !== 'AbortError') {
+        openWhatsAppSlip(voter, boothInfo);
+      }
+    } finally {
+      setIsSharingCard(false);
+    }
   };
 
   return (
     <div 
-      className="fixed inset-0 z-[200] bg-black/85 backdrop-blur-sm flex items-end sm:items-center justify-center p-3 animate-in fade-in duration-150"
+      className="voter-slip-print-overlay fixed inset-0 z-[200] bg-black/85 backdrop-blur-sm flex items-end sm:items-center justify-center p-3 animate-in fade-in duration-150"
       onClick={(e) => {
         if (e.target === e.currentTarget) onClose();
       }}
     >
       <div 
-        className="bg-slate-900 border border-amber-500/40 rounded-3xl max-w-sm w-full p-5 space-y-4 shadow-2xl relative max-h-[95vh] overflow-y-auto"
+        className="voter-slip-print-card bg-slate-900 border border-amber-500/40 rounded-3xl max-w-sm w-full p-5 space-y-4 shadow-2xl relative max-h-[95vh] overflow-y-auto"
         onClick={(e) => e.stopPropagation()}
       >
         <button
           onClick={onClose}
-          className="absolute top-4 right-4 text-slate-400 hover:text-white bg-slate-800 p-1.5 rounded-full"
+          className="no-print absolute top-4 right-4 text-slate-400 hover:text-white bg-slate-800 p-1.5 rounded-full"
         >
           <X className="w-4 h-4" />
         </button>
@@ -255,23 +316,69 @@ _దయచేసి మీ ఓటు హక్కును వినియోగ
         </div>
 
         {/* Actions */}
-        <div className="grid grid-cols-2 gap-2 pt-1">
+        <div className="no-print space-y-2 pt-1">
+          <div className="grid grid-cols-3 gap-2">
+            <button
+              onClick={handleShareWhatsApp}
+              className="w-full py-2.5 bg-emerald-600 hover:bg-emerald-500 text-white rounded-xl text-xs font-bold flex items-center justify-center gap-1 shadow-md shadow-emerald-950/40 cursor-pointer"
+            >
+              <Share2 className="w-3.5 h-3.5" />
+              WhatsApp
+            </button>
+            <button
+              type="button"
+              onClick={handleCopySlipText}
+              className="w-full py-2.5 bg-slate-800 hover:bg-slate-700 text-emerald-300 rounded-xl text-xs font-bold flex items-center justify-center gap-1 border border-emerald-500/40 cursor-pointer"
+            >
+              {copiedSlipText ? <CheckCircle2 className="w-3.5 h-3.5 text-emerald-400" /> : <Copy className="w-3.5 h-3.5" />}
+              {copiedSlipText ? 'Copied!' : 'Copy Text'}
+            </button>
+            <button
+              onClick={() => window.print()}
+              className="w-full py-2.5 bg-slate-800 hover:bg-slate-700 text-slate-200 rounded-xl text-xs font-bold flex items-center justify-center gap-1 border border-slate-700 cursor-pointer"
+            >
+              <Printer className="w-3.5 h-3.5 text-amber-400" />
+              Print
+            </button>
+          </div>
+          {(voter.card_url || voter.card) && (
+            <div className="grid grid-cols-2 gap-2">
+              <button
+                type="button"
+                onClick={handleShareCardAndText}
+                disabled={isSharingCard}
+                className="w-full py-2 bg-emerald-900/70 hover:bg-emerald-800/80 text-emerald-200 border border-emerald-500/40 rounded-xl text-[11px] font-bold flex items-center justify-center gap-1.5 cursor-pointer disabled:opacity-60"
+              >
+                <ImageIcon className="w-3.5 h-3.5 text-emerald-400" />
+                <span>{isSharingCard ? 'Preparing...' : 'Share Card + Text'}</span>
+              </button>
+              <button
+                type="button"
+                onClick={handleCopyCardImage}
+                className="w-full py-2 bg-slate-800 hover:bg-slate-700 text-amber-300 border border-slate-700 rounded-xl text-[11px] font-bold flex items-center justify-center gap-1.5 cursor-pointer"
+              >
+                {copiedCardImg ? <CheckCircle2 className="w-3.5 h-3.5 text-emerald-400" /> : <Copy className="w-3.5 h-3.5" />}
+                <span>{copiedCardImg ? 'Card Copied!' : 'Copy Card Image'}</span>
+              </button>
+            </div>
+          )}
           <button
-            onClick={handleShareWhatsApp}
-            className="w-full py-2.5 bg-emerald-600 hover:bg-emerald-500 text-white rounded-xl text-xs font-bold flex items-center justify-center gap-1.5 shadow-md shadow-emerald-950/40"
+            type="button"
+            onClick={() => setShowSlipConfig(true)}
+            className="w-full py-2 bg-amber-500/15 hover:bg-amber-500/25 text-amber-300 border border-amber-500/40 rounded-xl text-[11px] font-bold flex items-center justify-center gap-1.5 cursor-pointer"
           >
-            <Share2 className="w-3.5 h-3.5" />
-            Share WhatsApp
-          </button>
-          <button
-            onClick={() => window.print()}
-            className="w-full py-2.5 bg-slate-800 hover:bg-slate-700 text-slate-200 rounded-xl text-xs font-bold flex items-center justify-center gap-1.5 border border-slate-700"
-          >
-            <Printer className="w-3.5 h-3.5 text-amber-400" />
-            Print Slip
+            <Settings className="w-3.5 h-3.5" />
+            <span>వార్డ్ అభ్యర్థి & టెంప్లేట్ సెట్టింగ్స్ (Configure Slip)</span>
           </button>
         </div>
       </div>
+
+      <SlipConfigModal
+        isOpen={showSlipConfig}
+        onClose={() => setShowSlipConfig(false)}
+        boothInfo={boothInfo}
+        sampleVoter={voter}
+      />
     </div>
   );
 };

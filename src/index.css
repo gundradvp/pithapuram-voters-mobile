@@ -536,9 +536,37 @@ body {
     display: none !important;
   }
 
-  /* When printing with GroupPrintModal open, hide ALL other siblings */
-  body > #root > div > *:not(.group-print-modal-overlay) {
+  /* When printing with GroupPrintModal or VoterSlipModal open, hide ALL other siblings */
+  body > #root > div > *:not(.group-print-modal-overlay):not(.voter-slip-print-overlay) {
     display: none !important;
+  }
+
+  .voter-slip-print-overlay {
+    position: static !important;
+    inset: auto !important;
+    display: flex !important;
+    align-items: flex-start !important;
+    justify-content: center !important;
+    width: 100% !important;
+    height: auto !important;
+    padding: 10mm !important;
+    background: #ffffff !important;
+    backdrop-filter: none !important;
+  }
+
+  .voter-slip-print-card {
+    max-height: none !important;
+    overflow: visible !important;
+    background: #ffffff !important;
+    color: #000000 !important;
+    border: 1.5px solid #000000 !important;
+    box-shadow: none !important;
+  }
+
+  .voter-slip-print-card * {
+    color: #000000 !important;
+    background: transparent !important;
+    border-color: #cbd5e1 !important;
   }
 
   /* Reset modal overlay */
