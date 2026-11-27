@@ -1246,9 +1246,9 @@ _దయచేసి మీ ఓటు హక్కును వినియోగ
       
       {/* Search Input & View Mode Controls */}
       <div className="sticky top-[51px] z-30 bg-slate-950/95 backdrop-blur-md pt-2 pb-1 space-y-2">
-        <div className="flex items-center gap-1.5">
-          <div className="relative flex-1">
-            <Search className="w-4 h-4 absolute left-3 top-3 text-slate-400" />
+        <div className="flex flex-col gap-2">
+          <div className="relative w-full">
+            <Search className="w-4 h-4 absolute left-3 top-1/2 -translate-y-1/2 text-slate-400" />
             <input
               type="text"
               value={searchQuery}
@@ -1257,7 +1257,7 @@ _దయచేసి మీ ఓటు హక్కును వినియోగ
                 setVisibleCount(INITIAL_VISIBLE_COUNT);
               }}
               placeholder={isVoiceListening ? (language === 'te' ? '🎙️ వింటున్నాము... మాట్లాడండి...' : '🎙️ Listening...') : (language === 'te' ? 'పేరు, ఇంటిపేరు (శబ్దోచ్ఛారణ), ఫోన్, ID...' : t.searchPlaceholder)}
-              className={`w-full bg-slate-900 border ${isVoiceListening ? 'border-red-500 ring-2 ring-red-500/30' : 'border-slate-800'} rounded-xl pl-9 pr-16 py-2 text-xs text-white placeholder-slate-500 focus:outline-none focus:border-amber-400 shadow-md transition-all`}
+              className={`w-full bg-slate-900 border ${isVoiceListening ? 'border-red-500 ring-2 ring-red-500/30' : 'border-slate-800'} rounded-xl pl-9 pr-16 py-2.5 text-sm text-white placeholder-slate-500 focus:outline-none focus:border-amber-400 shadow-md transition-all`}
             />
             <div className="absolute right-2 top-1/2 -translate-y-1/2 flex items-center gap-1">
               {searchQuery && (
@@ -1293,6 +1293,7 @@ _దయచేసి మీ ఓటు హక్కును వినియోగ
             </div>
           </div>
 
+          <div className="flex items-center justify-between gap-1.5 w-full overflow-x-auto no-scrollbar">
           {/* Phonetic Search Toggle */}
           <button
             onClick={() => setIsPhoneticEnabled(!isPhoneticEnabled)}
@@ -1454,6 +1455,7 @@ _దయచేసి మీ ఓటు హక్కును వినియోగ
               <Table className="w-3.5 h-3.5 text-emerald-400" />
               <span className="font-black">{language === 'te' ? '📊 ఎక్సెల్' : '📊 Excel'}</span>
             </button>
+          </div>
           </div>
         </div>
 
